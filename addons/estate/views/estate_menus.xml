@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="estate_property_menu_root" name="491资产管理">
+        <menuitem id="estate_property_first_level_menu_renting" name="491园区招租">
+            <menuitem id="estate_property_menu_action_renting" action="491_real_estate_action"/>
+        </menuitem>
+        <menuitem id="estate_property_first_level_menu_setting" name="设置">
+            <menuitem id="estate_property_menu_setting_property_type" action="real_estate_action_property_type"/>
+            <menuitem id="estate_property_menu_setting_property_tag" action="real_estate_action_property_tag"/>
+        </menuitem>
+    </menuitem>
+</odoo>

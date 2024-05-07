@@ -1,0 +1,34 @@
+<record id="footer" model="ir.ui.view">
+   <field name="name">Airproof Footer</field>
+   <field name="type">qweb</field>
+   <field name="key">website_airproof.footer</field>
+   <field name="inherit_id" ref="website.layout"/>
+   <field name="mode">extension</field>
+   <field name="arch" type="xml">
+      <xpath expr="//div[@id='footer']" position="replace">
+         <div id="footer" class="oe_structure oe_structure_solo" t-ignore="true" t-if="not no_footer">
+            <!-- Content -->
+         </div>
+      </xpath>
+   </field>
+
+   <template id="copyright" inherit_id="website.layout">
+      <xpath expr="//div[hasclass('o_footer_copyright')]" position="replace">
+         <div class="o_footer_copyright" data-name="Copyright">
+            <!-- Content -->
+         </div>
+      </xpath>
+   </template>
+   <template id="oe_structure_layout_01" inherit_id="..." name="...">
+      <xpath expr="//*[@id='oe_structure_layout_01']" position="replace">
+         <div id="oe_structure_layout_01" class="oe_structure oe_structure_solo">
+            <!-- Content -->
+         </div>
+      </xpath>
+   </template>
+   <template id="s_mega_menu_airproof" name="Airproof" groups="base.group_user">
+      <section class="s_mega_menu_airproof o_cc o_cc1 pt40">
+         <!-- Content -->
+      </section>
+   </template>
+</record>

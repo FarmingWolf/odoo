@@ -1,0 +1,7 @@
+<record id="img_about_01" model="ir.attachment">
+    <field name="name">About Image 01</field>
+    <field name="datas" type="base64" file="website_airproof/static/src/img/content/img_about_01.jpg"/>
+    <field name="res_model">ir.ui.view</field>
+    <field name="public" eval="True"/>
+    <section style="background-image: url('/web/image/website_airproof.img_about_01');">
+</record>

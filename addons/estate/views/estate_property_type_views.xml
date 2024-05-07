@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="real_estate_action_property_type" model="ir.actions.act_window">
+        <field name="name">资产类型设置</field>
+        <field name="res_model">estate.property.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                这句话来自estate_property_type_views.xml
+            </p>
+            <p>
+                这里可以展示一些文本信息。
+            </p>
+        </field>
+    </record>
+
+    <record id="real_estate_property_type_view_tree" model="ir.ui.view">
+        <field name="name">real.estate.property.type.tree</field>
+        <field name="model">estate.property.type</field>
+        <field name="arch" type="xml">
+            <tree string="property_type_tree">
+                <field name="name" string="资产类型"/>
+                <field name="offer_ids" string="报价记录"/>
+                <field name="offer_count" string="报价条数"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="real_estate_property_type_view_form" model="ir.ui.view">
+        <field name="name">real.estate.property.type.form</field>
+        <field name="model">estate.property.type</field>
+        <field name="arch" type="xml">
+            <form string="RealEstatePropertyType" create="True" edit="True" duplicate="True" delete="True">
+
+                <sheet>
+                    <field name="name" class="o_estate_property_form_title_large_font" default_focus="True"/>
+
+                    <field name="offer_count" invisible="1"/>
+                    <button name="action_toggle_show_offer" icon="fa-eye"
+                                    type="object"
+                                    class="oe_stat_button"
+                                    invisible="offer_count==0"
+                                    title="显示报价"/>
+
+                    <group>
+                        <field name="name" string="资产类型"/>
+                    </group>
+                    <notebook>
+                        <page string="资产条目">
+                            <field name="property_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="expected_price"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

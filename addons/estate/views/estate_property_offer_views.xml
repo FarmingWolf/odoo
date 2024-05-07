@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="real_estate_property_offer_view_tree" model="ir.ui.view">
+        <field name="name">real.estate.property.offer.tree</field>
+        <field name="model">estate.property.offer</field>
+        <field name="arch" type="xml">
+            <tree string="property_offer_tree">
+                <field name="price" string="报价"/>
+                <field name="status" string="状态"/>
+                <field name="partner_id" string="报价人"/>
+                <field name="date_deadline" string="报价有效期至"/>
+                <field name="validity" string="报价有效期天数"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="real_estate_property_offer_view_form" model="ir.ui.view">
+        <field name="name">real.estate.property.offer.form</field>
+        <field name="model">estate.property.offer</field>
+        <field name="arch" type="xml">
+            <form string="RealEstatePropertyOffer" create="True" edit="True" duplicate="True" delete="True">
+                <sheet>
+                    <group>
+                        <field name="property_id" string="资产对象" readonly="True" options="{'no_open': True}"/>
+                        <field name="property_type_id" string="资产类别" readonly="True" options="{'no_open': True}"/>
+                        <field name="price"  string="报价"/>
+                        <field name="status" string="状态"/>
+                        <field name="partner_id" string="报价人"/>
+                        <field name="date_deadline"/>
+                        <field name="validity"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

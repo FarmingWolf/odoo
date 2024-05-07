@@ -1,0 +1,23 @@
+<record id="website.template_header_contact" model="ir.ui.view">
+    <field name="active" eval="True"/>
+    <field name="header_overlay" eval="True"/>
+</record>
+
+<template id="template_header_opt" inherit_id="website.snippet_options" name="Header Template - Option">
+   <xpath expr="//we-select[@data-variable='header-template']" position="inside">
+      <we-button title="airproof"
+         data-customize-website-views="website_airproof.header"
+         data-customize-website-variable="'airproof'"
+         data-img="/website_airproof/static/src/img/wbuilder/template_header_opt.svg"/>
+   </xpath>
+</template>
+
+<template id="snippet_options" inherit_id="website.snippet_options" name="Airproof - Mega Menu Options">
+    <xpath expr="//*[@data-name='mega_menu_template_opt']/*" position="before">
+        <t t-set="_label">Airproof</t>
+        <we-button t-att-data-select-label="_label"
+            data-select-template="website_website_airproof.s_mega_menu_airproof"
+            data-img="/website_airproof/static/src/img/builder/header_opt.svg"
+            t-out="_label"/>
+    </xpath>
+</template>

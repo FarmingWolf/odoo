@@ -1,0 +1,3 @@
+<record id="website.homepage" model="ir.ui.view">
+    <field name="active" eval="False"/>
+</record>

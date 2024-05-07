@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="491_real_estate_action" model="ir.actions.act_window">
+        <field name="name">491资产管理</field>
+        <field name="res_model">estate.property</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                这句话来自estate_property_views.xml
+            </p>
+            <p>
+                这里可以展示一些文本信息。
+            </p>
+        </field>
+    </record>
+
+    <record id="491_real_estate_view_tree" model="ir.ui.view">
+        <field name="name">491.real.estate.property.tree</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <tree string="properties_tree" decoration-success="state=='sold'" decoration-warning="state=='canceled'">
+                <field name="name" string="资产名称"/>
+                <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}" />
+                <field name="state"/>
+                <field name="property_type_id" string="资产类型"/>
+                <field name="total_area"/>
+                <field name="floor"/>
+                <field name="bedrooms" string="卧室"/>
+                <field name="living_area" string="客厅（㎡）"/>
+                <field name="expected_price" string="期待价格"/>
+                <field name="selling_price" string="实际价格"/>
+                <field name="date_availability" string="上架日期"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="491_real_estate_view_form" model="ir.ui.view">
+        <field name="name">491.real.estate.property.form</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <form string="RealEstateProperty" create="True" edit="True" duplicate="True" delete="True">
+                <header>
+                    <button name="action_cancel_property" type="object" string="取消"></button>
+                    <button name="action_sold_property" type="object" string="标志为已售出"></button>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <field name="name" class="o_estate_property_form_title_large_font" default_focus="True"/>
+                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
+                    <group>
+                        <group>
+<!--                            <field name="state" readonly="True"/>-->
+                            <field name="property_type_id" options="{'no_create': true, 'no_open': true}"/>
+                            <field name="total_area"/>
+                            <field name="date_availability" string="上架日期"/>
+                        </group>
+                        <group>
+                            <field name="expected_price" string="期待价格"/>
+                            <field name="selling_price" string="实际价格"/>
+                            <field name="best_price"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="详细信息">
+                            <group>
+                                <field name="description" string="简介"/>
+                                <field name="floor" string="楼层"/>
+                                <field name="bedrooms" string="房间数"/>
+                                <field name="living_area" string="套内面积"/>
+                                <field name="facades" string="朝向"/>
+                                <field name="garage" string="车库"/>
+                                <field name="garden" string="花园"/>
+                                <field name="garden_area" string="花园面积（㎡）" invisible="not garden"/>
+                                <field name="garden_orientation" string="花园朝向" invisible="not garden"/>
+                                <field name="total_area"/>
+                            </group>
+                        </page>
+                        <page string="报价信息">
+                            <field name="offer_ids" readonly="state in ('sold', 'canceled')">
+                                <tree decoration-success="status=='accepted'"
+                                      decoration-danger="status=='refused'">
+                                    <field name="price" string="报价"/>
+                                    <field name="partner_id" string="报价人"/>
+                                    <field name="date_deadline"/>
+                                    <button name="action_accept" states="draft" type="object" string="接受"
+                                            icon="fa-check" invisible="status in ('accepted', 'refused')"/>
+                                    <button name="action_refuse" states="draft" type="object" string="拒绝"
+                                            icon="fa-check" invisible="status in ('accepted', 'refused')"/>
+                                    <field name="status" string="状态"/>
+                                    <field name="validity"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="其他信息">
+                            <group>
+                                <field name="sales_person_id"/>
+                                <field name="buyer_id"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="491_real_estate_view_search" model="ir.ui.view">
+        <field name="name">491.real.estate.property.search</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <search string="资产检索">
+                <filter name="active" string="数据可用" domain="[('active','=','true')]" />
+                <separator/>
+                <field name="total_area" string="套内面积" filter_domain="[('living_area', '>=', self)]"/>
+                <separator/>
+            </search>
+        </field>
+    </record>
+</odoo>

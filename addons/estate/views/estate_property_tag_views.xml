@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="real_estate_action_property_tag" model="ir.actions.act_window">
+        <field name="name">资产标签设置</field>
+        <field name="res_model">estate.property.tag</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                这句话来自estate_property_tag_views.xml
+            </p>
+            <p>
+                这里可以展示一些文本信息。
+            </p>
+        </field>
+    </record>
+
+    <record id="real_estate_property_tag_view_tree" model="ir.ui.view">
+        <field name="name">real.estate.property.tag.tree</field>
+        <field name="model">estate.property.tag</field>
+        <field name="arch" type="xml">
+            <tree string="property_tag_tree">
+                <field name="name" string="资产标签"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="real_estate_property_tag_view_form" model="ir.ui.view">
+        <field name="name">real.estate.property.tag.form</field>
+        <field name="model">estate.property.tag</field>
+        <field name="arch" type="xml">
+            <form string="RealEstatePropertyTag" create="True" edit="True" duplicate="True" delete="True">
+                <sheet>
+                    <field name="name" class="o_estate_property_form_title_large_font" default_focus="True"/>
+                    <group>
+                        <field name="name" string="资产标签"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
