@@ -27,6 +27,13 @@
         </field>
     </record>
 
+    <record id="action_toggle_show_offer" model="ir.actions.act_window">
+        <field name="name">切换报价记录</field>
+        <field name="res_model">estate.property.offer</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('property_type_id', '=', active_id)]</field>
+    </record>
+
     <record id="real_estate_property_type_view_form" model="ir.ui.view">
         <field name="name">real.estate.property.type.form</field>
         <field name="model">estate.property.type</field>
@@ -35,23 +42,22 @@
 
                 <sheet>
                     <field name="name" class="o_estate_property_form_title_large_font" default_focus="True"/>
+                    <button name="%(estate.action_toggle_show_offer)d" icon="fa-users" type="action"
+                            class="oe_stat_button" invisible="offer_count==0" title="显示报价">
+<!--                            class="oe_stat_button" invisible="offer_count==0" title="显示报价">-->
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">报价条数：</span>
+                            <field name="offer_count" class="o_stat_value"/>
+                        </div>
+                    </button>
 
-                    <field name="offer_count" invisible="1"/>
-                    <button name="action_toggle_show_offer" icon="fa-eye"
-                                    type="object"
-                                    class="oe_stat_button"
-                                    invisible="offer_count==0"
-                                    title="显示报价"/>
-
-                    <group>
-                        <field name="name" string="资产类型"/>
-                    </group>
                     <notebook>
                         <page string="资产条目">
                             <field name="property_ids">
                                 <tree>
                                     <field name="name"/>
                                     <field name="expected_price"/>
+                                    <field name="property_offer_count"/>
                                     <field name="state"/>
                                 </tree>
                             </field>
@@ -61,4 +67,5 @@
             </form>
         </field>
     </record>
+
 </odoo>

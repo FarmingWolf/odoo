@@ -66,6 +66,20 @@ class EstateProperty(models.Model):
         help="新上，收到报价，接受报价，已售出，已取消"
     )
 
+    property_offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价")
+    property_offer_count = fields.Integer(compute="_compute_property_offer_count", default=0, string="报价条数")
+
+    @api.depends("property_offer_ids")
+    def _compute_property_offer_count(self):
+        for record in self:
+            print(record.property_offer_ids)
+            record.property_offer_count = len(record.property_offer_ids)
+
+    active = fields.Boolean(default=True)
+    _sql_constraints = [
+        ('name', 'unique(name)', '资产类型不能重复')
+    ]
+
     _sql_constraints = [
         ('expected_price', 'CHECK(expected_price > 0)', '期待售价必须大于零'),
         ('selling_price', 'CHECK(selling_price > 0)', '实际售价必须大于零'),

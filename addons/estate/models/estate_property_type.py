@@ -31,3 +31,6 @@ class EstatePropertyType(models.Model):
     def action_toggle_show_offer(self):
         for record in self:
             pass
+
+    def _get_chinese_name(self):
+        return "报价条数"
