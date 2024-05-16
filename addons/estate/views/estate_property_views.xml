@@ -3,7 +3,7 @@
     <record id="491_real_estate_action" model="ir.actions.act_window">
         <field name="name">491资产管理</field>
         <field name="res_model">estate.property</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,kanban</field>
         <field name="context">{'search_default_active': True}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -116,4 +116,34 @@
             </search>
         </field>
     </record>
+
+    <record id="view_estate_property_kanban" model="ir.ui.view">
+        <field name="name">estate.property.kanban</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="property_type_id"
+                    edit="False"> <!-- 添加default_group_by属性以按type分组，readonly="1"禁止拖放 -->
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_card">
+                                <div class="o_kanban_record_title">
+                                    <field name="name"/>
+                                    <div t-if="record.state == 'new'">上新</div>
+                                    <field name="expected_price"/>
+                                    <div t-if="record.state === 'offer_received'">
+                                        <field name="best_price"/>
+                                    </div>
+                                    <div t-if="record.state == 'offer_accepted'">
+                                        <field name="selling_price"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
 </odoo>

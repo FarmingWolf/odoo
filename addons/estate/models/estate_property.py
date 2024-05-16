@@ -66,14 +66,14 @@ class EstateProperty(models.Model):
         help="新上，收到报价，接受报价，已售出，已取消"
     )
 
-    property_offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价")
+    # property_offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价")
     property_offer_count = fields.Integer(compute="_compute_property_offer_count", default=0, string="报价条数")
 
-    @api.depends("property_offer_ids")
+    @api.depends("offer_ids")
     def _compute_property_offer_count(self):
         for record in self:
-            print(record.property_offer_ids)
-            record.property_offer_count = len(record.property_offer_ids)
+            print(record.offer_ids)
+            record.property_offer_count = len(record.offer_ids)
 
     active = fields.Boolean(default=True)
     _sql_constraints = [
@@ -100,6 +100,7 @@ class EstateProperty(models.Model):
             record.state = 'canceled'
 
     def action_sold_property(self):
+        print("action_sold_property called")
         for record in self:
             if record.state == 'canceled':
                 raise UserError(_('该记录已经被取消，不能再被设置为已售出'))
@@ -128,3 +129,23 @@ class EstateProperty(models.Model):
             if float_compare(record.selling_price, record.expected_price * 0.9, 2) <= 0:
                 raise ValidationError("实际售价不能低于期待售价的90%。实际售价=[{0}]；期待售价=[{1}]；期待售价的90%=[{1}*90%={2}]".
                                       format(record.selling_price, record.expected_price, record.expected_price * 0.9))
+
+    @api.model
+    def _get_state_label(self, state_value):
+        """辅助方法来获取state字段的显示值"""
+        # 通过字段的_get_selection方法获取这些对，然后返回对应value的label
+        selection = self.env['estate.property']._fields['state'].selection
+        for value, label in selection:
+            if value == state_value:
+                return label
+        return "Unknown State[{0}]".format(state_value)
+
+
+    @api.model
+    def ondelete(self):
+        for record in self:
+            if record.state not in ("new", "canceled"):
+                state_label = self._get_state_label(record.state)
+                raise UserError(_('[{0}]该条资产状态为【{1}】，不可被删除!'.format(record.name, state_label)))
+
+        return super().ondelete(self)

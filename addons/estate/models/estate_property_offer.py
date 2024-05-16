@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from datetime import timedelta, datetime
+from typing import Dict, List
 
 from odoo import fields, models, api
+from odoo import _
+from odoo.exceptions import ValidationError
 
 
 class EstatePropertyOffer(models.Model):
+
     _name = "estate.property.offer"
     _description = "报价"
     _order = "price desc"
@@ -47,11 +51,46 @@ class EstatePropertyOffer(models.Model):
     def action_accept(self):
         for record in self:
             record.status = 'accepted'
+            print("record.property_id.id=[{0}]".format(record.property_id.id))
+            self.env['estate.property'].browse(record.property_id.id).write({'state': 'offer_accepted'})
 
     def action_refuse(self):
         for record in self:
             record.status = 'refused'
 
-    def action_toggle_show_offer(self):
-        for record in self:
-            pass
+    # def action_toggle_show_offer(self):
+    #     for record in self:
+    #         pass
+
+    # def onchange(self, values: Dict, field_names: List[str], fields_spec: Dict):
+    #     return super(EstatePropertyOffer, self).onchange()
+
+    @api.model
+    def create(self, vals_list):
+        # 先检查一下这条offer的价格是否高于已经接受的offer
+        # property_id = self.env['estate.property.offer'].browse(vals_list['property_id'])
+        property_id = vals_list.get('property_id')
+        print("要对{0}添加报价".format(property_id))
+        # 确保property_id已提供
+        if not property_id:
+            raise ValueError(_("发生错误：创建报价时，未得到资产ID"))
+
+        # 查询同一property下的所有offer，找出最高价
+        highest_offer = self.search([
+            ('property_id', '=', property_id),
+            ('status', '=', 'accepted'),
+            ('id', '!=', False)  # 这里是为了排除当前正在创建的offer，避免自己与自己比较
+        ], order='price desc', limit=1)
+
+        # 如果找到报价且最高价高于新的offer_price，则抛出错误
+        if highest_offer and vals_list.get('price', 0) <= highest_offer.price:
+            raise ValidationError(_("新报价必须高于已接受的最高报价:[{0}]".format(highest_offer.price)))
+
+        # 如果检查通过，则正常创建报价
+        new_offer = super(EstatePropertyOffer, self).create(vals_list)
+
+        # 如果可接受，那就把property设置为state=offer_received
+        self.env['estate.property'].browse(vals_list['property_id']).write({'state': 'offer_received'})
+
+        return new_offer
+

@@ -4,6 +4,7 @@
 {
     'name': "资产管理",
     'depends': ['base'],
+    'summary': '资产租赁、合同管理等等',
     'category': '园区管理/资产管理',
     'website': 'https://www.odoo.com/app/realestate',
     'installable': True,
@@ -14,6 +15,7 @@
         'security/estate.property.type.csv',
         'security/estate.property.tag.csv',
 
+        'views/estate_property_sales_person_views.xml',
         'views/estate_property_type_views.xml',
         'views/estate_property_tag_views.xml',
         'views/estate_property_offer_views.xml',
