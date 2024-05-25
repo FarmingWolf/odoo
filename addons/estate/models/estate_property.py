@@ -126,7 +126,7 @@ class EstateProperty(models.Model):
     @api.constrains('selling_price')
     def _check_selling_price(self):
         for record in self:
-            if float_compare(record.selling_price, record.expected_price * 0.9, 2) <= 0:
+            if record.selling_price > 1 and float_compare(record.selling_price, record.expected_price * 0.9, 2) <= 0:
                 raise ValidationError("实际售价不能低于期待售价的90%。实际售价=[{0}]；期待售价=[{1}]；期待售价的90%=[{1}*90%={2}]".
                                       format(record.selling_price, record.expected_price, record.expected_price * 0.9))
 
