@@ -1,0 +1,2 @@
+id,name,model_id:id,domain_force
+property_salesperson_rule,Restrict Properties by Salesperson,model_estate_property,"['|',('sales_person_id','=',False),('sales_person_id','=',user.id)]"

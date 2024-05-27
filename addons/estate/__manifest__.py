@@ -11,6 +11,7 @@
     'application': True,
     'auto_install': False,
     'data': [
+        'security/ir.rule.csv',
         'security/security.xml',
         'security/ir.model.access.csv',
         'security/estate.property.type.csv',
