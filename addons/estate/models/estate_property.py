@@ -32,7 +32,13 @@ class EstateProperty(models.Model):
     expected_price = fields.Float("期望售价", default=0.0)
     selling_price = fields.Float("实际售价", copy=False)
     bedrooms = fields.Integer(default=0)
-    living_area = fields.Float(default=0.0)
+    building_area = fields.Float(default=0.0, string="建筑面积")
+    living_area = fields.Float(default=0.0, string="使用面积")
+    unit_building_area = fields.Float(default=0.0, string="套内建筑面积")
+    unit_living_area = fields.Float(default=0.0, string="套内使用面积")
+    share_area = fields.Float(default=0.0, string="公摊面积")
+    actual_living_area = fields.Float(default=0.0, string="实际使用面积")
+    rent_area = fields.Float(default=0.0, string="计租面积")
     facades = fields.Integer(default=0)
     garage = fields.Boolean(default=False)
     garden = fields.Boolean(default=False)
@@ -43,6 +49,8 @@ class EstateProperty(models.Model):
         help="点击下拉框选择花园朝向"
     )
     total_area = fields.Float(compute="_compute_total_area", string="总面积（㎡）", readonly=True)
+    current_contract_no = fields.Char('当前租赁合同编号', required=False)
+    color = fields.Integer()
 
     @api.depends("living_area", "garden_area")
     def _compute_total_area(self):

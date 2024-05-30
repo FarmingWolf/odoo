@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="estate_lease_contract_action" model="ir.actions.act_window">
+        <field name="name">资产租赁合同管理</field>
+        <field name="res_model">estate.lease.contract</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="context">{'search_default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                这里可以展示0些文本信息。
+            </p>
+            <p>
+                这里可以展示一些文本信息。
+            </p>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.tree</field>
+        <field name="model">estate.lease.contract</field>
+        <field name="arch" type="xml">
+            <tree string="contracts_tree"
+                  decoration-success="date_end &gt;= (context_today() + relativedelta(years=+1))"
+                  decoration-warning="date_end &lt;= (context_today() + relativedelta(days=+30))">
+                <field name="contract_no"/>
+                <field name="name"/>
+                <field name="contract_amount"/>
+                <field name="date_sign"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="date_rent_start"/>
+                <field name="date_decorate_start"/>
+                <field name="date_decorate_end"/>
+                <field name="contract_type_id"/>
+                <field name="property_ids" widget="many2many_tags" string="租赁场地" options="{'color_field': 'color'}" />
+                <field name="renter_id"/>
+                <field name="contact_id"/>
+                <field name="tag_ids" widget="many2many_tags" string="合同标签" options="{'color_field': 'color'}" />
+            </tree>
+        </field>
+    </record>
+</odoo>
