@@ -3,7 +3,7 @@
 
 {
     'name': "资产租赁合同管理",
-    'depends': ['base', 'web', 'estate'],
+    'depends': ['base', 'web', 'estate', 'parking'],
     'summary': '资产租赁合同管理',
     'category': '合同/资产租赁合同管理',
     'website': 'https://www.odoo.com/app/realestate',

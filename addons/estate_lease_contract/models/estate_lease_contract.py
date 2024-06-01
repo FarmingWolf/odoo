@@ -33,28 +33,38 @@ class EstateLeaseContract(models.Model):
     date_decorate_end = fields.Date("计划装修结束日期")
 
     contract_type_id = fields.Many2one("estate.lease.contract.type", string="合同类型")
-    tag_ids = fields.Many2many("estate.lease.contract.tag")
+    tag_ids = fields.Many2many("estate.lease.contract.tag", string='合同标签')
 
-    rent_account_name = fields.Char('租金收缴账户名', required=True, translate=True)
-    rent_account_bank = fields.Char('租金收缴账户银行', required=True, translate=True)
-    rent_account_no = fields.Char('租金收缴账号', required=True, translate=True)
+    rent_account = fields.Many2one("estate.lease.contract.bank.account", string='租金收缴账户')
+    # rent_account_name = fields.Char('租金收缴账户名', required=True, translate=True)
+    # rent_account_bank = fields.Char('租金收缴账户银行', required=True, translate=True)
+    # rent_account_no = fields.Char('租金收缴账号', required=True, translate=True)
 
-    property_management_fee_account_name = fields.Char('物业费收缴账户名', required=True, translate=True)
-    property_management_fee_bank = fields.Char('物业费收缴账户银行', required=True, translate=True)
-    property_management_fee_account_no = fields.Char('物业费收缴账号', required=True, translate=True)
+    rental_plan_id = fields.Many2one("estate.lease.contract.rental.plan", string="租金方案")
 
-    electricity_account_name = fields.Char('电费收缴账户名', required=True, translate=True)
-    electricity_bank = fields.Char('电费收缴账户银行', required=True, translate=True)
-    electricity_account_no = fields.Char('电费收缴账号', required=True, translate=True)
+    property_management_fee_account = fields.Many2one("estate.lease.contract.bank.account", string='物业费收缴账户名')
+    # property_management_fee_account_name = fields.Char('物业费收缴账户名', required=True, translate=True)
+    # property_management_fee_bank = fields.Char('物业费收缴账户银行', required=True, translate=True)
+    # property_management_fee_account_no = fields.Char('物业费收缴账号', required=True, translate=True)
 
-    water_bill_account_name = fields.Char('水费收缴账户名', required=True, translate=True)
-    water_bill_bank = fields.Char('水费收缴账户银行', required=True, translate=True)
-    water_bill_account_no = fields.Char('水费收缴账号', required=True, translate=True)
+    electricity_account = fields.Many2one("estate.lease.contract.bank.account", string='电费收缴账户名')
+    # electricity_account_name = fields.Char('电费收缴账户名', required=True, translate=True)
+    # electricity_bank = fields.Char('电费收缴账户银行', required=True, translate=True)
+    # electricity_account_no = fields.Char('电费收缴账号', required=True, translate=True)
+
+    water_bill_account = fields.Many2one("estate.lease.contract.bank.account", string='水费收缴账户名')
+    # water_bill_account_name = fields.Char('水费收缴账户名', required=True, translate=True)
+    # water_bill_bank = fields.Char('水费收缴账户银行', required=True, translate=True)
+    # water_bill_account_no = fields.Char('水费收缴账号', required=True, translate=True)
+
+    parking_fee_account = fields.Many2one("estate.lease.contract.bank.account", string='停车费收缴账户名')
+
+    parking_space_ids = fields.Many2many('parking.space', 'contract_parking_space_rel', 'contract_id',
+                                         'parking_space_id',
+                                         string='停车位')
 
     invoicing_address = fields.Char('发票邮寄地址', required=True, translate=True)
     invoicing_email = fields.Char('电子发票邮箱', required=True, translate=True)
-
-    rental_plan_id = fields.Many2one("estate.lease.contract.rental.plan", string="租金方案")
 
     sales_person_id = fields.Many2one('res.users', string='招商员', index=True, default=lambda self: self.env.user)
     opt_person_id = fields.Many2one('res.users', string='录入员', index=True, default=lambda self: self.env.user)
@@ -66,3 +76,4 @@ class EstateLeaseContract(models.Model):
                                     string='租赁场地')
 
     description = fields.Text("详细信息")
+

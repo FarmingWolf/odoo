@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="parking_menu_root" name="停车位管理">
+        <menuitem id="parking_first_level_menu_list" name="园区和停车场">
+            <menuitem id="parking_menu_action" action="parking_action"/>
+        </menuitem>
+        <menuitem id="parking_menu_settings" name="车场与车位">
+            <menuitem id="parking_lot_menu" action="parking_lot_action"/>
+            <menuitem id="parking_space_menu" action="parking_space_action"/>
+        </menuitem>
+    </menuitem>
+</odoo>

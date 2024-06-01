@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_park_base,access.park.base,model_park,base.group_user,1,0,0,0
+access_parking_lot_base,access.parking.lot.base,model_parking_lot,base.group_user,1,0,0,0
+access_parking_space_base,access.parking.space.base,model_parking_space,base.group_user,1,0,0,0
+access_parking_space_type_base,access.parking.space.type.base,model_parking_space_type,base.group_user,1,0,0,0
+access_parking_read,access.parking.read,model_park,parking_group_user,1,0,0,0
+access_parking_lot_read,access.parking.lot.read,model_parking_lot,parking_group_user,1,0,0,0
+access_parking_space_read,access.parking.space.read,model_parking_space,parking_group_user,1,0,0,0
+access_parking_space_type_read,access.parking.space.type.read,model_parking_space_type,parking_group_user,1,0,0,0
+access_parking_node_link,access.estate.parking.node.link,model_park,parking_group_manager,1,1,1,1
+access_parking_space_type_manager,access.estate.parking.space.type.manager,model_parking_space_type,parking_group_manager,1,1,1,1
+access_parking_space_manager,access.estate.parking.space.manager,model_parking_space,parking_group_manager,1,1,1,1
+access_parking_lot_manager,access.estate.parking.lot.manager,model_parking_lot,parking_group_manager,1,1,1,1

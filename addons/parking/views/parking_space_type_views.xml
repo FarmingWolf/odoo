@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="parking_space_type_action" model="ir.actions.act_window">
+        <field name="name">车位类型</field>
+        <field name="res_model">parking.space.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                这里可以展示一些文本信息。
+            </p>
+            <p>
+                这里可以展示二些文本信息。
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -33,6 +33,7 @@
                 <field name="date_decorate_end"/>
                 <field name="contract_type_id"/>
                 <field name="property_ids" widget="many2many_tags" string="租赁场地" options="{'color_field': 'color'}" />
+                <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}" />
                 <field name="renter_id"/>
                 <field name="contact_id"/>
                 <field name="tag_ids" widget="many2many_tags" string="合同标签" options="{'color_field': 'color'}" />
