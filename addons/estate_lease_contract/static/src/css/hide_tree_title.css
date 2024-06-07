@@ -1,0 +1,3 @@
+.o_list_view .o_list_view_header .o_column_title:contains("not_display") {
+    display: none !important;
+}

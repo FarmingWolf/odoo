@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="estate_lease_contract_action_rental_plan" model="ir.actions.act_window">
+    <record id="estate_lease_contract_rental_plan_action" model="ir.actions.act_window">
         <field name="name">资产租赁合同租金方案设置</field>
         <field name="res_model">estate.lease.contract.rental.plan</field>
         <field name="view_mode">tree,form</field>
@@ -11,6 +11,102 @@
             <p>
                 这里可以展示二些文本信息。
             </p>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_rental_plan_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.rental.plan.tree</field>
+        <field name="model">estate.lease.contract.rental.plan</field>
+        <field name="arch" type="xml">
+            <tree string="estate_lease_contract_rental_plan_tree">
+                <field name="name"/>
+                <field name="business_method_id"/>
+                <field name="business_type_id"/>
+                <field name="main_category"/>
+                <field name="billing_method"/>
+                <field name="billing_progress_method_id"/>
+                <field name="sequence"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_rental_plan_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.rental.plan.form</field>
+        <field name="model">estate.lease.contract.rental.plan</field>
+        <field name="arch" type="xml">
+            <form string="estate_lease_contract_rental_plan_form">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="business_method_id"/>
+                            <field name="main_category"/>
+                            <field name="billing_method"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="business_type_id"/>
+                            <field name="payment_period"/>
+                            <field name="payment_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="租金计费详情：固定金额" invisible="billing_method != 'by_fixed_price'">
+                            <group>
+                                <field name="rent_price"/>
+                            </group>
+                        </page>
+                        <page string="租金计费详情：纯抽成" invisible="billing_method != 'by_percentage'">
+                            <group col="4">
+                                <field name="rent_price" string="起始单价（元/月/㎡）"/>
+                            </group>
+                            <group col="2">
+                                <group>
+                                    <field name="compensation_method"/>
+                                </group>
+                                <group>
+                                    <field name="compensation_period"/>
+                                </group>
+                            </group>
+                            <field name="turnover_percentage_id"/>
+                        </page>
+                        <page string="租金计费详情：按递增率"  invisible="billing_method != 'by_progress'">
+
+                            <group col="4">
+                                <field name="billing_progress_method_id"/>
+                            </group>
+
+                            <group string="按时间段递增" invisible="billing_progress_method_id != 'by_period'" col="2">
+                                <group>
+                                    <field name="rent_price" string="起始单价（元/月/㎡）"/>
+                                </group>
+                                <field name="period_percentage_id"/>
+                            </group>
+                            <group string="按营业额递增" invisible="billing_progress_method_id != 'by_turnover'" col="1">
+                                <group col="2">
+                                    <group>
+                                        <field name="compensation_method"/>
+                                    </group>
+                                    <group>
+                                        <field name="compensation_period"/>
+                                    </group>
+                                </group>
+                                <newline/>
+                                <field name="turnover_percentage_id"/>
+                            </group>
+
+
+                        </page>
+                        <page string="租金计费详情：保底抽成两者取高" invisible="billing_method != 'by_fixed_price_percentage_higher'">
+                            <group>
+                                <field name="rent_price" string="保底单价（元/月/㎡）"/>
+                            </group>
+                            <field name="turnover_percentage_id"/>
+                        </page>
+                    </notebook>
+
+                </sheet>
+            </form>
         </field>
     </record>
 </odoo>

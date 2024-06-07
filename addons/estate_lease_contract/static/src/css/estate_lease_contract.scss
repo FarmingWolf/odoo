@@ -1,3 +1,23 @@
 .o_estate_lease_contract_form_title_large_font {
     font-size: 24px !important; /* 根据需要调整字体大小 */
 }
+
+.custom-many2many-binary-style {
+    display: flex;
+    flex-wrap: nowrap; /* 防止换行 */
+    overflow-x: auto; /* 如果需要滚动条 */
+}
+
+/* 控制每个附件元素的样式，具体选择器根据实际情况调整 */
+.custom-many2many-binary-style .attachment-line {
+    margin-right: 10px; /* 根据需要调整间距 */
+}
+
+.o_list_view .o_list_view_header .o_column_title.hidden-title {
+    display: none !important;
+}
+
+.o_list_view .o_list_view_header .o_column_title.my-tree-header-class {
+    /* 自定义你的样式，比如模拟 Bootstrap 的 muted 效果 */
+    color: #6c757d !important; /* 这是 Bootstrap 中 muted 文字的颜色 */
+}

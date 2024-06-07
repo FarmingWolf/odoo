@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="estate_lease_contract_rental_turnover_percentage_action" model="ir.actions.act_window">
+        <field name="name">按营业额提成详细设置</field>
+        <field name="res_model">estate.lease.contract.rental.turnover.percentage</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                这里可以展示一些文本信息。
+            </p>
+            <p>
+                这里可以展示二些文本信息。
+            </p>
+        </field>
+    </record>
+    <record id="estate_lease_contract_rental_turnover_percentage_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.rental.turnover.percentage.tree</field>
+        <field name="model">estate.lease.contract.rental.turnover.percentage</field>
+        <field name="arch" type="xml">
+            <tree string="estate_lease_contract_rental_turnover_percentage_tree">
+                <field name="name"/>
+                <field name="turnover_type"/>
+                <field name="name_description"/>
+                <field name="sequence"/>
+            </tree>
+        </field>
+    </record>
+    <record id="estate_lease_contract_rental_turnover_percentage_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.rental.turnover.percentage.form</field>
+        <field name="model">estate.lease.contract.rental.turnover.percentage</field>
+        <field name="arch" type="xml">
+            <form string="estate_lease_contract_rental_turnover_percentage_form">
+                <group col="2">
+                    <group>
+                        <field name="name"/>
+                        <field name="turnover_type"/>
+                        <field name="percentage_from"/>
+                        <field name="turnover_from"/>
+                    </group>
+                    <group>
+                        <field name="sequence"/>
+                        <field name="percentage"/>
+                        <field name="percentage_to"/>
+                        <field name="turnover_to"/>
+                    </group>
+                </group>
+                <newline/>
+                <group>
+                    <field name="name_description"/>
+                </group>
+            </form>
+        </field>
+    </record>
+</odoo>

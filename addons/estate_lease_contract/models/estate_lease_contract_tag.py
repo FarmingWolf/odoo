@@ -12,6 +12,7 @@ class EstateLeaseContractTag(models.Model):
     name = fields.Char('资产租赁合同标签', required=True)
     color = fields.Integer()
     active = fields.Boolean(default=True)
+    sequence = fields.Integer('排序', default=1)
 
     _sql_constraints = [
         ('name', 'unique(name)', '合同标签不能重复')

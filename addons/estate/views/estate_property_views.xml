@@ -22,19 +22,17 @@
             <tree string="properties_tree" decoration-success="state=='sold'" decoration-warning="state=='canceled'">
                 <field name="name" string="资产名称"/>
                 <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}" />
-                <field name="state"/>
+                <field name="state" />
                 <field name="property_type_id" string="资产类型"/>
-                <field name="total_area"/>
                 <field name="floor"/>
-                <field name="bedrooms" string="卧室"/>
-                <field name="living_area" string="客厅（㎡）"/>
-                <field name="expected_price" string="期待价格"/>
-                <field name="selling_price" string="实际价格"/>
-                <field name="date_availability" string="上架日期"/>
+                <field name="building_area"/>
+                <field name="rent_area"/>
+                <field name="expected_price" string="期待价格（元/月/㎡）"/>
+                <field name="selling_price" string="实际价格（元/月/㎡）"/>
+                <field name="date_availability" string="交付日期"/>
             </tree>
         </field>
     </record>
-
     <record id="491_real_estate_view_form" model="ir.ui.view">
         <field name="name">491.real.estate.property.form</field>
         <field name="model">estate.property</field>
@@ -46,16 +44,20 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
-                    <field name="name" class="o_estate_property_form_title_large_font" default_focus="True"/>
+                    <group>
+                        <field name="name" class="o_estate_property_form_title_large_font" default_focus="True"/>
+                    </group>
                     <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
                     <group>
                         <group>
 <!--                            <field name="state" readonly="True"/>-->
                             <field name="property_type_id" options="{'no_create': true, 'no_open': true}"/>
                             <field name="total_area"/>
-                            <field name="date_availability" string="上架日期"/>
+                            <field name="building_area"/>
+                            <field name="rent_area"/>
                         </group>
                         <group>
+                            <field name="date_availability" string="上架日期"/>
                             <field name="expected_price" string="期待价格"/>
                             <field name="selling_price" string="实际价格"/>
                             <field name="best_price"/>

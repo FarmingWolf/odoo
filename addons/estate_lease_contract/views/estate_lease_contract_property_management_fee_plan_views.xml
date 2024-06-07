@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="estate_lease_contract_action_type" model="ir.actions.act_window">
-        <field name="name">资产租赁合同类型设置</field>
-        <field name="res_model">estate.lease.contract.type</field>
+    <record id="estate_lease_contract_property_management_fee_plan_action" model="ir.actions.act_window">
+        <field name="name">资产租赁合同物业费方案设置</field>
+        <field name="res_model">estate.lease.contract.property.management.fee.plan</field>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

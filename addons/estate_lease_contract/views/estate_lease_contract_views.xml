@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="estate_lease_contract_action" model="ir.actions.act_window">
-        <field name="name">资产租赁合同管理</field>
+        <field name="name">资产租赁合同</field>
         <field name="res_model">estate.lease.contract</field>
         <field name="view_mode">tree,form,kanban</field>
         <field name="context">{'search_default_active': True}</field>
@@ -15,29 +15,123 @@
         </field>
     </record>
 
+    <record id="491_real_estate_view_tree_custom" model="ir.ui.view">
+        <field name="name">491.real.estate.property.tree.custom</field>
+        <field name="model">estate.property</field>
+        <field name="inherit_id" ref="estate.491_real_estate_view_tree"></field>
+        <field name="arch" type="xml">
+            <tree position="replace" >
+                <tree string="child_tree" decoration-success="state=='sold'" decoration-warning="state=='canceled'">
+                    <field name="name" string="资产名称"/>
+                    <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}" />
+                    <field name="state" string="" invisible="1" width="0"/>
+                    <field name="property_type_id" string="资产类型"/>
+                    <field name="floor"/>
+                    <field name="building_area"/>
+                    <field name="rent_area"/>
+                    <field name="expected_price" string="期待价格（元/月/㎡）"/>
+                    <field name="selling_price" string="实际价格（元/月/㎡）"/>
+                    <field name="date_availability" string="交付日期"/>
+                </tree>
+            </tree>
+        </field>
+    </record>
+
     <record id="estate_lease_contract_view_tree" model="ir.ui.view">
         <field name="name">estate.lease.contract.tree</field>
         <field name="model">estate.lease.contract</field>
         <field name="arch" type="xml">
             <tree string="contracts_tree"
-                  decoration-success="date_end &gt;= (context_today() + relativedelta(years=+1))"
-                  decoration-warning="date_end &lt;= (context_today() + relativedelta(days=+30))">
+                  decoration-success="date_rent_end &gt;= (context_today() + relativedelta(years=+1))"
+                  decoration-warning="date_rent_end &lt;= (context_today() + relativedelta(days=+30))">
                 <field name="contract_no"/>
                 <field name="name"/>
-                <field name="contract_amount"/>
                 <field name="date_sign"/>
-                <field name="date_start"/>
-                <field name="date_end"/>
                 <field name="date_rent_start"/>
+                <field name="date_rent_end"/>
                 <field name="date_decorate_start"/>
                 <field name="date_decorate_end"/>
                 <field name="contract_type_id"/>
                 <field name="property_ids" widget="many2many_tags" string="租赁场地" options="{'color_field': 'color'}" />
                 <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}" />
                 <field name="renter_id"/>
-                <field name="contact_id"/>
-                <field name="tag_ids" widget="many2many_tags" string="合同标签" options="{'color_field': 'color'}" />
+                <field name="sales_person_id"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
             </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.form</field>
+        <field name="model">estate.lease.contract</field>
+        <field name="arch" type="xml">
+            <form string="estate_lease_contract_form">
+                <sheet>
+                    <group col="2">
+                        <group>
+                            <field name="name" />
+                            <field name="contract_no" />
+                            <field name="contract_type_id" />
+                            <field name="renter_id" />
+                            <field name="sales_person_id" />
+                            <field name="opt_person_id" />
+                            <field name="date_sign" />
+                            <field name="date_deliver" />
+                            <field name="deliver_condition" />
+                        </group>
+                        <group>
+                            <field name="date_rent_start" />
+                            <field name="date_rent_end" />
+                            <field name="days_rent_total" readonly="1"/>
+                            <field name="days_free" />
+                            <field name="date_decorate_start" />
+                            <field name="date_decorate_end" />
+                            <field name="days_decorate" readonly="1"/>
+                            <field name="opening_date" />
+                            <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="租赁标的">
+                            <group col="3">
+                                <group>
+                                    <field name="rent_count"></field>
+                                </group>
+                                <group>
+                                    <field name="building_area"></field>
+                                </group>
+                                <group>
+                                    <field name="rent_area"></field>
+                                </group>
+                            </group>
+                            <field name="property_ids" />
+                        </page>
+                        <page string="停车位">
+                            <group>
+                                    <field name="parking_space_count"></field>
+                            </group>
+                            <field name="parking_space_ids" />
+                        </page>
+                        <page string="租金方案">
+                            <field name="rental_plan_id" />
+                        </page>
+                        <page string="物业费方案">
+                            <field name="property_management_fee_plan_id" />
+                        </page>
+                        <page string="优惠方案">
+
+                        </page>
+                        <page string="收款账户">
+
+                        </page>
+                        <page string="附件">
+                            <field name="attachment_ids" widget="many2many_binary" options="{'no_create': True}"/>
+<!--                            <field name="attachment_ids" widget="custom_many2many_binary" options="{'no_create': True}"/>-->
+                        </page>
+                    </notebook>
+
+                </sheet>
+            </form>
         </field>
     </record>
 </odoo>

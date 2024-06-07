@@ -30,9 +30,8 @@
         <field name="arch" type="xml">
             <form string="estate_lease_contract_tag_form" create="True" edit="True" duplicate="True" delete="True">
                 <sheet>
-                    <field name="name" class="o_estate_lease_contract_form_title_large_font" default_focus="True"/>
                     <group>
-                        <field name="name" string="合同标签"/>
+                        <field name="name" class="o_estate_lease_contract_form_title_large_font" default_focus="True"/>
                     </group>
                 </sheet>
             </form>
