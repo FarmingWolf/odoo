@@ -3,7 +3,7 @@
 
 {
     'name': "资产管理",
-    'depends': ['base'],
+    'depends': ['base', 'web'],
     'summary': '资产租赁、合同管理等等',
     'category': 'Real Estate/Brokerage',
     'website': 'https://www.odoo.com/app/realestate',
@@ -11,8 +11,8 @@
     'application': True,
     'auto_install': False,
     'data': [
-        'security/ir.rule.csv',
         'security/security.xml',
+        # 'security/ir.rule.csv',
         'security/ir.model.access.csv',
         'security/estate.property.type.csv',
         'security/estate.property.tag.csv',
@@ -31,5 +31,6 @@
         'web.assets_backend': [
             'estate/static/src/css/estate_property.css',
         ],
-    }
+    },
+    'license': 'AGPL-3'
 }
