@@ -1,8 +1,9 @@
-odoo.define('estate_lease_contract.CustomMany2manyBinary', ['web.core', 'web.FieldMany2ManyBinary'], function (require) {
-    "use strict";
+/** @odoo-module */
 
-    var webcore = require('web.core');
-    const FieldMany2ManyBinary = require('web.FieldMany2ManyBinary');
+import { core } from "@web/core";
+import { FieldMany2ManyBinary } from "@web.FieldMany2ManyBinary";
+
+export function useClicker() {
 
     const CustomMany2ManyBinary = FieldMany2ManyBinary.extend({
         // 重写初始化方法来添加自定义行为
@@ -20,7 +21,7 @@ odoo.define('estate_lease_contract.CustomMany2manyBinary', ['web.core', 'web.Fie
         },
     });
 
-    webcore.field_registry.add('custom_many2many_binary', CustomMany2ManyBinary);
+    core.field_registry.add('custom_many2many_binary', CustomMany2ManyBinary);
 
     return CustomMany2ManyBinary;
-});
+}

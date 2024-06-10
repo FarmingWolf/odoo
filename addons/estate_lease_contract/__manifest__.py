@@ -6,7 +6,7 @@
     'version': '0.0.1',
     'depends': ['base', 'web', 'estate', 'parking'],
     'summary': '资产租赁合同管理',
-    'category': '合同/资产租赁合同管理',
+    'category': 'Real Estate/Lease Contract',
     'website': 'https://www.odoo.com/app/realestate',
     'installable': True,
     'application': True,
@@ -17,6 +17,7 @@
         'security/estate.lease.contract.rental.business.type.csv',
         'security/estate.lease.contract.rental.main.category.csv',
 
+        'views/estate_lease_contract_property_views.xml',
         'views/estate_lease_contract_tag_views.xml',
         'views/estate_lease_contract_rental_business_type_views.xml',
         'views/estate_lease_contract_rental_main_category_views.xml',
@@ -29,10 +30,11 @@
     ],
     'assets': {
         'web.assets_backend': [
-            # 'estate_lease_contract/static/src/js/custom_widgets.js',
-            # 'estate_lease_contract/static/src/js/hide_column_title.js',
-            'estate_lease_contract/static/src/css/hide_tree_title.css',
-            'estate_lease_contract/static/src/css/estate_lease_contract.scss',
+            # 'estate_lease_contract/static/src/**/*',
+            # 'estate_lease_contract/static/src/css/estate_lease_contract.scss',
+            # 'estate_lease_contract/static/src/js/estate_lease_contract_events.js',
+            'estate_lease_contract/static/src/js/estate_lease_contract_rental_plan_load.js',
         ],
-    }
+    },
+    'license': 'AGPL-3'
 }

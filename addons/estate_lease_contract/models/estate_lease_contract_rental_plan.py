@@ -8,10 +8,10 @@ class EstateLeaseContractRentalPlan(models.Model):
 
     _name = "estate.lease.contract.rental.plan"
     _description = "资产租赁合同租金方案"
-    _order = "sequence"
+    _order = "rent_target"
 
     name = fields.Char('资产租赁合同租金方案', required=True)
-    sequence = fields.Integer('排序', default=1)
+    rent_target = fields.Many2one("estate.property", string='对应标的')
     business_method_id = fields.Selection(string="经营性质",
                                           selection=[('direct_sale', '直营'), ('franchisee', '加盟'),
                                                      ('agent', '代理'), ('direct_and_agent', '直营+代理'),

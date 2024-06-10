@@ -15,5 +15,5 @@
     'data': [
 
     ],
-
+    'license': 'AGPL-3'
 }

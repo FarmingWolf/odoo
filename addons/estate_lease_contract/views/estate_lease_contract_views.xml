@@ -18,7 +18,7 @@
     <record id="491_real_estate_view_tree_custom" model="ir.ui.view">
         <field name="name">491.real.estate.property.tree.custom</field>
         <field name="model">estate.property</field>
-        <field name="inherit_id" ref="estate.491_real_estate_view_tree"></field>
+        <field name="inherit_id" ref="estate.491_real_estate_view_tree"/>
         <field name="arch" type="xml">
             <tree position="replace" >
                 <tree string="child_tree" decoration-success="state=='sold'" decoration-warning="state=='canceled'">

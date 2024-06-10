@@ -24,5 +24,6 @@
         'web.assets_backend': [
             'parking/static/src/css/parking.scss',
         ],
-    }
+    },
+    'license': 'AGPL-3'
 }
