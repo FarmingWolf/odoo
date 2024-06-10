@@ -67,16 +67,24 @@
                         <page string="详细信息">
                             <group>
                                 <field name="description" string="简介"/>
-                                <field name="floor" string="楼层"/>
-                                <field name="bedrooms" string="房间数"/>
-                                <field name="living_area" string="套内面积"/>
-                                <field name="facades" string="朝向"/>
-                                <field name="garage" string="车库"/>
-                                <field name="garden" string="花园"/>
-                                <field name="garden_area" string="花园面积（㎡）" invisible="not garden"/>
-                                <field name="garden_orientation" string="花园朝向" invisible="not garden"/>
-                                <field name="total_area"/>
                             </group>
+                            <newline/>
+                            <group>
+                                <group>
+                                    <field name="floor" string="楼层"/>
+                                    <field name="bedrooms" string="房间数"/>
+                                    <field name="living_area" string="套内面积"/>
+                                    <field name="facades" string="朝向"/>
+                                    <field name="total_area"/>
+                                </group>
+                                <group>
+                                    <field name="garage" string="车库"/>
+                                    <field name="garden" string="花园"/>
+                                    <field name="garden_area" string="花园面积（㎡）" invisible="not garden"/>
+                                    <field name="garden_orientation" string="花园朝向" invisible="not garden"/>
+                                </group>
+                            </group>
+
                         </page>
                         <page string="报价信息">
                             <field name="offer_ids" readonly="state in ('sold', 'canceled')">

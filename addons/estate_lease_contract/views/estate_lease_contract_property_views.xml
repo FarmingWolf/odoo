@@ -73,11 +73,10 @@
                                 </group>
                             </group>
                         </page>
-                    </xpath>
-                    <xpath expr="//notebook" position="inside">
                         <page string="物业费方案">
                             <group>
-                                <field name="management_fee_plan_id"/>
+                                <field name="management_fee_plan_id" string="选择物业费方案"/>
+                                <field name="management_fee_name_description"/>
                             </group>
                         </page>
                     </xpath>

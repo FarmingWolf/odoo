@@ -132,10 +132,11 @@ class EstateLeaseContract(models.Model):
                     record.building_area += rent_property.building_area
                     record.rent_area += rent_property.rent_area
 
-    rent_amount = fields.Float(default=0.0, string="总月租金（元）")
+    rent_amount = fields.Float(default=0.0, string="总月租金（元/月）")
     rent_amount_first_period = fields.Float(default=0.0, string="首期租金（元）")
     rent_first_period_from = fields.Date(string="首期租金期间（开始日）")
     rent_first_period_to = fields.Date(string="首期租金期间（结束日）")
+    rent_first_payment_date = fields.Date(string="首期租金缴纳日")
 
     business_discount_days = fields.Integer(default=0, string="经营优惠（天）")
     business_discount_amount = fields.Float(default=0.0, string="经营优惠（元）")

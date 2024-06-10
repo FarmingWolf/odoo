@@ -6,7 +6,6 @@ from odoo import fields, models, api
 
 
 class EstateLeaseContractPropertyExtend(models.Model):
-
     _description = "资产租赁合同租赁标的"
     _inherit = ['estate.property']
 
@@ -26,6 +25,30 @@ class EstateLeaseContractPropertyExtend(models.Model):
     billing_method_fixed_price_percentage_higher_invisible = \
         fields.Boolean(string="计费方式保底抽成取高组不可见",
                        compute="_compute_billing_method_group_invisible")
+
+    # 物业费信息
+    management_fee_name_description = fields.Char(string="方案描述", readonly=True,
+                                                  compute="_get_property_management_fee_info")
+
+    @api.onchange("rent_plan_id")
+    def _onchange_rent_plan_id(self):
+        self._compute_billing_method_group_invisible()
+        self._compute_billing_progress_method_group_invisible()
+        self._get_rent_plan_info()
+
+    @api.onchange("management_fee_plan_id")
+    def _onchange_management_fee_plan_id(self):
+        self._get_property_management_fee_info()
+
+    @api.depends("management_fee_plan_id")
+    def _get_property_management_fee_info(self):
+        print("_get_property_management_fee_info in")
+        for record in self:
+            if record.management_fee_plan_id:
+                record.management_fee_name_description = record.management_fee_plan_id.name_description
+            else:
+                record.management_fee_name_description = ""
+            print("record.management_fee_name_description={0}".format(record.management_fee_name_description))
 
     @api.depends("rent_plan_id")
     def _compute_billing_method_group_invisible(self):

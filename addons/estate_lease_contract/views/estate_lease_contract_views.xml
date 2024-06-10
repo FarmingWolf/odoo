@@ -78,6 +78,8 @@
                             <field name="date_sign" />
                             <field name="date_deliver" />
                             <field name="deliver_condition" />
+                            <field name="performance_guarantee" />
+                            <field name="rent_amount" />
                         </group>
                         <group>
                             <field name="date_rent_start" />
@@ -88,6 +90,8 @@
                             <field name="date_decorate_end" />
                             <field name="days_decorate" readonly="1"/>
                             <field name="opening_date" />
+                            <field name="rent_amount_first_period" />
+                            <field name="rent_first_payment_date" />
                             <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}"/>
                         </group>
                     </group>
