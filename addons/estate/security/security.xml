@@ -12,7 +12,7 @@
     </record>
 
     <record id="estate_property_read_rule" model="ir.rule">
-        <field name="name">不动产数据访问权限</field>
+        <field name="name">不动产数据读取权限</field>
         <field name="model_id" ref="model_estate_property"/>
         <field name="perm_read" eval="True"/>
         <field name="perm_create" eval="False"/>
@@ -27,7 +27,7 @@
     </record>
 
     <record id="estate_property_manage_rule" model="ir.rule">
-        <field name="name">不动产数据访问权限</field>
+        <field name="name">不动产数据管理权限</field>
         <field name="model_id" ref="model_estate_property"/>
         <field name="groups" eval="[Command.link(ref('estate_group_manager'))]"/>
     </record>

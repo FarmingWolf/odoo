@@ -123,7 +123,65 @@
                             <field name="property_management_fee_plan_id" />
                         </page>
                         <page string="优惠方案">
+                            <group>
+                                <field name="contract_incentives_ids" />
+                            </group>
+                            <sheet>
+                                <group>
+                                    <group>
+                                        <field name="name"/>
+                                        <field name="days_free"/>
+                                    </group>
+                                    <group>
+                                        <field name="date_incentives_start"/>
+                                        <field name="date_incentives_end"/>
+                                    </group>
 
+                                    <group string="经营优惠">
+                                        <group>
+                                            <field name="business_discount_days"/>
+                                        </group>
+                                        <group>
+                                            <field name="business_discount_amount"/>
+                                        </group>
+                                    </group>
+                                    <group string="装修优惠">
+                                        <group>
+                                            <field name="decoration_discount_days"/>
+                                        </group>
+                                        <group>
+                                            <field name="decoration_discount_amount"/>
+                                        </group>
+                                    </group>
+                                    <group string="扶持优惠">
+                                        <group>
+                                            <field name="support_discount_days"/>
+                                        </group>
+                                        <group>
+                                            <field name="support_discount_amount"/>
+                                        </group>
+                                    </group>
+                                    <group string="专项优惠">
+                                        <group>
+                                            <field name="special_discount_days"/>
+                                        </group>
+                                        <group>
+                                            <field name="special_discount_amount"/>
+                                        </group>
+                                    </group>
+                                    <group string="合计总优惠">
+                                        <group>
+                                            <field name="incentives_days_total"/>
+                                        </group>
+                                        <group>
+                                            <field name="incentives_amount_total"/>
+                                        </group>
+                                    </group>
+                                </group>
+                                <group>
+                                    <field name="contract_incentives_description"/>
+                                </group>
+                            </sheet>
                         </page>
                         <page string="收款账户">
 

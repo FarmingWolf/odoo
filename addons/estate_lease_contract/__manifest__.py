@@ -3,7 +3,7 @@
 
 {
     'name': "资产租赁合同管理",
-    'version': '0.0.1',
+    'version': '0.0.2',
     'depends': ['base', 'web', 'estate', 'parking'],
     'summary': '资产租赁合同管理',
     'category': 'Real Estate/Lease Contract',
@@ -17,6 +17,7 @@
         'security/estate.lease.contract.rental.business.type.csv',
         'security/estate.lease.contract.rental.main.category.csv',
 
+        'views/estate_lease_contract_incentives_views.xml',
         'views/estate_lease_contract_property_views.xml',
         'views/estate_lease_contract_tag_views.xml',
         'views/estate_lease_contract_rental_business_type_views.xml',

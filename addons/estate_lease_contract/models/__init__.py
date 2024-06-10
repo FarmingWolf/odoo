@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
+from . import estate_lease_contract_incentives
 from . import estate_lease_contract_property
 from . import estate_lease_contract_property_extend
 from . import estate_lease_contract_bank_account

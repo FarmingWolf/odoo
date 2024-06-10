@@ -115,7 +115,6 @@ class EstateLeaseContract(models.Model):
     opt_person_id = fields.Many2one('res.users', string='录入员', index=True, default=lambda self: self.env.user)
 
     renter_id = fields.Many2one('res.partner', string='承租人', index=True)
-    # contact_id = fields.Many2one('res.partner', string='联系人', index=True)
 
     property_ids = fields.Many2many('estate.property', 'contract_property_rel', 'contract_id', 'property_id',
                                     string='租赁标的')
@@ -138,17 +137,55 @@ class EstateLeaseContract(models.Model):
     rent_first_period_to = fields.Date(string="首期租金期间（结束日）")
     rent_first_payment_date = fields.Date(string="首期租金缴纳日")
 
-    business_discount_days = fields.Integer(default=0, string="经营优惠（天）")
-    business_discount_amount = fields.Float(default=0.0, string="经营优惠（元）")
+    contract_incentives_ids = fields.Many2one('estate.lease.contract.incentives', string='优惠方案')
+    date_incentives_start = fields.Char(string="优惠政策开始日期", readonly=True, compute="_get_incentives_info")
+    date_incentives_end = fields.Char(string="优惠政策结束日期", readonly=True, compute="_get_incentives_info")
+    days_free = fields.Char(string="免租期天数", readonly=True, compute="_get_incentives_info")
+    business_discount_days = fields.Char(string="经营优惠（天）", readonly=True, compute="_get_incentives_info")
+    business_discount_amount = fields.Char(string="经营优惠（元）", readonly=True, compute="_get_incentives_info")
+    decoration_discount_days = fields.Char(string="装修优惠（天）", readonly=True, compute="_get_incentives_info")
+    decoration_discount_amount = fields.Char(string="装修优惠（元）", readonly=True, compute="_get_incentives_info")
+    support_discount_days = fields.Char(string="扶持优惠（天）", readonly=True, compute="_get_incentives_info")
+    support_discount_amount = fields.Char(string="扶持优惠（元）", readonly=True, compute="_get_incentives_info")
+    special_discount_days = fields.Char(string="专项优惠（天）", readonly=True, compute="_get_incentives_info")
+    special_discount_amount = fields.Char(string="专项优惠（元）", readonly=True, compute="_get_incentives_info")
+    incentives_days_total = fields.Char(string="总优惠天数", readonly=True, compute="_get_incentives_info")
+    incentives_amount_total = fields.Char(string="总优惠金额（元）", readonly=True, compute="_get_incentives_info")
+    contract_incentives_description = fields.Text(string="详细信息", readonly=True, compute="_get_incentives_info")
 
-    decoration_discount_days = fields.Integer(default=0, string="装修优惠（天）")
-    decoration_discount_amount = fields.Float(default=0.0, string="装修优惠（元）")
-
-    support_discount_days = fields.Integer(default=0, string="扶持优惠（天）")
-    support_discount_amount = fields.Float(default=0.0, string="扶持优惠（元）")
-
-    special_discount_days = fields.Integer(default=0, string="专项优惠（天）")
-    special_discount_amount = fields.Float(default=0.0, string="专项优惠（元）")
+    @api.depends("contract_incentives_ids")
+    def _get_incentives_info(self):
+        for record in self:
+            if record.contract_incentives_ids:
+                record.date_incentives_start = record.contract_incentives_ids.date_incentives_start
+                record.date_incentives_end = record.contract_incentives_ids.date_incentives_end
+                record.days_free = record.contract_incentives_ids.days_free
+                record.business_discount_days = record.contract_incentives_ids.business_discount_days
+                record.business_discount_amount = record.contract_incentives_ids.business_discount_amount
+                record.decoration_discount_days = record.contract_incentives_ids.decoration_discount_days
+                record.decoration_discount_amount = record.contract_incentives_ids.decoration_discount_amount
+                record.support_discount_days = record.contract_incentives_ids.support_discount_days
+                record.support_discount_amount = record.contract_incentives_ids.support_discount_amount
+                record.special_discount_days = record.contract_incentives_ids.special_discount_days
+                record.special_discount_amount = record.contract_incentives_ids.special_discount_amount
+                record.incentives_days_total = record.contract_incentives_ids.incentives_days_total
+                record.incentives_amount_total = record.contract_incentives_ids.incentives_amount_total
+                record.contract_incentives_description = record.contract_incentives_ids.name_description
+            else:
+                record.date_incentives_start = ""
+                record.date_incentives_end = ""
+                record.days_free = ""
+                record.business_discount_days = ""
+                record.business_discount_amount = ""
+                record.decoration_discount_days = ""
+                record.decoration_discount_amount = ""
+                record.support_discount_days = ""
+                record.support_discount_amount = ""
+                record.special_discount_days = ""
+                record.special_discount_amount = ""
+                record.incentives_days_total = ""
+                record.incentives_amount_total = ""
+                record.contract_incentives_description = ""
 
     advance_collection_of_coupon_deposit_guarantee = fields.Float(default=0.0, string="预收卡券保证金（元）")
     performance_guarantee = fields.Float(string="履约保证金（元）")
