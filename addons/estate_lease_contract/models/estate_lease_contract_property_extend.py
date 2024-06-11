@@ -180,3 +180,13 @@ class EstateLeaseContractPropertyExtend(models.Model):
         for record in records:
             formatted_values.append(f"{record.name}：{record.name_description}")
         return '； '.join(formatted_values)
+
+    def action_refresh_rent_plan(self):
+        for record in self:
+            if record.rent_plan_id:
+                self._onchange_rent_plan_id()
+
+    def action_refresh_management_fee_plan(self):
+        for record in self:
+            if record.rent_plan_id:
+                self._get_property_management_fee_info()

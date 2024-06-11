@@ -201,6 +201,19 @@
 <!--                            <field name="attachment_ids" widget="custom_many2many_binary" options="{'no_create': True}"/>-->
                             </group>
                         </page>
+                        <page string="金额汇总">
+                            <sheet readonly="1">
+                                <group string="租金（含优惠）">
+
+                                </group>
+                                <group string="物业费">
+
+                                </group>
+                                <group string="押金">
+
+                                </group>
+                            </sheet>
+                        </page>
                     </notebook>
 
                 </sheet>

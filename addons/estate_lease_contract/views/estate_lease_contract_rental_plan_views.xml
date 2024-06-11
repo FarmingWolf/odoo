@@ -44,7 +44,7 @@
                             <field name="billing_method"/>
                         </group>
                         <group>
-                            <field name="rent_targets" widget="many2many_tags" />
+                            <field name="rent_targets" widget="many2many_tags" readonly="1" />
                             <field name="business_type_id"/>
                             <field name="payment_period"/>
                             <field name="payment_date"/>

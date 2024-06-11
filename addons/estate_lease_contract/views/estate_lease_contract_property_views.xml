@@ -31,22 +31,31 @@
                             <field name="billing_progress_method_no_progress_invisible" invisible="1"/>
                             <group col="2">
                                 <group col="1">
-                                    <field name="rent_plan_id" string="选择租金方案"/>
-                                    <field name="business_method_id"/>
-                                    <field name="main_category"/>
-                                    <field name="billing_method"/>
-                                </group>
-                                <group col="1">
                                     <group>
-                                        <field name="business_type_id"/>
-                                        <field name="payment_period"/>
-                                        <field name="payment_date"/>
+                                        <field name="rent_plan_id" string="选择租金方案"/>
+                                        <field name="business_method_id"/>
+                                        <field name="main_category"/>
+                                        <field name="billing_method"/>
                                     </group>
                                     <group invisible="billing_method_fixed_price_invisible">
                                         <field name="rent_price"/>
                                     </group>
                                     <group invisible="billing_method_progress_invisible">
                                         <field name="billing_progress_method_id"/>
+                                    </group>
+                                </group>
+                                <group col="1">
+                                    <group col="1">
+                                        <button name="action_refresh_rent_plan" type="object"
+                                                string="点击刷新"></button>
+                                    </group>
+                                    <group col="1">
+                                        <field name="business_type_id"/>
+                                        <field name="payment_period"/>
+                                        <field name="payment_date"/>
+                                    </group>
+                                    <group col="1" invisible="billing_method_progress_invisible or billing_progress_method_period_invisible">
+                                        <field name="rent_price" string="起始单价（元/月/㎡）"/>
                                     </group>
                                 </group>
                             </group>
@@ -57,39 +66,51 @@
                                 <field name="turnover_percentage_id"/>
                             </group>
 
-                            <group name="按递增率" invisible="billing_method_progress_invisible">
-                                <group name="按时间段递增" invisible="billing_progress_method_period_invisible">
-                                    <field name="rent_price" string="起始单价（元/月/㎡）"/>
+                            <group name="按递增率" col="1" invisible="billing_method_progress_invisible">
+                                <group name="按时间段递增" col="2" invisible="billing_progress_method_period_invisible">
+
                                     <field name="period_percentage_id"/>
                                 </group>
-                                <group name="按营业额递增" invisible="billing_progress_method_turnover_invisible">
+                                <group name="按营业额递增" col="2" invisible="billing_progress_method_turnover_invisible">
                                     <field name="turnover_percentage_id"/>
                                 </group>
-                                <group name="固定单价" invisible="billing_progress_method_no_progress_invisible">
+                                <group name="固定单价" col="2" invisible="billing_progress_method_no_progress_invisible">
                                     <field name="rent_price" string="无递增固定单价（元/月/㎡）"/>
                                 </group>
                             </group>
 
-                            <group name="取高" invisible="billing_method_fixed_price_percentage_higher_invisible">
-                                <group col="4">
-                                    <field name="rent_price" string="保底单价（元/月/㎡）"/>
-                                </group>
+                            <group name="取高" col="1" invisible="billing_method_fixed_price_percentage_higher_invisible">
                                 <group col="2">
-                                    <group>
-                                        <field name="compensation_method"/>
+                                    <group col="1">
+                                        <field name="rent_price" string="保底单价（元/月/㎡）"/>
                                     </group>
-                                    <group>
-                                        <field name="compensation_period"/>
+                                    <group col="2">
+                                        <group>
+                                            <field name="compensation_method"/>
+                                        </group>
+                                        <group>
+                                            <field name="compensation_period"/>
+                                        </group>
                                     </group>
                                 </group>
-                                <group>
+                                <newline/>
+                                <group col="1">
                                     <field name="turnover_percentage_id"/>
                                 </group>
                             </group>
                         </page>
                         <page string="物业费方案">
-                            <group>
-                                <field name="management_fee_plan_id" string="选择物业费方案"/>
+                            <group col="2">
+                                <group col="1">
+                                    <field name="management_fee_plan_id" string="选择物业费方案"/>
+                                </group>
+                                <group col="1">
+                                    <button name="action_refresh_management_fee_plan" type="object"
+                                            string="点击刷新"></button>
+                                </group>
+                            </group>
+                            <newline/>
+                            <group col="1">
                                 <field name="management_fee_name_description"/>
                             </group>
                         </page>

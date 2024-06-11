@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="estate_lease_contract_rental_business_type_action" model="ir.actions.act_window">
-        <field name="name">租金方案经营业态设置</field>
+        <field name="name">资产租赁合同经营业态设置</field>
         <field name="res_model">estate.lease.contract.rental.business.type</field>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">

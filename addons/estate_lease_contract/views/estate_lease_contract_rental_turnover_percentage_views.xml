@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="estate_lease_contract_rental_turnover_percentage_action" model="ir.actions.act_window">
-        <field name="name">按营业额提成详细设置</field>
+        <field name="name">资产租赁合同租金提成方案设置</field>
         <field name="res_model">estate.lease.contract.rental.turnover.percentage</field>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
