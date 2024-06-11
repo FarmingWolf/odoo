@@ -40,7 +40,7 @@
             <form string="RealEstateProperty" create="True" edit="True" duplicate="True" delete="True">
                 <header>
                     <button name="action_cancel_property" type="object" string="取消"></button>
-                    <button name="action_sold_property" type="object" string="标志为已售出"></button>
+                    <button name="action_sold_property" type="object" string="标记为已售出"></button>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>

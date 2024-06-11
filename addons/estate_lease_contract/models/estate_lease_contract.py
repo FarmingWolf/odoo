@@ -95,6 +95,7 @@ class EstateLeaseContract(models.Model):
     # water_bill_account_no = fields.Char('水费收缴账号', required=True, translate=True)
 
     parking_fee_account = fields.Many2one("estate.lease.contract.bank.account", string='停车费收缴账户名')
+    pledge_account = fields.Many2one("estate.lease.contract.bank.account", string='押金收缴账户名')
 
     parking_space_ids = fields.Many2many('parking.space', 'contract_parking_space_rel', 'contract_id',
                                          'parking_space_id',
@@ -151,7 +152,7 @@ class EstateLeaseContract(models.Model):
     special_discount_amount = fields.Char(string="专项优惠（元）", readonly=True, compute="_get_incentives_info")
     incentives_days_total = fields.Char(string="总优惠天数", readonly=True, compute="_get_incentives_info")
     incentives_amount_total = fields.Char(string="总优惠金额（元）", readonly=True, compute="_get_incentives_info")
-    contract_incentives_description = fields.Text(string="详细信息", readonly=True, compute="_get_incentives_info")
+    contract_incentives_description = fields.Text(string="优惠说明", readonly=True, compute="_get_incentives_info")
 
     @api.depends("contract_incentives_ids")
     def _get_incentives_info(self):
@@ -200,4 +201,4 @@ class EstateLeaseContract(models.Model):
 
     description = fields.Text("详细信息")
 
-    attachment_ids = fields.Many2many('ir.attachment', string="Attachments")
+    attachment_ids = fields.Many2many('ir.attachment', string="附件管理")
