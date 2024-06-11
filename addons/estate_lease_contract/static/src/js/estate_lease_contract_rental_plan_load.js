@@ -9,7 +9,7 @@ export function child_view_filter(){
             this._super.apply(this, arguments);
             var selectedPropertyIds = JSON.parse(localStorage.getItem('selected_property_ids') || '[]');
             if (selectedPropertyIds.length) {
-                this.dataset.domain.push(['rent_target', 'in', selectedPropertyIds]);
+                this.dataset.domain.push(['rent_targets', 'in', selectedPropertyIds]);
                 // 重载列表视图以应用新的domain
                 this.reload();
             }

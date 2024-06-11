@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="estate_lease_contract_bank_account_action" model="ir.actions.act_window">
+        <field name="name">资产租赁各账户设置</field>
+        <field name="res_model">estate.lease.contract.bank.account</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                这里可以展示一些文本信息。
+            </p>
+            <p>
+                这里可以展示二些文本信息。
+            </p>
+        </field>
+    </record>
+    <record id="estate_lease_contract_bank_account_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.bank.account.tree</field>
+        <field name="model">estate.lease.contract.bank.account</field>
+        <field name="arch" type="xml">
+            <tree string="estate_lease_contract_bank_account">
+                <field name="name"/>
+                <field name="bank_id"/>
+                <field name="bank_name"/>
+                <field name="bank_branch_id"/>
+                <field name="bank_branch_name"/>
+                <field name="bank_account_id"/>
+                <field name="bank_account_name"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

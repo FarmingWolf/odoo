@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <record id="estate_lease_contract_property_view_tree" model="ir.ui.view">
+            <field name="name">estate.lease.contract.property.extend.tree</field>
+            <field name="model">estate.property</field>
+            <field name="inherit_id" ref="estate.491_real_estate_view_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='expected_price']" position="replace">
+                    <field name="rent_plan_id"></field>
+                </xpath>
+                <xpath expr="//field[@name='selling_price']" position="replace">
+                    <field name="management_fee_plan_id"></field>
+                </xpath>
+            </field>
+        </record>
+
         <record id="estate_lease_contract_property_view_form" model="ir.ui.view">
             <field name="name">estate.lease.contract.property.extend.form</field>
             <field name="model">estate.property</field>

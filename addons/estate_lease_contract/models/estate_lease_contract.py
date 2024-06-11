@@ -10,7 +10,6 @@ from odoo.tools import float_compare
 
 
 class EstateLeaseContract(models.Model):
-
     _name = "estate.lease.contract"
     _description = "资产租赁合同管理模型"
 
@@ -72,12 +71,34 @@ class EstateLeaseContract(models.Model):
     # rent_account_no = fields.Char('租金收缴账号', required=True, translate=True)
 
     opening_date = fields.Date(string="计划开业日期")
-    rental_plan_id = fields.Many2many("estate.lease.contract.rental.plan", 'contract_rental_plan_rel', 'contract_id',
-                                      'rental_plan_id', string="租金方案")
+    # rental_plan_id = fields.Many2many("estate.lease.contract.rental.plan", 'contract_rental_plan_rel', 'contract_id',
+    #                                   'rental_plan_id', string="租金方案")
 
-    property_management_fee_plan_id = fields.Many2many("estate.lease.contract.property.management.fee.plan",
-                                                       'contract_property_management_fee_plan_rel', 'contract_id',
-                                                       'property_management_fee_plan_id', string="物业费方案")
+    rental_plan_ids = fields.One2many("estate.lease.contract.rental.plan", compute='_compute_rental_plan_ids',
+                                      string='租金方案')
+
+    @api.depends('property_ids')
+    def _compute_rental_plan_ids(self):
+        for record in self:
+            # 获取所有关联的property的rent_plan_id，并去重
+            rent_plans = self.env['estate.property'].search([('id', 'in', record.property_ids.ids)]).mapped(
+                'rent_plan_id')
+            record.rental_plan_ids = rent_plans
+
+    # property_management_fee_plan_id = fields.Many2many("estate.lease.contract.property.management.fee.plan",
+    #                                                    'contract_property_management_fee_plan_rel', 'contract_id',
+    #                                                    'property_management_fee_plan_id', string="物业费方案")
+
+    property_management_fee_plan_ids = fields.One2many("estate.lease.contract.property.management.fee.plan",
+                                                       compute='_compute_property_management_fee_plan_ids',
+                                                       string="物业费方案")
+
+    @api.depends('property_ids')
+    def _compute_property_management_fee_plan_ids(self):
+        for record in self:
+            management_fee_plans = self.env['estate.property'].search([('id', 'in', record.property_ids.ids)]).mapped(
+                'management_fee_plan_id')
+            record.property_management_fee_plan_ids = management_fee_plans
 
     property_management_fee_account = fields.Many2one("estate.lease.contract.bank.account", string='物业费收缴账户名')
     # property_management_fee_account_name = fields.Char('物业费收缴账户名', required=True, translate=True)
@@ -119,6 +140,7 @@ class EstateLeaseContract(models.Model):
 
     property_ids = fields.Many2many('estate.property', 'contract_property_rel', 'contract_id', 'property_id',
                                     string='租赁标的')
+
     rent_count = fields.Integer(default=0, string="租赁标的数量", compute="_calc_rent_total_info")
     building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", compute="_calc_rent_total_info")
     rent_area = fields.Float(default=0.0, string="总计租面积（㎡）", compute="_calc_rent_total_info")
