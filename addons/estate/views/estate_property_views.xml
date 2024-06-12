@@ -27,8 +27,8 @@
                 <field name="floor"/>
                 <field name="building_area"/>
                 <field name="rent_area"/>
-                <field name="expected_price" string="期待价格（元/月/㎡）"/>
-                <field name="selling_price" string="实际价格（元/月/㎡）"/>
+                <field name="expected_price" string="期待价格（元/天/㎡）"/>
+                <field name="selling_price" string="实际价格（元/天/㎡）"/>
                 <field name="date_availability" string="交付日期"/>
             </tree>
         </field>

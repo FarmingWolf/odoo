@@ -24,6 +24,7 @@
                 <field name="business_type_id"/>
                 <field name="main_category"/>
                 <field name="billing_method"/>
+                <field name="payment_period"/>
                 <field name="billing_progress_method_id"/>
                 <field name="rent_targets" widget="many2many_tags"/>
             </tree>
@@ -68,7 +69,7 @@
 
                             <group string="按时间段递增" invisible="billing_progress_method_id != 'by_period'" col="2">
                                 <group>
-                                    <field name="rent_price" string="起始单价（元/月/㎡）"/>
+                                    <field name="rent_price" string="起始单价（元/天/㎡）"/>
                                 </group>
                                 <field name="period_percentage_id"/>
                             </group>
@@ -78,13 +79,13 @@
                             </group>
                             <group string="固定单价" invisible="billing_progress_method_id != 'no_progress'" col="2">
                                 <group>
-                                    <field name="rent_price" string="固定单价（元/月/㎡）"/>
+                                    <field name="rent_price" string="固定单价（元/天/㎡）"/>
                                 </group>
                             </group>
                         </page>
                         <page string="租金计费详情：保底抽成两者取高" invisible="billing_method != 'by_fixed_price_percentage_higher'">
                             <group col="4">
-                                <field name="rent_price" string="保底单价（元/月/㎡）"/>
+                                <field name="rent_price" string="保底单价（元/天/㎡）"/>
                             </group>
                             <group col="2">
                                 <group>

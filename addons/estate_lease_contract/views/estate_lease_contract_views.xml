@@ -29,8 +29,8 @@
                     <field name="floor"/>
                     <field name="building_area"/>
                     <field name="rent_area"/>
-                    <field name="expected_price" string="期待价格（元/月/㎡）"/>
-                    <field name="selling_price" string="实际价格（元/月/㎡）"/>
+                    <field name="expected_price" string="期待价格（元/天/㎡）"/>
+                    <field name="selling_price" string="实际价格（元/天/㎡）"/>
                     <field name="date_availability" string="交付日期"/>
                 </tree>
             </tree>
@@ -86,6 +86,7 @@
                             <field name="date_rent_end" />
                             <field name="days_rent_total" readonly="1"/>
                             <field name="days_free" />
+                            <field name="contract_rental_payment_day" />
                             <field name="date_decorate_start" />
                             <field name="date_decorate_end" />
                             <field name="days_decorate" readonly="1"/>
@@ -202,8 +203,18 @@
                             </group>
                         </page>
                         <page string="金额汇总">
+                            <group col="1">
+                                <button name="action_refresh_all_money" type="object"
+                                        string="点击刷新"></button>
+                            </group>
                             <sheet readonly="1">
-                                <group string="租金（含优惠）">
+                                <group string="租金（优惠后）">
+                                    <group string="首期租金">
+
+                                    </group>
+                                    <group string="每期租金">
+
+                                    </group>
 
                                 </group>
                                 <group string="物业费">

@@ -4,12 +4,14 @@ from typing import Dict, List
 
 from odoo import fields, models, api
 
-
 class EstateLeaseContractPropertyExtend(models.Model):
     _description = "资产租赁合同租赁标的"
     _inherit = ['estate.property']
 
     rent_plan_id = fields.Many2one('estate.lease.contract.rental.plan', string="租金方案")
+    property_rental_detail_ids = fields.One2many('estate.lease.contract.property.rental.detail', 'property_id',
+                                                 string="租金明细")
+
     management_fee_plan_id = fields.Many2one('estate.lease.contract.property.management.fee.plan', string="物业费方案")
 
     business_method_id = fields.Char(string="经营性质", readonly=True, compute="_get_rent_plan_info")
@@ -123,7 +125,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
     period_percentage_id = fields.Char(string='期间段递增率详情', readonly=True, compute="_get_rent_plan_info")
     turnover_percentage_id = fields.Char(string='营业额抽成详情', readonly=True, compute="_get_rent_plan_info")
     payment_period = fields.Char(string="支付周期", readonly=True, compute="_get_rent_plan_info")
-    rent_price = fields.Char(string="租金单价（元/月/㎡）", readonly=True, compute="_get_rent_plan_info")
+    rent_price = fields.Char(string="租金单价（元/天/㎡）", readonly=True, compute="_get_rent_plan_info")
     payment_date = fields.Char(string="租金支付日", readonly=True, compute="_get_rent_plan_info")
     compensation_method = fields.Char(string='补差方式', readonly=True, compute="_get_rent_plan_info")
     compensation_period = fields.Char(string='补差周期', readonly=True, compute="_get_rent_plan_info")

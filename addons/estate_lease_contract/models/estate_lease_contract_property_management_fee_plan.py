@@ -11,7 +11,7 @@ class EstateLeaseContractPropertyManagementFeePlan(models.Model):
 
     name = fields.Char('物业费方案', required=True)
     sequence = fields.Integer('排序', default=1)
-    property_management_fee_price = fields.Float(default=0.0, string="单价（元/月/㎡）")
+    property_management_fee_price = fields.Float(default=0.0, string="单价（元/天/㎡）")
     billing_progress_method_id = fields.Selection(string='递进方式',
                                                   selection=[('by_period', '按时间段递增'), ('no_progress', '不递增')],
                                                   )
@@ -30,10 +30,10 @@ class EstateLeaseContractPropertyManagementFeePlan(models.Model):
             for record in self:
                 if record:
                     if record.billing_progress_method_id == "no_progress":
-                        record.name_description = "{0}：物业费单价{1}元/月/㎡，不递增。".format(record.name,
+                        record.name_description = "{0}：物业费单价{1}元/天/㎡，不递增。".format(record.name,
                                                                                   record.property_management_fee_price)
                     else:
-                        record.name_description = "{0}：物业费单价{1}元/月/㎡，从第{2}个月起，每{3}个月递增{4}%。". \
+                        record.name_description = "{0}：物业费单价{1}元/天/㎡，从第{2}个月起，每{3}个月递增{4}%。". \
                             format(record.name,
                                    record.property_management_fee_price,
                                    record.billing_progress_info_month_from,

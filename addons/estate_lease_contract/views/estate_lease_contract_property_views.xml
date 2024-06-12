@@ -55,7 +55,7 @@
                                         <field name="payment_date"/>
                                     </group>
                                     <group col="1" invisible="billing_method_progress_invisible or billing_progress_method_period_invisible">
-                                        <field name="rent_price" string="起始单价（元/月/㎡）"/>
+                                        <field name="rent_price" string="起始单价（元/天/㎡）"/>
                                     </group>
                                 </group>
                             </group>
@@ -75,14 +75,14 @@
                                     <field name="turnover_percentage_id"/>
                                 </group>
                                 <group name="固定单价" col="2" invisible="billing_progress_method_no_progress_invisible">
-                                    <field name="rent_price" string="无递增固定单价（元/月/㎡）"/>
+                                    <field name="rent_price" string="无递增固定单价（元/天/㎡）"/>
                                 </group>
                             </group>
 
                             <group name="取高" col="1" invisible="billing_method_fixed_price_percentage_higher_invisible">
                                 <group col="2">
                                     <group col="1">
-                                        <field name="rent_price" string="保底单价（元/月/㎡）"/>
+                                        <field name="rent_price" string="保底单价（元/天/㎡）"/>
                                     </group>
                                     <group col="2">
                                         <group>

@@ -4,7 +4,7 @@
 {
     'name': "资产租赁合同管理",
     'version': '0.0.2',
-    'depends': ['base', 'web', 'estate', 'parking'],
+    'depends': ['base', 'web', 'utils', 'estate', 'parking'],
     'summary': '资产租赁合同管理',
     'category': 'Real Estate/Lease Contract',
     'website': 'https://www.odoo.com/app/realestate',

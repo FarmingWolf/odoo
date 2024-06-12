@@ -1,17 +1,122 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from datetime import timedelta, datetime
-
 from dateutil.utils import today
 
-from odoo import fields, models, api
+from addons.utils.models.utils import Utils
+from odoo import fields, models, api, exceptions
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare
+
+
+def _cal_date_payment(current_s, current_e, rental_plan):
+    """rental_plan.payment_date:
+    [('period_start_7_pay_pre', '租期开始后的7日内付上期抽成费用'),
+   ('period_start_10_pay_pre', '租期开始后的10日内付上期抽成费用'),
+   ('period_start_15_pay_pre', '租期开始后的15日内付上期抽成费用'),
+   ('period_start_18_pay_pre', '租期开始后的18日内付上期抽成费用'),
+   ('period_start_20_pay_pre', '租期开始后的20日内付上期抽成费用'),
+   ('period_start_25_pay_pre', '租期开始后的25日内付上期抽成费用'),
+   ('period_start_1_pay_this', '租期开始后的1日内付本期费用'),
+   ('period_start_5_pay_this', '租期开始后的5日内付本期费用'),
+   ('period_start_7_pay_this', '租期开始后的7日内付本期费用'),
+   ('period_start_10_pay_this', '租期开始后的10日内付本期费用'),
+   ('period_start_15_pay_this', '租期开始后的15日内付本期费用'),
+   ('period_start_18_pay_this', '租期开始后的18日内付本期费用'),
+   ('period_start_30_pay_this', '租期开始后的30日内付本期费用'),
+   ('period_end_month_15_pay_next', '租期结束当月的15号前付下期费用'),
+   ('period_end_month_20_pay_next', '租期结束当月的20号前付下期费用'),
+   ('period_end_month_25_pay_next', '租期结束当月的25号前付下期费用'),
+   ('period_end_month_30_pay_next', '租期结束当月的30号前付下期费用'), ]
+    """
+    if 'start' in rental_plan.payment_date:
+        day_cnt = int(rental_plan.payment_date.split('_')[2])
+        date_payment = current_s + timedelta(days=day_cnt)
+    else:
+        day_date = int(rental_plan.payment_date.split('_')[3])
+        if day_date == 30 and (current_e.day == 28 or current_e.day == 29):
+            date_payment = current_e
+        else:
+            date_payment = current_e.replace(day=day_date)
+
+    return date_payment
+
+
+def _cal_rental_amount(month_cnt, current_s, current_e, record_self, rental_plan):
+
+    days_delta = current_e - current_s
+    rental_amount = record_self.rent_area * rental_plan.rent_price
+    return rental_amount
+
+
+def _generate_details_from_rent_plan(record_self):
+    """
+    一个租赁标的有一个租金方案，
+    一个租金方案生成多条租金明细
+    租赁期间→支付周期→支付日类型→支付日期→期数→计费方式（固定？抽成？递增？取高？）→每期支付金额
+    """
+    # 前边已经判断过，这里不用重复判断self
+    # 根据租赁期间、支付周期、支付日期类型生成支付期
+    rental_periods_details = []
+    date_s = fields.Date.from_string(record_self.date_rent_start)
+    date_e = fields.Date.from_string(record_self.date_rent_end)
+
+    for rental_plan in record_self.rental_plan_ids:
+        month_cnt = 1
+        if rental_plan.payment_period == 'month':
+            month_cnt = 1
+        elif rental_plan.payment_period == 'bimonthly':
+            month_cnt = 2
+        elif rental_plan.payment_period == 'season':
+            month_cnt = 3
+        elif rental_plan.payment_period == 'half_year':
+            month_cnt = 6
+        elif rental_plan.payment_period == 'year':
+            month_cnt = 12
+
+        current_s = date_s
+        period_no = 1
+        while current_s <= date_e:
+
+            # 计算本期结束日
+            current_tmp = current_s
+            for i in range(month_cnt):
+                current_e = (current_tmp.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)
+                current_tmp = current_e + timedelta(days=1)
+
+            if current_e > date_e:
+                current_e = date_e
+
+            # 计算支付日期
+            date_payment = _cal_date_payment(current_s, current_e, rental_plan)
+            billing_method_str = dict(rental_plan._fields['billing_method'].selection).get(rental_plan.billing_method)
+            payment_date_str = dict(rental_plan._fields['payment_date'].selection).get(rental_plan.payment_date)
+            rental_amount = _cal_rental_amount(month_cnt, current_s, current_e, record_self, rental_plan)
+            rental_amount_zh = Utils.arabic_to_chinese(rental_amount)
+
+            rental_periods_details.append({'period_date_from': f"{current_s.strftime('%Y-%m-%d')}",
+                                           'period_date_to': f"{current_e.strftime('%Y-%m-%d')}",
+                                           'date_payment': f"{date_payment.strftime('%Y-%m-%d')}",
+                                           'rental_amount': f"{rental_amount}",
+                                           'rental_amount_zh': f"{rental_amount_zh}",
+                                           'rental_period_no': period_no,
+                                           'description': f"{rental_plan.name}-{billing_method_str}-"
+                                                          f"{payment_date_str}",
+                                           })
+
+            # 下期开始日
+            current_s = current_e + timedelta(days=1)
+            period_no += 1
+
+        print("{1}.rental_periods={0}".format(rental_periods_details, rental_plan.name))
+
+    return rental_periods_details
 
 
 class EstateLeaseContract(models.Model):
     _name = "estate.lease.contract"
     _description = "资产租赁合同管理模型"
+    _order = "contract_no, id"
 
     name = fields.Char('合同名称', required=True, translate=True)
 
@@ -30,13 +135,25 @@ class EstateLeaseContract(models.Model):
 
     days_rent_total = fields.Char(string="租赁期限", compute="_calc_days_rent_total")
 
-    @api.depends("date_rent_start", "date_rent_end")
+    @api.depends("date_rent_start", "date_rent_end", "days_free")
     def _calc_days_rent_total(self):
         for record in self:
             if record.date_rent_start and record.date_rent_end:
+                if record.date_rent_start > record.date_rent_end:
+                    raise exceptions.UserError("计租开始日期不能大于计租结束日期")
+
                 date_s = fields.Date.from_string(record.date_rent_start)
                 date_e = fields.Date.from_string(record.date_rent_end)
                 delta = date_e - date_s
+                if record.days_free:
+                    if int(record.days_free) > delta.days:
+                        raise exceptions.UserError("免租期天数{0}不能大于租赁天数共{3}天[{1}至{2}]！如果不能打开合同界面，"
+                                                   "说明您在合同数据保存之后，优惠方案受到调整。那么"
+                                                   "请前往优惠方案页面调整免租期天数".format(record.days_free,
+                                                                             record.date_rent_start,
+                                                                             record.date_rent_end,
+                                                                             delta.days))
+
                 year_delta = (delta.days + 1) / 365
                 record.days_rent_total = "{0}年（{1}天）".format(round(year_delta, 2), delta.days + 1)
             else:
@@ -85,10 +202,6 @@ class EstateLeaseContract(models.Model):
                 'rent_plan_id')
             record.rental_plan_ids = rent_plans
 
-    # property_management_fee_plan_id = fields.Many2many("estate.lease.contract.property.management.fee.plan",
-    #                                                    'contract_property_management_fee_plan_rel', 'contract_id',
-    #                                                    'property_management_fee_plan_id', string="物业费方案")
-
     property_management_fee_plan_ids = fields.One2many("estate.lease.contract.property.management.fee.plan",
                                                        compute='_compute_property_management_fee_plan_ids',
                                                        string="物业费方案")
@@ -101,19 +214,10 @@ class EstateLeaseContract(models.Model):
             record.property_management_fee_plan_ids = management_fee_plans
 
     property_management_fee_account = fields.Many2one("estate.lease.contract.bank.account", string='物业费收缴账户名')
-    # property_management_fee_account_name = fields.Char('物业费收缴账户名', required=True, translate=True)
-    # property_management_fee_bank = fields.Char('物业费收缴账户银行', required=True, translate=True)
-    # property_management_fee_account_no = fields.Char('物业费收缴账号', required=True, translate=True)
 
     electricity_account = fields.Many2one("estate.lease.contract.bank.account", string='电费收缴账户名')
-    # electricity_account_name = fields.Char('电费收缴账户名', required=True, translate=True)
-    # electricity_bank = fields.Char('电费收缴账户银行', required=True, translate=True)
-    # electricity_account_no = fields.Char('电费收缴账号', required=True, translate=True)
 
     water_bill_account = fields.Many2one("estate.lease.contract.bank.account", string='水费收缴账户名')
-    # water_bill_account_name = fields.Char('水费收缴账户名', required=True, translate=True)
-    # water_bill_bank = fields.Char('水费收缴账户银行', required=True, translate=True)
-    # water_bill_account_no = fields.Char('水费收缴账号', required=True, translate=True)
 
     parking_fee_account = fields.Many2one("estate.lease.contract.bank.account", string='停车费收缴账户名')
     pledge_account = fields.Many2one("estate.lease.contract.bank.account", string='押金收缴账户名')
@@ -175,6 +279,27 @@ class EstateLeaseContract(models.Model):
     incentives_days_total = fields.Char(string="总优惠天数", readonly=True, compute="_get_incentives_info")
     incentives_amount_total = fields.Char(string="总优惠金额（元）", readonly=True, compute="_get_incentives_info")
     contract_incentives_description = fields.Text(string="优惠说明", readonly=True, compute="_get_incentives_info")
+    contract_rental_payment_day = fields.Char(string="租金支付周期", readonly=True, compute="_get_payment_day_info")
+
+    @api.depends("rental_plan_ids")
+    def _get_payment_day_info(self):
+        for record in self:
+            if record.rental_plan_ids:
+                formatted_values = []
+                for rental_plan in record.rental_plan_ids:
+                    payment_period_str = ""
+                    payment_date_str = ""
+                    if rental_plan.payment_period:
+                        payment_period_str = dict(rental_plan._fields['payment_period'].selection).get(
+                            rental_plan.payment_period)
+
+                    if rental_plan.payment_date:
+                        payment_date_str = dict(rental_plan._fields['payment_date'].selection).get(
+                            rental_plan.payment_date)
+
+                    formatted_values.append(f"{payment_period_str}：{payment_date_str}")
+                record.contract_rental_payment_day = '； '.join(formatted_values)
+                return record.contract_rental_payment_day
 
     @api.depends("contract_incentives_ids")
     def _get_incentives_info(self):
@@ -224,3 +349,33 @@ class EstateLeaseContract(models.Model):
     description = fields.Text("详细信息")
 
     attachment_ids = fields.Many2many('ir.attachment', string="附件管理")
+
+    """
+    合同页面金额汇总标签页的刷新按钮动作
+    """
+    def action_refresh_all_money(self):
+        self._compute_property_rental_detail_ids()
+
+    """
+    根据租期和租金方案计算租金明细
+    """
+    test_str = fields.Text(string="测试结果")
+
+    @api.depends("date_rent_start", "date_rent_end", "property_ids", "rental_plan_ids")
+    def _compute_property_rental_detail_ids(self):
+        for record in self:
+            if record.date_rent_start and record.date_rent_end and record.property_ids and record.rental_plan_ids:
+                generated_rental_details = _generate_details_from_rent_plan(record)
+                record.test_str = generated_rental_details
+                # 根据租金方案生成的租金明细，逐条生成model：estate.lease.contract.property.rental.detail
+                for rental_detail in generated_rental_details:
+                    self.env['estate.lease.contract.property.rental.detail'].create({
+                        'property_id': record.id,
+                        'rental_amount': rental_detail['rental_amount'],
+                        'rental_amount_zh': rental_detail['rental_amount_zh'],
+                        'rental_period_no': rental_detail['rental_period_no'],
+                        'period_date_from': rental_detail['period_date_from'],
+                        'period_date_to': rental_detail['period_date_to'],
+                        'date_payment': rental_detail['date_payment'],
+                        'description': rental_detail['description'],
+                    })

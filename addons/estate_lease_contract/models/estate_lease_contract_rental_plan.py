@@ -8,9 +8,9 @@ class EstateLeaseContractRentalPlan(models.Model):
 
     _name = "estate.lease.contract.rental.plan"
     _description = "资产租赁合同租金方案"
-    _order = "rent_targets"
+    _order = "name"
 
-    name = fields.Char('资产租赁合同租金方案', required=True)
+    name = fields.Char('资产租赁合同租金方案', required=True, copy=False, default="租金方案名-请重命名")
     rent_targets = fields.One2many("estate.property", "rent_plan_id", string='对应标的')
     business_method_id = fields.Selection(string="经营性质",
                                           selection=[('direct_sale', '直营'), ('franchisee', '加盟'),
@@ -41,7 +41,7 @@ class EstateLeaseContractRentalPlan(models.Model):
     payment_period = fields.Selection(string="支付周期",
                                       selection=[('month', '月付'), ('bimonthly', '双月付'), ('season', '季付'),
                                                  ('half_year', '半年付'), ('year', '年付')], )
-    rent_price = fields.Float(default=0.0, string="租金单价（元/月/㎡）")
+    rent_price = fields.Float(default=0.0, string="租金单价（元/天/㎡）")
 
     payment_date = fields.Selection(string="租金支付日",
                                     selection=[('period_start_7_pay_pre', '租期开始后的7日内付上期抽成费用'),
