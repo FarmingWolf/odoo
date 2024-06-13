@@ -292,20 +292,15 @@ class EstateLeaseContract(models.Model):
     @api.depends("rental_plan_ids")
     def _get_payment_day_info(self):
         for record in self:
-            if record.rental_plan_ids:
+            if record.property_ids:
                 formatted_values = []
-                for rental_plan in record.rental_plan_ids:
+                for record_property in record.property_ids:
                     payment_period_str = ""
-                    payment_date_str = ""
-                    if rental_plan.payment_period:
-                        payment_period_str = dict(rental_plan._fields['payment_period'].selection).get(
-                            rental_plan.payment_period)
+                    if record_property.rent_plan_id.payment_period:
+                        payment_period_str = dict(record_property.rent_plan_id._fields['payment_period'].selection).get(
+                            record_property.rent_plan_id.payment_period)
 
-                    if rental_plan.payment_date:
-                        payment_date_str = dict(rental_plan._fields['payment_date'].selection).get(
-                            rental_plan.payment_date)
-
-                    formatted_values.append(f"{payment_period_str}：{payment_date_str}")
+                    formatted_values.append(f"{record_property.name}：{payment_period_str}")
                 record.contract_rental_payment_day = '； '.join(formatted_values)
                 return record.contract_rental_payment_day
 
