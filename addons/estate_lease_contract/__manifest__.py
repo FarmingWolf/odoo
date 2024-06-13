@@ -19,6 +19,7 @@
 
         'views/estate_lease_contract_bank_account_views.xml',
         'views/estate_lease_contract_incentives_views.xml',
+        'views/estate_lease_contract_property_rental_detail_views.xml',
         'views/estate_lease_contract_property_views.xml',
         'views/estate_lease_contract_tag_views.xml',
         'views/estate_lease_contract_rental_business_type_views.xml',

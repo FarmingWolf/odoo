@@ -61,7 +61,13 @@ def _generate_details_from_rent_plan(record_self):
     date_s = fields.Date.from_string(record_self.date_rent_start)
     date_e = fields.Date.from_string(record_self.date_rent_end)
 
-    for rental_plan in record_self.rental_plan_ids:
+    # 根据property去找rental_plan
+    for property_id in record_self.property_ids:
+        if property_id.rent_plan_id:
+            rental_plan = property_id.rent_plan_id
+        else:
+            continue
+
         month_cnt = 1
         if rental_plan.payment_period == 'month':
             month_cnt = 1
@@ -94,12 +100,14 @@ def _generate_details_from_rent_plan(record_self):
             rental_amount = _cal_rental_amount(month_cnt, current_s, current_e, record_self, rental_plan)
             rental_amount_zh = Utils.arabic_to_chinese(rental_amount)
 
-            rental_periods_details.append({'period_date_from': f"{current_s.strftime('%Y-%m-%d')}",
+            rental_periods_details.append({'contract_id': f"{record_self.id}",
+                                           'property_id': f"{property_id.id}",
+                                           'period_date_from': f"{current_s.strftime('%Y-%m-%d')}",
                                            'period_date_to': f"{current_e.strftime('%Y-%m-%d')}",
                                            'date_payment': f"{date_payment.strftime('%Y-%m-%d')}",
                                            'rental_amount': f"{rental_amount}",
                                            'rental_amount_zh': f"{rental_amount_zh}",
-                                           'rental_period_no': period_no,
+                                           'rental_period_no': f"{period_no}",
                                            'description': f"{rental_plan.name}-{billing_method_str}-"
                                                           f"{payment_date_str}",
                                            })
@@ -350,27 +358,41 @@ class EstateLeaseContract(models.Model):
 
     attachment_ids = fields.Many2many('ir.attachment', string="附件管理")
 
+    rental_details = fields.One2many('estate.lease.contract.property.rental.detail', 'contract_id',
+                                     compute='_compute_rental_details', string="租金明细")
+
+    @api.depends("property_ids", "rental_plan_ids")
+    def _compute_rental_details(self):
+        # 把计算结果付回给rental_details
+        for record in self:
+            rental_details = self.env['estate.property'].search([('id', 'in', record.property_ids.ids)]).mapped(
+                'property_rental_detail_ids')
+            record.rental_details = rental_details
+
     """
     合同页面金额汇总标签页的刷新按钮动作
     """
     def action_refresh_all_money(self):
         self._compute_property_rental_detail_ids()
+        self._compute_rental_details()
 
     """
     根据租期和租金方案计算租金明细
     """
-    test_str = fields.Text(string="测试结果")
-
     @api.depends("date_rent_start", "date_rent_end", "property_ids", "rental_plan_ids")
     def _compute_property_rental_detail_ids(self):
         for record in self:
             if record.date_rent_start and record.date_rent_end and record.property_ids and record.rental_plan_ids:
                 generated_rental_details = _generate_details_from_rent_plan(record)
-                record.test_str = generated_rental_details
+                # 先删除旧纪录
+                print("删除掉estate.lease.contract.property.rental.detail其中的contract_id={0}的记录".format(record.id))
+                self.env['estate.lease.contract.property.rental.detail'].search(
+                    [('contract_id', '=', record.id)]).unlink()
                 # 根据租金方案生成的租金明细，逐条生成model：estate.lease.contract.property.rental.detail
                 for rental_detail in generated_rental_details:
                     self.env['estate.lease.contract.property.rental.detail'].create({
-                        'property_id': record.id,
+                        'contract_id': rental_detail['contract_id'],
+                        'property_id': rental_detail['property_id'],
                         'rental_amount': rental_detail['rental_amount'],
                         'rental_amount_zh': rental_detail['rental_amount_zh'],
                         'rental_period_no': rental_detail['rental_period_no'],

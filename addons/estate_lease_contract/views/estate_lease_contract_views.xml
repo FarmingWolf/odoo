@@ -205,23 +205,21 @@
                         <page string="金额汇总">
                             <group col="1">
                                 <button name="action_refresh_all_money" type="object"
-                                        string="点击刷新"></button>
+                                        string="点击刷新"/>
                             </group>
                             <sheet readonly="1">
-                                <group string="租金（优惠后）">
-                                    <group string="首期租金">
+                                <group>
+                                    <group string="租金（优惠后）">
+                                        <group string="首期租金">
+                                        </group>
+                                        <group string="押金">
+                                        </group>
 
                                     </group>
-                                    <group string="每期租金">
+                                    <group string="物业费">
 
                                     </group>
-
-                                </group>
-                                <group string="物业费">
-
-                                </group>
-                                <group string="押金">
-
+                                    <field name="rental_details"></field>
                                 </group>
                             </sheet>
                         </page>

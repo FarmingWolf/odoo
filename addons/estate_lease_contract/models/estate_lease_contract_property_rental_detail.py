@@ -11,9 +11,10 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     _description = "资产租赁合同租金明细"
     _order = "id"
 
+    contract_id = fields.Many2one('estate.lease.contract', string="合同")
     property_id = fields.Many2one('estate.property', string="租赁标的")
-    rental_amount = fields.Float(default=0.0, string="租金(元)")
-    rental_amount_zh = fields.Char(string="大写")
+    rental_amount = fields.Float(default=0.0, string="本期租金(元)")
+    rental_amount_zh = fields.Char(string="本期租金(元)大写")
     rental_period_no = fields.Integer(default=0, string="期数")
     period_date_from = fields.Date(string="开始日期")
     period_date_to = fields.Date(string="结束日期")
