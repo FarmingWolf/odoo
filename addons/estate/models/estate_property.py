@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from datetime import timedelta, datetime
-from importlib.resources import _
+from odoo.tools.translate import _
 
 from dateutil.utils import today
 
@@ -28,9 +28,9 @@ class EstateProperty(models.Model):
     description = fields.Text("详细信息")
     postcode = fields.Char()
     three_months_later = datetime.today() + timedelta(days=90)
-    date_availability = fields.Date(default=three_months_later, copy=False)
-    expected_price = fields.Float("期望售价", default=0.0)
-    selling_price = fields.Float("实际售价", copy=False)
+    date_availability = fields.Date(default=three_months_later, copy=False, string="可租日期")
+    expected_price = fields.Float(string="期望售价", default=0.0)
+    selling_price = fields.Float(string="实际售价", copy=False)
     bedrooms = fields.Integer(default=0)
     building_area = fields.Float(default=0.0, string="建筑面积")
     living_area = fields.Float(default=0.0, string="使用面积")
@@ -48,9 +48,48 @@ class EstateProperty(models.Model):
         selection=[('east', '东'), ('south', '南'), ('west', '西'), ('north', '北')],
         help="点击下拉框选择花园朝向"
     )
-    total_area = fields.Float(compute="_compute_total_area", string="总面积（㎡）", readonly=True)
-    current_contract_no = fields.Char('当前租赁合同编号', required=False)
     color = fields.Integer()
+
+    total_area = fields.Float(compute="_compute_total_area", string="总面积（㎡）", readonly=True, copy=False)
+
+    current_contract_id = fields.Many2one(string='当前合同', compute="_compute_latest_info",
+                                          readonly=True, copy=False, stroe=False)
+
+    current_contract_no = fields.Char(string='当前合同号', compute="_compute_latest_info", readonly=True, copy=False)
+    current_contract_nm = fields.Char(string='当前合同名称', compute="_compute_latest_info", readonly=True, copy=False)
+
+    latest_rent_date_e = fields.Date(string="上次出租结束日期", compute="_compute_latest_info", readonly=True, copy=False)
+    latest_rent_date_s = fields.Date(string="本次出租开始日期", compute="_compute_latest_info", readonly=True, copy=False)
+    out_of_rent_days = fields.Integer(string="本次空置天数", compute="_compute_latest_info", readonly=True, copy=False)
+
+    @api.depends("current_contract_id")
+    def _compute_latest_info(self):
+        for record in self:
+            # 本property对应的所有contract，原则上只能有一条active的contract
+            current_contract = self.env['estate.lease.contract'].search([('property_ids', 'in', record.id),
+                                                                         ('active', '=', True),
+                                                                         ('state', '=', 'released')], limit=1)
+            record.current_contract_id = current_contract.id if current_contract else False
+            record.current_contract_no = current_contract.contract_no if current_contract else False
+            record.current_contract_nm = current_contract.name if current_contract else False
+            record.latest_rent_date_s = current_contract.date_rent_start if current_contract else False
+
+            old_contract = self.env['estate.lease.contract'].search([('property_ids', 'in', record.id),
+                                                                     ('active', '=', True),
+                                                                     ('state', '=', 'invalid')],
+                                                                    order='date_rent_end DESC',
+                                                                    limit=1)
+            record.latest_rent_date_e = old_contract.date_rent_end if old_contract else False
+            if record.latest_rent_date_s:
+                if record.latest_rent_date_e:
+                    record.out_of_rent_days = (record.latest_rent_date_s - record.latest_rent_date_e).days - 1
+                else:
+                    record.out_of_rent_days = 0
+            else:
+                if record.latest_rent_date_e:
+                    record.out_of_rent_days = (datetime.today() - record.latest_rent_date_e).days
+                else:
+                    record.out_of_rent_days = 0
 
     @api.depends("living_area", "garden_area")
     def _compute_total_area(self):
@@ -83,9 +122,8 @@ class EstateProperty(models.Model):
             print(record.offer_ids)
             record.property_offer_count = len(record.offer_ids)
 
-    active = fields.Boolean(default=True)
     _sql_constraints = [
-        ('name', 'unique(name)', '资产类型不能重复'),
+        ('name', 'unique(name)', '资产名称不能重复'),
         ('expected_price', 'CHECK(expected_price > 0)', '期待售价必须大于零'),
         ('selling_price', 'CHECK(selling_price > 0)', '实际售价必须大于零'),
     ]
@@ -143,7 +181,6 @@ class EstateProperty(models.Model):
             if value == state_value:
                 return label
         return "Unknown State[{0}]".format(state_value)
-
 
     @api.model
     def ondelete(self):

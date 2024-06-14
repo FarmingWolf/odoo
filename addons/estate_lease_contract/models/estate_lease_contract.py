@@ -423,6 +423,9 @@ class EstateLeaseContract(models.Model):
             else:
                 record.state = 'to_be_released'
 
+            if record.date_rent_end < date.today():
+                record.state = 'invalid'
+
     """
     取消发布合同
     """

@@ -7,14 +7,14 @@
             <field name="inherit_id" ref="estate.491_real_estate_view_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='expected_price']" position="replace">
-                    <field name="rent_plan_id"></field>
+                    <field name="rent_plan_id"/>
                 </xpath>
                 <xpath expr="//field[@name='selling_price']" position="replace">
-                    <field name="management_fee_plan_id"></field>
+                    <field name="management_fee_plan_id"/>
                 </xpath>
                 <xpath expr="//field[@name='date_availability']" position="replace">
-                    <field name="payment_period"></field>
-                    <field name="payment_date"></field>
+                    <field name="payment_period"/>
+                    <field name="payment_date"/>
                 </xpath>
             </field>
         </record>
@@ -51,7 +51,7 @@
                                 <group col="1">
                                     <group col="1">
                                         <button name="action_refresh_rent_plan" type="object"
-                                                string="点击刷新"></button>
+                                                string="点击刷新"/>
                                     </group>
                                     <group col="1">
                                         <field name="business_type_id"/>
@@ -110,7 +110,7 @@
                                 </group>
                                 <group col="1">
                                     <button name="action_refresh_management_fee_plan" type="object"
-                                            string="点击刷新"></button>
+                                            string="点击刷新"/>
                                 </group>
                             </group>
                             <newline/>

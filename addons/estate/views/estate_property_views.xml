@@ -39,8 +39,8 @@
         <field name="arch" type="xml">
             <form string="RealEstateProperty" create="True" edit="True" duplicate="True" delete="True">
                 <header>
-                    <button name="action_cancel_property" type="object" string="取消"></button>
-                    <button name="action_sold_property" type="object" string="标记为已售出"></button>
+                    <button name="action_cancel_property" type="object" string="取消"/>
+                    <button name="action_sold_property" type="object" string="标记为已售出"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -50,8 +50,13 @@
                     <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
                     <group col="2">
                         <group col="1">
-                            <group col="1">
-                                <field name="property_type_id" options="{'no_create': true, 'no_open': true}"/>
+                            <group col="2">
+                                <group>
+                                    <field name="property_type_id" options="{'no_create': true, 'no_open': true}"/>
+                                </group>
+                                <group>
+                                    <field name="date_availability"/>
+                                </group>
                             </group>
                             <group col="3">
                                 <group>
@@ -64,14 +69,38 @@
                                     <field name="rent_area"/>
                                 </group>
                             </group>
-                            <group col="1">
-                                <field name="date_availability" string="可租日期"/>
+                            <group col="2">
+                                <group>
+                                    <field name="latest_rent_date_e"/>
+                                </group>
+                                <group>
+                                    <field name="latest_rent_date_s"/>
+                                </group>
+                            </group>
+                            <group col="2">
+                                <group>
+                                    <field name="out_of_rent_days"/>
+                                </group>
                             </group>
                         </group>
                         <group col="1">
-                            <field name="expected_price" string="期待价格"/>
-                            <field name="selling_price" string="实际价格"/>
-                            <field name="best_price"/>
+                            <group col="2">
+                                <group>
+                                    <field name="expected_price"/>
+                                </group>
+                                <group>
+                                    <field name="best_price"/>
+                                </group>
+                            </group>
+                            <group col="2">
+                                <field name="selling_price"/>
+                            </group>
+                            <group col="2">
+                                <field name="current_contract_no"/>
+                            </group>
+                            <group col="2">
+                                <field name="current_contract_nm"/>
+                            </group>
                         </group>
                     </group>
                     <notebook>
