@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="estate_lease_contract_action" model="ir.actions.act_window">
-        <field name="name">资产租赁合同列表</field>
+        <field name="name">资产租赁合同列表（查看）</field>
         <field name="res_model">estate.lease.contract</field>
         <field name="view_mode">tree,form,kanban</field>
         <field name="views" eval="[[False, 'tree'], [ref('estate_lease_contract_view_tree'), 'tree']]"/>
@@ -9,10 +9,10 @@
         <field name="domain">[('active', '=', True)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                这里可以展示0些文本信息。
+                还没有合同信息。
             </p>
             <p>
-                这里可以展示一些文本信息。
+                说明合同还没录入，或者录入了也没发布。
             </p>
         </field>
     </record>
@@ -26,10 +26,7 @@
         <field name="domain">[('active', '=', False)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                这里可以展示0些文本信息。
-            </p>
-            <p>
-                这里可以展示一些文本信息。
+                录入中的合同都在这里。
             </p>
         </field>
     </record>
@@ -66,6 +63,7 @@
                 <field name="contract_no"/>
                 <field name="name"/>
                 <field name="date_sign"/>
+                <field name="date_start"/>
                 <field name="date_rent_start"/>
                 <field name="date_rent_end"/>
                 <field name="date_decorate_start"/>
@@ -91,6 +89,7 @@
                 <field name="contract_no"/>
                 <field name="name"/>
                 <field name="date_sign"/>
+                <field name="date_start"/>
                 <field name="date_rent_start"/>
                 <field name="date_rent_end"/>
                 <field name="date_decorate_start"/>
@@ -111,6 +110,11 @@
         <field name="model">estate.lease.contract</field>
         <field name="arch" type="xml">
             <form string="estate_lease_contract_form">
+                <header>
+                    <button name="action_release_contract" type="object" string="发布"/>
+                    <button name="action_cancel_release_contract" type="object" string="取消发布"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
                 <sheet>
                     <group col="2">
                         <group>
@@ -121,7 +125,7 @@
                             <field name="sales_person_id" />
                             <field name="opt_person_id" />
                             <field name="date_sign" />
-                            <field name="date_deliver" />
+                            <field name="date_start" />
                             <field name="deliver_condition" />
                             <field name="performance_guarantee" />
                             <field name="rent_amount" />
@@ -144,20 +148,20 @@
                         <page string="租赁标的">
                             <group col="3">
                                 <group>
-                                    <field name="rent_count"></field>
+                                    <field name="rent_count"/>
                                 </group>
                                 <group>
-                                    <field name="building_area"></field>
+                                    <field name="building_area"/>
                                 </group>
                                 <group>
-                                    <field name="rent_area"></field>
+                                    <field name="rent_area"/>
                                 </group>
                             </group>
                             <field name="property_ids" />
                         </page>
                         <page string="停车位">
                             <group>
-                                    <field name="parking_space_count"></field>
+                                <field name="parking_space_count"/>
                             </group>
                             <field name="parking_space_ids" />
                         </page>
@@ -253,15 +257,17 @@
                             </group>
                             <sheet readonly="1">
                                 <group>
-                                    <group string="租金（优惠后）">
-                                        <group string="首期租金">
-                                        </group>
-                                        <group string="押金">
-                                        </group>
+                                    <group string="todo" invisble="1">
+                                        <group string="租金（优惠后）">
+                                            <group string="首期租金">
+                                            </group>
+                                            <group string="押金">
+                                            </group>
 
-                                    </group>
-                                    <group string="物业费">
+                                        </group>
+                                        <group string="物业费">
 
+                                        </group>
                                     </group>
                                     <field name="rental_details"></field>
                                 </group>

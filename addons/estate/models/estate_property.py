@@ -85,10 +85,7 @@ class EstateProperty(models.Model):
 
     active = fields.Boolean(default=True)
     _sql_constraints = [
-        ('name', 'unique(name)', '资产类型不能重复')
-    ]
-
-    _sql_constraints = [
+        ('name', 'unique(name)', '资产类型不能重复'),
         ('expected_price', 'CHECK(expected_price > 0)', '期待售价必须大于零'),
         ('selling_price', 'CHECK(selling_price > 0)', '实际售价必须大于零'),
     ]
@@ -112,7 +109,6 @@ class EstateProperty(models.Model):
         for record in self:
             if record.state == 'canceled':
                 raise UserError(_('该记录已经被取消，不能再被设置为已售出'))
-                print("设置错误之后")
 
             # 设置实际售价和购买者
             record.selling_price = record.best_price

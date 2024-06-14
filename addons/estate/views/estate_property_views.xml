@@ -48,16 +48,27 @@
                         <field name="name" class="o_estate_property_form_title_large_font" default_focus="True"/>
                     </group>
                     <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
-                    <group>
-                        <group>
-<!--                            <field name="state" readonly="True"/>-->
-                            <field name="property_type_id" options="{'no_create': true, 'no_open': true}"/>
-                            <field name="total_area"/>
-                            <field name="building_area"/>
-                            <field name="rent_area"/>
+                    <group col="2">
+                        <group col="1">
+                            <group col="1">
+                                <field name="property_type_id" options="{'no_create': true, 'no_open': true}"/>
+                            </group>
+                            <group col="3">
+                                <group>
+                                    <field name="total_area"/>
+                                </group>
+                                <group>
+                                    <field name="building_area"/>
+                                </group>
+                                <group>
+                                    <field name="rent_area"/>
+                                </group>
+                            </group>
+                            <group col="1">
+                                <field name="date_availability" string="可租日期"/>
+                            </group>
                         </group>
-                        <group>
-                            <field name="date_availability" string="上架日期"/>
+                        <group col="1">
                             <field name="expected_price" string="期待价格"/>
                             <field name="selling_price" string="实际价格"/>
                             <field name="best_price"/>

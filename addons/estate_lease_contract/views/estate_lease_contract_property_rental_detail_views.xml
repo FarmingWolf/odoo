@@ -26,6 +26,8 @@
                 <field name="date_payment"/>
                 <field name="rental_amount"/>
                 <field name="rental_amount_zh"/>
+                <field name="rental_receivable"/>
+                <field name="rental_received"/>
                 <field name="description"/>
             </tree>
         </field>

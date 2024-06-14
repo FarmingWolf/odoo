@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
+from odoo.tools.translate import _
+
 from dateutil.utils import today
 
 from addons.utils.models.utils import Utils
@@ -45,7 +47,7 @@ def _cal_date_payment(current_s, current_e, rental_plan):
 def _cal_rental_amount(month_cnt, current_s, current_e, record_self, rental_plan):
 
     days_delta = current_e - current_s
-    rental_amount = record_self.rent_area * rental_plan.rent_price
+    rental_amount = record_self.rent_area * rental_plan.rent_price * days_delta
     return rental_amount
 
 
@@ -126,20 +128,19 @@ class EstateLeaseContract(models.Model):
     _description = "资产租赁合同管理模型"
     _order = "contract_no, id"
 
-    name = fields.Char('合同名称', required=True, translate=True, copy=False)
+    name = fields.Char('合同名称', required=True, translate=True, copy=False, default="")
 
-    contract_no = fields.Char('合同编号', required=True, translate=True, copy=False)
+    contract_no = fields.Char('合同编号', required=True, translate=True, copy=False, default="")
     # contract_amount = fields.Float("合同金额", default=0.0)
     # contract_tax = fields.Float("税额", default=0.0)
     # contract_tax_per = fields.Float("税率", default=0.0)
     # contract_tax_out = fields.Float("不含税合同额", default=0.0)
 
     date_sign = fields.Date("合同签订日期")
-    # date_start = fields.Date("合同开始日期")
+    date_start = fields.Date("合同开始日期")
 
-    date_rent_start = fields.Date("计租开始日期")
-    date_rent_end = fields.Date("计租结束日期")
-    days_free = fields.Integer("免租期天数", default=0)
+    date_rent_start = fields.Date("计租开始日期", required=True)
+    date_rent_end = fields.Date("计租结束日期", required=True)
 
     days_rent_total = fields.Char(string="租赁期限", compute="_calc_days_rent_total")
 
@@ -188,19 +189,14 @@ class EstateLeaseContract(models.Model):
                                         selection=[('lease', '租赁合同'), ('property_management', '物业合同'),
                                                    ('lease_property_management', '租赁及物业合同')], )
 
-    tag_ids = fields.Many2many("estate.lease.contract.tag", string='合同标签')
+    tag_ids = fields.Many2many("estate.lease.contract.tag", string='合同标签', copy=False)
 
     rent_account = fields.Many2one("estate.lease.contract.bank.account", string='租金收缴账户')
-    # rent_account_name = fields.Char('租金收缴账户名', required=True, translate=True)
-    # rent_account_bank = fields.Char('租金收缴账户银行', required=True, translate=True)
-    # rent_account_no = fields.Char('租金收缴账号', required=True, translate=True)
 
     opening_date = fields.Date(string="计划开业日期")
-    # rental_plan_id = fields.Many2many("estate.lease.contract.rental.plan", 'contract_rental_plan_rel', 'contract_id',
-    #                                   'rental_plan_id', string="租金方案")
 
     rental_plan_ids = fields.One2many("estate.lease.contract.rental.plan", compute='_compute_rental_plan_ids',
-                                      string='租金方案')
+                                      string='租金方案', copy=False)
 
     @api.depends('property_ids')
     def _compute_rental_plan_ids(self):
@@ -212,7 +208,7 @@ class EstateLeaseContract(models.Model):
 
     property_management_fee_plan_ids = fields.One2many("estate.lease.contract.property.management.fee.plan",
                                                        compute='_compute_property_management_fee_plan_ids',
-                                                       string="物业费方案")
+                                                       string="物业费方案", copy=False)
 
     @api.depends('property_ids')
     def _compute_property_management_fee_plan_ids(self):
@@ -232,34 +228,38 @@ class EstateLeaseContract(models.Model):
 
     parking_space_ids = fields.Many2many('parking.space', 'contract_parking_space_rel', 'contract_id',
                                          'parking_space_id',
-                                         string='停车位')
+                                         string='停车位', copy=False)
 
     parking_space_count = fields.Integer(default=0, string="分配停车位数量", compute="_calc_parking_space_cnt")
 
     @api.depends("parking_space_ids")
     def _calc_parking_space_cnt(self):
         for record in self:
+            record.parking_space_count = 0
             if record.parking_space_ids:
                 record.parking_space_count = len(record.parking_space_ids)
 
-    invoicing_address = fields.Char('发票邮寄地址', required=True, translate=True)
-    invoicing_email = fields.Char('电子发票邮箱', required=True, translate=True)
+    invoicing_address = fields.Char('发票邮寄地址', translate=True, copy=False)
+    invoicing_email = fields.Char('电子发票邮箱', translate=True, copy=False)
 
     sales_person_id = fields.Many2one('res.users', string='招商员', index=True, default=lambda self: self.env.user)
     opt_person_id = fields.Many2one('res.users', string='录入员', index=True, default=lambda self: self.env.user)
 
-    renter_id = fields.Many2one('res.partner', string='承租人', index=True)
+    renter_id = fields.Many2one('res.partner', string='承租人', index=True, copy=False)
 
     property_ids = fields.Many2many('estate.property', 'contract_property_rel', 'contract_id', 'property_id',
-                                    string='租赁标的')
+                                    string='租赁标的', copy=False)
 
-    rent_count = fields.Integer(default=0, string="租赁标的数量", compute="_calc_rent_total_info")
-    building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", compute="_calc_rent_total_info")
-    rent_area = fields.Float(default=0.0, string="总计租面积（㎡）", compute="_calc_rent_total_info")
+    rent_count = fields.Integer(default=0, string="租赁标的数量", compute="_calc_rent_total_info", copy=False)
+    building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", compute="_calc_rent_total_info", copy=False)
+    rent_area = fields.Float(default=0.0, string="总计租面积（㎡）", compute="_calc_rent_total_info", copy=False)
 
     @api.depends("property_ids")
     def _calc_rent_total_info(self):
         for record in self:
+            record.rent_count = 0
+            record.building_area = 0
+            record.rent_area = 0
             if record.property_ids:
                 for rent_property in record.property_ids:
                     record.rent_count += 1
@@ -272,7 +272,7 @@ class EstateLeaseContract(models.Model):
     rent_first_period_to = fields.Date(string="首期租金期间（结束日）")
     rent_first_payment_date = fields.Date(string="首期租金缴纳日")
 
-    contract_incentives_ids = fields.Many2one('estate.lease.contract.incentives', string='优惠方案')
+    contract_incentives_ids = fields.Many2one('estate.lease.contract.incentives', string='优惠方案', copy=False)
     date_incentives_start = fields.Char(string="优惠政策开始日期", readonly=True, compute="_get_incentives_info")
     date_incentives_end = fields.Char(string="优惠政策结束日期", readonly=True, compute="_get_incentives_info")
     days_free = fields.Char(string="免租期天数", readonly=True, compute="_get_incentives_info")
@@ -339,19 +339,19 @@ class EstateLeaseContract(models.Model):
                 record.contract_incentives_description = ""
 
     advance_collection_of_coupon_deposit_guarantee = fields.Float(default=0.0, string="预收卡券保证金（元）")
-    performance_guarantee = fields.Float(string="履约保证金（元）")
-    property_management_fee_guarantee = fields.Float(string="物管费保证金（元）")
+    performance_guarantee = fields.Float(default=0.0, string="履约保证金（元）")
+    property_management_fee_guarantee = fields.Float(default=0.0, string="物管费保证金（元）")
 
-    decoration_deposit = fields.Float(string="装修押金（元）")
-    decoration_management_fee = fields.Float(string="装修管理费（元）")
-    decoration_water_fee = fields.Float(string="装修水费（元）")
-    decoration_electricity_fee = fields.Float(string="装修电费（元）")
-    refuse_collection = fields.Float(string="建筑垃圾清运费（元）")
-    garbage_removal_fee = fields.Float(string="垃圾清运费（元）")
+    decoration_deposit = fields.Float(default=0.0, string="装修押金（元）")
+    decoration_management_fee = fields.Float(default=0.0, string="装修管理费（元）")
+    decoration_water_fee = fields.Float(default=0.0, string="装修水费（元）")
+    decoration_electricity_fee = fields.Float(default=0.0, string="装修电费（元）")
+    refuse_collection = fields.Float(default=0.0, string="建筑垃圾清运费（元）")
+    garbage_removal_fee = fields.Float(default=0.0, string="垃圾清运费（元）")
 
-    description = fields.Text("详细信息")
+    description = fields.Text("详细信息", copy=False)
 
-    attachment_ids = fields.Many2many('ir.attachment', string="附件管理")
+    attachment_ids = fields.Many2many('ir.attachment', string="附件管理", copy=False)
 
     rental_details = fields.One2many('estate.lease.contract.property.rental.detail', 'contract_id',
                                      compute='_compute_rental_details', string="租金明细")
@@ -397,11 +397,36 @@ class EstateLeaseContract(models.Model):
                         'description': rental_detail['description'],
                     })
     # 合同新建时默认不生效，需要手动修改
-    active = fields.Boolean(default=False)
+    active = fields.Boolean(default=False, copy=False)
     # 合同状态
     state = fields.Selection(
         string='合同状态',
-        selection=[('recording', '录入中未生效'), ('to_be_released', '发布待生效'), ('released', '发布已生效'),
-                   ('terminated', '终止无效'), ('out_of_date', '过期无效')]
+        selection=[('recording', '录入中未生效'), ('to_be_released', '已发布待生效'), ('released', '已发布已生效'),
+                   ('invalid', '失效')], default="recording", copy=False
     )
 
+    # 合同终止状态
+    terminated = fields.Boolean(default=False, copy=False)
+
+    """
+    发布合同
+    """
+    def action_release_contract(self):
+        for record in self:
+            if record.terminated:
+                raise UserError(_('该合同已经被终止执行，不能再发布'))
+
+            record.active = True
+            # 根据合同生效日期判断state
+            if record.date_start <= date.today():
+                record.state = 'released'
+            else:
+                record.state = 'to_be_released'
+
+    """
+    取消发布合同
+    """
+    def action_cancel_release_contract(self):
+        for record in self:
+            record.active = False
+            record.state = 'recording'
