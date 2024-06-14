@@ -12,6 +12,10 @@
                 <xpath expr="//field[@name='selling_price']" position="replace">
                     <field name="management_fee_plan_id"></field>
                 </xpath>
+                <xpath expr="//field[@name='date_availability']" position="replace">
+                    <field name="payment_period"></field>
+                    <field name="payment_date"></field>
+                </xpath>
             </field>
         </record>
 

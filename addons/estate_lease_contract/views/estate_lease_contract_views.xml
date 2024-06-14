@@ -86,7 +86,6 @@
                             <field name="date_rent_end" />
                             <field name="days_rent_total" readonly="1"/>
                             <field name="days_free" />
-                            <field name="contract_rental_payment_day" />
                             <field name="date_decorate_start" />
                             <field name="date_decorate_end" />
                             <field name="days_decorate" readonly="1"/>
