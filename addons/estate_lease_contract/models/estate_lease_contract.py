@@ -126,9 +126,9 @@ class EstateLeaseContract(models.Model):
     _description = "资产租赁合同管理模型"
     _order = "contract_no, id"
 
-    name = fields.Char('合同名称', required=True, translate=True)
+    name = fields.Char('合同名称', required=True, translate=True, copy=False)
 
-    contract_no = fields.Char('合同编号', required=True, translate=True)
+    contract_no = fields.Char('合同编号', required=True, translate=True, copy=False)
     # contract_amount = fields.Float("合同金额", default=0.0)
     # contract_tax = fields.Float("税额", default=0.0)
     # contract_tax_per = fields.Float("税率", default=0.0)
@@ -396,3 +396,12 @@ class EstateLeaseContract(models.Model):
                         'date_payment': rental_detail['date_payment'],
                         'description': rental_detail['description'],
                     })
+    # 合同新建时默认不生效，需要手动修改
+    active = fields.Boolean(default=False)
+    # 合同状态
+    state = fields.Selection(
+        string='合同状态',
+        selection=[('recording', '录入中未生效'), ('to_be_released', '发布待生效'), ('released', '发布已生效'),
+                   ('terminated', '终止无效'), ('out_of_date', '过期无效')]
+    )
+

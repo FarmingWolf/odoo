@@ -3,6 +3,7 @@
     <menuitem id="estate_lease_contract_menu_root" name="资产租赁合同">
         <menuitem id="estate_ease_contract_first_level_menu_list" name="合同列表">
             <menuitem id="estate_lease_contract_menu_action" action="estate_lease_contract_action"/>
+            <menuitem id="estate_lease_contract_menu_action_recording" action="estate_lease_contract_action_recording"/>
         </menuitem>
         <menuitem id="estate_lease_contract_menu_settings" name="合同基础设置">
             <menuitem id="estate_lease_contract_menu_setting_tag" action="estate_lease_contract_action_tag"/>
