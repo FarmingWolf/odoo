@@ -27,8 +27,7 @@ class EstateProperty(models.Model):
     floor = fields.Integer(default=1, string='楼层')
     description = fields.Text("详细信息")
     postcode = fields.Char()
-    three_months_later = datetime.today() + timedelta(days=90)
-    date_availability = fields.Date(default=three_months_later, copy=False, string="可租日期")
+    date_availability = fields.Date(copy=False, string="可租日期", compute="_compute_latest_info")
     expected_price = fields.Float(string="期望售价", default=0.0)
     selling_price = fields.Float(string="实际售价", copy=False)
     bedrooms = fields.Integer(default=0)
@@ -62,7 +61,7 @@ class EstateProperty(models.Model):
     latest_rent_date_s = fields.Date(string="本次出租开始日期", compute="_compute_latest_info", readonly=True, copy=False)
     out_of_rent_days = fields.Integer(string="本次空置天数", compute="_compute_latest_info", readonly=True, copy=False)
 
-    @api.depends("current_contract_id")
+    @api.depends("current_contract_id", "date_availability")
     def _compute_latest_info(self):
         for record in self:
             # 本property对应的所有contract，原则上只能有一条active的contract
@@ -80,16 +79,24 @@ class EstateProperty(models.Model):
                                                                     order='date_rent_end DESC',
                                                                     limit=1)
             record.latest_rent_date_e = old_contract.date_rent_end if old_contract else False
+            record.date_availability = record.latest_rent_date_e + timedelta(days=1) if old_contract else False
+
             if record.latest_rent_date_s:
-                if record.latest_rent_date_e:
-                    record.out_of_rent_days = (record.latest_rent_date_s - record.latest_rent_date_e).days - 1
+                if record.date_availability:
+                    record.out_of_rent_days = (record.latest_rent_date_s - record.date_availability).days - 1
                 else:
-                    record.out_of_rent_days = 0
+                    if record.latest_rent_date_e:
+                        record.out_of_rent_days = (record.latest_rent_date_s - record.latest_rent_date_e).days - 1
+                    else:
+                        record.out_of_rent_days = 0
             else:
-                if record.latest_rent_date_e:
-                    record.out_of_rent_days = (datetime.today() - record.latest_rent_date_e).days
+                if record.date_availability:
+                    record.out_of_rent_days = (datetime.today() - record.date_availability).days
                 else:
-                    record.out_of_rent_days = 0
+                    if record.latest_rent_date_e:
+                        record.out_of_rent_days = (datetime.today() - record.latest_rent_date_e).days
+                    else:
+                        record.out_of_rent_days = 0
 
     @api.depends("living_area", "garden_area")
     def _compute_total_area(self):
