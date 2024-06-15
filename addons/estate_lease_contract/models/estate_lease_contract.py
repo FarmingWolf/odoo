@@ -45,7 +45,6 @@ def _cal_date_payment(current_s, current_e, rental_plan):
 
 
 def _cal_rental_amount(month_cnt, current_s, current_e, record_self, rental_plan):
-
     days_delta = current_e - current_s
     rental_amount = record_self.rent_area * rental_plan.rent_price * days_delta
     return rental_amount
@@ -136,11 +135,11 @@ class EstateLeaseContract(models.Model):
     # contract_tax_per = fields.Float("税率", default=0.0)
     # contract_tax_out = fields.Float("不含税合同额", default=0.0)
 
-    date_sign = fields.Date("合同签订日期")
-    date_start = fields.Date("合同开始日期")
+    date_sign = fields.Date("合同签订日期", required=True, copy=False)
+    date_start = fields.Date("合同开始日期", required=True, copy=False)
 
-    date_rent_start = fields.Date("计租开始日期", required=True)
-    date_rent_end = fields.Date("计租结束日期", required=True)
+    date_rent_start = fields.Date("计租开始日期", required=True, copy=False)
+    date_rent_end = fields.Date("计租结束日期", required=True, copy=False)
 
     days_rent_total = fields.Char(string="租赁期限", compute="_calc_days_rent_total")
 
@@ -253,6 +252,20 @@ class EstateLeaseContract(models.Model):
     rent_count = fields.Integer(default=0, string="租赁标的数量", compute="_calc_rent_total_info", copy=False)
     building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", compute="_calc_rent_total_info", copy=False)
     rent_area = fields.Float(default=0.0, string="总计租面积（㎡）", compute="_calc_rent_total_info", copy=False)
+
+    """检查该合同的资产是否在其他合同中，且与其计租期重叠"""
+
+    def _check_property_in_contract(self, rent_property, self_record):
+        property_current_contract = self.env['estate.lease.contract'].search(
+            [('property_ids', '=', rent_property.id), ('active', '=', True),
+             '|', '&', ('date_rent_start', '>=', self_record.date_rent_start),
+             ('date_rent_start', '<=', self_record.date_rent_end),
+             '|', '&', ('date_rent_end', '>=', self_record.date_rent_start),
+             ('date_rent_end', '<=', self_record.date_rent_end),
+             '&', ('date_rent_start', '<=', self_record.date_rent_start),
+             ('date_rent_end', '>=', self_record.date_rent_end), ])
+
+        return property_current_contract
 
     @api.depends("property_ids")
     def _calc_rent_total_info(self):
@@ -367,6 +380,7 @@ class EstateLeaseContract(models.Model):
     """
     合同页面金额汇总标签页的刷新按钮动作
     """
+
     def action_refresh_all_money(self):
         self._compute_property_rental_detail_ids()
         self._compute_rental_details()
@@ -374,6 +388,7 @@ class EstateLeaseContract(models.Model):
     """
     根据租期和租金方案计算租金明细
     """
+
     @api.depends("date_rent_start", "date_rent_end", "property_ids", "rental_plan_ids")
     def _compute_property_rental_detail_ids(self):
         for record in self:
@@ -396,6 +411,7 @@ class EstateLeaseContract(models.Model):
                         'date_payment': rental_detail['date_payment'],
                         'description': rental_detail['description'],
                     })
+
     # 合同新建时默认不生效，需要手动修改
     active = fields.Boolean(default=False, copy=False)
     # 合同状态
@@ -408,13 +424,30 @@ class EstateLeaseContract(models.Model):
     # 合同终止状态
     terminated = fields.Boolean(default=False, copy=False)
 
-    """
-    发布合同
-    """
+    # 发布合同
     def action_release_contract(self):
         for record in self:
             if record.terminated:
                 raise UserError(_('该合同已经被终止执行，不能再发布'))
+
+            if record.property_ids:
+                current_contract_list = []
+                for property_id in record.property_ids:
+                    if record.date_rent_start and record.date_rent_end:
+                        property_current_contract = self._check_property_in_contract(property_id, record)
+                        if property_current_contract:
+                            for each_contract in property_current_contract:
+                                if each_contract.id != record.id:
+                                    current_contract_list.append(
+                                        f"房屋：【 {property_id.name}】合同：【{each_contract.name}】"
+                                        f"租赁期间：【{each_contract.date_rent_start}~{each_contract.date_rent_end}】")
+
+                if current_contract_list:
+                    warn_msg = '；'.join(current_contract_list)
+                    raise UserError(_('房屋在不同租赁合同中租赁期间重叠：{0}'.format(warn_msg)))
+
+            else:
+                raise UserError(_('发布合同需要至少绑定一个租赁标的'))
 
             record.active = True
             # 根据合同生效日期判断state
@@ -429,6 +462,7 @@ class EstateLeaseContract(models.Model):
     """
     取消发布合同
     """
+
     def action_cancel_release_contract(self):
         for record in self:
             record.active = False

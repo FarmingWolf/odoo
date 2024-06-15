@@ -52,7 +52,7 @@ class EstateProperty(models.Model):
     total_area = fields.Float(compute="_compute_total_area", string="总面积（㎡）", readonly=True, copy=False)
 
     current_contract_id = fields.Many2one(string='当前合同', compute="_compute_latest_info",
-                                          readonly=True, copy=False, stroe=False)
+                                          readonly=True, copy=False, store=False)
 
     current_contract_no = fields.Char(string='当前合同号', compute="_compute_latest_info", readonly=True, copy=False)
     current_contract_nm = fields.Char(string='当前合同名称', compute="_compute_latest_info", readonly=True, copy=False)
