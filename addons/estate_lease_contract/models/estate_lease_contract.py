@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import logging
 from datetime import timedelta, datetime, date
 from odoo.tools.translate import _
 
@@ -9,6 +10,8 @@ from addons.utils.models.utils import Utils
 from odoo import fields, models, api, exceptions
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare
+
+_logger = logging.getLogger(__name__)
 
 
 def _cal_date_payment(current_s, current_e, rental_plan):
@@ -45,8 +48,18 @@ def _cal_date_payment(current_s, current_e, rental_plan):
 
 
 def _cal_rental_amount(month_cnt, current_s, current_e, record_self, rental_plan):
+    """
+    租金计算方法：先计算年租金，再计算每月租金或每期租金
+    年租金=租金单价×计租面积×365
+    月租金=年租金÷12
+    两个月租金=月租金×2
+    三个月租金=月租金×3
+    以此类推
+    """
     days_delta = current_e - current_s
-    rental_amount = record_self.rent_area * rental_plan.rent_price * days_delta
+    rental_amount_year = record_self.rent_area * rental_plan.rent_price * 365
+    rental_amount_month = rental_amount_year / 12
+    rental_amount = rental_amount_month * month_cnt
     return rental_amount
 
 
@@ -74,7 +87,7 @@ def _generate_details_from_rent_plan(record_self):
             month_cnt = 1
         elif rental_plan.payment_period == 'bimonthly':
             month_cnt = 2
-        elif rental_plan.payment_period == 'season':
+        elif rental_plan.payment_period == 'quarterly':
             month_cnt = 3
         elif rental_plan.payment_period == 'half_year':
             month_cnt = 6
@@ -373,22 +386,24 @@ class EstateLeaseContract(models.Model):
     def _compute_rental_details(self):
         # 把计算结果付回给rental_details
         for record in self:
-            rental_details = self.env['estate.property'].search([('id', 'in', record.property_ids.ids)]).mapped(
-                'property_rental_detail_ids')
+            rental_details = self.env['estate.lease.contract.property.rental.detail'].search(
+                    [('contract_id', '=', record.id)])
             record.rental_details = rental_details
 
-    """
-    合同页面金额汇总标签页的刷新按钮动作
-    """
-
+    # 合同页面金额汇总标签页的刷新按钮动作
     def action_refresh_all_money(self):
         self._compute_property_rental_detail_ids()
         self._compute_rental_details()
 
-    """
-    根据租期和租金方案计算租金明细
-    """
+    # 刷新租金方案
+    def action_refresh_rental_plan(self):
+        self._compute_rental_plan_ids()
 
+    # 刷新物业费方案
+    def action_refresh_management_fee_plan(self):
+        self._compute_property_management_fee_plan_ids()
+
+    # 根据租期和租金方案计算租金明细
     @api.depends("date_rent_start", "date_rent_end", "property_ids", "rental_plan_ids")
     def _compute_property_rental_detail_ids(self):
         for record in self:
@@ -444,7 +459,7 @@ class EstateLeaseContract(models.Model):
 
                 if current_contract_list:
                     warn_msg = '；'.join(current_contract_list)
-                    raise UserError(_('房屋在不同租赁合同中租赁期间重叠：{0}'.format(warn_msg)))
+                    raise UserError(_('不能发布本合同，因为房屋在其他租赁合同中租赁期重叠：{0}'.format(warn_msg)))
 
             else:
                 raise UserError(_('发布合同需要至少绑定一个租赁标的'))

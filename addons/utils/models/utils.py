@@ -5,8 +5,8 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-class Utils:
 
+class Utils:
     _name = 'utils'
     # 小额数字到汉字的映射
     chinese_digits = {
@@ -49,11 +49,9 @@ class Utils:
 
     @staticmethod
     def arabic_to_chinese(amount):
-        """
-        将阿拉伯数字金额转换为汉字大写表示，遵循财务书写规范。
-        """
-
+        # 将阿拉伯数字金额转换为汉字大写表示，遵循财务书写规范。
         # 分离整数和小数部分
+        _logger.debug("amount=[{0}]".format(amount))
         parts = str(amount).split('.')
         yuan = int(parts[0])  # 整数部分
         decimal = parts[1] if len(parts) > 1 else '00'  # 小数部分，不足两位补0
@@ -149,4 +147,4 @@ class Utils:
 # print("51040506070809.89={0}".format(Utils.arabic_to_chinese(51040506070809.89)))
 # print("123456789012345.67={0}".format(Utils.arabic_to_chinese(123456789012345.67)))
 # print("223456789012346.7={0}".format(Utils.arabic_to_chinese(223456789012346.7)))
-# print("323456789012347.08={0}".format(Utils.arabic_to_chinese(323456789012347.08)))
+_logger.debug("323456789012347.08={0}".format(Utils.arabic_to_chinese(323456789012347.08)))

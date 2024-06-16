@@ -166,9 +166,11 @@
                             <field name="parking_space_ids" />
                         </page>
                         <page string="租金方案">
+                            <button name="action_refresh_rental_plan" type="object" string="点击刷新"/>
                             <field name="rental_plan_ids"/>
                         </page>
                         <page string="物业费方案">
+                            <button name="action_refresh_management_fee_plan" type="object" string="点击刷新"/>
                             <field name="property_management_fee_plan_ids" />
                         </page>
                         <page string="优惠方案">
@@ -247,17 +249,15 @@
                         <page string="附件">
                             <group>
                                 <field name="attachment_ids" widget="many2many_binary" options="{'no_create': True}"/>
-<!--                            <field name="attachment_ids" widget="custom_many2many_binary" options="{'no_create': True}"/>-->
                             </group>
                         </page>
                         <page string="金额汇总">
                             <group col="1">
-                                <button name="action_refresh_all_money" type="object"
-                                        string="点击刷新"/>
+                                <button name="action_refresh_all_money" type="object" string="点击刷新"/>
                             </group>
                             <sheet readonly="1">
                                 <group>
-                                    <group string="todo" invisble="1">
+                                    <group string="todo" invisible="1">
                                         <group string="租金（优惠后）">
                                             <group string="首期租金">
                                             </group>
@@ -269,7 +269,7 @@
 
                                         </group>
                                     </group>
-                                    <field name="rental_details"></field>
+                                    <field name="rental_details"/>
                                 </group>
                             </sheet>
                         </page>

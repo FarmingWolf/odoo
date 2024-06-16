@@ -98,6 +98,9 @@ class EstateProperty(models.Model):
                     else:
                         record.out_of_rent_days = 0
 
+            if record.out_of_rent_days < 0:
+                record.out_of_rent_days = 0
+
     @api.depends("living_area", "garden_area")
     def _compute_total_area(self):
         for record in self:

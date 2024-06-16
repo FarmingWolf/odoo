@@ -58,24 +58,19 @@
                                     <field name="date_availability"/>
                                 </group>
                             </group>
-                            <group col="3">
+                            <group col="2">
                                 <group>
                                     <field name="total_area"/>
                                 </group>
                                 <group>
                                     <field name="building_area"/>
                                 </group>
-                                <group>
-                                    <field name="rent_area"/>
-                                </group>
                             </group>
-                            <group col="2">
-                                <group>
-                                    <field name="latest_rent_date_e"/>
-                                </group>
-                                <group>
-                                    <field name="latest_rent_date_s"/>
-                                </group>
+                            <group>
+                                <field name="rent_area"/>
+                            </group>
+                            <group>
+                                <field name="latest_rent_date_e"/>
                             </group>
                             <group col="2">
                                 <group>
@@ -101,6 +96,10 @@
                             <group col="2">
                                 <field name="current_contract_nm"/>
                             </group>
+                            <group>
+                                <field name="latest_rent_date_s"/>
+                            </group>
+
                         </group>
                     </group>
                     <notebook>
