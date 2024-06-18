@@ -19,6 +19,8 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
     property_id = fields.Many2one('estate.property', string="资产（房屋）")
     property_state = fields.Char(string='资产状态')
     property_date_availability = fields.Date(string="可租日期")
+    property_building_area = fields.Integer(string="建筑面积")
+    property_rent_area = fields.Integer(string="计租面积")
 
     contract_id = fields.Many2one('estate.lease.contract', string="在租合同")
     contract_state = fields.Char(string='合同状态')
@@ -91,6 +93,8 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                 # 先把资产状态设置为空
                 record_property_state = None
                 record_property_date_availability = each_property.date_availability
+                record_property_building_area = each_property.property_building_area
+                record_property_rent_area = each_property.property_rent_area
 
                 # 查询该日期对应的有效合同
                 contract_domain = [('property_ids', '=', each_property.id), ('active', '=', True),
@@ -125,6 +129,8 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                     'name': record_name,
                     'status_date': record_status_date,
                     'property_id': record_property_id.id,
+                    'property_building_area': record_property_building_area,
+                    'property_rent_area': record_property_rent_area,
                     'property_state': record_property_state,
                     'property_date_availability': record_property_date_availability,
                     'contract_id': record_contract_id_id,

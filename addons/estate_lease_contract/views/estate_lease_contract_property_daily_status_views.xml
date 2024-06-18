@@ -25,6 +25,8 @@
             <tree string="estate_lease_contract_property_daily_status_view_tree">
                 <field name="status_date" readonly="1"/>
                 <field name="property_id" readonly="1"/>
+                <field name="property_building_area" readonly="1"/>
+                <field name="property_rent_area" readonly="1"/>
                 <field name="property_state" readonly="1"/>
                 <field name="property_date_availability" readonly="1"/>
                 <field name="contract_id" readonly="1"/>
@@ -56,6 +58,8 @@
                         <group>
                             <field name="status_date" readonly="1"/>
                             <field name="property_id" readonly="1"/>
+                            <field name="property_building_area" readonly="1"/>
+                            <field name="property_rent_area" readonly="1"/>
                             <field name="property_state" readonly="1"/>
                             <field name="property_date_availability" readonly="1"/>
                         </group>
