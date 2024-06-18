@@ -50,10 +50,10 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
         # 每日JOB从数据库里记录的最新一天开始往后按天计算
         latest_date = self.env['estate.lease.contract.property.daily.status'].search([], order='status_date DESC',
                                                                                      limit=1)
-        # 如果数据库中有数据，则以其为基准，计算其后一日
+        # 如果数据库中有数据，则重新计算其最大日期数据，计算至date.today()
         if latest_date:
             if latest_date[0].status_date:
-                record_status_date = latest_date[0].status_date + timedelta(days=1)
+                record_status_date = latest_date[0].status_date
             else:
                 record_status_date = date.today() - timedelta(days=1)
         else:
