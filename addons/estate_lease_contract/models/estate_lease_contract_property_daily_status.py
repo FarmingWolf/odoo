@@ -93,8 +93,8 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                 # 先把资产状态设置为空
                 record_property_state = None
                 record_property_date_availability = each_property.date_availability
-                record_property_building_area = each_property.property_building_area
-                record_property_rent_area = each_property.property_rent_area
+                record_property_building_area = each_property.building_area
+                record_property_rent_area = each_property.rent_area
 
                 # 查询该日期对应的有效合同
                 contract_domain = [('property_ids', '=', each_property.id), ('active', '=', True),
