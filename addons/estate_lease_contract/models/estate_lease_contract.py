@@ -15,6 +15,7 @@ _logger = logging.getLogger(__name__)
 
 
 def _cal_date_payment(current_s, current_e, rental_plan):
+    # todo:每期开始前的N日内支付下期费用
     """rental_plan.payment_date:
     [('period_start_7_pay_pre', '租期开始后的7日内付上期抽成费用'),
    ('period_start_10_pay_pre', '租期开始后的10日内付上期抽成费用'),
@@ -266,8 +267,7 @@ class EstateLeaseContract(models.Model):
     building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", compute="_calc_rent_total_info", copy=False)
     rent_area = fields.Float(default=0.0, string="总计租面积（㎡）", compute="_calc_rent_total_info", copy=False)
 
-    """检查该合同的资产是否在其他合同中，且与其计租期重叠"""
-
+    # 检查该合同的资产是否在其他合同中，且与其计租期重叠
     def _check_property_in_contract(self, rent_property, self_record):
         property_current_contract = self.env['estate.lease.contract'].search(
             [('property_ids', '=', rent_property.id), ('active', '=', True),
@@ -474,10 +474,7 @@ class EstateLeaseContract(models.Model):
             if record.date_rent_end < date.today():
                 record.state = 'invalid'
 
-    """
-    取消发布合同
-    """
-
+    # 取消发布合同
     def action_cancel_release_contract(self):
         for record in self:
             record.active = False

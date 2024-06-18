@@ -5,7 +5,7 @@
     'name': "资产管理账户",
     'version': '1.0',
     'depends': ['estate', 'account'],
-    'category': '园区管理/资产管理/账户管理',
+    'category': 'Real Estate/Brokerage',
     'summary': '可集成至estate',
     'author': '491科技',
     'website': 'https://www.odoo.com/app/account',

@@ -29,13 +29,14 @@
         'views/estate_lease_contract_property_management_fee_plan_views.xml',
         'views/estate_lease_contract_rental_plan_views.xml',
         'views/estate_lease_contract_views.xml',
+        'views/estate_lease_contract_property_daily_status_views.xml',
         'views/estate_lease_contract_menus.xml',
+
+        'data/cron_daily_property_status.xml',
     ],
     'assets': {
         'web.assets_backend': [
-            # 'estate_lease_contract/static/src/**/*',
-            # 'estate_lease_contract/static/src/css/estate_lease_contract.scss',
-            # 'estate_lease_contract/static/src/js/estate_lease_contract_events.js',
+            'estate_lease_contract/static/src/js/estate_lease_contract_property_status_load.js',
             'estate_lease_contract/static/src/js/estate_lease_contract_rental_plan_load.js',
         ],
     },

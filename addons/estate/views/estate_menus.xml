@@ -8,5 +8,9 @@
             <menuitem id="estate_property_menu_setting_property_type" action="real_estate_action_property_type"/>
             <menuitem id="estate_property_menu_setting_property_tag" action="real_estate_action_property_tag"/>
         </menuitem>
+        <menuitem id="estate_property_status_menu" name="出租状态">
+            <menuitem id="estate_property_menu_daily_status_create_manual" action="estate_lease_contract.estate_lease_contract_property_daily_status_create_manual_action"/>
+            <menuitem id="estate_property_menu_daily_status" action="estate_lease_contract.estate_lease_contract_property_daily_status_action"/>
+        </menuitem>
     </menuitem>
 </odoo>

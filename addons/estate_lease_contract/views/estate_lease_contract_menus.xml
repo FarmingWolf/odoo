@@ -17,7 +17,7 @@
             <menuitem id="estate_lease_contract_menu_setting_contract_accounts" action="estate_lease_contract_bank_account_action"/>
         </menuitem>
         <menuitem id="estate_lease_contract_menu_rental" name="租金明细">
-            <menuitem id="estate_lease_contract_menu_setting_rental_details" action="estate_lease_contract_property_rental_detail_action"/>
+            <menuitem id="estate_lease_contract_menu_rental_details" action="estate_lease_contract_property_rental_detail_action"/>
         </menuitem>
     </menuitem>
 </odoo>

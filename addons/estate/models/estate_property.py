@@ -118,9 +118,9 @@ class EstateProperty(models.Model):
     active = fields.Boolean(default=True)
     state = fields.Selection(
         string='资产状态',
-        selection=[('new', '新上'), ('offer_received', '收到报价'), ('offer_accepted', '接受报价'),
-                   ('sold', '已售出'), ('canceled', '已取消')],
-        help="新上，收到报价，接受报价，已售出，已取消"
+        selection=[('repairing', '整备中'), ('new', '新上'), ('offer_received', '收到报价'), ('offer_accepted', '接受报价'),
+                   ('sold', '已租'), ('canceled', '已取消')],
+        help="新上，收到报价，接受报价，已出租，已取消"
     )
 
     # property_offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价")

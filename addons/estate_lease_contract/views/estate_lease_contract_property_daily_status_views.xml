@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="estate_lease_contract_property_daily_status_action" model="ir.actions.act_window">
+        <field name="name">资产出租每日状态明细</field>
+        <field name="res_model">estate.lease.contract.property.daily.status</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">日报尚未生成。</p>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_property_daily_status_create_manual_action" model="ir.actions.server">
+        <field name="name">资产出租今日状态生成</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="estate_lease_contract.model_estate_lease_contract_property_daily_status"/>
+        <field name="binding_model_id" ref="estate_lease_contract.model_estate_lease_contract_property_daily_status"/>
+        <field name="state">code</field>
+        <field name="code">model.automatic_daily_calc_status()</field>
+    </record>
+
+    <record id="estate_lease_contract_property_daily_status_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.daily.status.tree</field>
+        <field name="model">estate.lease.contract.property.daily.status</field>
+        <field name="arch" type="xml">
+            <tree string="estate_lease_contract_property_daily_status_view_tree">
+                <field name="status_date" readonly="1"/>
+                <field name="property_id" readonly="1"/>
+                <field name="property_state" readonly="1"/>
+                <field name="property_date_availability" readonly="1"/>
+                <field name="contract_id" readonly="1"/>
+                <field name="contract_state" readonly="1"/>
+                <field name="contract_date_sign" readonly="1"/>
+                <field name="contract_date_start" readonly="1"/>
+                <field name="contract_date_rent_start" readonly="1"/>
+                <field name="contract_date_rent_end" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_property_daily_status_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.daily.status.form</field>
+        <field name="model">estate.lease.contract.property.daily.status</field>
+        <field name="arch" type="xml">
+            <form string="estate_lease_contract_property_daily_status_form">
+                <header>
+                    <button name="automatic_daily_calc_status" type="object" string="重新计算资产状态"/>
+                    <group>
+                        <field name="cal_date_s"/>
+                    </group>
+                    <group>
+                        <field name="cal_date_e"/>
+                    </group>
+                </header>
+                <sheet>
+                    <group col="2">
+                        <group>
+                            <field name="status_date" readonly="1"/>
+                            <field name="property_id" readonly="1"/>
+                            <field name="property_state" readonly="1"/>
+                            <field name="property_date_availability" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="contract_id" readonly="1"/>
+                            <field name="contract_state" readonly="1"/>
+                            <field name="contract_date_sign" readonly="1"/>
+                            <field name="contract_date_start" readonly="1"/>
+                            <field name="contract_date_rent_start" readonly="1"/>
+                            <field name="contract_date_rent_end" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
