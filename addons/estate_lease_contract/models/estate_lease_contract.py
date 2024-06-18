@@ -14,10 +14,13 @@ from odoo.tools import float_compare
 _logger = logging.getLogger(__name__)
 
 
-def _cal_date_payment(current_s, current_e, rental_plan):
-    # todo:每期开始前的N日内支付下期费用
-    """rental_plan.payment_date:
-    [('period_start_7_pay_pre', '租期开始后的7日内付上期抽成费用'),
+def _cal_date_payment(current_s, current_e, rental_plan, date_e):
+    """rental_plan.payment_date:[
+    ('period_end_month_15_pay_next', '租期结束日的15日前付下期费用'),
+   ('period_end_month_20_pay_next', '租期结束日的20日前付下期费用'),
+   ('period_end_month_25_pay_next', '租期结束日的25日前付下期费用'),
+   ('period_end_month_30_pay_next', '租期结束日的30日前付下期费用'),
+    ('period_start_7_pay_pre', '租期开始后的7日内付上期抽成费用'),
    ('period_start_10_pay_pre', '租期开始后的10日内付上期抽成费用'),
    ('period_start_15_pay_pre', '租期开始后的15日内付上期抽成费用'),
    ('period_start_18_pay_pre', '租期开始后的18日内付上期抽成费用'),
@@ -29,21 +32,18 @@ def _cal_date_payment(current_s, current_e, rental_plan):
    ('period_start_10_pay_this', '租期开始后的10日内付本期费用'),
    ('period_start_15_pay_this', '租期开始后的15日内付本期费用'),
    ('period_start_18_pay_this', '租期开始后的18日内付本期费用'),
-   ('period_start_30_pay_this', '租期开始后的30日内付本期费用'),
-   ('period_end_month_15_pay_next', '租期结束当月的15号前付下期费用'),
-   ('period_end_month_20_pay_next', '租期结束当月的20号前付下期费用'),
-   ('period_end_month_25_pay_next', '租期结束当月的25号前付下期费用'),
-   ('period_end_month_30_pay_next', '租期结束当月的30号前付下期费用'), ]
+   ('period_start_30_pay_this', '租期开始后的30日内付本期费用'),]
     """
     if 'start' in rental_plan.payment_date:
         day_cnt = int(rental_plan.payment_date.split('_')[2])
         date_payment = current_s + timedelta(days=day_cnt)
-    else:
-        day_date = int(rental_plan.payment_date.split('_')[3])
-        if day_date == 30 and (current_e.day == 28 or current_e.day == 29):
-            date_payment = current_e
-        else:
-            date_payment = current_e.replace(day=day_date)
+    elif 'end' in rental_plan.payment_date:
+        day_cnt = int(rental_plan.payment_date.split('_')[3])
+        date_payment = current_e - timedelta(days=day_cnt)
+
+    if 'next' in rental_plan.payment_date:
+        if current_e == date_e:
+            date_payment = False
 
     return date_payment
 
@@ -102,30 +102,51 @@ def _generate_details_from_rent_plan(record_self):
             # 计算本期结束日
             current_tmp = current_s
             for i in range(month_cnt):
-                current_e = (current_tmp.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)
+                if current_tmp.day == 1:  # 本月1号至月末
+                    current_e = (current_tmp.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)
+                elif current_tmp.day <= 29:  # 本月N号至下月N-1号
+                    current_e = (current_tmp.replace(day=28) + timedelta(days=4)).replace(day=current_tmp.day - 1)
+                else:  # 30或者31日
+                    if current_tmp.month != 1:  # 当前月不是1月，下个月就不是2月，下个月的月末就都可以N-1号
+                        current_e = (current_tmp.replace(day=28) + timedelta(days=4)).replace(day=current_tmp.day - 1)
+                    else:  # 当前月是1月30、31，下个月就是2月，2月的月末必须是3月1号-1天
+                        current_e = (current_tmp.replace(month=3)).replace(day=1) - timedelta(days=1)
+
                 current_tmp = current_e + timedelta(days=1)
+
+            # 循环后，再调整结束日期的日至开始日期的日-1
+            if current_s.day == 1:  # 1号开始的期间，按照上述逻辑，最后的current_e就是月末，不用调整
+                pass
+            elif current_s.day <= 29:  # 开始月的日期为29号以下，那么结束月的日子应该是28号
+                current_e.replace(day=current_s.day - 1)
+            else:  # 开始日期的日为30或者31日
+                if current_e.month != 2:  # 结束日期不是在2月，那么其结束日期可以是N-1
+                    current_e.replace(day=current_s.day - 1)
+                else:  # 结束日期在2月，那么上边逻辑已经计算好了2月末的最后一天小于30、31
+                    pass
 
             if current_e > date_e:
                 current_e = date_e
 
             # 计算支付日期
-            date_payment = _cal_date_payment(current_s, current_e, rental_plan)
+            date_payment = _cal_date_payment(current_s, current_e, rental_plan, date_e)
             billing_method_str = dict(rental_plan._fields['billing_method'].selection).get(rental_plan.billing_method)
             payment_date_str = dict(rental_plan._fields['payment_date'].selection).get(rental_plan.payment_date)
             rental_amount = _cal_rental_amount(month_cnt, current_s, current_e, record_self, rental_plan)
             rental_amount_zh = Utils.arabic_to_chinese(rental_amount)
 
-            rental_periods_details.append({'contract_id': f"{record_self.id}",
-                                           'property_id': f"{property_id.id}",
-                                           'period_date_from': f"{current_s.strftime('%Y-%m-%d')}",
-                                           'period_date_to': f"{current_e.strftime('%Y-%m-%d')}",
-                                           'date_payment': f"{date_payment.strftime('%Y-%m-%d')}",
-                                           'rental_amount': f"{rental_amount}",
-                                           'rental_amount_zh': f"{rental_amount_zh}",
-                                           'rental_period_no': f"{period_no}",
-                                           'description': f"{rental_plan.name}-{billing_method_str}-"
-                                                          f"{payment_date_str}",
-                                           })
+            rental_periods_details.append({
+                'contract_id': f"{record_self.id}",
+                'property_id': f"{property_id.id}",
+                'period_date_from': f"{current_s.strftime('%Y-%m-%d')}",
+                'period_date_to': f"{current_e.strftime('%Y-%m-%d')}",
+                'date_payment': date_payment,
+                'rental_amount': f"{rental_amount}",
+                'rental_amount_zh': f"{rental_amount_zh}",
+                'rental_period_no': f"{period_no}",
+                'description': f"{rental_plan.name}-{billing_method_str}-"
+                               f"{payment_date_str}",
+            })
 
             # 下期开始日
             current_s = current_e + timedelta(days=1)
@@ -387,7 +408,7 @@ class EstateLeaseContract(models.Model):
         # 把计算结果付回给rental_details
         for record in self:
             rental_details = self.env['estate.lease.contract.property.rental.detail'].search(
-                    [('contract_id', '=', record.id)])
+                [('contract_id', '=', record.id)])
             record.rental_details = rental_details
 
     # 合同页面金额汇总标签页的刷新按钮动作

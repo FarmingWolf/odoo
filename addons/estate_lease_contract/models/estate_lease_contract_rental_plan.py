@@ -5,7 +5,6 @@ from odoo import fields, models, api
 
 
 class EstateLeaseContractRentalPlan(models.Model):
-
     _name = "estate.lease.contract.rental.plan"
     _description = "资产租赁合同租金方案"
     _order = "name"
@@ -44,7 +43,11 @@ class EstateLeaseContractRentalPlan(models.Model):
     rent_price = fields.Float(default=0.0, string="租金单价（元/天/㎡）")
 
     payment_date = fields.Selection(string="租金支付日",
-                                    selection=[('period_start_7_pay_pre', '租期开始后的7日内付上期抽成费用'),
+                                    selection=[('period_end_month_15_pay_next', '租期结束日的15日前付下期费用'),
+                                               ('period_end_month_20_pay_next', '租期结束日的20日前付下期费用'),
+                                               ('period_end_month_25_pay_next', '租期结束日的25日前付下期费用'),
+                                               ('period_end_month_30_pay_next', '租期结束日的30日前付下期费用'),
+                                               ('period_start_7_pay_pre', '租期开始后的7日内付上期抽成费用'),
                                                ('period_start_10_pay_pre', '租期开始后的10日内付上期抽成费用'),
                                                ('period_start_15_pay_pre', '租期开始后的15日内付上期抽成费用'),
                                                ('period_start_18_pay_pre', '租期开始后的18日内付上期抽成费用'),
@@ -56,11 +59,7 @@ class EstateLeaseContractRentalPlan(models.Model):
                                                ('period_start_10_pay_this', '租期开始后的10日内付本期费用'),
                                                ('period_start_15_pay_this', '租期开始后的15日内付本期费用'),
                                                ('period_start_18_pay_this', '租期开始后的18日内付本期费用'),
-                                               ('period_start_30_pay_this', '租期开始后的30日内付本期费用'),
-                                               ('period_end_month_15_pay_next', '租期结束当月的15号前付下期费用'),
-                                               ('period_end_month_20_pay_next', '租期结束当月的20号前付下期费用'),
-                                               ('period_end_month_25_pay_next', '租期结束当月的25号前付下期费用'),
-                                               ('period_end_month_30_pay_next', '租期结束当月的30号前付下期费用'), ], )
+                                               ('period_start_30_pay_this', '租期开始后的30日内付本期费用'), ], )
 
     compensation_method = fields.Selection(
         string='补差方式',
