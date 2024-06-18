@@ -1,0 +1,11 @@
+<odoo>
+  <data>
+    <record model="ir.actions.client" id="dashboard">
+      <field name="name">仪表板配置→</field>
+      <field name="tag">estate_dashboard.dashboard</field>
+    </record>
+
+    <menuitem name="资产管理仪表板" id="estate_dashboard.menu_root" groups="base.group_user" web_icon="estate_dashboard,static/description/icon.png"/>
+    <menuitem name="仪表板" id="estate_dashboard.dashboard_menu" parent="estate_dashboard.menu_root" action="estate_dashboard.dashboard" sequence="1"/>
+  </data>
+</odoo>

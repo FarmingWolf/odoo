@@ -7,7 +7,7 @@
         <field name="interval_type">hours</field>
         <field name="numbercall">-1</field> <!-- -1 表示无限次执行 -->
         <field name="nextcall" eval="(DateTime.now().replace(hour=0, minute=0)).strftime('%Y-%m-%d %H:%M:%S')" />
-        <field name="doall" eval="True"/> <!-- True表示即使服务器关闭期间错过执行也会补执行 -->
+        <field name="doall" eval="False"/> <!-- True表示即使服务器关闭期间错过执行也会补执行 -->
         <field name="code">model.automatic_daily_calc_status()</field>
         <field name="user_id" eval="2"/><!--admin-->
         <field name="active" eval="True"/> <!-- 设置任务为激活状态 -->
