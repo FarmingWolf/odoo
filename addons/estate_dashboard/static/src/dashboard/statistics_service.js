@@ -6,11 +6,8 @@ import { reactive } from "@odoo/owl";
 
 const statisticsService = {
     dependencies: ["rpc"],
-    // async: ["loadStatistics"],
     start(env, { rpc }) {
-        // return {
-        //     loadStatistics: memoize(() => rpc("/estate_dashboard/statistics")),
-        // };
+
         const statistics = reactive({ isReady: false });
 
         async function loadData() {
@@ -18,7 +15,7 @@ const statisticsService = {
             Object.assign(statistics, updates, { isReady: true });
         }
 
-        setInterval(loadData, 6*1000);
+        setInterval(loadData, 1000*60*60);
         loadData();
 
         return statistics;

@@ -19,8 +19,8 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
     property_id = fields.Many2one('estate.property', string="资产（房屋）")
     property_state = fields.Char(string='资产状态')
     property_date_availability = fields.Date(string="可租日期")
-    property_building_area = fields.Integer(string="建筑面积")
-    property_rent_area = fields.Integer(string="计租面积")
+    property_building_area = fields.Float(string="建筑面积")
+    property_rent_area = fields.Float(string="计租面积")
 
     contract_id = fields.Many2one('estate.lease.contract', string="在租合同")
     contract_state = fields.Char(string='合同状态')
@@ -145,5 +145,5 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                 int_cnt += 1
 
             record_status_date = record_status_date + timedelta(days=1)
-        _logger.info(
-            "资产租赁状态{0}至{1}数据做成{2}条。".format(record_status_date_s, record_status_date_end - timedelta(days=1), int_cnt))
+        _logger.info("资产租赁状态{0}至{1}数据做成{2}条。".format(record_status_date_s,
+                                                     record_status_date_end - timedelta(days=1), int_cnt))

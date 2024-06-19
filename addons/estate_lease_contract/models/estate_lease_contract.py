@@ -48,7 +48,7 @@ def _cal_date_payment(current_s, current_e, rental_plan, date_e):
     return date_payment
 
 
-def _cal_rental_amount(month_cnt, current_s, current_e, record_self, rental_plan):
+def _cal_rental_amount(month_cnt, current_s, current_e, property_id, rental_plan):
     """
     租金计算方法：先计算年租金，再计算每月租金或每期租金
     年租金=租金单价×计租面积×365
@@ -58,7 +58,8 @@ def _cal_rental_amount(month_cnt, current_s, current_e, record_self, rental_plan
     以此类推
     """
     days_delta = current_e - current_s
-    rental_amount_year = record_self.rent_area * rental_plan.rent_price * 365
+    # _logger.info(f"record_self=【{record_self}】")
+    rental_amount_year = property_id.rent_area * rental_plan.rent_price * 365
     rental_amount_month = rental_amount_year / 12
     rental_amount = rental_amount_month * month_cnt
     return rental_amount
@@ -132,7 +133,7 @@ def _generate_details_from_rent_plan(record_self):
             date_payment = _cal_date_payment(current_s, current_e, rental_plan, date_e)
             billing_method_str = dict(rental_plan._fields['billing_method'].selection).get(rental_plan.billing_method)
             payment_date_str = dict(rental_plan._fields['payment_date'].selection).get(rental_plan.payment_date)
-            rental_amount = _cal_rental_amount(month_cnt, current_s, current_e, record_self, rental_plan)
+            rental_amount = _cal_rental_amount(month_cnt, current_s, current_e, property_id, rental_plan)
             rental_amount_zh = Utils.arabic_to_chinese(rental_amount)
 
             rental_periods_details.append({

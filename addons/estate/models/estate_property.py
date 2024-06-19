@@ -37,7 +37,7 @@ class EstateProperty(models.Model):
     unit_living_area = fields.Float(default=0.0, string="套内使用面积")
     share_area = fields.Float(default=0.0, string="公摊面积")
     actual_living_area = fields.Float(default=0.0, string="实际使用面积")
-    rent_area = fields.Float(default=0.0, string="计租面积")
+    rent_area = fields.Float(default=building_area, string="计租面积")
     facades = fields.Integer(default=0)
     garage = fields.Boolean(default=False)
     garden = fields.Boolean(default=False)

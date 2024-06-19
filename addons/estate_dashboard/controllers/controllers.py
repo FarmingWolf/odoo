@@ -2,6 +2,9 @@
 
 import logging
 import random
+from datetime import date
+
+import dateutil.utils
 
 from odoo import http
 from odoo.http import request
@@ -17,20 +20,60 @@ class EstateDashboard(http.Controller):
         资产总数（房屋间数）、资产总面积（㎡）、在租资产总数（房屋间数）、在租资产总面积（㎡）、在租比率（房屋间数 %）、在租比率（㎡ %）、
         在租空置比图（房屋间数）、在租空置比图（㎡）、
         """
+        latest_property_detail = []
+        latest_property_detail_ids = []
+        request.env.cr.execute("""
+            SELECT * FROM estate_lease_contract_property_daily_status
+            WHERE status_date = ( SELECT MAX(status_date) FROM estate_lease_contract_property_daily_status LIMIT 1 );
+        """)
+        latest_property_detail_record = request.env.cr.fetchall()
+        for record_tuple in latest_property_detail_record:
+            latest_property_detail_ids.append(record_tuple[0])  # 假设id是每条记录的第一个元素
+
+        if latest_property_detail_ids:
+            latest_property_detail = request.env['estate.lease.contract.property.daily.status'].browse(
+                latest_property_detail_ids)
+
+        estate_property_quantity = 0
+        estate_property_lease_quantity = 0
+        estate_property_area_quantity = 0.0
+        estate_property_area_lease_quantity = 0.0
+        ratio_property_quantity = 1.00
+        ratio_property_area_quantity = 1.00
+
+        for record_detail in latest_property_detail:
+
+            logger.info("record_detail=【{0}】".format(record_detail))
+            logger.info("record_detail.id={0}".format(record_detail.id))
+            logger.info("record_detail.property_id=【{0}】".format(record_detail.property_id))
+            logger.info("record_detail.property_building_area=【{0}】".format(record_detail.property_building_area))
+            logger.info("record_detail.property_rent_area=【{0}】".format(record_detail.property_rent_area))
+
+            estate_property_quantity += 1
+            estate_property_area_quantity += float(record_detail.property_rent_area)
+            if record_detail.contract_id:
+                estate_property_lease_quantity += 1
+                estate_property_area_lease_quantity += float(record_detail.property_rent_area)
+
+        if estate_property_quantity != 0:
+            ratio_property_quantity = estate_property_lease_quantity / estate_property_quantity
+
+        if estate_property_area_quantity != 0:
+            ratio_property_area_quantity = estate_property_area_lease_quantity / estate_property_area_quantity
 
         return {
-            'estate_property_quantity': random.randint(4, 12),
-            'estate_property_area_quantity': random.randint(4, 123),
-            'estate_property_lease_quantity': random.randint(10, 200),
-            'estate_property_area_lease_quantity': random.randint(0, 50),
-            'ratio_property_quantity': random.randint(0, 50),
-            'ratio_property_area_quantity': random.randint(0, 50),
+            'estate_property_quantity': estate_property_quantity,
+            'estate_property_area_quantity': estate_property_area_quantity,
+            'estate_property_lease_quantity': estate_property_lease_quantity,
+            'estate_property_area_lease_quantity': estate_property_area_lease_quantity,
+            'ratio_property_quantity': ratio_property_quantity,
+            'ratio_property_area_quantity': ratio_property_area_quantity,
             'pie_chart_ratio_property_quantity': {
-                '在租间数': random.randint(0, 150),
-                '空置间数': random.randint(0, 150),
+                '在租间数': estate_property_lease_quantity,
+                '空置间数': estate_property_quantity - estate_property_lease_quantity,
             },
             'pie_chart_ratio_property_area_quantity': {
-                '在租面积(㎡)': random.randint(0, 150),
-                '空置面积(㎡)': random.randint(0, 150),
+                '在租面积(㎡)': estate_property_area_lease_quantity,
+                '空置面积(㎡)': estate_property_area_quantity - estate_property_area_lease_quantity,
             },
         }
