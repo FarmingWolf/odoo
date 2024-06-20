@@ -48,22 +48,23 @@ class EstateLeaseContractRentalTurnoverPercentage(models.Model):
         ('name', 'unique(turnover_type, turnover_from, turnover_to, percentage)', '相同营业额范围，相同抽成比例已存在')
     ]
 
-    @api.depends("turnover_type")
-    def _get_display_value(self):
-        field_info = self.env['ir.model.fields'].search_read(
-            [('model', '=', self._name), ('name', '=', 'turnover_type')],
-            ['selection']
-        )
-
-        if field_info and 'selection' in field_info[0]:
-            selection_options_str = field_info[0]['selection']
-            selection_options = ast.literal_eval(selection_options_str)
-
-            for record in self:
-                for key, value in selection_options:
-                    if key == record.turnover_type:
-                        return value
-                return False
+    # ↓↓↓不应该用这个方法，经过比较，不如dict方法精准
+    # @api.depends("turnover_type")
+    # def _get_display_value(self):
+    #     field_info = self.env['ir.model.fields'].search_read(
+    #         [('model', '=', self._name), ('name', '=', 'turnover_type')],
+    #         ['selection']
+    #     )
+    #
+    #     if field_info and 'selection' in field_info[0]:
+    #         selection_options_str = field_info[0]['selection']
+    #         selection_options = ast.literal_eval(selection_options_str)
+    #
+    #         for record in self:
+    #             for key, value in selection_options:
+    #                 if key == record.turnover_type:
+    #                     return value
+    #             return False
 
     # turnover_type_display = fields.Char(string='营业额种类显示值', compute='_get_display_value')
 
@@ -73,7 +74,9 @@ class EstateLeaseContractRentalTurnoverPercentage(models.Model):
             record.name_description = "{3}从{0}元（不含）到{1}元（含）抽成比例为{2}%".format(record.turnover_from,
                                                                              record.turnover_to,
                                                                              record.percentage,
-                                                                             self._get_display_value())
+                                                                             dict(record._fields[
+                                                                                      'turnover_type'].selection).get(
+                                                                                 record.turnover_type))
 
     @api.constrains("turnover_from", "turnover_to", "percentage", "percentage_from", "percentage_to")
     def _check_input(self):
