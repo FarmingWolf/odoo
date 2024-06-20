@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="estate_group_user" model="res.groups">
-        <field name="name">Agent</field>
+        <field name="name">资产数据查看使用</field>
         <field name="category_id" ref="base.module_category_real_estate_brokerage"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
     </record>
 
     <record id="estate_group_manager" model="res.groups">
-        <field name="name">Manager</field>
+        <field name="name">资产数据管理员</field>
+        <field name="category_id" ref="base.module_category_real_estate_brokerage"/>
+        <field name="implied_ids" eval="[(4, ref('estate.estate_group_user'))]"/>
+    </record>
+
+    <record id="estate_group_tutorial_research" model="res.groups">
+        <field name="name">技术研发教学组</field>
+        <field name="category_id" ref="base.module_category_real_estate_brokerage"/>
+    </record>
+
+    <record id="estate_group_dashboard" model="res.groups">
+        <field name="name">资产租赁看板</field>
         <field name="category_id" ref="base.module_category_real_estate_brokerage"/>
         <field name="implied_ids" eval="[(4, ref('estate.estate_group_user'))]"/>
     </record>
@@ -19,16 +31,13 @@
         <field name="perm_write" eval="False"/>
         <field name="perm_unlink" eval="False"/>
         <field name="groups" eval="[Command.link(ref('estate_group_user'))]"/>
-        <field name="domain_force">[
-            '|', ('sales_person_id', '=', user.id),
-            ('sales_person_id', '=', False)
-            ]
-        </field>
+        <field name="domain_force">['|', ('active', '=', True), ('active', '=', False)]</field>
     </record>
 
     <record id="estate_property_manage_rule" model="ir.rule">
         <field name="name">不动产数据管理权限</field>
         <field name="model_id" ref="model_estate_property"/>
         <field name="groups" eval="[Command.link(ref('estate_group_manager'))]"/>
+        <field name="domain_force">['|', ('active', '=', True), ('active', '=', False)]</field>
     </record>
 </odoo>

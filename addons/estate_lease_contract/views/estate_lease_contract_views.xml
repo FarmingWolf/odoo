@@ -59,7 +59,8 @@
         <field name="arch" type="xml">
             <tree string="contracts_tree"
                   decoration-success="date_rent_end &gt;= (context_today() + relativedelta(years=+1))"
-                  decoration-warning="date_rent_end &lt;= (context_today() + relativedelta(days=+30))">
+                  decoration-warning="date_rent_end &lt;= (context_today() + relativedelta(days=+30))"
+                  create="false" delete="false" edit="false">
                 <field name="contract_no"/>
                 <field name="name"/>
                 <field name="date_sign"/>

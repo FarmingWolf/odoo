@@ -4,12 +4,12 @@
     <t t-name="estate_dashboard.EstateDashboard">
         <Layout display="display" className="'o_dashboard h-100'">
             <t t-set-slot="layout-buttons">
-                <button class="btn btn-primary" t-on-click="openEstatePropertyDailyStatus">打开资产租赁列表</button>
+                <button class="btn btn-primary" t-on-click="openEstatePropertyDailyStatus">打开资产租赁状态明细列表</button>
             </t>
 
             <t t-set-slot="control-panel-additional-actions">
                 <button t-on-click="openConfiguration" class="btn p-0 ms-1 border-0">
-                    <i class="fa fa-cog"></i>
+                    <i class="fa fa-cog"/>
                 </button>
             </t>
 

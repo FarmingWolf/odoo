@@ -4,6 +4,7 @@
         <field name="name">资产出租每日状态明细</field>
         <field name="res_model">estate.lease.contract.property.daily.status</field>
         <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_active': True}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">日报尚未生成。</p>
         </field>
@@ -22,7 +23,7 @@
         <field name="name">estate.lease.contract.property.daily.status.tree</field>
         <field name="model">estate.lease.contract.property.daily.status</field>
         <field name="arch" type="xml">
-            <tree string="estate_lease_contract_property_daily_status_view_tree">
+            <tree string="estate_lease_contract_property_daily_status_view_tree" create="false" delete="false" edit="false">
                 <field name="status_date" readonly="1"/>
                 <field name="property_id" readonly="1"/>
                 <field name="property_building_area" readonly="1"/>
@@ -43,8 +44,8 @@
         <field name="name">estate.lease.contract.property.daily.status.form</field>
         <field name="model">estate.lease.contract.property.daily.status</field>
         <field name="arch" type="xml">
-            <form string="estate_lease_contract_property_daily_status_form">
-                <header>
+            <form string="estate_lease_contract_property_daily_status_form" create="false" delete="false" edit="false">
+                <header groups="estate.estate_group_manager" >
                     <button name="automatic_daily_calc_status" type="object" string="重新计算资产状态"/>
                     <group>
                         <field name="cal_date_s"/>
@@ -76,4 +77,17 @@
             </form>
         </field>
     </record>
+
+    <record id="estate_property_status_view_search" model="ir.ui.view">
+        <field name="name">estate.property.status.view.search</field>
+        <field name="model">estate.lease.contract.property.daily.status</field>
+        <field name="arch" type="xml">
+            <search string="按日期筛选">
+                <field name="status_date"/>
+                <field name="property_id"/>
+                <separator/>
+            </search>
+        </field>
+    </record>
+
 </odoo>

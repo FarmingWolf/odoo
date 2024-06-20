@@ -14,11 +14,11 @@
         </field>
     </record>
 
-        <record id="estate_lease_contract_property_rental_detail_view_tree" model="ir.ui.view">
+    <record id="estate_lease_contract_property_rental_detail_view_tree" model="ir.ui.view">
         <field name="name">estate.lease.contract.property.rental.detail.tree</field>
         <field name="model">estate.lease.contract.property.rental.detail</field>
         <field name="arch" type="xml">
-            <tree string="estate_lease_contract_property_rental_detail_view_tree">
+            <tree string="estate_lease_contract_property_rental_detail_view_tree" create="false" delete="false" edit="false">
                 <field name="contract_id"/>
                 <field name="property_id"/>
                 <field name="rental_period_no"/>
@@ -34,4 +34,27 @@
         </field>
     </record>
 
+    <record id="estate_lease_contract_property_rental_detail_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.rental.detail.form</field>
+        <field name="model">estate.lease.contract.property.rental.detail</field>
+        <field name="arch" type="xml">
+            <form string="estate_lease_contract_property_rental_detail_view_form" create="false" delete="false" edit="false">
+                <group>
+                    <field name="contract_id"/>
+                    <field name="property_id"/>
+                    <field name="rental_period_no"/>
+                    <field name="period_date_from"/>
+                    <field name="period_date_to"/>
+                    <field name="date_payment"/>
+                </group>
+                <group>
+                    <field name="rental_amount"/>
+                    <field name="rental_amount_zh"/>
+                    <field name="rental_receivable"/>
+                    <field name="rental_received"/>
+                    <field name="description"/>
+                </group>
+            </form>
+        </field>
+    </record>
 </odoo>

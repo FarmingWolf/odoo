@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="estate_lease_contract_group_user" model="res.groups">
-        <field name="name">资产租赁招商员</field>
+        <field name="name">资产租赁合同录入</field>
         <field name="category_id" ref="base.module_category_real_estate_brokerage"/>
     </record>
 
