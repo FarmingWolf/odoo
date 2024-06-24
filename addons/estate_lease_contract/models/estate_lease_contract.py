@@ -461,7 +461,6 @@ class EstateLeaseContract(models.Model):
     # 合同终止状态
     terminated = fields.Boolean(default=False, copy=False)
 
-    # 发布合同
     def action_release_contract(self):
         for record in self:
             if record.terminated:
@@ -501,3 +500,9 @@ class EstateLeaseContract(models.Model):
         for record in self:
             record.active = False
             record.state = 'recording'
+
+    @api.constrains('property_ids')
+    def _check_update(self):
+        for record in self:
+            if record.state in ['released', 'released']:
+                self.action_release_contract()

@@ -19,7 +19,7 @@ class EstateProperty(models.Model):
 
     name = fields.Char('资产名称', required=True, translate=True)
     property_type_id = fields.Many2one("estate.property.type", string="资产类型")
-    tag_ids = fields.Many2many("estate.property.tag")
+    tag_ids = fields.Many2many("estate.property.tag", string="标签")
     sales_person_id = fields.Many2one('res.users', string='销售员', index=True,
                                       default=lambda self: self.env.user)
     buyer_id = fields.Many2one('res.partner', string='购买人', index=True)
@@ -27,17 +27,17 @@ class EstateProperty(models.Model):
     floor = fields.Integer(default=1, string='楼层')
     description = fields.Text("详细信息")
     postcode = fields.Char()
-    date_availability = fields.Date(copy=False, string="可租日期", compute="_compute_latest_info")
-    expected_price = fields.Float(string="期望售价", default=0.0)
-    selling_price = fields.Float(string="实际售价", copy=False)
+    date_availability = fields.Date(copy=False, string="可租日期")
+    expected_price = fields.Float(string="期望价格", default=0.0)
+    selling_price = fields.Float(string="实际价格", copy=False, default=0.0)
     bedrooms = fields.Integer(default=0)
-    building_area = fields.Float(default=0.0, string="建筑面积")
+    building_area = fields.Float(default=0.0, string="总建筑面积")
     living_area = fields.Float(default=0.0, string="使用面积")
     unit_building_area = fields.Float(default=0.0, string="套内建筑面积")
     unit_living_area = fields.Float(default=0.0, string="套内使用面积")
     share_area = fields.Float(default=0.0, string="公摊面积")
     actual_living_area = fields.Float(default=0.0, string="实际使用面积")
-    rent_area = fields.Float(default=building_area, string="计租面积")
+    rent_area = fields.Float(default=0.0, string="计租面积")
     facades = fields.Integer(default=0)
     garage = fields.Boolean(default=False)
     garden = fields.Boolean(default=False)
@@ -49,7 +49,7 @@ class EstateProperty(models.Model):
     )
     color = fields.Integer()
 
-    total_area = fields.Float(compute="_compute_total_area", string="总面积（㎡）", readonly=True, copy=False)
+    total_area = fields.Float(compute="_compute_total_area", string="总使用面积（㎡）", readonly=True, copy=False)
 
     current_contract_id = fields.Many2one(string='当前合同', compute="_compute_latest_info",
                                           readonly=True, copy=False, store=False)
@@ -60,6 +60,12 @@ class EstateProperty(models.Model):
     latest_rent_date_e = fields.Date(string="上次出租结束日期", compute="_compute_latest_info", readonly=True, copy=False)
     latest_rent_date_s = fields.Date(string="本次出租开始日期", compute="_compute_latest_info", readonly=True, copy=False)
     out_of_rent_days = fields.Integer(string="本次空置天数", compute="_compute_latest_info", readonly=True, copy=False)
+
+    # @api.onchange("building_area")
+    # def _get_building_area(self):
+    #     for record in self:
+    #         if record.rent_area == 0 and record.building_area != 0:
+    #             record.rent_area = record.building_area
 
     @api.depends("current_contract_id", "date_availability")
     def _compute_latest_info(self):
@@ -79,7 +85,8 @@ class EstateProperty(models.Model):
                                                                     order='date_rent_end DESC',
                                                                     limit=1)
             record.latest_rent_date_e = old_contract.date_rent_end if old_contract else False
-            record.date_availability = record.latest_rent_date_e + timedelta(days=1) if old_contract else False
+            record.date_availability = record.latest_rent_date_e + timedelta(
+                days=1) if old_contract else record.date_availability
 
             if record.latest_rent_date_s:
                 if record.date_availability:
@@ -91,10 +98,10 @@ class EstateProperty(models.Model):
                         record.out_of_rent_days = 0
             else:
                 if record.date_availability:
-                    record.out_of_rent_days = (datetime.today() - record.date_availability).days
+                    record.out_of_rent_days = (fields.Date.context_today(self) - record.date_availability).days
                 else:
                     if record.latest_rent_date_e:
-                        record.out_of_rent_days = (datetime.today() - record.latest_rent_date_e).days
+                        record.out_of_rent_days = (fields.Date.context_today(self) - record.latest_rent_date_e).days
                     else:
                         record.out_of_rent_days = 0
 
@@ -135,7 +142,7 @@ class EstateProperty(models.Model):
     _sql_constraints = [
         ('name', 'unique(name)', '资产名称不能重复'),
         ('expected_price', 'CHECK(expected_price > 0)', '期待售价必须大于零'),
-        ('selling_price', 'CHECK(selling_price > 0)', '实际售价必须大于零'),
+        ('selling_price', 'CHECK(selling_price >= 0)', '实际售价不能小于零'),
     ]
 
     @api.onchange("garden")
@@ -170,17 +177,20 @@ class EstateProperty(models.Model):
                 print("after search partner_id=[{0}],price=[{1}]".format(rcd.partner_id, rcd.price))
 
             # 如果设置售出，那么一定已经有报价了
+            if not _best_price_rcd:
+                raise ValidationError("这是个保留功能，请不要在这里设置已售出。请前往合同管理模块，在合同中选择资产。")
+
             record.buyer_id = _best_price_rcd[0].partner_id
 
             if record.state != 'sold':
                 record.state = 'sold'
 
-    @api.constrains('selling_price')
-    def _check_selling_price(self):
+    @api.constrains('date_availability')
+    def _check_date_availability(self):
         for record in self:
-            if record.selling_price > 1 and float_compare(record.selling_price, record.expected_price * 0.9, 2) <= 0:
-                raise ValidationError("实际售价不能低于期待售价的90%。实际售价=[{0}]；期待售价=[{1}]；期待售价的90%=[{1}*90%={2}]".
-                                      format(record.selling_price, record.expected_price, record.expected_price * 0.9))
+            if record.date_availability and record.latest_rent_date_e:
+                if record.date_availability <= record.latest_rent_date_e:
+                    raise ValidationError("可租日期不能早于上次出租结束日期")
 
     @api.model
     def _get_state_label(self, state_value):

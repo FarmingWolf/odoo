@@ -3684,7 +3684,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:event.view_event_type_form
 #, python-format
 msgid "Tickets"
-msgstr ""
+msgstr "门票"
 
 #. module: event
 #: model_terms:event.event,ticket_instructions:event.event_0

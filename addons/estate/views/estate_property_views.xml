@@ -47,7 +47,9 @@
                     <group>
                         <field name="name" class="o_estate_property_form_title_large_font" default_focus="True"/>
                     </group>
-                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
+                    <group>
+                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
+                    </group>
                     <group col="2">
                         <group col="1">
                             <group col="2">
@@ -112,7 +114,7 @@
                                 <group>
                                     <field name="floor" string="楼层"/>
                                     <field name="bedrooms" string="房间数"/>
-                                    <field name="living_area" string="套内面积"/>
+                                    <field name="living_area"/>
                                     <field name="facades" string="朝向"/>
                                     <field name="total_area"/>
                                 </group>

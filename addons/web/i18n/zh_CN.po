@@ -30345,7 +30345,7 @@ msgstr "带勾号的勾选框"
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "ticket"
-msgstr "工单"
+msgstr "门票"
 
 #. module: web
 #. odoo-javascript

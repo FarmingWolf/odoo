@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import hashlib
+import urllib
 
+import requests
 import werkzeug.urls
 
 from odoo import models, fields, api
@@ -29,7 +32,11 @@ class Partner(models.Model):
             'q': '%s, %s %s, %s' % (self.street or '', self.city or '', self.zip or '', self.country_id and self.country_id.display_name or ''),
             'z': zoom,
         }
-        return 'https://maps.google.com/maps?' + werkzeug.urls.url_encode(params)
+        # return 'https://maps.google.com/maps?' + werkzeug.urls.url_encode(params)
+        # return 'https://map.baidu.com/search/' + werkzeug.urls.url_encode(params)
+        # return 'https://map.baidu.com/?newmap=1&query={}'.format(werkzeug.urls.url_encode(params))
+        return "https://map.baidu.com/poi/491%E7%A9%BA%E9%97%B4%E6%B0%B4%E5%8F%B0%E5%B9%BF%E5%9C%BA/@12978624.913896881,4823018.582049059,19z?uid=421ce3191e3cc95b8505bf72&ugc_type=3&ugc_ver=1&device_ratio=1&compat=1&pcevaname=pc4.1&querytype=detailConInfo&da_src=shareurl"
+
 
     @api.depends('website_id')
     @api.depends_context('display_website')

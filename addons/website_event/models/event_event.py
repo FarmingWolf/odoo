@@ -30,7 +30,7 @@ class Event(models.Model):
     def _default_cover_properties(self):
         res = super()._default_cover_properties()
         res.update({
-            'background-image': "url('/website_event/static/src/img/event_cover_4.jpg')",
+            'background-image': "url('/website_event/static/src/img/event_cover_491.jpg')",
             'opacity': '0.4',
             'resize_class': 'cover_auto'
         })

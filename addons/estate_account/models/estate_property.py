@@ -8,6 +8,10 @@ class EstateProperty(models.Model):
     def action_sold_property(self):
         print("calling super action_sold_property")
 
+        print("暂时不用发票逻辑")
+        # 暂时不用发票逻辑
+        return super(EstateProperty, self).action_sold_property()
+
         # 新增步骤：创建发票
         for property in self:
             # 获取当前estate.property的partner_id

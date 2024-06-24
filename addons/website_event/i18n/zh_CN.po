@@ -131,7 +131,7 @@ msgid ""
 "title=\"Configure event tickets\"/><em>Configure Tickets</em>"
 msgstr ""
 "<i class=\"fa fa-gear me-1\" role=\"img\" aria-label=\"Configure\" "
-"title=\"Configure event tickets\"/><em>配置工单</em>"
+"title=\"Configure event tickets\"/><em>配置门票</em>"
 
 #. module: website_event
 #: model_terms:ir.ui.view,arch_db:website_event.index_sidebar_follow_us
@@ -1445,7 +1445,7 @@ msgstr "门票销售开始于"
 #: model_terms:ir.ui.view,arch_db:website_event.modal_ticket_registration
 #: model_terms:ir.ui.view,arch_db:website_event.registration_template
 msgid "Tickets"
-msgstr "工单"
+msgstr "门票"
 
 #. module: website_event
 #: model_terms:ir.ui.view,arch_db:website_event.registration_template

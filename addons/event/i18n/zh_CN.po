@@ -4370,7 +4370,7 @@ msgstr "门票说明"
 #: model_terms:ir.ui.view,arch_db:event.event_event_ticket_form_view
 #: model_terms:ir.ui.view,arch_db:event.view_registration_search
 msgid "Ticket Type"
-msgstr "工单类型"
+msgstr "门票类型"
 
 #. module: event
 #: model_terms:ir.ui.view,arch_db:event.attendee_list
@@ -4396,7 +4396,7 @@ msgstr "票证类型使您可以区分参加者。 让我们<b>创建</b>一个�
 #: model_terms:ir.ui.view,arch_db:event.view_event_type_form
 #, python-format
 msgid "Tickets"
-msgstr "工单"
+msgstr "门票"
 
 #. module: event
 #: model_terms:event.event,ticket_instructions:event.event_0
