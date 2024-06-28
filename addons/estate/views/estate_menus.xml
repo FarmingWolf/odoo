@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <menuitem id="estate_property_menu_root" groups="estate_group_user" name="491资产管理">
+    <menuitem id="estate_property_menu_root" groups="estate_group_user" name="四九一资产管理">
         <menuitem id="estate_property_first_level_menu_renting" name="资产管理">
             <menuitem id="estate_property_menu_action_renting" action="491_real_estate_action"/>
         </menuitem>
