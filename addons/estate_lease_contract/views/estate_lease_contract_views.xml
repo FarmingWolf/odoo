@@ -1,58 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="estate_lease_contract_action" model="ir.actions.act_window">
-        <field name="name">资产租赁合同列表（查看）</field>
-        <field name="res_model">estate.lease.contract</field>
-        <field name="view_mode">tree,form,kanban</field>
-        <field name="views" eval="[[False, 'tree'], [ref('estate_lease_contract_view_tree'), 'tree']]"/>
-        <field name="context">{'search_default_active': True}</field>
-        <field name="domain">[('active', '=', True)]</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                还没有合同信息。
-            </p>
-            <p>
-                说明合同还没录入，或者录入了也没发布。
-            </p>
-        </field>
-    </record>
-
-    <record id="estate_lease_contract_action_recording" model="ir.actions.act_window">
-        <field name="name">资产租赁合同列表（录入）</field>
-        <field name="res_model">estate.lease.contract</field>
-        <field name="view_mode">tree,form,kanban</field>
-        <field name="views" eval="[[False, 'tree'], [ref('estate_lease_contract_view_inactive_tree'), 'tree']]"/>
-        <field name="context">{'search_default_active': False}</field>
-        <field name="domain">[('active', '=', False)]</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                录入中的合同都在这里。
-            </p>
-        </field>
-    </record>
-
-    <record id="491_real_estate_view_tree_custom" model="ir.ui.view">
-        <field name="name">491.real.estate.property.tree.custom</field>
-        <field name="model">estate.property</field>
-        <field name="inherit_id" ref="estate.491_real_estate_view_tree"/>
-        <field name="arch" type="xml">
-            <tree position="replace" >
-                <tree string="child_tree" decoration-success="state=='sold'" decoration-warning="state=='canceled'">
-                    <field name="name" string="资产名称"/>
-                    <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}" />
-                    <field name="state" string="" invisible="1" width="0"/>
-                    <field name="property_type_id" string="资产类型"/>
-                    <field name="floor"/>
-                    <field name="building_area"/>
-                    <field name="rent_area"/>
-                    <field name="expected_price" string="期待价格（元/天/㎡）"/>
-                    <field name="selling_price" string="实际价格（元/天/㎡）"/>
-                    <field name="date_availability" string="交付日期"/>
-                </tree>
-            </tree>
-        </field>
-    </record>
-
     <record id="estate_lease_contract_view_tree" model="ir.ui.view">
         <field name="name">estate.lease.contract.tree</field>
         <field name="model">estate.lease.contract</field>
@@ -102,6 +49,59 @@
                 <field name="renter_id"/>
                 <field name="sales_person_id"/>
                 <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_action" model="ir.actions.act_window">
+        <field name="name">资产租赁合同列表（查看）</field>
+        <field name="res_model">estate.lease.contract</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="views" eval="[[False, 'tree'], [ref('estate_lease_contract_view_tree'), 'tree']]"/>
+        <field name="context">{'search_default_active': True}</field>
+        <field name="domain">[('active', '=', True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                还没有合同信息。
+            </p>
+            <p>
+                说明合同还没录入，或者录入了也没发布。
+            </p>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_action_recording" model="ir.actions.act_window">
+        <field name="name">资产租赁合同列表（录入）</field>
+        <field name="res_model">estate.lease.contract</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="views" eval="[[False, 'tree'], [ref('estate_lease_contract_view_inactive_tree'), 'tree']]"/>
+        <field name="context">{'search_default_active': False}</field>
+        <field name="domain">[('active', '=', False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                录入中的合同都在这里。
+            </p>
+        </field>
+    </record>
+
+    <record id="491_real_estate_view_tree_custom" model="ir.ui.view">
+        <field name="name">491.real.estate.property.tree.custom</field>
+        <field name="model">estate.property</field>
+        <field name="inherit_id" ref="estate.491_real_estate_view_tree"/>
+        <field name="arch" type="xml">
+            <tree position="replace" >
+                <tree string="child_tree" decoration-success="state=='sold'" decoration-warning="state=='canceled'">
+                    <field name="name" string="资产名称"/>
+                    <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}" />
+                    <field name="state" string="" invisible="1" width="0"/>
+                    <field name="property_type_id" string="资产类型"/>
+                    <field name="floor"/>
+                    <field name="building_area"/>
+                    <field name="rent_area"/>
+                    <field name="expected_price" string="期待价格（元/天/㎡）"/>
+                    <field name="selling_price" string="实际价格（元/天/㎡）"/>
+                    <field name="date_availability" string="交付日期"/>
+                </tree>
             </tree>
         </field>
     </record>
