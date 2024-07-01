@@ -1559,7 +1559,7 @@ msgstr ""
 #: code:addons/web/static/src/views/list/list_controller.js:0
 #, python-format
 msgid "Bye-bye, record!"
-msgstr "再见，唱片！"
+msgstr "再见，数据！"
 
 #. module: web
 #. odoo-javascript
@@ -33482,7 +33482,7 @@ msgstr "— 按下"
 #: code:addons/web/static/src/core/commands/command_items.xml:0
 #, python-format
 msgid "— search for"
-msgstr ""
+msgstr "— 查找"
 
 #. module: web
 #. odoo-javascript
@@ -33580,7 +33580,7 @@ msgstr "“禁止”"
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "“reserved”"
-msgstr "“reserved”"
+msgstr "“已预定”"
 
 #. module: web
 #. odoo-javascript
