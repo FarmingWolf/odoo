@@ -95,6 +95,7 @@
                     <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}" />
                     <field name="state" string="" invisible="1" width="0"/>
                     <field name="property_type_id" string="资产类型"/>
+                    <field name="building_no"/>
                     <field name="floor"/>
                     <field name="building_area"/>
                     <field name="rent_area"/>

@@ -24,6 +24,7 @@
                 <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}" />
                 <field name="state" />
                 <field name="property_type_id" string="资产类型"/>
+                <field name="building_no"/>
                 <field name="floor"/>
                 <field name="building_area"/>
                 <field name="rent_area"/>
@@ -112,13 +113,14 @@
                             <newline/>
                             <group>
                                 <group>
-                                    <field name="floor" string="楼层"/>
+                                    <field name="building_no"/>
                                     <field name="bedrooms" string="房间数"/>
                                     <field name="living_area"/>
                                     <field name="facades" string="朝向"/>
                                     <field name="total_area"/>
                                 </group>
                                 <group>
+                                    <field name="floor"/>
                                     <field name="garage" string="车库"/>
                                     <field name="garden" string="花园"/>
                                     <field name="garden_area" string="花园面积（㎡）" invisible="not garden"/>

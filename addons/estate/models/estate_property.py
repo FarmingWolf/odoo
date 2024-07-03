@@ -24,6 +24,7 @@ class EstateProperty(models.Model):
                                       default=lambda self: self.env.user)
     buyer_id = fields.Many2one('res.partner', string='购买人', index=True)
     offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价")
+    building_no = fields.Integer(string='楼号')
     floor = fields.Integer(default=1, string='楼层')
     description = fields.Text("详细信息")
     postcode = fields.Char()
