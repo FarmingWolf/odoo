@@ -42,13 +42,6 @@ class EstateDashboard(http.Controller):
         ratio_property_area_quantity = 1.00
 
         for record_detail in latest_property_detail:
-
-            logger.info("record_detail=【{0}】".format(record_detail))
-            logger.info("record_detail.id={0}".format(record_detail.id))
-            logger.info("record_detail.property_id=【{0}】".format(record_detail.property_id))
-            logger.info("record_detail.property_building_area=【{0}】".format(record_detail.property_building_area))
-            logger.info("record_detail.property_rent_area=【{0}】".format(record_detail.property_rent_area))
-
             estate_property_quantity += 1
             estate_property_area_quantity += float(record_detail.property_rent_area)
             if record_detail.contract_id:
@@ -61,19 +54,21 @@ class EstateDashboard(http.Controller):
         if estate_property_area_quantity != 0:
             ratio_property_area_quantity = estate_property_area_lease_quantity / estate_property_area_quantity
 
+        logger.info(f"estate_property_area_quantity=【{estate_property_area_quantity}】")
+
         return {
             'estate_property_quantity': estate_property_quantity,
-            'estate_property_area_quantity': estate_property_area_quantity,
+            'estate_property_area_quantity': round(estate_property_area_quantity, 2),
             'estate_property_lease_quantity': estate_property_lease_quantity,
-            'estate_property_area_lease_quantity': estate_property_area_lease_quantity,
-            'ratio_property_quantity': ratio_property_quantity,
-            'ratio_property_area_quantity': ratio_property_area_quantity,
+            'estate_property_area_lease_quantity': round(estate_property_area_lease_quantity, 2),
+            'ratio_property_quantity': round(ratio_property_quantity, 2),
+            'ratio_property_area_quantity': round(ratio_property_area_quantity, 2),
             'pie_chart_ratio_property_quantity': {
                 '在租间数': estate_property_lease_quantity,
                 '空置间数': estate_property_quantity - estate_property_lease_quantity,
             },
             'pie_chart_ratio_property_area_quantity': {
-                '在租面积(㎡)': estate_property_area_lease_quantity,
-                '空置面积(㎡)': estate_property_area_quantity - estate_property_area_lease_quantity,
+                '在租面积(㎡)': round(estate_property_area_lease_quantity, 2),
+                '空置面积(㎡)': round(estate_property_area_quantity - estate_property_area_lease_quantity, 2),
             },
         }

@@ -24,21 +24,22 @@ class EstateProperty(models.Model):
                                       default=lambda self: self.env.user)
     buyer_id = fields.Many2one('res.partner', string='购买人', index=True)
     offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价")
-    building_no = fields.Integer(string='楼号')
-    floor = fields.Integer(default=1, string='楼层')
+    building_no = fields.Char(string='楼号')
+    floor = fields.Char(default=1, string='楼层')
+    room_no = fields.Char(string='房间号')
     description = fields.Text("详细信息")
     postcode = fields.Char()
     date_availability = fields.Date(copy=False, string="可租日期")
-    expected_price = fields.Float(string="期望价格", default=0.0)
-    selling_price = fields.Float(string="实际价格", copy=False, default=0.0)
+    expected_price = fields.Float(string="期望价格（元/天/㎡）", default=0.0)
+    selling_price = fields.Float(string="实际价格（元/天/㎡）", copy=False, default=0.0)
     bedrooms = fields.Integer(default=0)
-    building_area = fields.Float(default=0.0, string="总建筑面积")
-    living_area = fields.Float(default=0.0, string="使用面积")
-    unit_building_area = fields.Float(default=0.0, string="套内建筑面积")
-    unit_living_area = fields.Float(default=0.0, string="套内使用面积")
-    share_area = fields.Float(default=0.0, string="公摊面积")
-    actual_living_area = fields.Float(default=0.0, string="实际使用面积")
-    rent_area = fields.Float(default=0.0, string="计租面积")
+    building_area = fields.Float(default=0.0, string="总建筑面积（㎡）")
+    living_area = fields.Float(default=0.0, string="使用面积（㎡）")
+    unit_building_area = fields.Float(default=0.0, string="套内建筑面积（㎡）")
+    unit_living_area = fields.Float(default=0.0, string="套内使用面积（㎡）")
+    share_area = fields.Float(default=0.0, string="公摊面积（㎡）")
+    actual_living_area = fields.Float(default=0.0, string="实际使用面积（㎡）")
+    rent_area = fields.Float(default=0.0, string="计租面积（㎡）")
     facades = fields.Integer(default=0)
     garage = fields.Boolean(default=False)
     garden = fields.Boolean(default=False)
@@ -58,8 +59,10 @@ class EstateProperty(models.Model):
     current_contract_no = fields.Char(string='当前合同号', compute="_compute_latest_info", readonly=True, copy=False)
     current_contract_nm = fields.Char(string='当前合同名称', compute="_compute_latest_info", readonly=True, copy=False)
 
-    latest_rent_date_e = fields.Date(string="上次出租结束日期", compute="_compute_latest_info", readonly=True, copy=False)
+    last_rent_date_s = fields.Date(string="上次出租开始日期", compute="_compute_latest_info", readonly=True, copy=False)
+    last_rent_date_e = fields.Date(string="上次出租结束日期", compute="_compute_latest_info", readonly=True, copy=False)
     latest_rent_date_s = fields.Date(string="本次出租开始日期", compute="_compute_latest_info", readonly=True, copy=False)
+    latest_rent_date_e = fields.Date(string="本次出租结束日期", compute="_compute_latest_info", readonly=True, copy=False)
     out_of_rent_days = fields.Integer(string="本次空置天数", compute="_compute_latest_info", readonly=True, copy=False)
 
     # @api.onchange("building_area")
@@ -79,30 +82,32 @@ class EstateProperty(models.Model):
             record.current_contract_no = current_contract.contract_no if current_contract else False
             record.current_contract_nm = current_contract.name if current_contract else False
             record.latest_rent_date_s = current_contract.date_rent_start if current_contract else False
+            record.latest_rent_date_e = current_contract.date_rent_end if current_contract else False
 
             old_contract = self.env['estate.lease.contract'].search([('property_ids', 'in', record.id),
                                                                      ('active', '=', True),
                                                                      ('state', '=', 'invalid')],
                                                                     order='date_rent_end DESC',
                                                                     limit=1)
-            record.latest_rent_date_e = old_contract.date_rent_end if old_contract else False
-            record.date_availability = record.latest_rent_date_e + timedelta(
+            record.last_rent_date_s = old_contract.date_rent_start if old_contract else False
+            record.last_rent_date_e = old_contract.date_rent_end if old_contract else False
+            record.date_availability = record.last_rent_date_e + timedelta(
                 days=1) if old_contract else record.date_availability
 
             if record.latest_rent_date_s:
                 if record.date_availability:
                     record.out_of_rent_days = (record.latest_rent_date_s - record.date_availability).days - 1
                 else:
-                    if record.latest_rent_date_e:
-                        record.out_of_rent_days = (record.latest_rent_date_s - record.latest_rent_date_e).days - 1
+                    if record.last_rent_date_e:
+                        record.out_of_rent_days = (record.latest_rent_date_s - record.last_rent_date_e).days - 1
                     else:
                         record.out_of_rent_days = 0
             else:
                 if record.date_availability:
                     record.out_of_rent_days = (fields.Date.context_today(self) - record.date_availability).days
                 else:
-                    if record.latest_rent_date_e:
-                        record.out_of_rent_days = (fields.Date.context_today(self) - record.latest_rent_date_e).days
+                    if record.last_rent_date_e:
+                        record.out_of_rent_days = (fields.Date.context_today(self) - record.last_rent_date_e).days
                     else:
                         record.out_of_rent_days = 0
 
@@ -189,8 +194,8 @@ class EstateProperty(models.Model):
     @api.constrains('date_availability')
     def _check_date_availability(self):
         for record in self:
-            if record.date_availability and record.latest_rent_date_e:
-                if record.date_availability <= record.latest_rent_date_e:
+            if record.date_availability and record.last_rent_date_e:
+                if record.date_availability <= record.last_rent_date_e:
                     raise ValidationError("可租日期不能早于上次出租结束日期")
 
     @api.model

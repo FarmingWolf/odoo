@@ -7,7 +7,7 @@
             <tree string="contracts_tree"
                   decoration-success="date_rent_end &gt;= (context_today() + relativedelta(years=+1))"
                   decoration-warning="date_rent_end &lt;= (context_today() + relativedelta(days=+30))"
-                  create="false" delete="false" edit="false">
+                  create="true" delete="false" edit="false">
                 <field name="contract_no"/>
                 <field name="name"/>
                 <field name="date_sign"/>
@@ -97,6 +97,7 @@
                     <field name="property_type_id" string="资产类型"/>
                     <field name="building_no"/>
                     <field name="floor"/>
+                    <field name="room_no"/>
                     <field name="building_area"/>
                     <field name="rent_area"/>
                     <field name="expected_price" string="期待价格（元/天/㎡）"/>
@@ -129,7 +130,7 @@
                             <field name="date_sign" />
                             <field name="date_start" />
                             <field name="deliver_condition" />
-                            <field name="performance_guarantee" />
+                            <field name="lease_deposit" />
                             <field name="rent_amount" />
                         </group>
                         <group>
@@ -143,6 +144,7 @@
                             <field name="opening_date" />
                             <field name="rent_amount_first_period" />
                             <field name="rent_first_payment_date" />
+                            <field name="performance_guarantee" />
                             <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}"/>
                         </group>
                     </group>

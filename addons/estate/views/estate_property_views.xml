@@ -26,6 +26,7 @@
                 <field name="property_type_id" string="资产类型"/>
                 <field name="building_no"/>
                 <field name="floor"/>
+                <field name="room_no"/>
                 <field name="building_area"/>
                 <field name="rent_area"/>
                 <field name="expected_price" string="期待价格（元/天/㎡）"/>
@@ -45,8 +46,25 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
-                    <group>
-                        <field name="name" class="o_estate_property_form_title_large_font" default_focus="True"/>
+                    <group col="2">
+                        <group col="1">
+                            <group col="2">
+                                <field name="name" default_focus="True"/>
+                            </group>
+                        </group>
+                        <group col="1">
+                            <group col="3">
+                                <group>
+                                    <field name="building_no"/>
+                                </group>
+                                <group>
+                                    <field name="floor"/>
+                                </group>
+                                <group>
+                                    <field name="room_no"/>
+                                </group>
+                            </group>
+                        </group>
                     </group>
                     <group>
                         <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
@@ -73,36 +91,25 @@
                                 <field name="rent_area"/>
                             </group>
                             <group>
-                                <field name="latest_rent_date_e"/>
+                                <field name="last_rent_date_s"/>
                             </group>
-                            <group col="2">
-                                <group>
-                                    <field name="out_of_rent_days"/>
-                                </group>
-                            </group>
-                        </group>
-                        <group col="1">
-                            <group col="2">
-                                <group>
-                                    <field name="expected_price"/>
-                                </group>
-                                <group>
-                                    <field name="best_price"/>
-                                </group>
-                            </group>
-                            <group col="2">
-                                <field name="selling_price"/>
-                            </group>
-                            <group col="2">
-                                <field name="current_contract_no"/>
-                            </group>
-                            <group col="2">
-                                <field name="current_contract_nm"/>
+                            <group>
+                                <field name="last_rent_date_e"/>
                             </group>
                             <group>
                                 <field name="latest_rent_date_s"/>
                             </group>
-
+                            <group>
+                                <field name="latest_rent_date_e"/>
+                            </group>
+                        </group>
+                        <group col="1">
+                            <field name="expected_price"/>
+                            <field name="best_price"/>
+                            <field name="selling_price"/>
+                            <field name="current_contract_no"/>
+                            <field name="current_contract_nm"/>
+                            <field name="out_of_rent_days"/>
                         </group>
                     </group>
                     <notebook>
@@ -113,14 +120,12 @@
                             <newline/>
                             <group>
                                 <group>
-                                    <field name="building_no"/>
-                                    <field name="bedrooms" string="房间数"/>
+                                    <field name="bedrooms" string="卧室数"/>
                                     <field name="living_area"/>
                                     <field name="facades" string="朝向"/>
                                     <field name="total_area"/>
                                 </group>
                                 <group>
-                                    <field name="floor"/>
                                     <field name="garage" string="车库"/>
                                     <field name="garden" string="花园"/>
                                     <field name="garden_area" string="花园面积（㎡）" invisible="not garden"/>
@@ -164,7 +169,7 @@
             <search string="资产检索">
                 <filter name="active" string="数据可用" domain="[('active','=','true')]" />
                 <separator/>
-                <field name="total_area" string="套内面积" filter_domain="[('living_area', '>=', self)]"/>
+                <field name="total_area" filter_domain="[('living_area', '>=', self)]"/>
                 <separator/>
             </search>
         </field>

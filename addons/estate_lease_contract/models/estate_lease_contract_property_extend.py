@@ -4,6 +4,7 @@ from typing import Dict, List
 
 from odoo import fields, models, api
 
+
 class EstateLeaseContractPropertyExtend(models.Model):
     _description = "资产租赁合同租赁标的"
     _inherit = ['estate.property']
@@ -126,6 +127,9 @@ class EstateLeaseContractPropertyExtend(models.Model):
     turnover_percentage_id = fields.Char(string='营业额抽成详情', readonly=True, compute="_get_rent_plan_info")
     payment_period = fields.Char(string="支付周期", readonly=True, compute="_get_rent_plan_info")
     rent_price = fields.Char(string="租金单价（元/天/㎡）", readonly=True, compute="_get_rent_plan_info")
+    rent_amount_monthly_auto = fields.Char(string="自动计算月租金（元/月/㎡）", readonly=True, compute="_get_rent_plan_info",
+                                           help="=租金单价（元/天/㎡）×计租面积（㎡）×365÷12")
+    rent_amount_monthly_adjust = fields.Float(string="手动调整月租金（元/月/㎡）", help="可手动调整此金额，系统以此为准")
     payment_date = fields.Char(string="租金支付日", readonly=True, compute="_get_rent_plan_info")
     compensation_method = fields.Char(string='补差方式', readonly=True, compute="_get_rent_plan_info")
     compensation_period = fields.Char(string='补差周期', readonly=True, compute="_get_rent_plan_info")
@@ -155,6 +159,13 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 record.payment_period = dict(record.rent_plan_id._fields['payment_period'].selection).get(
                     record.rent_plan_id.payment_period)
                 record.rent_price = record.rent_plan_id.rent_price
+                record.rent_amount_monthly_auto = round(record.rent_plan_id.rent_price * record.rent_area * 365 / 12, 2)
+                if record.rent_amount_monthly_adjust:
+                    pass
+                else:
+                    record.rent_amount_monthly_adjust = round(
+                        record.rent_plan_id.rent_price * record.rent_area * 365 / 12, 2)
+
                 record.payment_date = dict(record.rent_plan_id._fields['payment_date'].selection).get(
                     record.rent_plan_id.payment_date)
                 record.compensation_method = dict(record.rent_plan_id._fields['compensation_method'].selection).get(
@@ -171,6 +182,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 record.turnover_percentage_id = ""
                 record.payment_period = ""
                 record.rent_price = ""
+                record.rent_amount_monthly_auto = ""
                 record.payment_date = ""
                 record.compensation_method = ""
                 record.compensation_period = ""

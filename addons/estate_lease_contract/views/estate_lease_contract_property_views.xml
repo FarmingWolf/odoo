@@ -43,6 +43,8 @@
                                     </group>
                                     <group invisible="billing_method_fixed_price_invisible">
                                         <field name="rent_price"/>
+                                        <field name="rent_amount_monthly_auto"/>
+                                        <field name="rent_amount_monthly_adjust"/>
                                     </group>
                                     <group invisible="billing_method_progress_invisible">
                                         <field name="billing_progress_method_id"/>
@@ -60,6 +62,8 @@
                                     </group>
                                     <group col="1" invisible="billing_method_progress_invisible or billing_progress_method_period_invisible">
                                         <field name="rent_price" string="起始单价（元/天/㎡）"/>
+                                        <field name="rent_amount_monthly_auto"/>
+                                        <field name="rent_amount_monthly_adjust"/>
                                     </group>
                                 </group>
                             </group>
@@ -80,6 +84,8 @@
                                 </group>
                                 <group name="固定单价" col="2" invisible="billing_progress_method_no_progress_invisible">
                                     <field name="rent_price" string="无递增固定单价（元/天/㎡）"/>
+                                    <field name="rent_amount_monthly_auto"/>
+                                    <field name="rent_amount_monthly_adjust"/>
                                 </group>
                             </group>
 
@@ -87,6 +93,8 @@
                                 <group col="2">
                                     <group col="1">
                                         <field name="rent_price" string="保底单价（元/天/㎡）"/>
+                                        <field name="rent_amount_monthly_auto"/>
+                                        <field name="rent_amount_monthly_adjust"/>
                                     </group>
                                     <group col="2">
                                         <group>

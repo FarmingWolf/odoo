@@ -13,7 +13,7 @@
     'author': "北京491科技",
     'website': "https://www.odoo.com/",
     'category': 'Real Estate/Estate Dashboard',
-    'version': '0.1',
+    'version': '0.2',
     'application': True,
     'installable': True,
     'depends': ['base', 'web', 'estate', 'estate_lease_contract'],
