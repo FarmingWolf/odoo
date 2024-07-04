@@ -177,10 +177,10 @@ def _generate_details_from_rent_plan(record_self):
             if current_s.day == 1:  # 1号开始的期间，按照上述逻辑，最后的current_e就是月末，不用调整
                 pass
             elif current_s.day <= 29:  # 开始月的日期为29号以下，那么结束月的日子应该是28号
-                current_e.replace(day=current_s.day - 1)
+                current_e = current_e.replace(day=current_s.day - 1)
             else:  # 开始日期的日为30或者31日
                 if current_e.month != 2:  # 结束日期不是在2月，那么其结束日期可以是N-1
-                    current_e.replace(day=current_s.day - 1)
+                    current_e = current_e.replace(day=current_s.day - 1)
                 else:  # 结束日期在2月，那么上边逻辑已经计算好了2月末的最后一天小于30、31
                     pass
 
