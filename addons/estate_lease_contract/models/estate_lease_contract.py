@@ -156,6 +156,8 @@ def _generate_details_from_rent_plan(record_self):
             month_cnt = 2
         elif rental_plan.payment_period == 'quarterly':
             month_cnt = 3
+        elif rental_plan.payment_period == 'four_months':
+            month_cnt = 4
         elif rental_plan.payment_period == 'half_year':
             month_cnt = 6
         elif rental_plan.payment_period == 'year':

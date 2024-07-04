@@ -19,7 +19,7 @@ class EstateLeaseContractRentalPlan(models.Model):
     business_type_id = fields.Many2one("estate.lease.contract.rental.business.type", string="经营业态")
     main_category = fields.Many2one("estate.lease.contract.rental.main.category", string="主品类")
 
-    billing_method = fields.Selection(string='计费方式',
+    billing_method = fields.Selection(string='计费方式', required=True,
                                       selection=[('by_fixed_price', '固定金额'), ('by_percentage', '纯抽成'),
                                                  ('by_progress', '按递增率'),
                                                  ('by_fixed_price_percentage_higher', '保底抽成两者取高')], )
@@ -37,12 +37,12 @@ class EstateLeaseContractRentalPlan(models.Model):
                                               'rental_plan_percentage_rel', 'rental_plan_id', 'turnover_percentage_id',
                                               string='营业额抽成详情')
 
-    payment_period = fields.Selection(string="支付周期",
+    payment_period = fields.Selection(string="支付周期", required=True,
                                       selection=[('month', '月付'), ('bimonthly', '双月付'), ('quarterly', '季付'),
-                                                 ('half_year', '半年付'), ('year', '年付')], )
+                                                 ('four_months', '四个月付'), ('half_year', '半年付'), ('year', '年付')], )
     rent_price = fields.Float(default=0.0, string="租金单价（元/天/㎡）")
 
-    payment_date = fields.Selection(string="租金支付日",
+    payment_date = fields.Selection(string="租金支付日", required=True,
                                     selection=[('period_end_month_15_pay_next', '租期结束日的15日前付下期费用'),
                                                ('period_end_month_20_pay_next', '租期结束日的20日前付下期费用'),
                                                ('period_end_month_25_pay_next', '租期结束日的25日前付下期费用'),
