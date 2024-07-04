@@ -1,7 +1,7 @@
 <odoo>
   <data>
     <record model="ir.actions.client" id="dashboard">
-      <field name="name">看板选项→</field>
+      <field name="name">资产出租率</field>
       <field name="tag">estate_dashboard.dashboard</field>
     </record>
 

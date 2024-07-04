@@ -1,3 +1,5 @@
 .o_dashboard {
     background-color: gray;
+    height: 100%; /* 确保容器占满整个高度 */
+    overflow-y: auto; /* 设置溢出内容为自动滚动 */
 }
