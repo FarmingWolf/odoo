@@ -49,8 +49,7 @@ def _cal_date_payment(current_s, current_e, rental_plan, date_e):
 
 
 # 最后一期有可能不是一整期
-def _cal_last_period_rental(month_cnt, current_s, current_e, date_e, property_id, rental_plan):
-
+def _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, property_id, rental_plan):
     last_period_rental = 0.0
     current_tmp = _get_current_e(current_s)
 
@@ -62,7 +61,6 @@ def _cal_last_period_rental(month_cnt, current_s, current_e, date_e, property_id
 
     # 如果足月，则直接取月金额
     while current_tmp < current_e:
-
         if property_id.rent_amount_monthly_adjust:
             last_period_rental += property_id.rent_amount_monthly_adjust
         else:
@@ -72,8 +70,14 @@ def _cal_last_period_rental(month_cnt, current_s, current_e, date_e, property_id
 
     # 最后不足月的天数
     if current_tmp > current_e:
-        period_days = current_e - current_s
-        last_period_rental += property_id.rent_area * rental_plan.rent_price * (period_days.days + 1)
+        if date_e.day == date_s.day - 1:
+            if property_id.rent_amount_monthly_adjust:
+                last_period_rental += property_id.rent_amount_monthly_adjust
+            else:
+                last_period_rental += property_id.rent_area * rental_plan.rent_price * 365 / 12
+        else:
+            period_days = current_e - current_s
+            last_period_rental += property_id.rent_area * rental_plan.rent_price * (period_days.days + 1)
     else:
         if property_id.rent_amount_monthly_adjust:
             last_period_rental += property_id.rent_amount_monthly_adjust
@@ -83,7 +87,7 @@ def _cal_last_period_rental(month_cnt, current_s, current_e, date_e, property_id
     return last_period_rental
 
 
-def _cal_rental_amount(month_cnt, current_s, current_e, date_e, property_id, rental_plan):
+def _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property_id, rental_plan):
     """
     租金计算方法：先计算年租金，再计算每月租金或每期租金
     年租金=租金单价×计租面积×365
@@ -101,13 +105,13 @@ def _cal_rental_amount(month_cnt, current_s, current_e, date_e, property_id, ren
     if date_e > current_e:
         rental_amount = rental_amount_month * month_cnt
     else:  # 最后一期租金
-        rental_amount = _cal_last_period_rental(month_cnt, current_s, current_e, date_e, property_id, rental_plan)
+        rental_amount = _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, property_id,
+                                                rental_plan)
 
     return rental_amount
 
 
 def _get_current_e(current_tmp):
-
     if current_tmp.day == 1:  # 本月1号至月末
         current_e = (current_tmp.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)
     elif current_tmp.day <= 29:  # 本月N号至下月N-1号
@@ -191,7 +195,8 @@ def _generate_details_from_rent_plan(record_self):
             date_payment = _cal_date_payment(current_s, current_e, rental_plan, date_e)
             billing_method_str = dict(rental_plan._fields['billing_method'].selection).get(rental_plan.billing_method)
             payment_date_str = dict(rental_plan._fields['payment_date'].selection).get(rental_plan.payment_date)
-            rental_amount = _cal_rental_amount(month_cnt, current_s, current_e, date_e, property_id, rental_plan)
+            rental_amount = _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property_id,
+                                               rental_plan)
             rental_amount_zh = Utils.arabic_to_chinese(rental_amount)
 
             rental_periods_details.append({
