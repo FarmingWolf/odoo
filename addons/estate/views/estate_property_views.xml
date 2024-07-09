@@ -41,8 +41,14 @@
         <field name="arch" type="xml">
             <form string="RealEstateProperty" create="True" edit="True" duplicate="True" delete="True">
                 <header>
-                    <button name="action_cancel_property" type="object" string="取消"/>
-                    <button name="action_sold_property" type="object" string="标记为已出租"/>
+                    <div>手动更新状态：</div>
+                    <button name="action_change_state_repairing" type="object" string="整备中"/>
+                    <button name="action_change_state_new" type="object" string="待租中"/>
+                    <button name="action_change_state_offer_received" type="object" string="洽谈中"/>
+                    <button name="action_change_state_offer_accepted" type="object" string="接受报价"/>
+                    <button name="action_sold_property" type="object" string="已租"/>
+                    <button name="action_cancel_property" type="object" string="已取消"/>
+                    <button name="action_property_out_dated" type="object" string="租约已到期"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -186,15 +192,8 @@
                         <div class="oe_kanban_global_click">
                             <div class="o_kanban_card">
                                 <div class="o_kanban_record_title">
-                                    <field name="name"/>
-                                    <div t-if="record.state == 'new'">上新</div>
-                                    <field name="expected_price"/>
-                                    <div t-if="record.state === 'offer_received'">
-                                        <field name="best_price"/>
-                                    </div>
-                                    <div t-if="record.state == 'offer_accepted'">
-                                        <field name="selling_price"/>
-                                    </div>
+                                    <field name="name"/><br/>
+                                    <field name="state"/>
                                 </div>
                             </div>
                         </div>
