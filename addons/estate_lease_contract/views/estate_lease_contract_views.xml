@@ -90,16 +90,11 @@
         <field name="inherit_id" ref="estate.491_real_estate_view_tree"/>
         <field name="arch" type="xml">
             <tree position="replace" >
-                <tree string="child_tree" decoration-success="state=='sold'" decoration-warning="state=='canceled'">
+                <tree string="child_tree" decoration-success="state=='sold'" decoration-warning="state!='sold'">
                     <field name="name" string="资产名称"/>
                     <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}" />
-                    <field name="state" string="" invisible="1" width="0"/>
-                    <field name="property_type_id" string="资产类型"/>
-                    <field name="building_no"/>
-                    <field name="floor"/>
-                    <field name="room_no"/>
-                    <field name="building_area"/>
-                    <field name="rent_area"/>
+                    <field name="state"/>
+                    <field name="rent_area" string="面积"/>
                     <field name="expected_price" string="期待价格（元/天/㎡）"/>
                     <field name="selling_price" string="实际价格（元/天/㎡）"/>
                     <field name="date_availability" string="交付日期"/>

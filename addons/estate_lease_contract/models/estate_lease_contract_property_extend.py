@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import logging
 from typing import Dict, List
 
 from odoo import fields, models, api
+
+_logger = logging.getLogger(__name__)
 
 
 class EstateLeaseContractPropertyExtend(models.Model):
@@ -204,3 +207,48 @@ class EstateLeaseContractPropertyExtend(models.Model):
         for record in self:
             if record.rent_plan_id:
                 self._get_property_management_fee_info()
+
+    # 自动计算资产状态（1、有效合同中的资产设置为已租；2、已租状态的资产，根据合同状态设置为租约已到期）
+    def automatic_daily_calc_property_status(self):
+        _logger.info("开始计算资产状态")
+        current_date = fields.Date.context_today(self)
+
+        property_ids = self.env['estate.property'].search([])
+        for each_property in property_ids:
+            _logger.info(f"资产{each_property.name}状态={each_property.state}")
+            state_change = False
+            # 本property对应的所有contract，原则上只能有一条active的contract
+            current_contract = self.env['estate.lease.contract'].search([('property_ids', 'in', each_property.id),
+                                                                         ('active', '=', True),
+                                                                         ('state', '=', 'released')],
+                                                                        order='date_rent_end DESC', limit=1)
+            # 根据最新发布的合同
+            if current_contract:
+                if each_property.state == "sold":
+                    if current_contract.date_rent_end:
+                        if current_date > current_contract.date_rent_end:
+                            each_property.state == "out_dated"
+                            state_change = True
+                else:
+                    if current_contract.date_start and current_contract.date_rent_end:
+                        if current_contract.date_start <= current_date <= current_contract.date_rent_end:
+                            each_property.state = "sold"
+                            state_change = True
+
+            else:  # 未发布的最新合同
+                unreleased_contract = self.env['estate.lease.contract'].search(
+                    [('property_ids', 'in', each_property.id),
+                     ('active', '=', True),
+                     ('state', '!=', 'released')],
+                    order='date_rent_end DESC', limit=1)
+                # 只关注未发布的新合同
+                if unreleased_contract:
+                    if (unreleased_contract.date_start and unreleased_contract.date_start > current_date) or \
+                            (unreleased_contract.date_rent_end and unreleased_contract.date_rent_end >= current_date):
+                        if each_property.state not in ("offer_received", "offer_accepted"):
+                            each_property.state = "offer_received"
+                            state_change = True
+
+            _logger.info(f"资产{each_property.name}状态={each_property.state},是否需要更新【{state_change}】")
+            if state_change:
+                each_property.write({'state': each_property.state})

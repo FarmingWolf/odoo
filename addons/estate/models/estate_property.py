@@ -10,6 +10,24 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare
 
 
+def _check_current_contract_valid(record):
+    if record.current_contract_id:
+        if record.latest_rent_date_s and record.latest_rent_date_e:
+            if fields.Date.context_today(record) >= record.latest_rent_date_s and fields.Date.context_today(
+                    record) <= record.latest_rent_date_e:
+
+                record.state = "sold"
+                return True
+
+            if fields.Date.context_today(record) <= record.latest_rent_date_s:
+                record.state = "offer_accepted"
+
+            if record.state == "sold" and fields.Date.context_today(record) > record.latest_rent_date_e:
+                record.state = "canceled"
+
+    return False
+
+
 class EstateProperty(models.Model):
     # def onchange(self, values: Dict, field_names: List[str], fields_spec: Dict):
     #     pass
@@ -77,7 +95,8 @@ class EstateProperty(models.Model):
             # 本property对应的所有contract，原则上只能有一条active的contract
             current_contract = self.env['estate.lease.contract'].search([('property_ids', 'in', record.id),
                                                                          ('active', '=', True),
-                                                                         ('state', '=', 'released')], limit=1)
+                                                                         ('state', '=', 'released')],
+                                                                        order='date_rent_end DESC', limit=1)
             record.current_contract_id = current_contract.id if current_contract else False
             record.current_contract_no = current_contract.contract_no if current_contract else False
             record.current_contract_nm = current_contract.name if current_contract else False
@@ -131,9 +150,8 @@ class EstateProperty(models.Model):
     active = fields.Boolean(default=True)
     state = fields.Selection(
         string='资产状态',
-        selection=[('repairing', '整备中'), ('new', '新上'), ('offer_received', '收到报价'), ('offer_accepted', '接受报价'),
-                   ('sold', '已租'), ('canceled', '已取消')],
-        help="新上，收到报价，接受报价，已出租，已取消"
+        selection=[('repairing', '整备中'), ('new', '待租中'), ('offer_received', '洽谈中'), ('offer_accepted', '接受报价'),
+                   ('sold', '已租'), ('canceled', '已取消'), ('out_dated', '租约已到期')],
     )
 
     # property_offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价")
@@ -160,16 +178,51 @@ class EstateProperty(models.Model):
             self.garden_area = 0
             self.garden_orientation = ''
 
+    def action_change_state_repairing(self):
+        for record in self:
+            if _check_current_contract_valid(record):
+                raise ValidationError(_("当前资产已在租，不能更改资产状态。"))
+
+            record.state = 'repairing'
+
+    def action_change_state_new(self):
+        for record in self:
+            if _check_current_contract_valid(record):
+                raise ValidationError(_("当前资产已在租，不能更改资产状态。"))
+
+            record.state = 'new'
+
+    def action_change_state_offer_received(self):
+        for record in self:
+            if _check_current_contract_valid(record):
+                raise ValidationError(_("当前资产已在租，不能更改资产状态。"))
+
+            record.state = 'offer_received'
+
+    def action_change_state_offer_accepted(self):
+        for record in self:
+            if _check_current_contract_valid(record):
+                raise ValidationError(_("当前资产已在租，不能更改资产状态。"))
+
+            record.state = 'offer_accepted'
+
     # 取消该条记录
     def action_cancel_property(self):
         for record in self:
+            if _check_current_contract_valid(record):
+                raise ValidationError(_("当前资产已在租，不能更改资产状态。"))
             record.state = 'canceled'
 
-    def action_sold_property(self):
-        print("action_sold_property called")
+    def action_property_out_dated(self):
         for record in self:
-            if record.state == 'canceled':
-                raise UserError(_('该记录已经被取消，不能再被设置为已售出'))
+            if _check_current_contract_valid(record):
+                raise ValidationError(_("当前资产已在租，不能更改资产状态。"))
+            record.state = 'out_dated'
+
+    def action_sold_property(self):
+        for record in self:
+            if not _check_current_contract_valid(record):
+                raise ValidationError(_('当前资产没有生效的租赁合同，不能被设置为已租。请前往合同管理模块，在合同中选择资产。'))
 
             # 设置实际售价和购买者
             record.selling_price = record.best_price
@@ -184,7 +237,7 @@ class EstateProperty(models.Model):
 
             # 如果设置售出，那么一定已经有报价了
             if not _best_price_rcd:
-                raise ValidationError("这是个保留功能，请不要在这里设置已售出。请前往合同管理模块，在合同中选择资产。")
+                raise ValidationError(_("这是个保留功能，请不要在这里设置已售出。请前往合同管理模块，在合同中选择资产。"))
 
             record.buyer_id = _best_price_rcd[0].partner_id
 
