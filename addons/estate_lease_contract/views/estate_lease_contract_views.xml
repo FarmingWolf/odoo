@@ -25,6 +25,7 @@
                             <field name="deliver_condition" readonly="context.get('contract_read_only')"/>
                             <field name="lease_deposit" readonly="context.get('contract_read_only')"/>
                             <field name="rent_amount" readonly="context.get('contract_read_only')"/>
+                            <field name="rent_amount_year" readonly="context.get('contract_read_only')"/>
                         </group>
                         <group>
                             <field name="date_rent_start" readonly="context.get('contract_read_only')"/>

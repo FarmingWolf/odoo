@@ -12,8 +12,13 @@
                 </xpath>
                 <xpath expr="//field[@name='selling_price']" position="replace">
                 </xpath>
+                <xpath expr="//field[@name='building_no']" position="replace">
+                    <field name="latest_payment_method"/>
+                </xpath>
+                <xpath expr="//field[@name='floor']" position="replace"/>
+                <xpath expr="//field[@name='room_no']" position="replace"/>
+
                 <xpath expr="//field[@name='date_availability']" position="replace">
-                    <field name="payment_period"/>
                     <field name="payment_date"/>
                 </xpath>
             </field>

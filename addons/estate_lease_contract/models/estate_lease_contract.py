@@ -213,6 +213,7 @@ def _generate_details_from_rent_plan(record_self):
         print("{1}.rental_periods={0}".format(rental_periods_details, rental_plan.name))
 
     record_self.rent_amount = temp_rent_amount
+    record_self.rent_amount_year = temp_rent_amount * 12
     record_self.lease_deposit = temp_deposit_amount
 
     return rental_periods_details
@@ -446,6 +447,7 @@ class EstateLeaseContract(models.Model):
                     record.rent_area += rent_property.rent_area
 
     rent_amount = fields.Float(default=0.0, string="总月租金（元/月）", readonly=True)
+    rent_amount_year = fields.Float(default=0.0, string="总年租金（元/年）", readonly=True)
     rent_amount_first_period = fields.Float(default=0.0, string="首期租金（元）")
     rent_first_period_from = fields.Date(string="首期租金期间（开始日）")
     rent_first_period_to = fields.Date(string="首期租金期间（结束日）")

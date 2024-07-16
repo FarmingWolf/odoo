@@ -27,13 +27,12 @@
                 <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}" />
                 <field name="state" />
                 <field name="property_type_id" string="资产类型"/>
+                <field name="rent_area" string="面积（㎡）"/>
+                <field name="expected_price" string="期待价格（元/天/㎡）"/>
+                <field name="selling_price" string="实际价格（元/天/㎡）"/>
                 <field name="building_no"/>
                 <field name="floor"/>
                 <field name="room_no"/>
-                <field name="building_area"/>
-                <field name="rent_area"/>
-                <field name="expected_price" string="期待价格（元/天/㎡）"/>
-                <field name="selling_price" string="实际价格（元/天/㎡）"/>
                 <field name="date_availability" string="交付日期"/>
             </tree>
         </field>
