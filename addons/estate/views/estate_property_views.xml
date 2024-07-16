@@ -4,7 +4,10 @@
         <field name="name">491资产管理</field>
         <field name="res_model">estate.property</field>
         <field name="view_mode">tree,form,kanban</field>
-        <field name="context">{'search_default_active': True}</field>
+        <field name="context">{
+            'search_default_active': True,
+            'contract_read_only': False,
+            'menu_root': 'estate.property',}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 这句话来自estate_property_views.xml
@@ -41,106 +44,143 @@
         <field name="arch" type="xml">
             <form string="RealEstateProperty" create="True" edit="True" duplicate="True" delete="True">
                 <header>
-                    <div>手动更新状态：</div>
-                    <button name="action_change_state_repairing" type="object" string="整备中"/>
-                    <button name="action_change_state_new" type="object" string="待租中"/>
-                    <button name="action_change_state_offer_received" type="object" string="洽谈中"/>
-                    <button name="action_change_state_offer_accepted" type="object" string="接受报价"/>
-                    <button name="action_sold_property" type="object" string="已租"/>
-                    <button name="action_cancel_property" type="object" string="已取消"/>
-                    <button name="action_property_out_dated" type="object" string="租约已到期"/>
+                    <button name="action_change_state_repairing" type="object" icon="fa-wrench" title="整备中"
+                            help="点击设置资产为整备中状态"/>
+                    <button name="action_change_state_new" type="object" icon="fa-building-o" title="待租中"
+                            help="点击设置资产为待租中状态"/>
+                    <button name="action_change_state_offer_received" type="object" icon="fa-weixin" title="洽谈中"
+                            help="点击设置资产为洽谈中状态"/>
+                    <button name="action_change_state_offer_accepted" type="object" icon="fa-handshake-o" title="已接受报价"
+                            help="点击设置资产为已接受报价状态"/>
+                    <button name="action_sold_property" type="object" icon="fa-lock" title="已租中"
+                            help="点击设置资产为已租中状态"/>
+                    <button name="action_cancel_property" type="object" icon="fa-times-circle" title="已取消"
+                            help="点击设置资产为已取消状态"/>
+                    <button name="action_property_out_dated" type="object" icon="fa-warning" title="租约已到期"
+                            help="点击设置资产为租约已到期状态"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
-                    <group col="2">
-                        <group col="1">
-                            <group col="2">
-                                <field name="name" default_focus="True"/>
-                            </group>
-                        </group>
-                        <group col="1">
-                            <group col="3">
-                                <group>
-                                    <field name="building_no"/>
-                                </group>
-                                <group>
-                                    <field name="floor"/>
-                                </group>
-                                <group>
-                                    <field name="room_no"/>
-                                </group>
-                            </group>
-                        </group>
+                    <group>
+                        <field name="name" default_focus="True"/>
                     </group>
                     <group>
                         <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
                     </group>
-                    <group col="2">
-                        <group col="1">
-                            <group col="2">
-                                <group>
-                                    <field name="property_type_id" options="{'no_create': true, 'no_open': true}"/>
-                                </group>
-                                <group>
-                                    <field name="date_availability"/>
+                    <group>
+                        <field name="rent_area" string="面积（㎡）"/>
+                    </group>
+
+                    <group col="2" name="not_under_lease" invisible="state in ('offer_received', 'offer_accepted', 'sold')">
+                        <group>
+                            <field name="date_availability"/>
+                            <field name="out_of_rent_days"/>
+                        </group>
+                        <group>
+                            <field name="expected_price" string="底价（元/天/㎡）"/>
+                            <field name="announced_price" string="报价（元/天/㎡）"/>
+                        </group>
+                    </group>
+                    <group col="2" name="under_lease" invisible="state not in ('offer_received', 'offer_accepted', 'sold')">
+                        <group>
+                            <field name="current_contract_no"
+                                   invisible="context.get('menu_root') == 'estate.lease.contract'
+                                   and not context.get('contract_read_only')"/>
+                            <field name="current_contract_nm"
+                                   invisible="context.get('menu_root') == 'estate.lease.contract'
+                                   and not context.get('contract_read_only')"/>
+                            <field name="latest_monthly_rent"/>
+                            <field name="latest_annual_rent"/>
+                            <field name="latest_deposit"/>
+                            <field name="latest_payment_method"/>
+                        </group>
+                        <group>
+                            <field name="latest_contract_date_s" string="开始日期"
+                                   invisible="context.get('menu_root') == 'estate.lease.contract'
+                                   and not context.get('contract_read_only')"/>
+                            <field name="latest_rent_date_e" string="结束日期"
+                                   invisible="context.get('menu_root') == 'estate.lease.contract'
+                                   and not context.get('contract_read_only')"/>
+                            <field name="latest_rent_days"
+                                   invisible="context.get('menu_root') == 'estate.lease.contract'
+                                   and not context.get('contract_read_only')"/>
+                            <field name="latest_contact_person"
+                                   invisible="context.get('menu_root') == 'estate.lease.contract'
+                                   and not context.get('contract_read_only')"/>
+                            <field name="latest_contact_person_tel"
+                                   invisible="context.get('menu_root') == 'estate.lease.contract'
+                                   and not context.get('contract_read_only')"/>
+                            <field name="latest_free_days" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="more_info_invisible"/>
+                    </group>
+                    <sheet invisible="not more_info_invisible">
+                        <group col="2" name="more_info">
+                            <group col="1">
+                                <group col="3">
+                                    <group>
+                                        <field name="building_no"/>
+                                    </group>
+                                    <group>
+                                        <field name="floor"/>
+                                    </group>
+                                    <group>
+                                        <field name="room_no"/>
+                                    </group>
                                 </group>
                             </group>
-                            <group col="2">
-                                <group>
-                                    <field name="total_area"/>
-                                </group>
-                                <group>
-                                    <field name="building_area"/>
-                                </group>
+                            <group col="1">
+                                <field name="property_type_id" options="{'no_create': true, 'no_open': true}"/>
                             </group>
-                            <group>
+
+                            <group col="1">
+                                <field name="total_area"/>
+                                <field name="building_area"/>
                                 <field name="rent_area"/>
+                            </group>
+
+                            <group col="1">
+                                <field name="expected_price"/>
+                                <field name="best_price"/>
+                                <field name="selling_price"/>
                             </group>
                             <group>
                                 <field name="last_rent_date_s"/>
-                            </group>
-                            <group>
                                 <field name="last_rent_date_e"/>
-                            </group>
-                            <group>
                                 <field name="latest_rent_date_s"/>
-                            </group>
-                            <group>
                                 <field name="latest_rent_date_e"/>
                             </group>
-                        </group>
-                        <group col="1">
-                            <field name="expected_price"/>
-                            <field name="best_price"/>
-                            <field name="selling_price"/>
-                            <field name="current_contract_no"/>
-                            <field name="current_contract_nm"/>
-                            <field name="out_of_rent_days"/>
-                        </group>
-                    </group>
-                    <notebook>
-                        <page string="详细信息">
                             <group>
-                                <field name="description" string="简介"/>
+                                <field name="date_availability"/>
+                                <field name="out_of_rent_days"/>
                             </group>
-                            <newline/>
-                            <group>
+                            <group col="2">
                                 <group>
                                     <field name="bedrooms" string="卧室数"/>
                                     <field name="living_area"/>
                                     <field name="facades" string="朝向"/>
-                                    <field name="total_area"/>
+                                    <field name="garage" string="车库"/>
                                 </group>
                                 <group>
-                                    <field name="garage" string="车库"/>
                                     <field name="garden" string="花园"/>
                                     <field name="garden_area" string="花园面积（㎡）" invisible="not garden"/>
                                     <field name="garden_orientation" string="花园朝向" invisible="not garden"/>
                                 </group>
                             </group>
+                            <group>
+                                <field name="sales_person_id"/>
+                                <field name="buyer_id"/>
+                            </group>
+                        </group>
 
-                        </page>
-                        <page string="报价信息">
+                        <group col="1">
+                            <field name="description" string="简介"/>
+                        </group>
+                    </sheet>
+                    <notebook>
+                        <page string="报价信息-暂时不显示" invisible="1">
                             <field name="offer_ids" readonly="state in ('sold', 'canceled')">
                                 <tree decoration-success="status=='accepted'"
                                       decoration-danger="status=='refused'">
@@ -155,12 +195,6 @@
                                     <field name="validity"/>
                                 </tree>
                             </field>
-                        </page>
-                        <page string="其他信息">
-                            <group>
-                                <field name="sales_person_id"/>
-                                <field name="buyer_id"/>
-                            </group>
                         </page>
                     </notebook>
                 </sheet>

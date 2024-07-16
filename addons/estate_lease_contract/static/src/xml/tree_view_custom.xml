@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <t t-name="estate_lease_contract.CustomTreeRow">
+        <tr>
+            <td t-attf-data-record-id="{record.resId}">
+                <span t-field="record.name" />
+                <span t-field="record.contract_no"/>
+                <span t-field="record.date_sign"/>
+                <span t-field="record.date_start"/>
+                <span t-field="record.date_rent_start"/>
+                <span t-field="record.date_rent_end"/>
+                <span t-field="record.date_decorate_start"/>
+                <span t-field="record.date_decorate_end"/>
+                <span t-field="record.state"/>
+                <span t-field="record.contract_type_id"/>
+                <span t-field="record.property_ids" />
+                <span t-field="record.parking_space_ids" />
+                <span t-field="record.renter_id"/>
+                <span t-field="record.sales_person_id"/>
+                <span t-field="record.tag_ids" />
+            </td>
+        </tr>
+    </t>
+</templates>

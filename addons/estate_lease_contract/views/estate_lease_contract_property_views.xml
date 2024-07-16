@@ -7,6 +7,7 @@
             <field name="inherit_id" ref="estate.491_real_estate_view_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='expected_price']" position="replace">
+                    <field name="default_rental_plan" column_invisible="1"/>
                     <field name="rent_plan_id"/>
                 </xpath>
                 <xpath expr="//field[@name='selling_price']" position="replace">
@@ -23,8 +24,31 @@
             <field name="model">estate.property</field>
             <field name="inherit_id" ref="estate.491_real_estate_view_form"/>
                 <field name="arch" type="xml">
-                    <xpath expr="//notebook" position="inside">
-                        <page string="租金方案">
+                    <xpath expr="//button[@name='action_change_state_repairing']" position="attributes">
+                        <attribute name="invisible">context.get('contract_read_only')</attribute>
+                    </xpath>
+                    <xpath expr="//button[@name='action_change_state_new']" position="attributes">
+                        <attribute name="invisible">context.get('contract_read_only')</attribute>
+                    </xpath>
+                    <xpath expr="//button[@name='action_change_state_offer_received']" position="attributes">
+                        <attribute name="invisible">context.get('contract_read_only')</attribute>
+                    </xpath>
+                    <xpath expr="//button[@name='action_change_state_offer_accepted']" position="attributes">
+                        <attribute name="invisible">context.get('contract_read_only')</attribute>
+                    </xpath>
+                    <xpath expr="//button[@name='action_sold_property']" position="attributes">
+                        <attribute name="invisible">context.get('contract_read_only')</attribute>
+                    </xpath>
+                    <xpath expr="//button[@name='action_cancel_property']" position="attributes">
+                        <attribute name="invisible">context.get('contract_read_only')</attribute>
+                    </xpath>
+                    <xpath expr="//button[@name='action_property_out_dated']" position="attributes">
+                        <attribute name="invisible">context.get('contract_read_only')</attribute>
+                    </xpath>
+
+                    <xpath expr="//page" position="before">
+                        <page string="租金方案" invisible="state not in ['offer_received', 'offer_accepted', 'sold']">
+                            <field name="default_rental_plan" invisible="1"/>
                             <field name="billing_method_fixed_price_invisible" invisible="1"/>
                             <field name="billing_method_percentage_invisible" invisible="1"/>
                             <field name="billing_method_progress_invisible" invisible="1"/>
@@ -32,10 +56,12 @@
                             <field name="billing_progress_method_period_invisible" invisible="1"/>
                             <field name="billing_progress_method_turnover_invisible" invisible="1"/>
                             <field name="billing_progress_method_no_progress_invisible" invisible="1"/>
+
                             <group col="2">
                                 <group col="1">
                                     <group>
-                                        <field name="rent_plan_id" string="选择租金方案"/>
+                                        <field name="rent_plan_id" string="选择租金方案"
+                                               readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"/>
                                         <field name="business_method_id"/>
                                         <field name="main_category"/>
                                         <field name="billing_method"/>
@@ -43,7 +69,7 @@
                                     <group invisible="billing_method_fixed_price_invisible">
                                         <field name="rent_price"/>
                                         <field name="rent_amount_monthly_auto"/>
-                                        <field name="rent_amount_monthly_adjust"/>
+                                        <field name="rent_amount_monthly_adjust" readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"/>
                                     </group>
                                     <group invisible="billing_method_progress_invisible">
                                         <field name="billing_progress_method_id"/>
@@ -52,7 +78,7 @@
                                 <group col="1">
                                     <group col="1">
                                         <button name="action_refresh_rent_plan" type="object"
-                                                string="点击刷新"/>
+                                                string="点击刷新" invisible="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"/>
                                     </group>
                                     <group col="1">
                                         <field name="business_type_id"/>
@@ -69,26 +95,25 @@
 
                             <newline/>
 
-                            <group name="纯抽成" invisible="billing_method_percentage_invisible">
+                            <group string="纯抽成" invisible="billing_method_percentage_invisible">
                                 <field name="turnover_percentage_id"/>
                             </group>
 
-                            <group name="按递增率" col="1" invisible="billing_method_progress_invisible">
+                            <group col="1" invisible="billing_method_progress_invisible">
                                 <group name="按时间段递增" col="2" invisible="billing_progress_method_period_invisible">
-
                                     <field name="period_percentage_id"/>
                                 </group>
-                                <group name="按营业额递增" col="2" invisible="billing_progress_method_turnover_invisible">
+                                <group string="按营业额递增" col="2" invisible="billing_progress_method_turnover_invisible">
                                     <field name="turnover_percentage_id"/>
                                 </group>
-                                <group name="固定单价" col="2" invisible="billing_progress_method_no_progress_invisible">
+                                <group string="固定单价" col="2" invisible="billing_progress_method_no_progress_invisible">
                                     <field name="rent_price" string="无递增固定单价（元/天/㎡）"/>
                                     <field name="rent_amount_monthly_auto"/>
                                     <field name="rent_amount_monthly_adjust"/>
                                 </group>
                             </group>
 
-                            <group name="取高" col="1" invisible="billing_method_fixed_price_percentage_higher_invisible">
+                            <group string="取高" col="1" invisible="billing_method_fixed_price_percentage_higher_invisible">
                                 <group col="2">
                                     <group col="1">
                                         <field name="rent_price" string="保底单价（元/天/㎡）"/>
@@ -109,15 +134,23 @@
                                     <field name="turnover_percentage_id"/>
                                 </group>
                             </group>
+                            <group string="押金" col="2">
+                                <group col="2">
+                                    <field name="deposit_months" readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"/>
+                                </group>
+                                <group col="2">
+                                    <field name="deposit_amount" readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"/>
+                                </group>
+                            </group>
                         </page>
-                        <page string="物业费方案">
+                        <page string="物业费方案-暂时不显示" invisible="1">
                             <group col="2">
                                 <group col="1">
                                     <field name="management_fee_plan_id" string="选择物业费方案"/>
                                 </group>
                                 <group col="1">
                                     <button name="action_refresh_management_fee_plan" type="object"
-                                            string="点击刷新"/>
+                                            string="点击刷新" invisible="context.get('contract_read_only')"/>
                                 </group>
                             </group>
                             <newline/>

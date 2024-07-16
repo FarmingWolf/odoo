@@ -11,6 +11,16 @@
     'installable': True,
     'application': True,
     'auto_install': False,
+    'assets': {
+        'web.assets_backend': [
+            'estate_lease_contract/static/src/js/custom_tree_render.js',
+            'estate_lease_contract/static/src/xml/custom_tree_render.xml',
+            'estate_lease_contract/static/src/js/tree_view_custom.js',
+            'estate_lease_contract/static/src/xml/tree_view_custom.xml',
+            'estate_lease_contract/static/src/js/estate_lease_contract_property_status_load.js',
+            'estate_lease_contract/static/src/js/estate_lease_contract_rental_plan_load.js',
+        ],
+    },
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
@@ -34,11 +44,5 @@
 
         'data/cron_daily_property_status.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'estate_lease_contract/static/src/js/estate_lease_contract_property_status_load.js',
-            'estate_lease_contract/static/src/js/estate_lease_contract_rental_plan_load.js',
-        ],
-    },
     'license': 'AGPL-3'
 }

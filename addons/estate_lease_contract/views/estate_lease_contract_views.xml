@@ -1,162 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="estate_lease_contract_view_tree" model="ir.ui.view">
-        <field name="name">estate.lease.contract.tree</field>
-        <field name="model">estate.lease.contract</field>
-        <field name="arch" type="xml">
-            <tree string="contracts_tree"
-                  decoration-success="date_rent_end &gt;= (context_today() + relativedelta(years=+1))"
-                  decoration-warning="date_rent_end &lt;= (context_today() + relativedelta(days=+30))"
-                  create="true" delete="false" edit="false">
-                <field name="contract_no"/>
-                <field name="name"/>
-                <field name="date_sign"/>
-                <field name="date_start"/>
-                <field name="date_rent_start"/>
-                <field name="date_rent_end"/>
-                <field name="date_decorate_start"/>
-                <field name="date_decorate_end"/>
-                <field name="state"/>
-                <field name="contract_type_id"/>
-                <field name="property_ids" widget="many2many_tags" string="租赁场地" options="{'color_field': 'color'}" />
-                <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}" />
-                <field name="renter_id"/>
-                <field name="sales_person_id"/>
-                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
-            </tree>
-        </field>
-    </record>
-
-    <record id="estate_lease_contract_view_inactive_tree" model="ir.ui.view">
-        <field name="name">estate.lease.contract.tree</field>
-        <field name="model">estate.lease.contract</field>
-        <field name="arch" type="xml">
-            <tree string="contracts_tree"
-                  decoration-success="date_rent_end &gt;= (context_today() + relativedelta(years=+1))"
-                  decoration-warning="date_rent_end &lt;= (context_today() + relativedelta(days=+30))">
-                <field name="contract_no"/>
-                <field name="name"/>
-                <field name="date_sign"/>
-                <field name="date_start"/>
-                <field name="date_rent_start"/>
-                <field name="date_rent_end"/>
-                <field name="date_decorate_start"/>
-                <field name="date_decorate_end"/>
-                <field name="state"/>
-                <field name="contract_type_id"/>
-                <field name="property_ids" widget="many2many_tags" string="租赁场地" options="{'color_field': 'color'}" />
-                <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}" />
-                <field name="renter_id"/>
-                <field name="sales_person_id"/>
-                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
-            </tree>
-        </field>
-    </record>
-
-    <record id="estate_lease_contract_action" model="ir.actions.act_window">
-        <field name="name">资产租赁合同列表（查看）</field>
-        <field name="res_model">estate.lease.contract</field>
-        <field name="view_mode">tree,form,kanban</field>
-        <field name="views" eval="[[False, 'tree'], [ref('estate_lease_contract_view_tree'), 'tree']]"/>
-        <field name="context">{'search_default_active': True}</field>
-        <field name="domain">[('active', '=', True)]</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                还没有合同信息。
-            </p>
-            <p>
-                说明合同还没录入，或者录入了也没发布。
-            </p>
-        </field>
-    </record>
-
-    <record id="estate_lease_contract_action_recording" model="ir.actions.act_window">
-        <field name="name">资产租赁合同列表（录入）</field>
-        <field name="res_model">estate.lease.contract</field>
-        <field name="view_mode">tree,form,kanban</field>
-        <field name="views" eval="[[False, 'tree'], [ref('estate_lease_contract_view_inactive_tree'), 'tree']]"/>
-        <field name="context">{'search_default_active': False}</field>
-        <field name="domain">[('active', '=', False)]</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                录入中的合同都在这里。
-            </p>
-        </field>
-    </record>
-
-    <record id="491_real_estate_view_tree_custom" model="ir.ui.view">
-        <field name="name">491.real.estate.property.tree.custom</field>
-        <field name="model">estate.property</field>
-        <field name="inherit_id" ref="estate.491_real_estate_view_tree"/>
-        <field name="arch" type="xml">
-            <tree position="replace" >
-                <tree string="child_tree" decoration-success="state=='sold'" decoration-warning="state!='sold'">
-                    <field name="name" string="资产名称"/>
-                    <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}" />
-                    <field name="state"/>
-                    <field name="rent_area" string="面积"/>
-                    <field name="expected_price" string="期待价格（元/天/㎡）"/>
-                    <field name="selling_price" string="实际价格（元/天/㎡）"/>
-                    <field name="date_availability" string="交付日期"/>
-                </tree>
-            </tree>
-        </field>
-    </record>
-
     <record id="estate_lease_contract_view_form" model="ir.ui.view">
         <field name="name">estate.lease.contract.form</field>
         <field name="model">estate.lease.contract</field>
         <field name="arch" type="xml">
             <form string="estate_lease_contract_form">
                 <header>
-                    <button name="action_release_contract" type="object" string="发布"/>
+                    <button name="action_release_contract" type="object" string="发布" invisible="context.get('contract_read_only')"/>
                     <button name="action_cancel_release_contract" type="object" string="取消发布"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <group col="2">
                         <group>
-                            <field name="name" />
-                            <field name="contract_no" />
-                            <field name="contract_type_id" />
-                            <field name="renter_id" />
-                            <field name="sales_person_id" />
-                            <field name="opt_person_id" />
-                            <field name="date_sign" />
-                            <field name="date_start" />
-                            <field name="deliver_condition" />
-                            <field name="lease_deposit" />
-                            <field name="rent_amount" />
+                            <field name="default_context_contract_id" invisible="1"/>
+                            <field name="name" readonly="context.get('contract_read_only')"/>
+                            <field name="contract_no" readonly="context.get('contract_read_only')"/>
+                            <field name="contract_type_id" readonly="context.get('contract_read_only')"/>
+                            <field name="renter_id" readonly="context.get('contract_read_only')"/>
+                            <field name="sales_person_id" readonly="context.get('contract_read_only')"/>
+                            <field name="opt_person_id" readonly="context.get('contract_read_only')"/>
+                            <field name="date_sign" readonly="context.get('contract_read_only')"/>
+                            <field name="date_start" readonly="context.get('contract_read_only')"/>
+                            <field name="deliver_condition" readonly="context.get('contract_read_only')"/>
+                            <field name="lease_deposit" readonly="context.get('contract_read_only')"/>
+                            <field name="rent_amount" readonly="context.get('contract_read_only')"/>
                         </group>
                         <group>
-                            <field name="date_rent_start" />
-                            <field name="date_rent_end" />
+                            <field name="date_rent_start" readonly="context.get('contract_read_only')"/>
+                            <field name="date_rent_end" readonly="context.get('contract_read_only')"/>
                             <field name="days_rent_total" readonly="1"/>
-                            <field name="days_free" />
-                            <field name="date_decorate_start" />
-                            <field name="date_decorate_end" />
+                            <field name="days_free" readonly="context.get('contract_read_only')"/>
+                            <field name="date_decorate_start" readonly="context.get('contract_read_only')"/>
+                            <field name="date_decorate_end" readonly="context.get('contract_read_only')"/>
                             <field name="days_decorate" readonly="1"/>
-                            <field name="opening_date" />
-                            <field name="rent_amount_first_period" />
-                            <field name="rent_first_payment_date" />
-                            <field name="performance_guarantee" />
-                            <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}"/>
+                            <field name="opening_date" readonly="context.get('contract_read_only')"/>
+                            <field name="rent_amount_first_period" readonly="context.get('contract_read_only')"/>
+                            <field name="rent_first_payment_date" readonly="context.get('contract_read_only')"/>
+                            <field name="performance_guarantee" readonly="context.get('contract_read_only')"/>
+                            <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}" readonly="context.get('contract_read_only')"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="租赁标的">
-                            <group col="3">
+                            <group col="2">
                                 <group>
                                     <field name="rent_count"/>
                                 </group>
                                 <group>
-                                    <field name="building_area"/>
-                                </group>
-                                <group>
-                                    <field name="rent_area"/>
+                                    <field name="rent_area" string="面积（㎡）"/>
                                 </group>
                             </group>
-                            <field name="property_ids" />
+                            <field name="property_ids" readonly="context.get('contract_read_only')"/>
                         </page>
                         <page string="停车位">
                             <group>
@@ -168,11 +63,11 @@
                             <button name="action_refresh_rental_plan" type="object" string="点击刷新"/>
                             <field name="rental_plan_ids"/>
                         </page>
-                        <page string="物业费方案">
+                        <page string="物业费方案" id="page_management_fee_plan">
                             <button name="action_refresh_management_fee_plan" type="object" string="点击刷新"/>
                             <field name="property_management_fee_plan_ids" />
                         </page>
-                        <page string="优惠方案">
+                        <page string="优惠方案" id="page_incentives">
                             <group>
                                 <field name="contract_incentives_ids" />
                             </group>
@@ -231,7 +126,7 @@
                                 </group>
                             </sheet>
                         </page>
-                        <page string="收款账户">
+                        <page string="收款账户" id="page_bank_account">
                             <group>
                                 <group>
                                     <field name="rent_account"/>
@@ -278,4 +173,102 @@
             </form>
         </field>
     </record>
+
+    <record id="estate_lease_contract_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.tree</field>
+        <field name="model">estate.lease.contract</field>
+        <field name="arch" type="xml">
+            <tree string="contracts_tree"
+                  decoration-success="date_rent_end &gt;= (context_today() + relativedelta(years=+1))"
+                  decoration-warning="date_rent_end &lt;= (context_today() + relativedelta(days=+30))"
+                  create="False" delete="False" edit="False" import="False" open_form_view="False">
+
+                <field name="default_context_contract_id" column_invisible="1"/>
+                <field name="contract_no"/>
+                <field name="name"/>
+                <field name="date_sign"/>
+                <field name="date_start"/>
+                <field name="date_rent_start"/>
+                <field name="date_rent_end"/>
+                <field name="date_decorate_start"/>
+                <field name="date_decorate_end"/>
+                <field name="state"/>
+                <field name="contract_type_id"/>
+                <field name="property_ids" widget="many2many_tags" string="租赁场地" options="{'color_field': 'color'}" />
+                <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}" />
+                <field name="renter_id"/>
+                <field name="sales_person_id"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_view_inactive_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.tree</field>
+        <field name="model">estate.lease.contract</field>
+        <field name="arch" type="xml">
+            <tree string="contracts_tree"
+                  decoration-success="date_rent_end &gt;= (context_today() + relativedelta(years=+1))"
+                  decoration-warning="date_rent_end &lt;= (context_today() + relativedelta(days=+30))"
+                  create="True" delete="True" edit="True">
+                <field name="default_context_contract_id" column_invisible="1"/>
+                <field name="contract_no"/>
+                <field name="name"/>
+                <field name="date_sign"/>
+                <field name="date_start"/>
+                <field name="date_rent_start"/>
+                <field name="date_rent_end"/>
+                <field name="date_decorate_start"/>
+                <field name="date_decorate_end"/>
+                <field name="state"/>
+                <field name="contract_type_id"/>
+                <field name="property_ids" widget="many2many_tags" string="租赁场地" options="{'color_field': 'color'}" />
+                <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}" />
+                <field name="renter_id"/>
+                <field name="sales_person_id"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_action" model="ir.actions.act_window">
+        <field name="name">资产租赁合同列表（查看）</field>
+        <field name="res_model">estate.lease.contract</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="views">[False, "tree"]</field>
+        <field name="view_id" ref="estate_lease_contract_view_tree" />
+        <field name="context">{
+            'search_default_active': True,
+            'contract_read_only': True,
+            'menu_root': 'estate.lease.contract',
+            }</field>
+        <field name="domain">[('active', '=', True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                还没有合同信息。
+            </p>
+            <p>
+                说明合同还没录入，或者录入了也没发布。
+            </p>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_action_recording" model="ir.actions.act_window">
+        <field name="name">资产租赁合同列表（录入）</field>
+        <field name="res_model">estate.lease.contract</field>
+        <field name="views">[False, "tree"]</field>
+        <field name="view_id" ref="estate_lease_contract_view_inactive_tree" />
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="context">{
+            'search_default_active': False,
+            'contract_read_only': False,
+            'menu_root': 'estate.lease.contract',}</field>
+        <field name="domain">[('active', '=', False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                录入中的合同都在这里。
+            </p>
+        </field>
+    </record>
+
 </odoo>

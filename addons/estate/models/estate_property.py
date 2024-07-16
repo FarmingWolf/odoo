@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import logging
 from datetime import timedelta, datetime
+
+from odoo.http import request
 from odoo.tools.translate import _
 
 from dateutil.utils import today
@@ -9,13 +12,13 @@ from odoo import fields, models, api
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare
 
+_logger = logging.getLogger(__name__)
 
 def _check_current_contract_valid(record):
     if record.current_contract_id:
         if record.latest_rent_date_s and record.latest_rent_date_e:
             if fields.Date.context_today(record) >= record.latest_rent_date_s and fields.Date.context_today(
                     record) <= record.latest_rent_date_e:
-
                 record.state = "sold"
                 return True
 
@@ -26,6 +29,15 @@ def _check_current_contract_valid(record):
                 record.state = "canceled"
 
     return False
+
+
+def _get_payment_method_str(record):
+    if record.deposit_months and record.rent_plan_id:
+        if record.rent_plan_id.payment_period:
+            return f"押{'{:.2f}'.format(round(record.deposit_months, 2)).rstrip('0').rstrip('.')}" \
+                   f"付{record.rent_plan_id.payment_period}"
+    else:
+        return None
 
 
 class EstateProperty(models.Model):
@@ -49,15 +61,16 @@ class EstateProperty(models.Model):
     postcode = fields.Char()
     date_availability = fields.Date(copy=False, string="可租日期")
     expected_price = fields.Float(string="期望价格（元/天/㎡）", default=0.0)
+    announced_price = fields.Float(string="报价（元/天/㎡）", default=0.0)
     selling_price = fields.Float(string="实际价格（元/天/㎡）", copy=False, default=0.0)
     bedrooms = fields.Integer(default=0)
-    building_area = fields.Float(default=0.0, string="总建筑面积（㎡）")
+    building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", help="实用面积+花园面积")
     living_area = fields.Float(default=0.0, string="使用面积（㎡）")
     unit_building_area = fields.Float(default=0.0, string="套内建筑面积（㎡）")
     unit_living_area = fields.Float(default=0.0, string="套内使用面积（㎡）")
     share_area = fields.Float(default=0.0, string="公摊面积（㎡）")
     actual_living_area = fields.Float(default=0.0, string="实际使用面积（㎡）")
-    rent_area = fields.Float(default=0.0, string="计租面积（㎡）")
+    rent_area = fields.Float(default=0.0, string="计租面积（㎡）", help="租赁合同用面积")
     facades = fields.Integer(default=0)
     garage = fields.Boolean(default=False)
     garden = fields.Boolean(default=False)
@@ -82,6 +95,23 @@ class EstateProperty(models.Model):
     latest_rent_date_s = fields.Date(string="本次出租开始日期", compute="_compute_latest_info", readonly=True, copy=False)
     latest_rent_date_e = fields.Date(string="本次出租结束日期", compute="_compute_latest_info", readonly=True, copy=False)
     out_of_rent_days = fields.Integer(string="本次空置天数", compute="_compute_latest_info", readonly=True, copy=False)
+    latest_sign_date = fields.Date(string="合同签订日期", compute="_compute_latest_info", readonly=True, copy=False)
+    latest_contract_date_s = fields.Date(string="合同开始日期", compute="_compute_latest_info", readonly=True, copy=False)
+    latest_rent_days = fields.Char(string="租赁期限", compute="_compute_latest_info", readonly=True, copy=False)
+    latest_payment_method = fields.Char(string="付款方式", compute="_compute_latest_info", readonly=True, copy=False)
+    latest_deposit = fields.Float(string="押金", compute="_compute_latest_info", readonly=True, copy=False)
+    latest_monthly_rent = fields.Float(string="月租金（元）", compute="_compute_latest_info", readonly=True, copy=False)
+    latest_annual_rent = fields.Float(string="年租金（元）", compute="_compute_latest_info", readonly=True, copy=False)
+    latest_is_renew = fields.Boolean(string="是否续租", copy=False)
+    latest_contact_person = fields.Char(string="联系人", compute="_compute_latest_info", readonly=True, copy=False)
+    latest_contact_person_tel = fields.Char(string="联系电话", compute="_compute_latest_info", readonly=True, copy=False)
+    latest_free_days = fields.Date(string="免租期", copy=False)
+    more_info_invisible = fields.Boolean(string="更多信息", copy=False, default=False, store=False)
+
+    @api.depends("_id")
+    def _get_context(self):
+        _logger.info(f"资产模型：default_contract_id=【{request.session.get('session_contract_id')}】")
+        _logger.info(f"资产模型：contract_read_only=【{request.session.get('contract_read_only')}】")
 
     # @api.onchange("building_area")
     # def _get_building_area(self):
@@ -93,6 +123,7 @@ class EstateProperty(models.Model):
     def _compute_latest_info(self):
         for record in self:
             # 本property对应的所有contract，原则上只能有一条active的contract
+            _logger.info("资产管理原始模型")
             current_contract = self.env['estate.lease.contract'].search([('property_ids', 'in', record.id),
                                                                          ('active', '=', True),
                                                                          ('state', '=', 'released')],
@@ -102,6 +133,16 @@ class EstateProperty(models.Model):
             record.current_contract_nm = current_contract.name if current_contract else False
             record.latest_rent_date_s = current_contract.date_rent_start if current_contract else False
             record.latest_rent_date_e = current_contract.date_rent_end if current_contract else False
+            record.latest_sign_date = current_contract.date_sign if current_contract else False
+            record.latest_contract_date_s = current_contract.date_start if current_contract else False
+            record.latest_rent_days = current_contract.days_rent_total if current_contract else False
+            record.latest_payment_method = _get_payment_method_str(record)
+            record.latest_deposit = record.deposit_amount
+            record.latest_monthly_rent = record.rent_amount_monthly_adjust if record.rent_amount_monthly_adjust else \
+                record.rent_amount_monthly_auto
+            record.latest_annual_rent = record.latest_monthly_rent * 12
+            record.latest_contact_person = current_contract.renter_id.name if current_contract else False
+            record.latest_contact_person_tel = current_contract.renter_id.phone if current_contract else False
 
             old_contract = self.env['estate.lease.contract'].search([('property_ids', 'in', record.id),
                                                                      ('active', '=', True),
@@ -268,4 +309,4 @@ class EstateProperty(models.Model):
                 state_label = self._get_state_label(record.state)
                 raise UserError(_('[{0}]该条资产状态为【{1}】，不可被删除!'.format(record.name, state_label)))
 
-        return super().ondelete(self)
+        return super().unlink()

@@ -17,7 +17,7 @@ class EventEvent(models.Model):
             return super(EventEvent, self).write(values)
         else:
             # 如果用户无权更改状态，可以抛出错误或采取其他措施
-            raise AccessError("您不能直接修改活动状态！请联系活动审批组进行审批！请恢复活动状态之后保存其他数据！")
+            raise AccessError(f"{self.env.user.groups_id}您不能直接修改活动状态！请联系活动审批组进行审批！请恢复活动状态之后保存其他数据！")
 
     def write(self, values):
         """Override the write method to enforce custom security checks."""

@@ -2,6 +2,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
 from datetime import timedelta, datetime, date
+from typing import Dict, List
+
+from odoo.http import request
 from odoo.tools.translate import _
 
 from dateutil.utils import today
@@ -139,6 +142,7 @@ def _generate_details_from_rent_plan(record_self):
 
     # 根据property去找rental_plan
     temp_rent_amount = 0.0
+    temp_deposit_amount = 0.0
     for property_id in record_self.property_ids:
         if property_id.rent_plan_id:
             rental_plan = property_id.rent_plan_id
@@ -153,19 +157,9 @@ def _generate_details_from_rent_plan(record_self):
 
         temp_rent_amount += rent_amount_monthly_val
 
-        month_cnt = 1
-        if rental_plan.payment_period == 'month':
-            month_cnt = 1
-        elif rental_plan.payment_period == 'bimonthly':
-            month_cnt = 2
-        elif rental_plan.payment_period == 'quarterly':
-            month_cnt = 3
-        elif rental_plan.payment_period == 'four_months':
-            month_cnt = 4
-        elif rental_plan.payment_period == 'half_year':
-            month_cnt = 6
-        elif rental_plan.payment_period == 'year':
-            month_cnt = 12
+        temp_deposit_amount += property_id.deposit_amount if property_id.deposit_amount else 0
+
+        month_cnt = int(rental_plan.payment_period) if rental_plan.payment_period else 1
 
         current_s = date_s
         period_no = 1
@@ -219,11 +213,15 @@ def _generate_details_from_rent_plan(record_self):
         print("{1}.rental_periods={0}".format(rental_periods_details, rental_plan.name))
 
     record_self.rent_amount = temp_rent_amount
+    record_self.lease_deposit = temp_deposit_amount
 
     return rental_periods_details
 
 
 class EstateLeaseContract(models.Model):
+    # def onchange(self, values, field_names, fields_spec):
+    #     super().onchange(values, field_names, fields_spec)
+
     _name = "estate.lease.contract"
     _description = "资产租赁合同管理模型"
     _order = "contract_no, id"
@@ -243,6 +241,74 @@ class EstateLeaseContract(models.Model):
     date_rent_end = fields.Date("计租结束日期", required=True, copy=False)
 
     days_rent_total = fields.Char(string="租赁期限", compute="_calc_days_rent_total")
+
+    def _compute_rental_plans_for_property(self):
+        print("进入_compute_rental_plans_for_property")
+        print(f"self.env.context.get('active_id')={self.env.context.get('active_id')}")
+        print(f"self.env.context.get('contract_read_only')={self.env.context.get('contract_read_only')}")
+        print(f"self.env.context.get('context_contract_id')={self.env.context.get('context_contract_id')}")
+        for contract in self:
+            contract.rental_plans_for_property = self.env['estate.lease.contract.rental.plan.rel'].search([
+                ('contract_id', '=', contract.id),
+                ('property_id', 'in', contract.property_ids.ids),
+            ])
+            return contract.rental_plans_for_property
+
+    rental_plans_for_property = fields.One2many('estate.lease.contract.rental.plan.rel',
+                                                compute='_compute_rental_plans_for_property',
+                                                default=_compute_rental_plans_for_property,
+                                                string='合同-资产-租金方案', store=False)
+    """ 这俩函数就是个废柴
+    @api.onchange("contract_no")
+    def _onchange_contract_no(self):
+        print(f"合同管理模型：_onchange_contract_no self.contract_no=【{self.contract_no}】")
+        # print(f"合同管理模型：_onchange_contract_no self._id=【{self._id}】")
+        print(f"合同管理模型：_onchange_contract_no self._id=【{self.id}】")
+        for record in self:
+
+            if record._id:
+                self._context = dict(self.env.context, default_contract_id=record._id, default_contract_exist=True)
+            else:
+                self._context = dict(self.env.context, default_contract_id=None, default_contract_exist=False)
+
+    @api.model
+    def default_get(self, fields_list):
+        print(f"合同管理模型：default_get self._id=【{self._id}】")
+        res = super(EstateLeaseContract, self).default_get(fields_list)
+        for record in self:
+            _logger.info(f"合同管理模型：default_get record._id=【{record._id}】")
+            if self._context.get('active_id'):
+                # 当active_id存在时设置context
+                res['context'] = dict(self.env.context, default_contract_id=record._id, default_contract_exist=True)
+            else:
+                res['context'] = dict(self.env.context, default_contract_id=None, default_contract_exist=False)
+        return res
+    """
+
+    def _set_context(self):
+        # 把contract_read_only和session_contract_id写进session
+        request.session["contract_read_only"] = self.env.context.get('contract_read_only')
+        request.session["menu_root"] = self.env.context.get('menu_root')
+        _logger.info(f"合同管理模型：session[menu_root]=【{request.session.get('menu_root')}】")
+        _logger.info(f"合同管理模型：session[contract_read_only]=【{request.session.get('contract_read_only')}】")
+        # 从tree点击某行传递active_id(貌似默认的tree点击事件并无此context)，所以在后边record中设置session
+        if self.env.context.get('active_id'):
+            request.session["session_contract_id"] = self.env.context.get('active_id')
+
+        for record in self:
+            request.session["session_contract_id"] = record.id
+            _logger.info(f"合同管理模型：[session_contract_id]=【{request.session.get('session_contract_id')}】")
+            # 这里设置的context，在下一个页面尝试获取
+            if record.id:
+                self = self.with_context(context_contract_id=record.id, default_contract_exist=True)
+            else:
+                self = self.with_context(context_contract_id=None, default_contract_exist=False)
+
+            _logger.info(f"合同管理模型： context_contract_id=【{self.env.context.get('context_contract_id')}】")
+            record.default_context_contract_id = record.id
+
+    default_context_contract_id = fields.Integer(string="contract id in context", compute="_set_context",
+                                                 default=_set_context, store=False)
 
     @api.depends("date_rent_start", "date_rent_end", "days_free")
     def _calc_days_rent_total(self):
@@ -573,3 +639,68 @@ class EstateLeaseContract(models.Model):
         for record in self:
             if record.state in ['released', 'released']:
                 self.action_release_contract()
+
+    def _insert_contract_property_rental_plan_rel(self, records):
+        _logger.info(f"进入 _insert_contract_property_rental_plan_rel 方法")
+        if records:
+            rgt_rcd = records
+        else:
+            rgt_rcd = self
+
+        for record in rgt_rcd:
+            self.env['estate.lease.contract.rental.plan.rel'].flush_model(['contract_id'])
+            self.env['estate.lease.contract.rental.plan.rel'].flush_model(['property_id'])
+            self.env['estate.lease.contract.rental.plan.rel'].flush_model(['rental_plan_id'])
+
+            for each_property in record.property_ids:
+                self.env.cr.execute("INSERT INTO estate_lease_contract_rental_plan_rel ("
+                                    "contract_id, property_id, rental_plan_id ) VALUES (%s, %s, %s)",
+                                    [record.id, each_property.id,
+                                     each_property.rent_plan_id.id if each_property.rent_plan_id.id else None])
+
+            self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['contract_id'])
+            self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['property_id'])
+            self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['rental_plan_id'])
+
+    @api.model
+    def create(self, vals):
+        # 将contract_id,property_id,rental_plan_id 写进 estate.lease.contract.rental.plan.rel 表
+
+        records = super().create(vals)
+
+        self._insert_contract_property_rental_plan_rel(records)
+
+        return records
+
+    @api.model
+    def write(self, vals):
+        records = super().write(vals)
+        self._delete_contract_property_rental_plan_rel()
+        self._insert_contract_property_rental_plan_rel(None)
+
+        return records
+
+    def _delete_contract_property_rental_plan_rel(self):
+
+        for record in self:
+            self.env['estate.lease.contract.rental.plan.rel'].flush_model(['contract_id'])
+            self.env['estate.lease.contract.rental.plan.rel'].flush_model(['property_id'])
+            self.env['estate.lease.contract.rental.plan.rel'].flush_model(['rental_plan_id'])
+
+            self.env.cr.execute("DELETE FROM estate_lease_contract_rental_plan_rel "
+                                "WHERE contract_id=%s", [record.id])
+
+            self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['contract_id'])
+            self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['property_id'])
+            self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['rental_plan_id'])
+
+    @api.model
+    def ondelete(self):
+
+        for record in self:
+            if record.state != 'recording':
+                raise UserError(_(f'本合同目前所处状态：{record.state}，不能删除'))
+                return
+
+        self._delete_contract_property_rental_plan_rel()
+        return super().unlink()
