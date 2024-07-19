@@ -19,19 +19,19 @@ export class CustomTreeRenderer extends Component {
 
 
     async onClick(event, record) {
-        if (event == undefined) {
-            return
-        }
-        if (event.currentTarget == undefined) {
-            return
-        }
-
-        const fieldValue = document.getElementsByName('context_contract_id');
-        let tgtVal = 0
-        if (fieldValue != undefined && fieldValue.length > 0) {
-            tgtVal = fieldValue[0].innerText
-            console.log(tgtVal);
-        }
+        // if (event == undefined) {
+        //     return
+        // }
+        // if (event.currentTarget == undefined) {
+        //     return
+        // }
+        //
+        // const fieldValue = document.getElementsByName('context_contract_id');
+        // let tgtVal = 0
+        // if (fieldValue != undefined && fieldValue.length > 0) {
+        //     tgtVal = fieldValue[0].innerText
+        //     console.log(tgtVal);
+        // }
         //
         // // 如果不是点击list
         // if (!record) {
