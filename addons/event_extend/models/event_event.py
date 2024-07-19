@@ -37,22 +37,6 @@ class EventEvent(models.Model):
 
     def action_print_venue_application(self):
         return self.env.ref('event_extend.action_print_venue_application').report_action(self)
-        # 返回 pdf report action
-        # return {
-        #     'name': '场地使用申请书',
-        #     'print_report_name': '场地使用申请书',
-        #     'type': 'ir.actions.report',
-        #     'model': 'ir.actions.report',
-        #     'binding_model_id': 'model_event_extend',
-        #     'report_type': 'qweb-pdf',
-        #     'report_name': 'event_extend.event_report_template_venue_application',
-        #     'report_file': 'event_extend.event_report_template_venue_application',
-        #     'paperformat_id': 'paperformat_event_full_page_venue_application',
-        #     'multi': False,
-        #     'attachment_use': False,
-        #     # 'attachment': attachment,
-        #     'binding_type': 'report',
-        # }
 
     def action_print_entry_exit_form(self):
-        pass
+        return self.env.ref('event_extend.action_print_entry_exit_form').report_action(self)

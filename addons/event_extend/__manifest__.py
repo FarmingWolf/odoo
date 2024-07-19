@@ -3,7 +3,7 @@
 
 {
     'name': "活动模型扩展",
-    'version': '1.0',
+    'version': '2.1',
     'depends': ['event', 'website_event', 'website_event_track'],
     'category': 'Marketing/Event_Supervisor',
     'summary': '活动模块的扩展',
@@ -11,7 +11,7 @@
     'website': 'https://www.odoo.com/',
     'installable': True,
     'application': True,
-    'auto_install': True,
+    'auto_install': False,
     'data': [
         'security/security.xml',
 

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="paperformat_event_full_page_venue_application" model="report.paperformat">
+        <field name="name">场地使用申请书底版</field>
+        <field name="default" eval="False"/>
+        <field name="disable_shrinking" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">8</field>
+        <field name="margin_left">20</field>
+        <field name="margin_right">20</field>
+        <field name="dpi">96</field>
+    </record>
+
+
+    <record id="paperformat_event_full_page_enter_exit_form" model="report.paperformat">
+        <field name="name">活动进出场单底版</field>
+        <field name="default" eval="False"/>
+        <field name="disable_shrinking" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">8</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <!-- The "Full Page Ticket", as opposed to the (a6) badge that only contains the bare minimum
+    (attendee name + barcode), gives all the information of the ticket in a portrait A4 format.
+    It allows to add some information in the ticket_instructions field and, when printed, functions
+    as an "official" ticket that the attendee can show to the registration desk where all
+    the information are available (event name, organizer, SO reference, barcode, footer with
+    sponsors, ...). -->
+    <record id="action_print_venue_application" model="ir.actions.report">
+        <field name="name">'场地使用申请书'</field>
+        <field name="model">event.event</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">event_extend.event_report_template_venue_application</field>
+        <field name="report_file">event_extend.event_report_template_venue_application</field>
+        <field name="binding_model_id" ref="event_extend.model_event_event"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'场地使用申请书'</field>
+        <field name="paperformat_id" ref="paperformat_event_full_page_venue_application"/>
+    </record>
+
+    <record id="action_print_entry_exit_form" model="ir.actions.report">
+        <field name="name">'活动进出场单'</field>
+        <field name="model">event.event</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">event_extend.event_report_template_enter_exit_form</field>
+        <field name="report_file">event_extend.event_report_template_enter_exit_form</field>
+        <field name="binding_model_id" ref="event_extend.model_event_event"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'活动进出场单'</field>
+        <field name="paperformat_id" ref="paperformat_event_full_page_enter_exit_form"/>
+    </record>
+</odoo>

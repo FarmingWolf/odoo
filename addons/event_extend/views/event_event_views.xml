@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<odoo><data>
+
+    <record id="view_event_form_extend" model="ir.ui.view">
+        <field name="name">event.extend.event.form</field>
+        <field name="model">event.event</field>
+        <field name="inherit_id" ref="website_event.event_event_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='event_menu_configuration']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_tz']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='lang']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='event_type_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//group[@name='right_event_details']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//sheet/group/group" position="inside">
+                <label for="note" string="说明" />
+                <br />
+                <field nolabel="1" colspan="2" name="note"
+                    placeholder="活动详情备注，联系人信息等" />
+            </xpath>
+            <xpath expr="//group[@name='right_event_details']" position="after">
+                <group name="event_details_extend">
+                    <field name="event_location_id" string="活动地点" widget="many2many_tags"/>
+                    <field name="event_map" string="活动地图"/>
+                    <label for="seats_limited" string="人数限制"/>
+                    <div>
+                        <field name="seats_limited"/>
+                        <span invisible="not seats_limited" required="not seats_limited">不超过 <field name="seats_max" class="oe_inline o_input_9ch"/> 人</span>
+                    </div>
+                </group>
+            </xpath>
+            <xpath expr="//notebook" position="before">
+                <field name="stage_id_sequence" invisible="1"/>
+                <div name="print_buttons" invisible="stage_id_sequence &lt; 10">
+                    <span>
+                        <button name="action_print_venue_application" type="object" class="btn btn-primary" icon="fa-file-pdf-o"
+                                string="场地使用申请书" title="点击打印场地使用申请书" help="财务确认收款后方可打印场地使用申请书" />
+                        <span>　</span>
+                        <button name="action_print_entry_exit_form" type="object" class="btn btn-primary" icon="fa-file-pdf-o"
+                                string="进出场单" title="点击打印进出场单" help="财务确认收款后方可打印进出场单" />
+                    </span>
+                </div>
+            </xpath>
+
+        </field>
+    </record>
+
+</data></odoo>
