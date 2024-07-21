@@ -1,8 +1,8 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo><data>
 
     <record id="view_event_form_extend" model="ir.ui.view">
-        <field name="name">event.extend.event.form</field>
+        <field name="name">event.extend.event.view.form</field>
         <field name="model">event.event</field>
         <field name="inherit_id" ref="website_event.event_event_view_form"/>
         <field name="arch" type="xml">
@@ -16,9 +16,6 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//field[@name='event_type_id']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-            <xpath expr="//group[@name='right_event_details']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//sheet/group/group" position="inside">
@@ -37,6 +34,9 @@
                         <span invisible="not seats_limited" required="not seats_limited">不超过 <field name="seats_max" class="oe_inline o_input_9ch"/> 人</span>
                     </div>
                 </group>
+            </xpath>
+            <xpath expr="//group[@name='right_event_details']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//notebook" position="before">
                 <field name="stage_id_sequence" invisible="1"/>

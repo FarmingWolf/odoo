@@ -17,7 +17,8 @@ class EventEvent(models.Model):
         """Custom logic to check user permissions before writing."""
         self.ensure_one()
         # 检查当前用户是否属于特定权限组，例如event_supervisor
-        if self.env.user.has_group('event_extend.group_event_supervisor'):
+        if self.env.user.has_group('event_extend.group_event_supervisor') or (
+                self._origin and 'cron' in self._origin._name):
             # 活动审批人仅可以操作“待审批→已审批”的流程
 
             return super(EventEvent, self).write(values)
