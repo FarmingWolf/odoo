@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_operation_dep_contract_contract_read,access.operation.dep.contract.contract.read,model_operation_contract_contract,operation_dep_contract_read,1,0,0,0
+access_operation_dep_contract_contract_op,access.operation.dep.contract.contract.op,model_operation_contract_contract,operation_dep_contract_operator,1,1,1,1
+access_operation_dep_contract_stage_read,access.operation.dep.contract.stage.read,model_operation_contract_stage,operation_dep_contract_read,1,0,0,0
+access_operation_dep_contract_stage_op,access.operation.dep.contract.stage.op,model_operation_contract_stage,operation_dep_contract_operator,1,1,1,1
+access_operation_dep_contract_no_prefix_read,access.operation.dep.contract.no.prefix.read,model_operation_contract_no_prefix,operation_dep_contract_read,1,0,0,0
+access_operation_dep_contract_no_prefix_op,access.operation.dep.contract.no.prefix.op,model_operation_contract_no_prefix,operation_dep_contract_operator,1,1,1,1
+access_operation_dep_contract_approval_detail_read,access.operation.dep.contract.approval.detail.read,model_operation_contract_approval_detail,operation_dep_contract_read,1,1,1,1

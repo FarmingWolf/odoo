@@ -41,14 +41,15 @@
             <xpath expr="//notebook" position="before">
                 <field name="stage_id_sequence" invisible="1"/>
                 <div name="print_buttons" invisible="stage_id_sequence &lt; 10">
-                    <span>
-                        <button name="action_print_venue_application" type="object" class="btn btn-primary" icon="fa-file-pdf-o"
-                                string="场地使用申请书" title="点击打印场地使用申请书" help="财务确认收款后方可打印场地使用申请书" />
-                        <span>　</span>
-                        <button name="action_print_entry_exit_form" type="object" class="btn btn-primary" icon="fa-file-pdf-o"
-                                string="进出场单" title="点击打印进出场单" help="财务确认收款后方可打印进出场单" />
-                    </span>
+                    <button name="action_print_venue_application" type="object" class="btn btn-primary" icon="fa-file-pdf-o"
+                            string="场地使用申请书" title="点击打印场地使用申请书" help="财务确认收款后方可打印场地使用申请书" />
+                    <span>　</span>
+                    <button name="action_print_entry_exit_form" type="object" class="btn btn-primary" icon="fa-file-pdf-o"
+                            string="进出场单" title="点击打印进出场单" help="财务确认收款后方可打印进出场单" />
                 </div>
+            </xpath>
+            <xpath expr="//notebook" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
 
         </field>

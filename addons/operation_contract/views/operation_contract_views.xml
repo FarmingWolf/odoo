@@ -1,0 +1,186 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="view_operation_contract_form">
+            <field name="name">operation.contract.form</field>
+            <field name="model">operation.contract.contract</field>
+            <field name="arch" type="xml">
+                <form string="运营合同" class="o_event_form_view">
+                    <header>
+                        <field name="stage_sequence" invisible="1"/>
+                        <field name="stage_op_department_id" invisible="1"/>
+                        <div invisible="not stage_op_department_id">
+                            <div invisible="stage_sequence &lt; 10">
+                                <button name="action_agree" type="object" class="btn btn-success" string="批准" title="点击批准该合同"/>
+                                <span>　</span>
+                                <button name="action_reject" type="object" class="btn btn-danger" string="驳回" title="点击驳回该合同"/>
+                            </div>
+                            <div invisible="stage_sequence &gt; 0">
+                                <button name="action_agree" type="object" class="btn btn-success" string="提交" title="点击提交该合同进入审批流程"/>
+                                <span>　</span>
+                                <button name="action_cancel" type="object" class="btn btn-danger" string="取消" title="点击取消该合同"/>
+                            </div>
+                        </div>
+                        <field name="stage_id" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <field name="active" invisible="1"/>
+                        <field name="partner_id" invisible="1"/>
+                        <field name="legend_blocked" invisible="1"/>
+                        <field name="legend_normal" invisible="1"/>
+                        <field name="legend_done" invisible="1"/>
+                        <field name="kanban_state" widget="state_selection" class="ms-auto float-end"/>
+                        <div class="oe_title">
+                            <label for="name" string="合同名称"/>
+                            <h1>
+                                <field class="text-break" options="{'line_breaks': False}" widget="text" name="name"
+                                       placeholder="例如： 某公司园区拍摄活动合同"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group col="2">
+                                <group>
+                                    <field name="contract_no"/>
+                                </group>
+                                <group>
+                                    <field name="date_approval_begin"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="date_begin" widget="daterange"
+                                       options="{'end_date_field': 'date_end'}"/>
+                                <field name="date_end" invisible="1"/>
+                                <field name="contract_amount" groups="!operation_contract.estate_management_dep_contract_read"/>
+                            </group>
+                            <group string="合作方" name="cooperator_info">
+                                <field name="partner_id"/>
+                                <field name="partner_contact_id"/>
+                                <field name="partner_contact_phone"/>
+                                <field name="comments"/>
+                            </group>
+                            <group string="经办人" name="operator_info">
+                                <field name="op_person_id" string="姓名"/>
+                                <field name="department_id"/>
+                                <field name="job_title"/>
+                            </group>
+                        </group>
+                        <div class="oe_title">
+                            <label for="description"/>
+                            <h1>
+                                <field nolabel="1" colspan="2" name="description" placeholder="合同详情说明"/>
+                            </h1>
+                        </div>
+
+                        <group string="审批情况" name="operation_department_approval_info">
+                            <field name="approval_detail_ids" string=""/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_operation_contract_tree">
+            <field name="name">operation.contract.tree</field>
+            <field name="model">operation.contract.contract</field>
+            <field name="arch" type="xml">
+                <tree string="运营合同"
+                      multi_edit="1"
+                      sample="1">
+                    <field name="name"/>
+                    <field name="op_person_id" readonly="1" widget="many2one_avatar_user"/>
+                    <field name="partner_id" groups="base.group_multi_company" readonly="1" optional="show"/>
+                    <field name="date_begin" readonly="1" widget="date"/>
+                    <field name="date_end" readonly="1" widget="date"/>
+                    <field name="stage_id" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_operation_contract_kanban">
+            <field name="name">operation.contract.kanban</field>
+            <field name="model">operation.contract.contract</field>
+            <field name="arch" type="xml">
+                <kanban class="o_event_kanban_view" default_group_by="stage_id" sample="1">
+                    <field name="op_person_id"/>
+                    <field name="name"/>
+                    <field name="stage_id" options='{"group_by_tooltip": {"description": "Description"}}'/>
+                    <field name="date_begin"/>
+                    <field name="date_end"/>
+                    <field name="legend_blocked"/>
+                    <field name="legend_normal"/>
+                    <field name="legend_done"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="d-flex flex-column p-0 oe_kanban_card oe_kanban_global_click">
+                                <div class="o_kanban_content p-0 m-0 position-relative row d-flex flex-fill">
+                                    <div class="col-4 text-bg-primary p-2 text-center d-flex flex-column justify-content-center">
+                                        <div t-esc="luxon.DateTime.fromISO(record.date_begin.raw_value).toFormat('d')"
+                                             class="o_event_fontsize_20"/>
+                                        <div>
+                                            <t t-esc="luxon.DateTime.fromISO(record.date_begin.raw_value).toFormat('MMM yyyy')"/>
+                                        </div>
+                                        <div>
+                                            <t t-esc="luxon.DateTime.fromISO(record.date_begin.raw_value).toFormat('t')"/>
+                                        </div>
+                                        <div t-if="record.date_begin.raw_value !== record.date_end.raw_value">
+                                            <i class="oi oi-arrow-right me-2 o_event_fontsize_09" title="End date"/>
+                                            <t t-esc="luxon.DateTime.fromISO(record.date_end.raw_value).toFormat('d MMM')"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-8 py-2 px-3 d-flex flex-column justify-content-between pt-3">
+                                        <div>
+                                            <div class="o_kanban_record_title o_text_overflow"
+                                                 t-att-title="record.name.value">
+                                                <field name="name"/>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_operation_contract_contract_search">
+            <field name="name">operation.contract.contract.search</field>
+            <field name="model">operation.contract.contract</field>
+            <field name="arch" type="xml">
+                <search string="运营合同">
+                    <field name="name"/>
+                    <field name="op_person_id"/>
+                    <field name="stage_id"/>
+                    <separator/>
+                    <filter string="合同开始日期" name="start_date" date="date_begin"/>
+                    <separator/>
+                    <filter string="已归档" name="filter_inactive" domain="[('active', '=', False)]"/>
+                    <separator/>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_operation_contract_contract_view">
+            <field name="name">运营合同</field>
+            <field name="res_model">operation.contract.contract</field>
+            <field name="view_mode">kanban,tree,form,pivot,graph,activity</field>
+            <field name="search_view_id" ref="view_operation_contract_contract_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    创建运营合同
+                </p>
+                <p>
+                    创建运营合同，提交审批后。审批完成、并确认收合同预付款后可发起活动流程。
+                </p>
+            </field>
+        </record>
+
+        <record id="menu_operation_contract_contract" model="ir.ui.menu">
+            <field name="name">运营合同</field>
+            <field name="action" ref="action_operation_contract_contract_view"/>
+        </record>
+
+    </data>
+</odoo>

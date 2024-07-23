@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<odoo>
+<data>
+    <record id="operation_contract_stage_view_form" model="ir.ui.view">
+        <field name="name">operation.contract.stage.view.form</field>
+        <field name="model">operation.contract.stage</field>
+        <field name="arch" type="xml">
+            <form string="合同阶段">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" placeholder='例如："新建"'/>
+                            <field name="pipe_end"/>
+                        </group>
+                        <group>
+                            <field name="fold"/>
+                            <field name="sequence"/>
+                            <field name="op_department_id"/>
+                        </group>
+                    </group>
+                    <group string="阶段说明和使用提示">
+                        <p class="text-muted" colspan="2">
+                            您可以在此处定义将为州显示的标签 看板视图中的默认标签。
+                        </p>
+                        <label for="legend_normal" string=" " class="o_status " title="本阶段任务处理中。点击可更改任务阶段状态。" aria-label="本阶段任务处理中。点击可更改任务阶段状态。" role="img"/>
+                        <field name="legend_normal" nolabel="1"/>
+                        <label for="legend_blocked" string=" " class="o_status o_status_red" title="本阶段任务受阻。点击可更改任务阶段状态。" aria-label="本阶段任务受阻。点击可更改任务阶段状态。" role="img"/>
+                        <field name="legend_blocked" nolabel="1"/>
+                        <label for="legend_done" string=" " class="o_status o_status_green" title="本阶段任务已完成。点击可更改任务阶段状态。" aria-label="本阶段任务已完成。点击可更改任务阶段状态。" role="img"/>
+                        <field name="legend_done" nolabel="1"/>
+
+                        <p class="text-muted" colspan="2">
+                            您也可以添加一个描述来帮助同事理解这个阶段的意义和目的。
+                        </p>
+                        <field name="description" placeholder="添加说明描述..." nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="operation_contract_stage_view_tree" model="ir.ui.view">
+        <field name="name">operation.contract.stage.view.tree</field>
+        <field name="model">operation.contract.stage</field>
+        <field name="arch" type="xml">
+            <tree string="运营合同阶段">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="operation_contract_stage_action" model="ir.actions.act_window">
+        <field name="name">运营合同阶段</field>
+        <field name="res_model">operation.contract.stage</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                创建运营合同阶段
+            </p><p>
+                运营合同阶段用于跟踪处理运营合同从最初到最终的各个阶段工作。
+            </p>
+        </field>
+    </record>
+
+    <record id="operation_contract_stage_menu" model="ir.ui.menu">
+        <field name="action" ref="operation_contract_stage_action"/>
+    </record>
+
+</data>
+</odoo>

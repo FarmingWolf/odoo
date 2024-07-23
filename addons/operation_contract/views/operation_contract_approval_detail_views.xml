@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="operation_contract_approval_detail_action" model="ir.actions.act_window">
+        <field name="name">运营合同审批明细</field>
+        <field name="res_model">operation.contract.approval.detail</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                这里可以展示一些文本信息。
+            </p>
+            <p>
+                这里也可以展示些文本信息。
+            </p>
+        </field>
+    </record>
+
+    <record id="operation_contract_approval_detail_view_tree" model="ir.ui.view">
+        <field name="name">operation.contract.approval.detail.tree</field>
+        <field name="model">operation.contract.approval.detail</field>
+        <field name="arch" type="xml">
+            <tree string="operation_contract_approval_detail_view_tree" create="False" edit="True" delete="False">
+                <field name="approval_decision" column_invisible="1"/>
+                <field name="contract_id" column_invisible="1"/>
+                <field name="approval_stage_nm"/>
+                <field name="approval_decision_txt"/>
+                <field name="approved_by_id" column_invisible="1"/>
+                <field name="approved_by_nm"/>
+                <field name="approval_comments"/>
+                <field name="approval_date_time"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="operation_contract_approval_detail_view_form" model="ir.ui.view">
+        <field name="name">operation.contract.approval.detail.form</field>
+        <field name="model">operation.contract.approval.detail</field>
+        <field name="arch" type="xml">
+            <form string="operation_contract_approval_detail_view_form" create="false" delete="false" edit="false">
+                <group>
+                    <field name="contract_id" invisible="1"/>
+                    <field name="approval_decision" invisible="1"/>
+                    <field name="approval_stage_nm"/>
+                    <field name="approval_decision_txt"/>
+                    <field name="approved_by_id" invisible="1"/>
+                    <field name="approved_by_nm"/>
+                    <field name="approval_comments"/>
+                    <field name="approval_date_time"/>
+                </group>
+            </form>
+        </field>
+    </record>
+</odoo>

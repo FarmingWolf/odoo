@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<odoo><data>
+
+    <!-- MAIN MENU -->
+    <menuitem name="运营合同"
+        id="operation_contract_main_menu"
+        sequence="65"
+        groups="operation_contract.operation_dep_contract_read"
+        web_icon="event,static/description/op_contract.png"/>
+
+    <!-- HEADER: EVENTS -->
+    <menuitem name="运营合同"
+        id="menu_operation_contract_contract"
+        sequence="1"
+        parent="operation_contract_main_menu"
+        groups="operation_contract.operation_dep_contract_read"/>
+
+    <!-- HEADER: CONFIGURATION -->
+    <menuitem name="配置"
+        id="menu_operation_contract_configuration"
+        sequence="99"
+        parent="operation_contract_main_menu"
+        groups="operation_contract.operation_dep_contract_operator"/>
+
+    <menuitem name="合同阶段"
+        id="operation_contract_stage_menu"
+        sequence="88"
+        parent="menu_operation_contract_configuration"
+        groups="operation_contract.operation_dep_contract_operator"/>
+
+    <menuitem name="合同前缀"
+        id="operation_contract_no_prefix_menu"
+        sequence="99"
+        parent="menu_operation_contract_configuration"
+        groups="operation_contract.operation_dep_contract_operator"/>
+
+</data></odoo>
