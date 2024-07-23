@@ -66,6 +66,15 @@ def _create_approval_detail(self, record, approval_or_reject, is_cancel):
     })
 
 
+def _check_rights(self, record):
+    record_stage_dep_id = record.stage_id.op_department_id.id
+    _logger.info(f"record.stage_id.op_department_id.id={record_stage_dep_id}")
+    this_employee_dep_id = self._get_employee_dp()
+    _logger.info(f"this.user.employee.department_id={this_employee_dep_id.id}")
+
+    return this_employee_dep_id.id == record_stage_dep_id or self.env.user.id <= 2
+
+
 class OperationContract(models.Model):
     _name = "operation.contract.contract"
     _description = "运营合同模型"
@@ -156,6 +165,15 @@ class OperationContract(models.Model):
         user = self.env.user
         if user.employee_ids:
             return user.employee_ids[0].name  # 返回第一个employee记录ID
+        else:
+            return False  # 如果没有employee记录，则返回False
+
+    @api.model
+    def _get_employee_dp(self):
+        # 获取当前登录用户的employee记录
+        user = self.env.user
+        if user.employee_ids:
+            return user.employee_ids[0].department_id  # 返回第一个employee记录ID
         else:
             return False  # 如果没有employee记录，则返回False
 
@@ -250,6 +268,9 @@ class OperationContract(models.Model):
     def action_agree(self):
         # 批准
         for record in self:
+            if not _check_rights(self, record):
+                raise UserError("当前数据状态超出您的审批权限！")
+
             # 先创建当前阶段的审批记录
             _create_approval_detail(self, record, True, False)
             all_stages = self.env['operation.contract.stage'].search([])
@@ -264,6 +285,9 @@ class OperationContract(models.Model):
     def action_reject(self):
         # 驳回
         for record in self:
+            if not _check_rights(self, record):
+                raise UserError("当前数据状态超出您的审批权限！")
+
             # 先创建当前阶段的驳回记录
             _create_approval_detail(self, record, False, False)
 
@@ -280,6 +304,9 @@ class OperationContract(models.Model):
 
     def action_cancel(self):
         for record in self:
+            if not _check_rights(self, record):
+                raise UserError("当前数据状态超出您的操作权限！")
+
             _create_approval_detail(self, record, False, True)
             all_stages = self.env['operation.contract.stage'].search([])
             for each_stage in all_stages:
