@@ -17,7 +17,6 @@ _logger = logging.getLogger(__name__)
 
 
 def _create_approval_detail(self, record, approval_or_reject, is_cancel):
-
     """ 既然页面已经设置了TZ，那么创建记录时就不应该多此一举，否则页面再选出来时，会多个8小时时差
     timezone = self._context.get('tz') or self.env.user.partner_id.tz or 'Asia/Shanghai'
 
@@ -75,11 +74,33 @@ def _check_rights(self, record):
     return this_employee_dep_id.id == record_stage_dep_id or self.env.user.id <= 2
 
 
+class ResPartner(models.Model):
+    _name = "res.partner"
+    _inherit = ['res.partner']
+
+    person_id_no = fields.Char(string="身份证号")
+
+    @api.model
+    def default_get(self, fields_list):
+        default_result = super().default_get(fields_list)
+
+        """_logger.info(f"进入时fields_list={fields_list}")
+        _logger.info(f"进入时default_result={default_result}")
+        _logger.info(f"进入时context={self.env.context}")
+        #if 'type' in fields_list:
+            # if default_result.get('type') == 'other':
+            #     default_result['type'] = 'contact'
+        """
+        return default_result
+
+
 class OperationContract(models.Model):
     _name = "operation.contract.contract"
     _description = "运营合同模型"
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = 'date_begin, id'
 
-    name = fields.Char('合同名称', required=True, translate=True)
+    name = fields.Char('合同名称', required=True, translate=True, tracking=True)
     contract_no = fields.Char(string='合同编号', readonly=True, default=lambda self: self._get_contract_no(False),
                               store=True)
 
@@ -91,29 +112,42 @@ class OperationContract(models.Model):
     department_id = fields.Many2one('hr.department', related='op_person_id.department_id', string="部门")
     job_title = fields.Char(related='op_person_id.job_title', string="职务")
 
-    partner_id = fields.Many2one('res.partner', string='公司名称')
-    partner_contact_id = fields.Char(string='负责人', compute='_compute_contact_info', readonly=True)
-    partner_contact_phone = fields.Char(string='电话', compute='_compute_contact_info', readonly=True)
+    partner_id = fields.Many2one('res.partner', string='公司名称', tracking=True)
+    partner_contact_id = fields.Char(string='联系人', compute='_compute_contact_info', readonly=True)
+    partner_contact_id_no = fields.Char(string='身份证号', compute='_compute_contact_info', readonly=True)
+    partner_contact_phone = fields.Char(string='联系电话', compute='_compute_contact_info', readonly=True)
+    partner_contact_mobile = fields.Char(string='联系手机', compute='_compute_contact_info', readonly=True)
+    partner_contact_position = fields.Char(string='职务', compute='_compute_contact_info', readonly=True)
+    partner_charger_id = fields.Char(string='责任人', compute='_compute_contact_info', readonly=True)
+    partner_charger_id_no = fields.Char(string='身份证号', compute='_compute_contact_info', readonly=True)
+    partner_charger_phone = fields.Char(string='责任电话', compute='_compute_contact_info', readonly=True)
+    partner_charger_mobile = fields.Char(string='责任手机', compute='_compute_contact_info', readonly=True)
+    partner_charger_position = fields.Char(string='职务', compute='_compute_contact_info', readonly=True)
+
     comments = fields.Text(string="备注")
 
     date_approval_begin = fields.Date(copy=False, string="审批发起日期", readonly=True,
                                       default=lambda self: fields.Date.context_today(self))
-    date_begin = fields.Date(copy=False, string="合同开始日期")
-    date_end = fields.Date(copy=False, string="合同结束日期")
+    date_begin = fields.Datetime(copy=False, string="合同开始日期", tracking=True)
+    date_end = fields.Datetime(copy=False, string="合同结束日期", tracking=True)
     contract_amount = fields.Float(string="合同金额（元）", copy=False, default=0.0, digits=(16, 2))
-    description = fields.Html(string='合同详情', store=True, readonly=False)
+    description = fields.Html(string='合同详情', store=True, readonly=False, tracking=True)
+    event_location_id = fields.Many2many('event.track.location', 'operation_contract_location_rel', 'contract_id',
+                                         'location_id', string='Event Location', copy=False)
+    event_tag_ids = fields.Many2many('event.tag', 'operation_contract_event_tag_rel', 'contract_id',
+                                     'tag_id', string="活动类型", readonly=False, store=True)
 
     def _get_default_stage_id(self):
         return self.env['operation.contract.stage'].search([], limit=1)
 
     stage_id = fields.Many2one(
         'operation.contract.stage', ondelete='restrict', default=_get_default_stage_id,
-        group_expand='_read_group_stage_ids', copy=False)
+        group_expand='_read_group_stage_ids', copy=False, tracking=True)
     stage_sequence = fields.Integer(string="状态序号", related="stage_id.sequence")
     stage_op_department_id = fields.Many2one(string="状态审批部门", related="stage_id.op_department_id")
     # Kanban fields
     kanban_state = fields.Selection([('normal', '推进中'), ('done', '已完成'), ('blocked', '任务受阻')], default='normal',
-                                    copy=False)
+                                    copy=False, tracking=True)
     kanban_state_label = fields.Char(
         string='看板状态', compute='_compute_kanban_state_label',
         store=True)
@@ -124,17 +158,63 @@ class OperationContract(models.Model):
 
     approval_detail_ids = fields.One2many('operation.contract.approval.detail', 'contract_id', string="审批情况")
 
+    @api.model
+    def default_get(self, fields_list):
+        default_result = super().default_get(fields_list)
+        if 'date_begin' in fields_list and 'date_begin' not in default_result:
+            now = fields.Datetime.now()
+            # Round the datetime to the nearest half hour (e.g. 08:17 => 08:30 and 08:37 => 09:00)
+            default_result['date_begin'] = now.replace(second=0, microsecond=0) + timedelta(minutes=-now.minute % 30)
+        if 'date_end' in fields_list and 'date_end' not in default_result and default_result.get('date_begin'):
+            default_result['date_end'] = default_result['date_begin'] + timedelta(days=1)
+        return default_result
+
     @api.depends('partner_id')
     def _compute_contact_info(self):
         for record in self:
             # 查找partner的child_ids中is_company=False的记录，这通常代表个人联系人
             contact = record.partner_id.child_ids.filtered(lambda r: not r.is_company)
             if contact:
-                record.partner_contact_id = contact[0].name
-                record.partner_contact_phone = contact[0].phone
+                for each_c in contact:
+                    check_str = str(each_c.name) + str(each_c.title.name) + str(each_c.function) + str(each_c.comment)
+                    _logger.info(f"check_str=[{check_str}]")
+                    if '联' in check_str:
+                        record.partner_contact_id = each_c.name
+                        record.partner_contact_id_no = each_c.person_id_no
+                        record.partner_contact_phone = each_c.phone
+                        record.partner_contact_mobile = each_c.mobile
+                        record.partner_contact_position = each_c.function
+                    elif '责' in check_str:
+                        record.partner_charger_id = each_c.name
+                        record.partner_charger_id_no = each_c.person_id_no
+                        record.partner_charger_phone = each_c.phone
+                        record.partner_charger_mobile = each_c.mobile
+                        record.partner_charger_position = each_c.function
+
+                if not record.partner_contact_id:
+                    record.partner_contact_id = contact[0].name
+                    record.partner_contact_id_no = contact[0].person_id_no
+                    record.partner_contact_phone = contact[0].phone
+                    record.partner_contact_mobile = contact[0].mobile
+                    record.partner_contact_position = contact[0].function
+                if not record.partner_charger_id:
+                    record.partner_charger_id = contact[0].name
+                    record.partner_charger_id_no = contact[0].person_id_no
+                    record.partner_charger_phone = contact[0].phone
+                    record.partner_charger_mobile = contact[0].mobile
+                    record.partner_charger_position = contact[0].function
+
             else:
                 record.partner_contact_id = False
+                record.partner_contact_id_no = False
                 record.partner_contact_phone = False
+                record.partner_contact_mobile = False
+                record.partner_contact_position = False
+                record.partner_charger_id = False
+                record.partner_charger_id_no = False
+                record.partner_charger_phone = False
+                record.partner_charger_mobile = False
+                record.partner_charger_position = False
 
     def _get_contract_no(self, last_write):
         _logger.info("开始计算合同编号")
