@@ -87,96 +87,6 @@ class OperationContract(models.Model):
     active = fields.Boolean(default=True)
     user_id = fields.Many2one('res.users', string='Responsible', default=lambda self: self.env.user)
 
-    def _get_contract_no(self, last_write):
-        _logger.info("开始计算合同编号")
-        if not last_write:
-            return "保存时将自动获取合同号"
-
-        prefix_rcd = self.env["operation.contract.no.prefix"].search([], limit=1)
-        _logger.info(f"prefix_rcd=[{prefix_rcd}]")
-        prefix_str = ""
-        for rcd in prefix_rcd:
-            prefix_str = rcd.prefix
-
-        if not prefix_str:
-            prefix_str = "OP-HT"
-
-        if not prefix_str.endswith('-'):
-            prefix_str = prefix_str + '-'
-
-        _logger.info(f"prefix_str=[{prefix_str}]")
-
-        formatted_date = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y%m%d-%H%M%S')
-        random_number = '{:03d}'.format(random.randint(0, 999))
-        str_ret = prefix_str + formatted_date + '-' + random_number
-        _logger.info(f"str_ret=[{str_ret}]")
-
-        return str_ret
-
-    @api.model
-    def create(self, vals):
-        if (not vals.get('contract_no')) or vals.get('contract_no') == "保存时将自动获取合同号":
-            vals['contract_no'] = self._get_contract_no(True)
-
-        res = super(OperationContract, self).create(vals)
-
-        # all_stages = self.env['operation.contract.stage'].search([])
-        # # 以第一阶段创建审批明细
-        # for record in res:
-        #     # 新建
-        #     _create_approval_detail(self, record, True, False)
-        #     # 合同阶段自动推到第二个阶段
-        #     i = 0
-        #     for stage in all_stages:
-        #         if i == 1:
-        #             record.stage_sequence = stage.sequence
-        #             record.stage_id = stage
-        #             vals['stage_id'] = record.stage_id
-        #             vals['stage_sequence'] = record.stage_sequence
-        #             self.write(vals)
-        #
-        #         i += 1
-
-        return res
-
-    def write(self, vals):
-        res = super(OperationContract, self).write(vals)
-        return res
-
-    def unlink(self):
-        # for record in self:
-        #     self.env['operation.contract.approval.detail'].search([('contract_id', '=', record.id)]).unlink()
-        #     self.env['operation.contract.contract'].search([('id', '=', record.id)]).unlink()
-        res = super(OperationContract, self).unlink()
-        return res
-
-    @api.model
-    def _get_employee(self):
-        # 获取当前登录用户的employee记录
-        user = self.env.user
-        if user.employee_ids:
-            return user.employee_ids[0].id  # 返回第一个employee记录ID
-        else:
-            return False  # 如果没有employee记录，则返回False
-
-    @api.model
-    def _get_employee_nm(self):
-        # 获取当前登录用户的employee记录
-        user = self.env.user
-        if user.employee_ids:
-            return user.employee_ids[0].name  # 返回第一个employee记录ID
-        else:
-            return False  # 如果没有employee记录，则返回False
-
-    @api.model
-    def _get_employee_dp(self):
-        # 获取当前登录用户的employee记录
-        user = self.env.user
-        if user.employee_ids:
-            return user.employee_ids[0].department_id  # 返回第一个employee记录ID
-        else:
-            return False  # 如果没有employee记录，则返回False
-
     # 使用related属性将employee_id中的某些字段映射到custom.model中
     department_id = fields.Many2one('hr.department', related='op_person_id.department_id', string="部门")
     job_title = fields.Char(related='op_person_id.job_title', string="职务")
@@ -185,18 +95,6 @@ class OperationContract(models.Model):
     partner_contact_id = fields.Char(string='负责人', compute='_compute_contact_info', readonly=True)
     partner_contact_phone = fields.Char(string='电话', compute='_compute_contact_info', readonly=True)
     comments = fields.Text(string="备注")
-
-    @api.depends('partner_id')
-    def _compute_contact_info(self):
-        for record in self:
-            # 查找partner的child_ids中is_company=False的记录，这通常代表个人联系人
-            contact = record.partner_id.child_ids.filtered(lambda r: not r.is_company)
-            if contact:
-                record.partner_contact_id = contact[0].name
-                record.partner_contact_phone = contact[0].phone
-            else:
-                record.partner_contact_id = False
-                record.partner_contact_phone = False
 
     date_approval_begin = fields.Date(copy=False, string="审批发起日期", readonly=True,
                                       default=lambda self: fields.Date.context_today(self))
@@ -225,6 +123,44 @@ class OperationContract(models.Model):
     legend_normal = fields.Char(related='stage_id.legend_normal', string='任务推进中说明', readonly=True)
 
     approval_detail_ids = fields.One2many('operation.contract.approval.detail', 'contract_id', string="审批情况")
+
+    @api.depends('partner_id')
+    def _compute_contact_info(self):
+        for record in self:
+            # 查找partner的child_ids中is_company=False的记录，这通常代表个人联系人
+            contact = record.partner_id.child_ids.filtered(lambda r: not r.is_company)
+            if contact:
+                record.partner_contact_id = contact[0].name
+                record.partner_contact_phone = contact[0].phone
+            else:
+                record.partner_contact_id = False
+                record.partner_contact_phone = False
+
+    def _get_contract_no(self, last_write):
+        _logger.info("开始计算合同编号")
+        if not last_write:
+            return "保存时将自动获取合同号"
+
+        prefix_rcd = self.env["operation.contract.no.prefix"].search([], limit=1)
+        _logger.info(f"prefix_rcd=[{prefix_rcd}]")
+        prefix_str = ""
+        for rcd in prefix_rcd:
+            prefix_str = rcd.prefix
+
+        if not prefix_str:
+            prefix_str = "OP-HT"
+
+        if not prefix_str.endswith('-'):
+            prefix_str = prefix_str + '-'
+
+        _logger.info(f"prefix_str=[{prefix_str}]")
+
+        formatted_date = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y%m%d-%H%M%S')
+        random_number = '{:03d}'.format(random.randint(0, 999))
+        str_ret = prefix_str + formatted_date + '-' + random_number
+        _logger.info(f"str_ret=[{str_ret}]")
+
+        return str_ret
 
     # @api.depends('contract_no')
     # def _compute_approval_details(self):
@@ -316,3 +252,66 @@ class OperationContract(models.Model):
                     self.write({'stage_id': record.stage_id, 'stage_sequence': record.stage_sequence})
                     return
 
+    @api.model
+    def _get_employee(self):
+        # 获取当前登录用户的employee记录
+        user = self.env.user
+        if user.employee_ids:
+            return user.employee_ids[0].id  # 返回第一个employee记录ID
+        else:
+            return False  # 如果没有employee记录，则返回False
+
+    @api.model
+    def _get_employee_nm(self):
+        # 获取当前登录用户的employee记录
+        user = self.env.user
+        if user.employee_ids:
+            return user.employee_ids[0].name  # 返回第一个employee记录ID
+        else:
+            return False  # 如果没有employee记录，则返回False
+
+    @api.model
+    def _get_employee_dp(self):
+        # 获取当前登录用户的employee记录
+        user = self.env.user
+        if user.employee_ids:
+            return user.employee_ids[0].department_id  # 返回第一个employee记录ID
+        else:
+            return False  # 如果没有employee记录，则返回False
+
+    @api.model
+    def create(self, vals):
+        if (not vals.get('contract_no')) or vals.get('contract_no') == "保存时将自动获取合同号":
+            vals['contract_no'] = self._get_contract_no(True)
+
+        res = super(OperationContract, self).create(vals)
+
+        # all_stages = self.env['operation.contract.stage'].search([])
+        # # 以第一阶段创建审批明细
+        # for record in res:
+        #     # 新建
+        #     _create_approval_detail(self, record, True, False)
+        #     # 合同阶段自动推到第二个阶段
+        #     i = 0
+        #     for stage in all_stages:
+        #         if i == 1:
+        #             record.stage_sequence = stage.sequence
+        #             record.stage_id = stage
+        #             vals['stage_id'] = record.stage_id
+        #             vals['stage_sequence'] = record.stage_sequence
+        #             self.write(vals)
+        #
+        #         i += 1
+
+        return res
+
+    def write(self, vals):
+        res = super(OperationContract, self).write(vals)
+        return res
+
+    def unlink(self):
+        # for record in self:
+        #     self.env['operation.contract.approval.detail'].search([('contract_id', '=', record.id)]).unlink()
+        #     self.env['operation.contract.contract'].search([('id', '=', record.id)]).unlink()
+        res = super(OperationContract, self).unlink()
+        return res
