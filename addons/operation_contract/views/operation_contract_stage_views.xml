@@ -44,8 +44,8 @@
         <field name="model">operation.contract.stage</field>
         <field name="arch" type="xml">
             <tree string="运营合同阶段">
-                <field name="sequence" widget="handle"/>
                 <field name="name"/>
+                <field name="sequence"/>
             </tree>
         </field>
     </record>

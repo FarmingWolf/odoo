@@ -11,7 +11,7 @@ class OperationContractStage(models.Model):
 
     name = fields.Char(string='阶段名称', required=True, translate=True)
     description = fields.Text(string='阶段描述', translate=True)
-    sequence = fields.Integer('序号', default=0, )
+    sequence = fields.Integer('阶段序号', default=0, )
     fold = fields.Boolean(string='看板折叠', default=False)
     pipe_end = fields.Boolean(
         string='结束', default=False,
