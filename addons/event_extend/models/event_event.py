@@ -28,13 +28,13 @@ class EventEvent(models.Model):
 
     def write(self, values):
         """Override the write method to enforce custom security checks."""
-        # 如果stage_id被修改，则先进行权限检查
-        if 'stage_id' in values:
-            for record in self:
-                record.check_and_write(values)
-        else:
-            # 对于非stage_id的写入操作，直接调用父类方法
-            return super(EventEvent, self).write(values)
+        # # 如果stage_id被修改，则先进行权限检查 todo:暂时取消关于stage_id的校验，关于活动完全由运营部负责人负责控制
+        # if 'stage_id' in values:
+        #     for record in self:
+        #         record.check_and_write(values)
+        # else:
+        #     # 对于非stage_id的写入操作，直接调用父类方法
+        return super(EventEvent, self).write(values)
 
     def action_print_venue_application(self):
         return self.env.ref('event_extend.action_print_venue_application').report_action(self)
