@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <!-- EVENT.OPTION.GROUP VIEWS -->
+        <record id="event_option_group_view_tree" model="ir.ui.view">
+            <field name="name">event.option.group.view.tree</field>
+            <field name="model">event.option.group</field>
+            <field name="arch" type="xml">
+                <tree string="Event Group">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="option_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="event_option_group_view_form" model="ir.ui.view">
+            <field name="name">event.option.group.view.form</field>
+            <field name="model">event.option.group</field>
+            <field name="arch" type="xml">
+                <form string="Event Group">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field nolabel="1" name="name" placeholder='例如："人数控制措施"'/></h1>
+                        </div>
+                        <group>
+                            <field name="option_ids" context="{'default_group_id': id}">
+                                <tree string="Options" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name" placeholder='例如："定向邀请"'/>
+                                    <field name="color" widget="color_picker"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="event_option_group_action_tree" model="ir.actions.act_window" >
+            <field name="name">活动选项组</field>
+            <field name="res_model">event.option.group</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    创建活动选项组
+                </p><p>
+                    分组管理活动选项，可用于活动控制人数手段、活动类型、活动雇佣人员手段类别等等。
+                </p>
+            </field>
+        </record>
+
+        <!-- EVENT.OPTION VIEWS -->
+        <record id="event_option_view_tree" model="ir.ui.view">
+            <field name="name">event.option.view.tree</field>
+            <field name="model">event.option</field>
+            <field name="arch" type="xml">
+                <tree string="Event Options Groups">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="group_id" options="{'no_quick_create':True}"/>
+                    <field name="color" widget="color_picker"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="event_option_view_form" model="ir.ui.view">
+            <field name="name">event.option.view.form</field>
+            <field name="model">event.option</field>
+            <field name="arch" type="xml">
+                <form string="Event Group Option">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="group_id" options="{'no_quick_create':True}" widget="many2one"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="menu_event_group" model="ir.ui.menu">
+            <field name="action" ref="event_extend.event_option_group_action_tree"/>
+        </record>
+
+    </data>
+</odoo>

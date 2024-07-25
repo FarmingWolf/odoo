@@ -14,10 +14,12 @@
     'auto_install': False,
     'data': [
         'security/security.xml',
+        'security/ir.model.access.csv',
 
         'report/event_event_templates.xml',
         'report/event_event_reports.xml',
         'views/event_event_views.xml',
+        'views/event_option_group_views.xml',
     ],
     'assets': {
         'web.report_assets_pdf': [

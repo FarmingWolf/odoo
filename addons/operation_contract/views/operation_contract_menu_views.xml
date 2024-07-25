@@ -30,8 +30,15 @@
 
     <menuitem name="合同前缀"
         id="operation_contract_no_prefix_menu"
-        sequence="99"
+        sequence="90"
         parent="menu_operation_contract_configuration"
+        groups="operation_contract.operation_dep_contract_operator"/>
+
+    <menuitem name="合同活动选项"
+        id="event_extend.menu_event_group"
+        sequence="93"
+        parent="menu_operation_contract_configuration"
+        action="event_extend.event_option_group_action_tree"
         groups="operation_contract.operation_dep_contract_operator"/>
 
 </data></odoo>

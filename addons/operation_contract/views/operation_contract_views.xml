@@ -226,5 +226,9 @@
             <field name="action" ref="action_operation_contract_contract_view"/>
         </record>
 
+<!--        <record id="menu_contract_event_group" model="ir.ui.menu">-->
+<!--            <field name="action" ref="event_extend.event_option_group_action_tree"/>-->
+<!--        </record>-->
+
     </data>
 </odoo>
