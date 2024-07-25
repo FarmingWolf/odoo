@@ -12,7 +12,7 @@ class OperationContractApprovalDetail(models.Model):
     _description = "运营合同审批明细"
     _order = "id"
 
-    contract_id = fields.Many2one('operation.contract.contract', string="运营合同")
+    contract_id = fields.Many2one('operation.contract.contract', string="运营合同", ondelete="restrict")  # 拒绝删除
     approved_by_id = fields.Many2one('hr.employee', string='审批人ID', default=lambda self: self._get_employee())
     approved_by_nm = fields.Char(string='审批人')
     approval_stage = fields.Many2one('operation.contract.stage', string="阶段")  # 这个字段先放在这，可能有用处
