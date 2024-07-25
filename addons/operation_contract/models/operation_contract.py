@@ -159,6 +159,137 @@ class OperationContract(models.Model):
     approval_detail_ids = fields.One2many('operation.contract.approval.detail', 'contract_id', string="审批情况")
 
     @api.model
+    def _get_event_options(self, param):
+        rs = self.env['event.option'].search(
+            [('group_id', 'in', self.env['event.option.group'].search(
+                [('name', '=', param)]).mapped('id'))])
+        _logger.info(f"param=[{param}],rs=[{rs}]")
+        option_created = [(r.id, r.name) for r in rs]
+        _logger.info(f"option_created=[{option_created}]")
+        return option_created
+
+    @api.model
+    def _get_event_options_crowd(self, param):
+        rs = self.env['event.option'].search(
+            [('group_id', 'in', self.env['event.option.group'].search(
+                [('name', '=', param)]).mapped('id'))])
+        _logger.info(f"param=[{param}],rs=[{rs}]")
+        return rs.ids
+
+    @api.model
+    def _get_crowd_control_method_options(self):
+        options = self._get_event_options_crowd('控制人数措施')
+        _logger.info(f"_get_crowd_control_method_options=[{options}]")
+        for record in self:
+            record.crowd_control_method = [(6, 0, options)]
+        return options
+
+    seats_max = fields.Integer(string='最多参与人数', readonly=False, store=True, tracking=True)
+    seats_limited = fields.Boolean(string='限制参与人数', store=True)
+    crowd_control_method = fields.Many2many('event.option', 'operation_contract_crowd_control_method', 'contract_id',
+                                            'option_id', string="控制人数措施", tracking=True)
+    '''这个方法自动设置了多选框的勾选值，不要
+    @api.onchange('crowd_control_method')
+    def _onchange_crowd_control_method(self):
+        for record in self:
+            valid_methods = self._get_crowd_control_method_options()
+            record.crowd_control_method = [(6, 0, valid_methods)]
+    '''
+
+    def _get_security_guard_method_options(self):
+        options = self._get_event_options('雇佣安保人员')
+        _logger.info(f"_get_security_guard_method_options=[{options}]")
+        return options
+
+    def _get_security_check_method_options(self):
+        options = self._get_event_options('雇佣安检人员')
+        _logger.info(f"_get_security_check_method_options=[{options}]")
+        return options
+
+    def _get_security_equipment_method_options(self):
+        options = self._get_event_options('使用安检器材')
+        _logger.info(f"_get_security_equipment_method_options=[{options}]")
+        return options
+
+    @api.depends('security_guard_method', 'security_check_method', 'security_equipment_method')
+    def _compute_check_show(self, check_tgt, tgt_str):
+        for record in self:
+            # options = self._get_event_options(tgt_str)
+
+            _logger.info(f"check_tgt={check_tgt},tgt_str={tgt_str}")
+            # _logger.info(f"options={options}")
+            _logger.info(f"record._fields[check_tgt]={record._fields[check_tgt]}")  # 这是字段
+            _logger.info(f"record._fields[check_tgt].selection={record._fields[check_tgt].selection}")  # 是函数，不能用
+            _logger.info(f"r_description_string={record._fields[check_tgt]._description_string(self.env)}")  # 这个有用
+            _logger.info(f"get_description={record._fields[check_tgt].get_description(self.env)}")  # 这里有selection集合
+
+            tgt_selection = dict(record._fields[check_tgt].get_description(self.env)).get('selection')
+            _logger.info(f"tgt_selection={tgt_selection}")
+            dict_selection = dict(tgt_selection)
+            _logger.info(f"dict_selection={dict_selection}")
+
+            if check_tgt == "security_guard_method":
+                if record.security_guard_method:
+                    show = '另行' in dict(dict_selection).get(record.security_guard_method)
+                else:
+                    show = False
+                record.security_guard_company_show = show
+            elif check_tgt == "security_check_method":
+                if record.security_check_method:
+                    show = '另行' in dict(dict_selection).get(record.security_check_method)
+                else:
+                    show = False
+                record.security_check_company_show = show
+            elif check_tgt == "security_equipment_method":
+                if record.security_equipment_method:
+                    show = '另行' in dict(dict_selection).get(record.security_equipment_method)
+                else:
+                    show = False
+                record.security_equipment_company_show = show
+
+            return show
+
+    security_guard_method = fields.Selection(selection=_get_security_guard_method_options, string="雇佣安保人员", store=True,
+                                             tracking=True)
+    security_guard_company = fields.Many2one('res.partner', string='安保公司', tracking=True)
+    security_guard_company_show = fields.Boolean(
+        string='显示安保公司', precompute=True, store=True,
+        compute=lambda self: self._compute_check_show('security_guard_method', '雇佣安保人员'))
+
+    security_check_method = fields.Selection(selection=_get_security_check_method_options, string="雇佣安检人员", store=True,
+                                             tracking=True)
+    security_check_company = fields.Many2one('res.partner', string='安检公司', tracking=True)
+    security_check_company_show = fields.Boolean(
+        string='显示安检公司', precompute=True, store=True,
+        compute=lambda self: self._compute_check_show('security_check_method', '雇佣安检人员'))
+
+    security_equipment_method = fields.Selection(selection=_get_security_equipment_method_options, string="使用安检器材",
+                                                 tracking=True, store=True)
+    security_equipment_company = fields.Many2one('res.partner', string='安检器材公司', tracking=True)
+    security_equipment_comment = fields.Char(string="安检设备种类及数量", tracking=True)
+    security_equipment_company_show = fields.Boolean(
+        string='显示安检器材公司', precompute=True, store=True,
+        compute=lambda self: self._compute_check_show('security_equipment_method', '使用安检器材'))
+
+    @api.onchange('security_guard_method')
+    def _on_security_guard_method_change(self):
+        for record in self:
+            _logger.info(f"_on_security_guard_method_change={record.security_guard_method}")
+            self._compute_check_show('security_guard_method', '雇佣安保人员')
+
+    @api.onchange('security_check_method')
+    def _on_security_check_method_change(self):
+        for record in self:
+            _logger.info(f"_on_security_check_method_change={record.security_check_method}")
+            self._compute_check_show('security_check_method', '雇佣安检人员')
+
+    @api.onchange('security_equipment_method')
+    def _on_security_equipment_method_change(self):
+        for record in self:
+            _logger.info(f"_on_security_equipment_method={record.security_equipment_method}")
+            self._compute_check_show('security_equipment_method', '使用安检器材')
+
+    @api.model
     def default_get(self, fields_list):
         default_result = super().default_get(fields_list)
         if 'date_begin' in fields_list and 'date_begin' not in default_result:
@@ -242,22 +373,22 @@ class OperationContract(models.Model):
 
         return str_ret
 
-    # @api.depends('contract_no')
-    # def _compute_approval_details(self):
-    #     for record in self:
-    #         approval_details = self.env['operation.contract.approval.detail'].search(
-    #             [('contract_id', '=', record.id)])
-    #         for detail in approval_details:
-    #             _logger.info(f"detail.approval_decision={detail.approval_decision}")
-    #             _logger.info(f"detail.approval_by_id={detail.approved_by_id}")
-    #             if detail.approval_decision:
-    #                 detail.approval_decision_txt = "同意"
-    #             elif detail.approval_date_time:  # 有操作时间
-    #                 detail.approval_decision_txt = "驳回"
-    #             else:
-    #                 detail.approval_decision_txt = ""
-    #
-    #         record.approval_detail_ids = approval_details
+    @api.depends('contract_no')
+    def _compute_approval_details(self):
+        for record in self:
+            approval_details = self.env['operation.contract.approval.detail'].search(
+                [('contract_id', '=', record.id)])
+            for detail in approval_details:
+                _logger.info(f"detail.approval_decision={detail.approval_decision}")
+                _logger.info(f"detail.approval_by_id={detail.approved_by_id}")
+                if detail.approval_decision:
+                    detail.approval_decision_txt = "同意"
+                elif detail.approval_date_time:  # 有操作时间
+                    detail.approval_decision_txt = "驳回"
+                else:
+                    detail.approval_decision_txt = ""
+
+            record.approval_detail_ids = approval_details
 
     @api.depends('stage_id', 'kanban_state')
     def _compute_kanban_state_label(self):
@@ -366,23 +497,6 @@ class OperationContract(models.Model):
 
         res = super(OperationContract, self).create(vals)
 
-        # all_stages = self.env['operation.contract.stage'].search([])
-        # # 以第一阶段创建审批明细
-        # for record in res:
-        #     # 新建
-        #     _create_approval_detail(self, record, True, False)
-        #     # 合同阶段自动推到第二个阶段
-        #     i = 0
-        #     for stage in all_stages:
-        #         if i == 1:
-        #             record.stage_sequence = stage.sequence
-        #             record.stage_id = stage
-        #             vals['stage_id'] = record.stage_id
-        #             vals['stage_sequence'] = record.stage_sequence
-        #             self.write(vals)
-        #
-        #         i += 1
-
         return res
 
     def write(self, vals):
@@ -390,8 +504,5 @@ class OperationContract(models.Model):
         return res
 
     def unlink(self):
-        # for record in self:
-        #     self.env['operation.contract.approval.detail'].search([('contract_id', '=', record.id)]).unlink()
-        #     self.env['operation.contract.contract'].search([('id', '=', record.id)]).unlink()
         res = super(OperationContract, self).unlink()
         return res
