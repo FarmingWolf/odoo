@@ -3,8 +3,8 @@
     <record id="estate_lease_contract_daily_cron" model="ir.cron">
         <field name="name">每日自动生成资产出租切面数据</field>
         <field name="model_id" ref="estate_lease_contract.model_estate_lease_contract_property_daily_status"/>
-        <field name="interval_number">4</field>
-        <field name="interval_type">hours</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
         <field name="numbercall">-1</field> <!-- -1 表示无限次执行 -->
         <field name="nextcall" eval="(DateTime.now().replace(hour=0, minute=0)).strftime('%Y-%m-%d %H:%M:%S')" />
         <field name="doall" eval="False"/> <!-- True表示即使服务器关闭期间错过执行也会补执行 -->
@@ -16,8 +16,8 @@
     <record id="estate_lease_property_daily_cron" model="ir.cron">
         <field name="name">每日自动计算资产状态数据</field>
         <field name="model_id" ref="estate_lease_contract.model_estate_property"/>
-        <field name="interval_number">4</field>
-        <field name="interval_type">hours</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
         <field name="numbercall">-1</field> <!-- -1 表示无限次执行 -->
         <field name="nextcall" eval="(DateTime.now().replace(hour=0, minute=30)).strftime('%Y-%m-%d %H:%M:%S')" />
         <field name="doall" eval="False"/> <!-- True表示即使服务器关闭期间错过执行也会补执行 -->
