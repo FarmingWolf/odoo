@@ -64,7 +64,7 @@
                                 <field name="contract_amount" groups="!operation_contract.estate_management_dep_contract_read"/>
                             </group>
                             <group string="合作方" name="cooperator_info" col="2">
-                                <field name="partner_id" placeholder="公司名称"/>
+                                <field name="partner_id" placeholder="请点击选择合作方"/>
                                 <group col="1">
                                     <field name="partner_contact_id"/>
                                     <field name="partner_contact_id_no"/>
@@ -96,31 +96,42 @@
                                 </group>
                             </group>
                             <group>
-                                <group col="1">
-                                    <label for="seats_limited" string="人数限制"/>
-                                    <div>
-                                        <field name="seats_limited"/>
-                                        <span invisible="not seats_limited" required="not seats_limited">不超过 <field name="seats_max" class="oe_inline o_input_9ch"/> 人</span>
-                                    </div>
+                                <group col="1" string="参与人数及控制人数措施">
+                                    <group>
+                                        <label for="seats_limited" string="人数限制"/>
+                                        <div>
+                                            <field name="seats_limited"/>
+                                            <span invisible="not seats_limited" required="not seats_limited">不超过<field name="seats_max" class="oe_inline o_input_7ch"/>人</span>
+                                        </div>
+                                    </group>
                                     <field name="crowd_control_method" widget="many2many_checkboxes"/>
                                 </group>
-                                <group>
+                                <group string="安保措施">
                                     <field name="security_guard_company_show" invisible="1"/>
                                     <field name="security_guard_method" placeholder="请选择"/>
                                     <field name="security_guard_company" required="security_guard_company_show" invisible="not security_guard_company_show" placeholder="请选择"/>
+                                    <field name="security_guard_charger_id" invisible="not security_guard_company_show"/>
+                                    <field name="security_guard_charger_phone" invisible="not security_guard_company_show"/>
+                                    <field name="security_guard_charger_mobile" invisible="not security_guard_company_show"/>
                                 </group>
                             </group>
-                            <group>
+                            <group string="安检措施">
                                 <group>
                                     <field name="security_check_company_show" invisible="1"/>
                                     <field name="security_check_method" placeholder="请选择"/>
                                     <field name="security_check_company" required="security_check_company_show" invisible="not security_check_company_show" placeholder="请选择"/>
+                                    <field name="security_check_charger_id" invisible="not security_check_company_show"/>
+                                    <field name="security_check_charger_phone" invisible="not security_check_company_show"/>
+                                    <field name="security_check_charger_mobile" invisible="not security_check_company_show"/>
                                 </group>
                                 <group>
                                     <field name="security_equipment_company_show" invisible="1"/>
                                     <field name="security_equipment_method" placeholder="请选择"/>
                                     <field name="security_equipment_company" required="security_equipment_company_show" invisible="not security_equipment_company_show" placeholder="请选择"/>
                                     <field name="security_equipment_comment" required="security_equipment_company_show" invisible="not security_equipment_company_show" placeholder="请输入设备种类及数量"/>
+                                    <field name="security_equipment_charger_id" invisible="not security_equipment_company_show"/>
+                                    <field name="security_equipment_charger_phone" invisible="not security_equipment_company_show"/>
+                                    <field name="security_equipment_charger_mobile" invisible="not security_equipment_company_show"/>
                                 </group>
                             </group>
                         </group>

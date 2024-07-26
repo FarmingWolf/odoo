@@ -142,7 +142,7 @@ class OperationContract(models.Model):
     date_begin = fields.Datetime(copy=False, string="合同开始日期", tracking=True)
     date_end = fields.Datetime(copy=False, string="合同结束日期", tracking=True)
     contract_amount = fields.Float(string="合同金额（元）", copy=False, default=0.0, digits=(16, 2))
-    description = fields.Html(string='合同详情', store=True, readonly=False, tracking=True)
+    description = fields.Html(string='合同详情', store=True, readonly=False)
     event_location_id = fields.Many2many('event.track.location', 'operation_contract_location_rel', 'contract_id',
                                          'location_id', string='Event Location', copy=False)
     event_tag_ids = fields.Many2many('event.tag', 'operation_contract_event_tag_rel', 'contract_id',
@@ -223,18 +223,105 @@ class OperationContract(models.Model):
     security_guard_company_show = fields.Boolean(
         string='显示安保公司', compute=lambda self: self._compute_company_show('security_guard_method'))
 
+    security_guard_charger_id = fields.Char(string='安保责任人', compute='_compute_guard_charger_info', readonly=True)
+    security_guard_charger_phone = fields.Char(string='电话', compute='_compute_guard_charger_info', readonly=True)
+    security_guard_charger_mobile = fields.Char(string='手机', compute='_compute_guard_charger_info', readonly=True)
+
     security_check_method = fields.Selection(selection=_get_security_check_method_options, string="雇佣安检人员",
                                              tracking=True, store=True)
     security_check_company = fields.Many2one('res.partner', string='安检公司', tracking=True)
     security_check_company_show = fields.Boolean(
         string='显示安检公司', compute=lambda self: self._compute_company_show('security_check_method'))
 
+    security_check_charger_id = fields.Char(string='安检责任人', compute='_compute_check_charger_info', readonly=True)
+    security_check_charger_phone = fields.Char(string='电话', compute='_compute_check_charger_info', readonly=True)
+    security_check_charger_mobile = fields.Char(string='手机', compute='_compute_check_charger_info', readonly=True)
+
     security_equipment_method = fields.Selection(selection=_get_security_equipment_method_options, string="使用安检器材",
                                                  tracking=True, store=True)
     security_equipment_company = fields.Many2one('res.partner', string='安检器材公司', tracking=True)
-    security_equipment_comment = fields.Char(string="安检设备种类及数量", tracking=True)
+    security_equipment_comment = fields.Text(string="安检设备种类及数量", tracking=True)
     security_equipment_company_show = fields.Boolean(
         string='显示安检器材公司', compute=lambda self: self._compute_company_show('security_equipment_method'))
+
+    security_equipment_charger_id = fields.Char(string='器材公司责任人', readonly=True,
+                                                compute='_compute_equipment_charger_info')
+    security_equipment_charger_phone = fields.Char(string='电话', readonly=True,
+                                                   compute='_compute_equipment_charger_info')
+    security_equipment_charger_mobile = fields.Char(string='手机', readonly=True,
+                                                    compute='_compute_equipment_charger_info')
+
+    @api.depends('security_guard_company')
+    def _compute_guard_charger_info(self):
+        for record in self:
+            # 查找partner的child_ids中is_company=False的记录，这通常代表个人联系人
+            contact = record.security_guard_company.child_ids.filtered(lambda r: not r.is_company)
+            if contact:
+                for each_c in contact:
+                    check_str = str(each_c.name) + str(each_c.title.name) + str(each_c.function) + str(each_c.comment)
+                    _logger.info(f"check_str=[{check_str}]")
+                    if '责' in check_str:
+                        record.security_guard_charger_id = each_c.name
+                        record.security_guard_charger_phone = each_c.phone
+                        record.security_guard_charger_mobile = each_c.mobile
+
+                if not record.security_guard_charger_id:
+                    record.security_guard_charger_id = contact[0].name
+                    record.security_guard_charger_phone = contact[0].phone
+                    record.security_guard_charger_mobile = contact[0].mobile
+
+            else:
+                record.security_guard_charger_id = False
+                record.security_guard_charger_phone = False
+                record.security_guard_charger_mobile = False
+
+    @api.depends('security_check_company')
+    def _compute_check_charger_info(self):
+        for record in self:
+            # 查找partner的child_ids中is_company=False的记录，这通常代表个人联系人
+            contact = record.security_check_company.child_ids.filtered(lambda r: not r.is_company)
+            if contact:
+                for each_c in contact:
+                    check_str = str(each_c.name) + str(each_c.title.name) + str(each_c.function) + str(each_c.comment)
+                    _logger.info(f"check_str=[{check_str}]")
+                    if '责' in check_str:
+                        record.security_check_charger_id = each_c.name
+                        record.security_check_charger_phone = each_c.phone
+                        record.security_check_charger_mobile = each_c.mobile
+
+                if not record.security_check_charger_id:
+                    record.security_check_charger_id = contact[0].name
+                    record.security_check_charger_phone = contact[0].phone
+                    record.security_check_charger_mobile = contact[0].mobile
+
+            else:
+                record.security_check_charger_id = False
+                record.security_check_charger_phone = False
+                record.security_check_charger_mobile = False
+
+    @api.depends('security_equipment_company')
+    def _compute_equipment_charger_info(self):
+        for record in self:
+            # 查找partner的child_ids中is_company=False的记录，这通常代表个人联系人
+            contact = record.security_equipment_company.child_ids.filtered(lambda r: not r.is_company)
+            if contact:
+                for each_c in contact:
+                    check_str = str(each_c.name) + str(each_c.title.name) + str(each_c.function) + str(each_c.comment)
+                    _logger.info(f"check_str=[{check_str}]")
+                    if '责' in check_str:
+                        record.security_equipment_charger_id = each_c.name
+                        record.security_equipment_charger_phone = each_c.phone
+                        record.security_equipment_charger_mobile = each_c.mobile
+
+                if not record.security_equipment_charger_id:
+                    record.security_equipment_charger_id = contact[0].name
+                    record.security_equipment_charger_phone = contact[0].phone
+                    record.security_equipment_charger_mobile = contact[0].mobile
+
+            else:
+                record.security_equipment_charger_id = False
+                record.security_equipment_charger_phone = False
+                record.security_equipment_charger_mobile = False
 
     @api.depends('security_guard_method', 'security_check_method', 'security_equipment_method')
     def _compute_company_show(self, check_tgt):
@@ -247,7 +334,6 @@ class OperationContract(models.Model):
             # _logger.info(f"record._fields[check_tgt].selection={record._fields[check_tgt].selection}")  # 是函数，不能用
             # _logger.info(f"r_description_string={record._fields[check_tgt]._description_string(self.env)}")  # 这个有用
             # _logger.info(f"get_description={record._fields[check_tgt].get_description(self.env)}")  # 这里有selection集合
-
 
             # _logger.info(f"dict_guard_selection={dict(record._fields['security_guard_method'].get_description(self.env)).get('selection')}")
             # _logger.info(f"dict_check_selection={dict(record._fields['security_check_method'].get_description(self.env)).get('selection')}")
@@ -272,6 +358,8 @@ class OperationContract(models.Model):
             if check_tgt == "security_guard_method":
                 if record.security_guard_method:
                     option_selected = dict_dict_selection.get(int(record.security_guard_method))
+                    record.security_guard_method = int(record.security_guard_method)
+                    _logger.info(f"security_check_method的option_selected={option_selected}")
                     show = '另行' in option_selected
                 else:
                     show = False
@@ -281,6 +369,7 @@ class OperationContract(models.Model):
             elif check_tgt == "security_check_method":
                 if record.security_check_method:
                     option_selected = dict_dict_selection.get(int(record.security_check_method))
+                    record.security_check_method = int(record.security_check_method)
                     _logger.info(f"security_check_method的option_selected={option_selected}")
                     show = '另行' in option_selected
                 else:
@@ -291,6 +380,7 @@ class OperationContract(models.Model):
             elif check_tgt == "security_equipment_method":
                 if record.security_equipment_method:
                     option_selected = dict_dict_selection.get(int(record.security_equipment_method))
+                    record.security_equipment_method = int(record.security_equipment_method)
                     _logger.info(f"security_equipment_method的option_selected={option_selected}")
                     show = '另行' in option_selected
                 else:
@@ -423,9 +513,8 @@ class OperationContract(models.Model):
 
     @api.model
     def default_get(self, fields_list):
-        """貌似只有新建记录时才会default_get方法"""
+        _logger.info(f"貌似只有新建记录时才会default_get方法fields_list={fields_list}")
         default_result = super().default_get(fields_list)
-
         _compute_date_begin_end(fields_list, default_result)
 
         return default_result
