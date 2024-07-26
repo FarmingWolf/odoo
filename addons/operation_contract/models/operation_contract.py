@@ -94,16 +94,7 @@ class ResPartner(models.Model):
         return default_result
 
 
-def _compute_security_guard_method(field_str, fields_list, default_result):
-    _logger.info(f'_compute_security_guard_method:field_str=【{field_str}】')
-    _logger.info(f'_compute_security_guard_method:fields_list=【{fields_list}】')
-    _logger.info(f'_compute_security_guard_method:default_result=【{default_result}】')
-    if field_str in fields_list and field_str not in default_result:
-        default_result[field_str] = dict(fields_list).get(field_str)
-
-
 def _compute_date_begin_end(fields_list, default_result):
-
     if 'date_begin' in fields_list and 'date_begin' not in default_result:
         now = fields.Datetime.now()
         # Round the datetime to the nearest half hour (e.g. 08:17 => 08:30 and 08:37 => 09:00)
@@ -193,14 +184,13 @@ class OperationContract(models.Model):
         rs = self.env['event.option'].search(
             [('group_id', 'in', self.env['event.option.group'].search(
                 [('name', '=', param)]).mapped('id'))])
-        _logger.info(f"param=[{param}],rs=[{rs}]")
+        _logger.info(f"param-crowd=[{param}],rs=[{rs}]")
         return rs.ids
 
     @api.model
     def _get_crowd_control_method_option_domain(self):
         options = self._get_event_options_crowd('控制人数措施')
         _logger.info(f"_get_crowd_control_method_option_domain=[{options}]")
-
         domain = [('id', 'in', options)]
         return domain
 
@@ -215,11 +205,13 @@ class OperationContract(models.Model):
         _logger.info(f"_get_security_guard_method_options=[{options}]")
         return options
 
+    @api.model
     def _get_security_check_method_options(self):
         options = self._get_event_options('雇佣安检人员')
         _logger.info(f"_get_security_check_method_options=[{options}]")
         return options
 
+    @api.model
     def _get_security_equipment_method_options(self):
         options = self._get_event_options('使用安检器材')
         _logger.info(f"_get_security_equipment_method_options=[{options}]")
@@ -229,79 +221,101 @@ class OperationContract(models.Model):
                                              tracking=True, store=True)
     security_guard_company = fields.Many2one('res.partner', string='安保公司', tracking=True)
     security_guard_company_show = fields.Boolean(
-        string='显示安保公司', precompute=True, store=True,
-        compute=lambda self: self._compute_check_show('security_guard_method', '雇佣安保人员'))
+        string='显示安保公司', compute=lambda self: self._compute_company_show('security_guard_method'))
 
     security_check_method = fields.Selection(selection=_get_security_check_method_options, string="雇佣安检人员",
                                              tracking=True, store=True)
     security_check_company = fields.Many2one('res.partner', string='安检公司', tracking=True)
     security_check_company_show = fields.Boolean(
-        string='显示安检公司', precompute=True, store=True,
-        compute=lambda self: self._compute_check_show('security_check_method', '雇佣安检人员'))
+        string='显示安检公司', compute=lambda self: self._compute_company_show('security_check_method'))
 
     security_equipment_method = fields.Selection(selection=_get_security_equipment_method_options, string="使用安检器材",
                                                  tracking=True, store=True)
     security_equipment_company = fields.Many2one('res.partner', string='安检器材公司', tracking=True)
     security_equipment_comment = fields.Char(string="安检设备种类及数量", tracking=True)
     security_equipment_company_show = fields.Boolean(
-        string='显示安检器材公司', precompute=True, store=True,
-        compute=lambda self: self._compute_check_show('security_equipment_method', '使用安检器材'))
+        string='显示安检器材公司', compute=lambda self: self._compute_company_show('security_equipment_method'))
 
     @api.depends('security_guard_method', 'security_check_method', 'security_equipment_method')
-    def _compute_check_show(self, check_tgt, tgt_str):
+    def _compute_company_show(self, check_tgt):
         for record in self:
-            # options = self._get_event_options(tgt_str)
+            # _logger.info(f"check_tgt={check_tgt},tgt_str={tgt_str}")
+            _logger.info(f"record.security_guard_method=【{record.security_guard_method}】")
+            _logger.info(f"record.security_check_method=【{record.security_check_method}】")
+            _logger.info(f"record.security_equipment_method=【{record.security_equipment_method}】")
+            # _logger.info(f"record._fields[check_tgt]={record._fields[check_tgt]}")  # 这是字段
+            # _logger.info(f"record._fields[check_tgt].selection={record._fields[check_tgt].selection}")  # 是函数，不能用
+            # _logger.info(f"r_description_string={record._fields[check_tgt]._description_string(self.env)}")  # 这个有用
+            # _logger.info(f"get_description={record._fields[check_tgt].get_description(self.env)}")  # 这里有selection集合
 
-            _logger.info(f"check_tgt={check_tgt},tgt_str={tgt_str}")
-            # _logger.info(f"options={options}")
-            _logger.info(f"record._fields[check_tgt]={record._fields[check_tgt]}")  # 这是字段
-            _logger.info(f"record._fields[check_tgt].selection={record._fields[check_tgt].selection}")  # 是函数，不能用
-            _logger.info(f"r_description_string={record._fields[check_tgt]._description_string(self.env)}")  # 这个有用
-            _logger.info(f"get_description={record._fields[check_tgt].get_description(self.env)}")  # 这里有selection集合
+
+            # _logger.info(f"dict_guard_selection={dict(record._fields['security_guard_method'].get_description(self.env)).get('selection')}")
+            # _logger.info(f"dict_check_selection={dict(record._fields['security_check_method'].get_description(self.env)).get('selection')}")
+            # _logger.info(f"dict_equipment_selection={dict(record._fields['security_equipment_method'].get_description(self.env)).get('selection')}")
+            #
+            # record.security_guard_method = int(record.security_guard_method)
+            # record.security_check_method = int(record.security_check_method)
+            # record.security_equipment_method = int(record.security_equipment_method)
+            #
+            # _logger.info(f"→→→.security_guard_method={record.security_guard_method}")
+            # _logger.info(f"→→→.security_check_method={record.security_check_method}")
+            # _logger.info(f"→→→.security_equipment_method={record.security_equipment_method}")
 
             tgt_selection = dict(record._fields[check_tgt].get_description(self.env)).get('selection')
-            _logger.info(f"tgt_selection={tgt_selection}")
+            # _logger.info(f"tgt_selection={tgt_selection}")
             dict_selection = dict(tgt_selection)
-            _logger.info(f"dict_selection={dict_selection}")
+            _logger.info(f"检查对象的dict_selection={dict_selection}")
+            dict_dict_selection = dict(dict_selection)
+            _logger.info(f"检查对象的dict(dict_selection)={dict_dict_selection}")
 
+            show = False
             if check_tgt == "security_guard_method":
                 if record.security_guard_method:
-                    show = '另行' in dict(dict_selection).get(record.security_guard_method)
+                    option_selected = dict_dict_selection.get(int(record.security_guard_method))
+                    show = '另行' in option_selected
                 else:
                     show = False
                 record.security_guard_company_show = show
+                _logger.info(f"→→→.security_guard_company_show={record.security_guard_company_show}")
+
             elif check_tgt == "security_check_method":
                 if record.security_check_method:
-                    show = '另行' in dict(dict_selection).get(record.security_check_method)
+                    option_selected = dict_dict_selection.get(int(record.security_check_method))
+                    _logger.info(f"security_check_method的option_selected={option_selected}")
+                    show = '另行' in option_selected
                 else:
                     show = False
                 record.security_check_company_show = show
+                _logger.info(f"→→→.security_check_company_show={record.security_check_company_show}")
+
             elif check_tgt == "security_equipment_method":
                 if record.security_equipment_method:
-                    show = '另行' in dict(dict_selection).get(record.security_equipment_method)
+                    option_selected = dict_dict_selection.get(int(record.security_equipment_method))
+                    _logger.info(f"security_equipment_method的option_selected={option_selected}")
+                    show = '另行' in option_selected
                 else:
                     show = False
                 record.security_equipment_company_show = show
+                _logger.info(f"→→→.security_equipment_company_show={record.security_equipment_company_show}")
+            else:
+                _logger.error(f"与未知check_tgt不期而遇：【{check_tgt}】")
 
             return show
 
     @api.onchange('security_guard_method')
     def _on_security_guard_method_change(self):
         for record in self:
-            _logger.info(f"_on_security_guard_method_change={record.security_guard_method}")
-            self._compute_check_show('security_guard_method', '雇佣安保人员')
+            self._compute_company_show('security_guard_method')
 
     @api.onchange('security_check_method')
     def _on_security_check_method_change(self):
         for record in self:
-            _logger.info(f"_on_security_check_method_change={record.security_check_method}")
-            self._compute_check_show('security_check_method', '雇佣安检人员')
+            self._compute_company_show('security_check_method')
 
     @api.onchange('security_equipment_method')
     def _on_security_equipment_method_change(self):
         for record in self:
-            _logger.info(f"_on_security_equipment_method={record.security_equipment_method}")
-            self._compute_check_show('security_equipment_method', '使用安检器材')
+            self._compute_company_show('security_equipment_method')
 
     @api.depends('partner_id')
     def _compute_contact_info(self):
@@ -413,7 +427,6 @@ class OperationContract(models.Model):
         default_result = super().default_get(fields_list)
 
         _compute_date_begin_end(fields_list, default_result)
-        # _compute_security_guard_method('security_guard_method', fields_list, default_result)
 
         return default_result
 
@@ -509,15 +522,21 @@ class OperationContract(models.Model):
             vals['contract_no'] = self._get_contract_no(True)
 
         res = super(OperationContract, self).create(vals)
-
         return res
 
     def write(self, vals):
-        if 'crowd_control_method' in vals:
+
+        if not vals.get('security_guard_method'):
             for record in self:
-                # record.crowd_control_method = [(6, 0, vals['crowd_control_method'])]
-                _logger.info(f"record.crowd_control_method={record.crowd_control_method}")
-                _logger.info(f"vals['crowd_control_method']={vals['crowd_control_method']}")
+                vals['security_guard_method'] = int(record.security_guard_method)
+
+        if not vals.get('security_check_method'):
+            for record in self:
+                vals['security_check_method'] = int(record.security_check_method)
+
+        if not vals.get('security_equipment_method'):
+            for record in self:
+                vals['security_equipment_method'] = int(record.security_equipment_method)
 
         res = super(OperationContract, self).write(vals)
         return res
