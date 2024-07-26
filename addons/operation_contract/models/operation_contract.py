@@ -94,6 +94,26 @@ class ResPartner(models.Model):
         return default_result
 
 
+def _compute_security_guard_method(field_str, fields_list, default_result):
+    _logger.info(f'_compute_security_guard_method:field_str=【{field_str}】')
+    _logger.info(f'_compute_security_guard_method:fields_list=【{fields_list}】')
+    _logger.info(f'_compute_security_guard_method:default_result=【{default_result}】')
+    if field_str in fields_list and field_str not in default_result:
+        default_result[field_str] = dict(fields_list).get(field_str)
+
+
+def _compute_date_begin_end(fields_list, default_result):
+
+    if 'date_begin' in fields_list and 'date_begin' not in default_result:
+        now = fields.Datetime.now()
+        # Round the datetime to the nearest half hour (e.g. 08:17 => 08:30 and 08:37 => 09:00)
+        default_result['date_begin'] = now.replace(second=0, microsecond=0) + timedelta(minutes=-now.minute % 30)
+    if 'date_end' in fields_list and 'date_end' not in default_result and default_result.get('date_begin'):
+        default_result['date_end'] = default_result['date_begin'] + timedelta(days=1)
+
+    return default_result
+
+
 class OperationContract(models.Model):
     _name = "operation.contract.contract"
     _description = "运营合同模型"
@@ -177,24 +197,18 @@ class OperationContract(models.Model):
         return rs.ids
 
     @api.model
-    def _get_crowd_control_method_options(self):
+    def _get_crowd_control_method_option_domain(self):
         options = self._get_event_options_crowd('控制人数措施')
-        _logger.info(f"_get_crowd_control_method_options=[{options}]")
-        for record in self:
-            record.crowd_control_method = [(6, 0, options)]
-        return options
+        _logger.info(f"_get_crowd_control_method_option_domain=[{options}]")
+
+        domain = [('id', 'in', options)]
+        return domain
 
     seats_max = fields.Integer(string='最多参与人数', readonly=False, store=True, tracking=True)
     seats_limited = fields.Boolean(string='限制参与人数', store=True)
     crowd_control_method = fields.Many2many('event.option', 'operation_contract_crowd_control_method', 'contract_id',
-                                            'option_id', string="控制人数措施", tracking=True)
-    '''这个方法自动设置了多选框的勾选值，不要
-    @api.onchange('crowd_control_method')
-    def _onchange_crowd_control_method(self):
-        for record in self:
-            valid_methods = self._get_crowd_control_method_options()
-            record.crowd_control_method = [(6, 0, valid_methods)]
-    '''
+                                            'option_id', string="控制人数措施", tracking=True, readonly=False,
+                                            domain=_get_crowd_control_method_option_domain)
 
     def _get_security_guard_method_options(self):
         options = self._get_event_options('雇佣安保人员')
@@ -210,6 +224,28 @@ class OperationContract(models.Model):
         options = self._get_event_options('使用安检器材')
         _logger.info(f"_get_security_equipment_method_options=[{options}]")
         return options
+
+    security_guard_method = fields.Selection(selection=_get_security_guard_method_options, string="雇佣安保人员",
+                                             tracking=True, store=True)
+    security_guard_company = fields.Many2one('res.partner', string='安保公司', tracking=True)
+    security_guard_company_show = fields.Boolean(
+        string='显示安保公司', precompute=True, store=True,
+        compute=lambda self: self._compute_check_show('security_guard_method', '雇佣安保人员'))
+
+    security_check_method = fields.Selection(selection=_get_security_check_method_options, string="雇佣安检人员",
+                                             tracking=True, store=True)
+    security_check_company = fields.Many2one('res.partner', string='安检公司', tracking=True)
+    security_check_company_show = fields.Boolean(
+        string='显示安检公司', precompute=True, store=True,
+        compute=lambda self: self._compute_check_show('security_check_method', '雇佣安检人员'))
+
+    security_equipment_method = fields.Selection(selection=_get_security_equipment_method_options, string="使用安检器材",
+                                                 tracking=True, store=True)
+    security_equipment_company = fields.Many2one('res.partner', string='安检器材公司', tracking=True)
+    security_equipment_comment = fields.Char(string="安检设备种类及数量", tracking=True)
+    security_equipment_company_show = fields.Boolean(
+        string='显示安检器材公司', precompute=True, store=True,
+        compute=lambda self: self._compute_check_show('security_equipment_method', '使用安检器材'))
 
     @api.depends('security_guard_method', 'security_check_method', 'security_equipment_method')
     def _compute_check_show(self, check_tgt, tgt_str):
@@ -249,28 +285,6 @@ class OperationContract(models.Model):
 
             return show
 
-    security_guard_method = fields.Selection(selection=_get_security_guard_method_options, string="雇佣安保人员", store=True,
-                                             tracking=True)
-    security_guard_company = fields.Many2one('res.partner', string='安保公司', tracking=True)
-    security_guard_company_show = fields.Boolean(
-        string='显示安保公司', precompute=True, store=True,
-        compute=lambda self: self._compute_check_show('security_guard_method', '雇佣安保人员'))
-
-    security_check_method = fields.Selection(selection=_get_security_check_method_options, string="雇佣安检人员", store=True,
-                                             tracking=True)
-    security_check_company = fields.Many2one('res.partner', string='安检公司', tracking=True)
-    security_check_company_show = fields.Boolean(
-        string='显示安检公司', precompute=True, store=True,
-        compute=lambda self: self._compute_check_show('security_check_method', '雇佣安检人员'))
-
-    security_equipment_method = fields.Selection(selection=_get_security_equipment_method_options, string="使用安检器材",
-                                                 tracking=True, store=True)
-    security_equipment_company = fields.Many2one('res.partner', string='安检器材公司', tracking=True)
-    security_equipment_comment = fields.Char(string="安检设备种类及数量", tracking=True)
-    security_equipment_company_show = fields.Boolean(
-        string='显示安检器材公司', precompute=True, store=True,
-        compute=lambda self: self._compute_check_show('security_equipment_method', '使用安检器材'))
-
     @api.onchange('security_guard_method')
     def _on_security_guard_method_change(self):
         for record in self:
@@ -288,17 +302,6 @@ class OperationContract(models.Model):
         for record in self:
             _logger.info(f"_on_security_equipment_method={record.security_equipment_method}")
             self._compute_check_show('security_equipment_method', '使用安检器材')
-
-    @api.model
-    def default_get(self, fields_list):
-        default_result = super().default_get(fields_list)
-        if 'date_begin' in fields_list and 'date_begin' not in default_result:
-            now = fields.Datetime.now()
-            # Round the datetime to the nearest half hour (e.g. 08:17 => 08:30 and 08:37 => 09:00)
-            default_result['date_begin'] = now.replace(second=0, microsecond=0) + timedelta(minutes=-now.minute % 30)
-        if 'date_end' in fields_list and 'date_end' not in default_result and default_result.get('date_begin'):
-            default_result['date_end'] = default_result['date_begin'] + timedelta(days=1)
-        return default_result
 
     @api.depends('partner_id')
     def _compute_contact_info(self):
@@ -405,6 +408,16 @@ class OperationContract(models.Model):
         return self.env['operation.contract.stage'].search([])
 
     @api.model
+    def default_get(self, fields_list):
+        """貌似只有新建记录时才会default_get方法"""
+        default_result = super().default_get(fields_list)
+
+        _compute_date_begin_end(fields_list, default_result)
+        # _compute_security_guard_method('security_guard_method', fields_list, default_result)
+
+        return default_result
+
+    @api.model
     def ondelete(self):
         for record in self:
             if record.stage_id.sequence != 0 and record.stage_id.sequence != 1000:  # 0：新建；1000：canceled
@@ -500,6 +513,12 @@ class OperationContract(models.Model):
         return res
 
     def write(self, vals):
+        if 'crowd_control_method' in vals:
+            for record in self:
+                # record.crowd_control_method = [(6, 0, vals['crowd_control_method'])]
+                _logger.info(f"record.crowd_control_method={record.crowd_control_method}")
+                _logger.info(f"vals['crowd_control_method']={vals['crowd_control_method']}")
+
         res = super(OperationContract, self).write(vals)
         return res
 

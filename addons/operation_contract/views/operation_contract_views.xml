@@ -95,33 +95,36 @@
                                     </group>
                                 </group>
                             </group>
-
-                            <group col="1">
-                                <label for="seats_limited" string="人数限制"/>
-                                <div>
-                                    <field name="seats_limited"/>
-                                    <span invisible="not seats_limited" required="not seats_limited">不超过 <field name="seats_max" class="oe_inline o_input_9ch"/> 人</span>
-                                </div>
-                                <field name="crowd_control_method" widget="many2many_checkboxes"/>
+                            <group>
+                                <group col="1">
+                                    <label for="seats_limited" string="人数限制"/>
+                                    <div>
+                                        <field name="seats_limited"/>
+                                        <span invisible="not seats_limited" required="not seats_limited">不超过 <field name="seats_max" class="oe_inline o_input_9ch"/> 人</span>
+                                    </div>
+                                    <field name="crowd_control_method" widget="many2many_checkboxes"/>
+                                </group>
+                                <group>
+                                    <field name="security_guard_company_show" invisible="1"/>
+                                    <field name="security_guard_method" placeholder="请选择"/>
+                                    <field name="security_guard_company" required="security_guard_company_show" invisible="not security_guard_company_show" placeholder="请选择"/>
+                                </group>
                             </group>
                             <group>
-                                <field name="security_guard_company_show" invisible="1"/>
-                                <field name="security_guard_method" placeholder="请选择"/>
-                                <field name="security_guard_company" required="security_guard_company_show" invisible="not security_guard_company_show" placeholder="请选择"/>
+                                <group>
+                                    <field name="security_check_company_show" invisible="1"/>
+                                    <field name="security_check_method" placeholder="请选择"/>
+                                    <field name="security_check_company" required="security_check_company_show" invisible="not security_check_company_show" placeholder="请选择"/>
+                                </group>
+                                <group>
+                                    <field name="security_equipment_company_show" invisible="1"/>
+                                    <field name="security_equipment_method" placeholder="请选择"/>
+                                    <field name="security_equipment_company" required="security_equipment_company_show" invisible="not security_equipment_company_show" placeholder="请选择"/>
+                                    <field name="security_equipment_comment" required="security_equipment_company_show" invisible="not security_equipment_company_show" placeholder="请输入设备种类及数量"/>
+                                </group>
                             </group>
-                            <group>
-                                <field name="security_check_company_show" invisible="1"/>
-                                <field name="security_check_method" placeholder="请选择"/>
-                                <field name="security_check_company" required="security_check_company_show" invisible="not security_check_company_show" placeholder="请选择"/>
-                            </group>
-                            <group>
-                                <field name="security_equipment_company_show" invisible="1"/>
-                                <field name="security_equipment_method" placeholder="请选择"/>
-                                <field name="security_equipment_company" required="security_equipment_company_show" invisible="not security_equipment_company_show" placeholder="请选择"/>
-                                <field name="security_equipment_comment" required="security_equipment_company_show" invisible="not security_equipment_company_show" placeholder="请输入设备种类及数量"/>
-                            </group>
-
                         </group>
+
                         <div class="oe_title">
                             <h1>
                                 <field nolabel="1" colspan="2" name="description" placeholder="合同活动内容，如：活动方案、嘉宾流程、搭建方案等"/>
