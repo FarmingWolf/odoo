@@ -7,7 +7,8 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//notebook/page[@name='contact_addresses']//field//form//sheet//group/field[@name='mobile']" position="after">
+                <xpath expr="//notebook/page[@name='contact_addresses']//field//form//sheet//group/field[@name='mobile']"
+                       position="after">
                     <field name="person_id_no"/>
                 </xpath>
             </field>
@@ -19,18 +20,23 @@
             <field name="arch" type="xml">
                 <form string="运营合同" class="o_event_form_view">
                     <header>
+                        <field name="page_editable" invisible="1"/>
                         <field name="stage_sequence" invisible="1"/>
                         <field name="stage_op_department_id" invisible="1"/>
                         <div invisible="not stage_op_department_id">
                             <div invisible="stage_sequence &lt; 10">
-                                <button name="action_agree" type="object" class="btn btn-success" string="批准" title="点击批准该合同"/>
+                                <button name="action_agree" type="object" class="btn btn-success" string="批准"
+                                        title="点击批准该合同"/>
                                 <span>　</span>
-                                <button name="action_reject" type="object" class="btn btn-danger" string="驳回" title="点击驳回该合同"/>
+                                <button name="action_reject" type="object" class="btn btn-danger" string="驳回"
+                                        title="点击驳回该合同"/>
                             </div>
-                            <div invisible="stage_sequence &gt; 0">
-                                <button name="action_agree" type="object" class="btn btn-success" string="提交" title="点击提交该合同进入审批流程"/>
+                            <div invisible="stage_sequence &gt; 0 or not page_editable">
+                                <button name="action_agree" type="object" class="btn btn-success" string="提交"
+                                        title="点击提交该合同进入审批流程"/>
                                 <span>　</span>
-                                <button name="action_cancel" type="object" class="btn btn-danger" string="取消" title="点击取消该合同"/>
+                                <button name="action_cancel" type="object" class="btn btn-danger" string="取消"
+                                        title="点击取消该合同"/>
                             </div>
                         </div>
                         <field name="stage_id" widget="statusbar"/>
@@ -42,13 +48,16 @@
                         <field name="legend_normal" invisible="1"/>
                         <field name="legend_done" invisible="1"/>
                         <field name="kanban_state" widget="state_selection" class="ms-auto float-end"/>
-                        <div class="oe_title">
-                            <label for="name" string="合同名称"/>
-                            <h1>
-                                <field class="text-break" options="{'line_breaks': False}" widget="text" name="name"
-                                       placeholder="例如： 某公司园区拍摄活动合同"/>
-                            </h1>
-                        </div>
+                        <group string="合同名称">
+                            <label for="name" string=""/>
+                            <div class="oe_title">
+                                <h1>
+                                    <field class="text-break" options="{'line_breaks': False}" colspan="3" widget="text"
+                                           name="name"
+                                           placeholder="例如： 某公司园区拍摄活动合同" readonly="not page_editable"/>
+                                </h1>
+                            </div>
+                        </group>
                         <group>
                             <group col="2">
                                 <group>
@@ -59,12 +68,18 @@
                                 </group>
                             </group>
                             <group>
-                                <field name="date_begin" widget="daterange" options="{'end_date_field': 'date_end'}"/>
+                                <field name="date_begin" widget="daterange" options="{'end_date_field': 'date_end'}"
+                                       readonly="not page_editable"/>
                                 <field name="date_end" invisible="1"/>
-                                <field name="contract_amount" groups="!operation_contract.estate_management_dep_contract_read"/>
+                                <field name="contract_amount"
+                                       groups="!operation_contract.estate_management_dep_contract_read"
+                                       readonly="not page_editable"/>
                             </group>
                             <group string="合作方" name="cooperator_info" col="2">
-                                <field name="partner_id" placeholder="请点击选择合作方"/>
+                                <field name="partner_id" placeholder="请点击选择合作方" readonly="not page_editable"
+                                       options="{'no_open': True}" invisible="page_editable"/>
+                                <field name="partner_id" placeholder="请点击选择合作方" readonly="not page_editable"
+                                       invisible="not page_editable"/>
                                 <group col="1">
                                     <field name="partner_contact_id"/>
                                     <field name="partner_contact_id_no"/>
@@ -82,65 +97,146 @@
                             </group>
                             <group>
                                 <group string="经办人" name="operator_info">
-                                    <field name="op_person_id" string="姓名"/>
-                                    <field name="department_id"/>
+                                    <field name="op_person_id" string="姓名" readonly="not page_editable"
+                                           options="{'no_open': True}" invisible="page_editable"/>
+                                    <field name="op_person_id" string="姓名" readonly="not page_editable"
+                                           invisible="not page_editable"/>
+                                    <field name="department_id" options="{'no_open': True}"/>
                                     <field name="job_title"/>
                                 </group>
                                 <group col="1">
                                     <group string="活动举办地点">
-                                        <field name="event_location_id" widget="many2many_tags" nolabel="1" colspan="2" placeholder="选择地点"/>
+                                        <field name="event_location_id" widget="many2many_tags" nolabel="1" colspan="2"
+                                               placeholder="选择地点" readonly="not page_editable"
+                                               options="{'no_open': True}" invisible="page_editable"/>
+                                        <field name="event_location_id" widget="many2many_tags" nolabel="1" colspan="2"
+                                               placeholder="选择地点" readonly="not page_editable"
+                                               invisible="not page_editable"/>
                                     </group>
                                     <group string="活动类型">
-                                        <field name="event_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" nolabel="1" colspan="2" placeholder="选择类型"/>
+                                        <field name="event_tag_ids" widget="many2many_tags"
+                                               options="{'color_field': 'color', 'no_open': True}" nolabel="1"
+                                               colspan="2" placeholder="选择类型" readonly="not page_editable"
+                                               invisible="page_editable"/>
+                                        <field name="event_tag_ids" widget="many2many_tags"
+                                               options="{'color_field': 'color'}" nolabel="1" colspan="2"
+                                               placeholder="选择类型" readonly="not page_editable"
+                                               invisible="not page_editable"/>
                                     </group>
                                 </group>
                             </group>
+                        </group>
+                        <group string="参与人数及控制人数措施" col="2">
                             <group>
-                                <group col="1" string="参与人数及控制人数措施">
-                                    <group>
-                                        <label for="seats_limited" string="人数限制"/>
-                                        <div>
-                                            <field name="seats_limited"/>
-                                            <span invisible="not seats_limited" required="not seats_limited">不超过<field name="seats_max" class="oe_inline o_input_7ch"/>人</span>
-                                        </div>
-                                    </group>
-                                    <field name="crowd_control_method" widget="many2many_checkboxes"/>
+                                <label for="seats_limited" string="人数限制"/>
+                                <div>
+                                    <field name="seats_limited" readonly="not page_editable"/>
+                                    <span invisible="not seats_limited" required="not seats_limited">不超过
+                                        <field name="seats_max" class="oe_inline o_input_11ch"
+                                               readonly="not page_editable"/>人
+                                    </span>
+                                </div>
+                            </group>
+                            <group nolabel="1">
+                                <field name="crowd_control_method" widget="many2many_checkboxes"
+                                       readonly="not page_editable"/>
+                            </group>
+                        </group>
+
+                        <group string="活动内容">
+                            <label for="description" string=""/>
+                            <div class="o_field_html">
+                                <h5>
+                                    <field nolabel="1" colspan="2" name="description"
+                                           placeholder="请输入合同活动内容，如：活动方案、嘉宾流程、搭建方案等"
+                                           readonly="not page_editable"/>
+                                    <field name="attachment_ids" widget="many2many_binary" options="{'no_create': True}"
+                                           groups="!operation_contract.estate_management_dep_contract_read"
+                                           readonly="not page_editable"/>
+                                </h5>
+                            </div>
+                        </group>
+                        <group string="安保措施" col="3">
+                            <group col="1">
+                                <field name="security_guard_company_show" invisible="1"/>
+                                <field name="security_guard_method" placeholder="请选择" readonly="not page_editable"
+                                       options="{'no_open': True}" invisible="page_editable"/>
+                                <field name="security_guard_method" placeholder="请选择" readonly="not page_editable"
+                                       invisible="not page_editable"/>
+                            </group>
+                            <group col="1" invisible="not security_guard_company_show">
+                                <field name="security_guard_company" string="" required="security_guard_company_show"
+                                       placeholder="请选择安保公司" readonly="not page_editable" options="{'no_open': True}"
+                                       invisible="page_editable"/>
+                                <field name="security_guard_company" string="" required="security_guard_company_show"
+                                       placeholder="请选择安保公司" readonly="not page_editable"
+                                       invisible="not page_editable"/>
+                            </group>
+                            <group col="2" invisible="not security_guard_company_show">
+                                <group>
+                                    <field name="security_guard_charger_id" string="责任人"/>
                                 </group>
-                                <group string="安保措施">
-                                    <field name="security_guard_company_show" invisible="1"/>
-                                    <field name="security_guard_method" placeholder="请选择"/>
-                                    <field name="security_guard_company" required="security_guard_company_show" invisible="not security_guard_company_show" placeholder="请选择"/>
-                                    <field name="security_guard_charger_id" invisible="not security_guard_company_show"/>
-                                    <field name="security_guard_charger_phone" invisible="not security_guard_company_show"/>
-                                    <field name="security_guard_charger_mobile" invisible="not security_guard_company_show"/>
+                                <group>
+                                    <field name="security_guard_charger_phone"/>
+                                    <field name="security_guard_charger_mobile"/>
                                 </group>
                             </group>
-                            <group string="安检措施">
+                        </group>
+                        <group string="安检措施" col="3">
+                            <group>
+                                <field name="security_check_company_show" invisible="1"/>
+                                <field name="security_check_method" placeholder="请选择" readonly="not page_editable"
+                                       options="{'no_open': True}" invisible="page_editable"/>
+                                <field name="security_check_method" placeholder="请选择" readonly="not page_editable"
+                                       invisible="not page_editable"/>
+                            </group>
+                            <group invisible="not security_check_company_show">
+                                <field name="security_check_company" string="" required="security_check_company_show"
+                                       placeholder="请选择安检公司" readonly="not page_editable" options="{'no_open': True}"
+                                       invisible="page_editable"/>
+                                <field name="security_check_company" string="" required="security_check_company_show"
+                                       placeholder="请选择安检公司" readonly="not page_editable"
+                                       invisible="not page_editable"/>
+                            </group>
+                            <group invisible="not security_check_company_show" col="2">
                                 <group>
-                                    <field name="security_check_company_show" invisible="1"/>
-                                    <field name="security_check_method" placeholder="请选择"/>
-                                    <field name="security_check_company" required="security_check_company_show" invisible="not security_check_company_show" placeholder="请选择"/>
-                                    <field name="security_check_charger_id" invisible="not security_check_company_show"/>
-                                    <field name="security_check_charger_phone" invisible="not security_check_company_show"/>
-                                    <field name="security_check_charger_mobile" invisible="not security_check_company_show"/>
+                                    <field name="security_check_charger_id" string="责任人"/>
                                 </group>
                                 <group>
-                                    <field name="security_equipment_company_show" invisible="1"/>
-                                    <field name="security_equipment_method" placeholder="请选择"/>
-                                    <field name="security_equipment_company" required="security_equipment_company_show" invisible="not security_equipment_company_show" placeholder="请选择"/>
-                                    <field name="security_equipment_comment" required="security_equipment_company_show" invisible="not security_equipment_company_show" placeholder="请输入设备种类及数量"/>
-                                    <field name="security_equipment_charger_id" invisible="not security_equipment_company_show"/>
-                                    <field name="security_equipment_charger_phone" invisible="not security_equipment_company_show"/>
-                                    <field name="security_equipment_charger_mobile" invisible="not security_equipment_company_show"/>
+                                    <field name="security_check_charger_phone"/>
+                                    <field name="security_check_charger_mobile"/>
+                                </group>
+                            </group>
+                        </group>
+                        <group string="安检器材" col="3">
+                            <group>
+                                <field name="security_equipment_company_show" invisible="1"/>
+                                <field name="security_equipment_method" placeholder="请选择" readonly="not page_editable"
+                                       options="{'no_open': True}" invisible="page_editable"/>
+                                <field name="security_equipment_method" placeholder="请选择" readonly="not page_editable"
+                                       invisible="not page_editable"/>
+                            </group>
+                            <group invisible="not security_equipment_company_show">
+                                <field name="security_equipment_company" required="security_equipment_company_show"
+                                       string="" placeholder="请选择安检器材公司" readonly="not page_editable"
+                                       options="{'no_open': True}" invisible="page_editable"/>
+                                <field name="security_equipment_company" required="security_equipment_company_show"
+                                       string="" placeholder="请选择安检器材公司" readonly="not page_editable"
+                                       invisible="not page_editable"/>
+                                <field name="security_equipment_comment" required="security_equipment_company_show"
+                                       string="" placeholder="请输入设备种类及数量" readonly="not page_editable"/>
+                            </group>
+                            <group invisible="not security_equipment_company_show" col="2">
+                                <group>
+                                    <field name="security_equipment_charger_id" string="责任人"/>
+                                </group>
+                                <group>
+                                    <field name="security_equipment_charger_phone"/>
+                                    <field name="security_equipment_charger_mobile"/>
                                 </group>
                             </group>
                         </group>
 
-                        <div class="oe_title">
-                            <h1>
-                                <field nolabel="1" colspan="2" name="description" placeholder="合同活动内容，如：活动方案、嘉宾流程、搭建方案等"/>
-                            </h1>
-                        </div>
                         <group string="审批情况" name="operation_department_approval_info">
                             <field name="approval_detail_ids" string=""/>
                         </group>
@@ -194,7 +290,9 @@
                                         <div>
                                             <t t-esc="luxon.DateTime.fromISO(record.date_begin.raw_value).toFormat('yyyy-MMM')"/>
                                         </div>
-                                        <div><t t-esc="luxon.DateTime.fromISO(record.date_begin.raw_value).toFormat('t')"/></div>
+                                        <div>
+                                            <t t-esc="luxon.DateTime.fromISO(record.date_begin.raw_value).toFormat('t')"/>
+                                        </div>
                                         <div t-if="record.date_begin.raw_value !== record.date_end.raw_value">
                                             <i class="oi oi-arrow-right me-2 o_event_fontsize_09" title="End date"/>
                                             <t t-esc="luxon.DateTime.fromISO(record.date_end.raw_value).toFormat('MMM-d')"/>

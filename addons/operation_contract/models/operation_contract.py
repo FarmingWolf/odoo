@@ -115,6 +115,7 @@ class OperationContract(models.Model):
     contract_no = fields.Char(string='合同编号', readonly=True, default=lambda self: self._get_contract_no(False),
                               store=True)
 
+    page_editable = fields.Boolean("page_editable", readonly=True, store=False, compute="_compute_page_editable")
     op_person_id = fields.Many2one('hr.employee', string='经办人', default=lambda self: self._get_employee())
     active = fields.Boolean(default=True)
     user_id = fields.Many2one('res.users', string='Responsible', default=lambda self: self.env.user)
@@ -144,9 +145,10 @@ class OperationContract(models.Model):
     contract_amount = fields.Float(string="合同金额（元）", copy=False, default=0.0, digits=(16, 2))
     description = fields.Html(string='合同详情', store=True, readonly=False)
     event_location_id = fields.Many2many('event.track.location', 'operation_contract_location_rel', 'contract_id',
-                                         'location_id', string='Event Location', copy=False)
+                                         'location_id', string='活动地点', copy=False, tracking=True)
     event_tag_ids = fields.Many2many('event.tag', 'operation_contract_event_tag_rel', 'contract_id',
-                                     'tag_id', string="活动类型", readonly=False, store=True)
+                                     'tag_id', string="活动类型", readonly=False, store=True, tracking=True)
+    attachment_ids = fields.Many2many('ir.attachment', string="附件", copy=False)
 
     def _get_default_stage_id(self):
         return self.env['operation.contract.stage'].search([], limit=1)
@@ -250,6 +252,17 @@ class OperationContract(models.Model):
                                                    compute='_compute_equipment_charger_info')
     security_equipment_charger_mobile = fields.Char(string='手机', readonly=True,
                                                     compute='_compute_equipment_charger_info')
+
+    @api.depends('stage_id')
+    def _compute_page_editable(self):
+        self.ensure_one()
+        res = False
+        for record in self:
+            if "运营" in record.stage_id.op_department_id.name:
+                if self.env.user.has_group('operation_contract.operation_dep_contract_operator'):
+                    res = True
+            record.page_editable = res
+        return res
 
     @api.depends('security_guard_company')
     def _compute_guard_charger_info(self):
@@ -615,17 +628,29 @@ class OperationContract(models.Model):
 
     def write(self, vals):
 
+        _logger.info(f"当前{self.env.user}在更新")
+        _logger.info(f"更新内容有：{vals}")
+
         if not vals.get('security_guard_method'):
             for record in self:
                 vals['security_guard_method'] = int(record.security_guard_method)
+                track_messages = record.message_ids.filtered(
+                    lambda m: m.subtype_id == self.env.ref('mail.mt_note') and 'security_guard_method' in m.body)
+                track_messages.write({'needaction_partner_ids': [(6, 0, [])]})
 
         if not vals.get('security_check_method'):
             for record in self:
                 vals['security_check_method'] = int(record.security_check_method)
+                track_messages = record.message_ids.filtered(
+                    lambda m: m.subtype_id == self.env.ref('mail.mt_note') and 'security_check_method' in m.body)
+                track_messages.write({'needaction_partner_ids': [(6, 0, [])]})
 
         if not vals.get('security_equipment_method'):
             for record in self:
                 vals['security_equipment_method'] = int(record.security_equipment_method)
+                track_messages = record.message_ids.filtered(
+                    lambda m: m.subtype_id == self.env.ref('mail.mt_note') and 'security_equipment_method' in m.body)
+                track_messages.write({'needaction_partner_ids': [(6, 0, [])]})
 
         res = super(OperationContract, self).write(vals)
         return res
@@ -633,3 +658,82 @@ class OperationContract(models.Model):
     def unlink(self):
         res = super(OperationContract, self).unlink()
         return res
+
+    def _message_post_after_hook(self, message, msg_vals):
+        # 获取当前记录的实例
+        record = self.browse(msg_vals['res_id'])
+        _logger.info(f"self message={self.message}")
+        _logger.info(f"param message={message}")
+        _logger.info(f"param msg_vals={msg_vals}")
+        _logger.info(f"message.subtype_id={message.subtype_id}self.env('mail.mt_note')={self.env.ref('mail.mt_note')}")
+        _logger.info(f"message.body={message.body}")
+        _logger.info(f"record.message_partner_ids={record.message_partner_ids}")
+        # 如果消息类型是内部笔记 (mail.mt_note) 并且消息内容包含 field_a 的变更记录
+        if message.subtype_id == self.env.ref('mail.mt_note') and \
+                ('contract_amount' in message.body or 'attachment_ids' in message.body):
+            # 获取所有订阅者
+            partners = record.message_partner_ids
+            # 筛选出没有查看权限的用户
+            excluded_partners = partners.filtered(
+                lambda p: p.user_ids.has_group('operation_contract.estate_management_dep_contract_read'))
+            # 获取允许查看的伙伴 ID
+            allowed_partners = partners - excluded_partners
+            # 更新消息的订阅者
+            message.write({'partner_ids': [(6, 0, allowed_partners.ids)]})
+            _logger.info(f"message.partner_ids={message.partner_ids}")
+        # 调用父类的方法
+        return super(OperationContract, self)._message_post_after_hook(message, msg_vals)
+
+    # @api.onchange('security_guard_method', 'security_check_method', 'security_equipment_method')
+    # def _onchange_selection_fields(self):
+    #     # 非编辑阶段，不记录这三个字段的变更
+    #     for record in self:
+    #         if record.stage_sequence > 10:
+    #             self._origin._message_untrack(['security_guard_method'])
+    #             self._origin._message_untrack(['security_check_method'])
+    #             self._origin._message_untrack(['security_equipment_method'])
+
+    def _message_log(self, body, subject=None, message_type='notification', **kwargs):
+        self.ensure_one()
+        contract_amount_field_id = self.env['ir.model.fields']._get('operation.contract.contract', 'contract_amount').id
+        attachment_filed_id = self.env['ir.model.fields']._get('operation.contract.contract', 'attachment_ids').id
+        security_guard_method_field_id = self.env['ir.model.fields']._get('operation.contract.contract',
+                                                                          'security_guard_method').id
+        security_check_method_field_id = self.env['ir.model.fields']._get('operation.contract.contract',
+                                                                          'security_check_method').id
+        security_equipment_method_field_id = self.env['ir.model.fields']._get('operation.contract.contract',
+                                                                              'security_equipment_method').id
+        _logger.info(
+            f"contract_amount_field_id={contract_amount_field_id},attachment_filed_id={attachment_filed_id},"
+            f"security_guard_method_field_id={security_guard_method_field_id}，"
+            f"security_check_method_field_id={security_check_method_field_id}，"
+            f"security_equipment_method_field_id={security_equipment_method_field_id}")
+
+        for record in self:
+            new_tracked_fields = []
+            # 当前非编辑stage时，就不应该有上述几个字段的track
+            if record.stage_sequence > 10:
+                for tracked_value_id in kwargs['tracking_value_ids']:
+                    if tracked_value_id[2]['field_id'] in (
+                            attachment_filed_id, security_guard_method_field_id, security_check_method_field_id,
+                            security_equipment_method_field_id):
+                        pass
+                        # # 获取所有订阅者
+                        # partners = record.message_partner_ids
+                        # _logger.info(f"当前partners={partners}")
+                        # # 筛选出没有查看权限的用户
+                        # excluded_partners = partners.filtered(
+                        #     lambda p: p.user_ids.has_group('operation_contract.estate_management_dep_contract_read'))
+                        # _logger.info(f"excluded_partners={excluded_partners}")
+                        # # 获取允许查看的伙伴 ID
+                        # allowed_partners = partners - excluded_partners
+                        # _logger.info(f"allowed_partners={allowed_partners}")
+                        # # 更新消息的订阅者
+                        # kwargs['partner_ids'] = allowed_partners.ids
+                    else:
+                        new_tracked_fields.append(tracked_value_id)
+
+                kwargs['tracking_value_ids'] = new_tracked_fields
+
+        _logger.info(f"kwargs={kwargs}")
+        return super()._message_log(subject=subject, message_type=message_type, **kwargs)

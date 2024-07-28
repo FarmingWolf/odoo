@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 class OperationContractApprovalDetail(models.Model):
     _name = "operation.contract.approval.detail"
     _description = "运营合同审批明细"
-    _order = "id"
+    _order = "id DESC"
 
     contract_id = fields.Many2one('operation.contract.contract', string="运营合同", ondelete="restrict")  # 拒绝删除
     approved_by_id = fields.Many2one('hr.employee', string='审批人ID', default=lambda self: self._get_employee())
