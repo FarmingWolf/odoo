@@ -80,9 +80,5 @@
             </field>
         </record>
 
-        <record id="menu_event_group" model="ir.ui.menu">
-            <field name="action" ref="event_extend.event_option_group_action_tree"/>
-        </record>
-
     </data>
 </odoo>

@@ -3,7 +3,7 @@
 
 {
     'name': "运营合同管理",
-    'depends': ['base', 'web', 'hr', 'event_extend'],
+    'depends': ['base', 'web', 'hr', 'event_option', 'website_event_track'],
     'summary': '运营活动合同审批等',
     'category': 'Operation/Operation Contract',
     'website': 'https://www.odoo.com/',

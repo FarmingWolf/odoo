@@ -35,10 +35,10 @@
         groups="operation_contract.operation_dep_contract_operator"/>
 
     <menuitem name="合同活动选项"
-        id="event_extend.menu_event_group"
+        id="event_option_menu_event_group"
         sequence="93"
         parent="menu_operation_contract_configuration"
-        action="event_extend.event_option_group_action_tree"
+        action="event_option.event_option_group_action_tree"
         groups="operation_contract.operation_dep_contract_operator"/>
 
 </data></odoo>

@@ -2,11 +2,11 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
-    'name': "活动模型扩展",
+    'name': "活动模型选项管理",
     'version': '2.1',
-    'depends': ['event', 'website_event', 'website_event_track', 'event_option'],
+    'depends': ['base', 'event'],
     'category': 'Marketing/Event_Supervisor',
-    'summary': '活动模块的扩展',
+    'summary': '活动的扩展,管理活动选项，选项分组灵活应用于多种活动选项场景',
     'author': '491Tech',
     'website': 'https://www.odoo.com/',
     'installable': True,
@@ -16,14 +16,9 @@
         'security/security.xml',
         'security/ir.model.access.csv',
 
-        'report/event_event_templates.xml',
-        'report/event_event_reports.xml',
-        'views/event_event_views.xml',
+        'views/event_option_group_views.xml',
     ],
     'assets': {
-        'web.report_assets_pdf': [
-            '/event_extend/static/src/scss/event_extend.scss',
-        ],
     },
     'license': 'AGPL-3'
 }

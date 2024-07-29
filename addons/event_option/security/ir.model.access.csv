@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_event_option_group_read,access.event.option.group.read,model_event_option_group,operation_contract.operation_dep_contract_read,1,0,0,0
+access_event_option_read,access.event.option.read,model_event_option,operation_contract.operation_dep_contract_read,1,0,0,0
+access_event_option_group_op,access.event.option.group.op,model_event_option_group,operation_contract.operation_dep_contract_operator,1,1,1,1
+access_event_option_op,access.event.option.op,model_event_option,operation_contract.operation_dep_contract_operator,1,1,1,1
+access_event_option_group_mngr,access.event.option.group.op,model_event_option_group,event.group_event_manager,1,1,1,1
+access_event_option_mngr,access.event.option.op,model_event_option,event.group_event_manager,1,1,1,1
