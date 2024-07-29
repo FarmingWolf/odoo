@@ -38,22 +38,27 @@
 
                         <p class="report_paragraph">
                             二、借用时间：
-                            <span style="border-bottom: 1px solid #000;">　　　　　　　　　　　　　　　　　　　　</span>；
+                            <span style="border-bottom: 1px solid #000;" t-esc="event.date_begin"/>-<span style="border-bottom: 1px solid #000;" t-esc="event.date_end"/>；
                         </p>
                         <p class="report_paragraph">
                             三、现场负责人及电话：
-                            <span style="border-bottom: 1px solid #000;">　　　　　　　　　　　　　　　　</span>；
+                            <span style="border-bottom: 1px solid #000;" t-esc="event.op_person_id.name"/>　<span style="border-bottom: 1px solid #000;" t-esc="event.op_person_mobile"/>；
                         </p>
                         <p class="report_paragraph">
                             四、活动场地范围：
-                            <span style="border-bottom: 1px solid #000;">　　　　　　　　　　　　　　　　　　</span>；
+                            <t t-foreach="event.event_location_id" t-as="location">
+                                <span style="border-bottom: 1px solid #000;" t-esc="location.name"/>，
+                            </t>；
                         </p>
                         <p class="report_paragraph">
                             五、活动人数：
-                            <span style="border-bottom: 1px solid #000;">　　　　　　　　　　　　　　　　　　　　</span>；
+                            <span style="border-bottom: 1px solid #000;" t-esc="event.seats_max"/>；
                         </p>
                         <p class="report_paragraph">
-                            六、活动方案（详见附件）
+                            六、活动方案（详见附件）<br/>
+                            <t t-foreach="event.event_attachment_ids" t-as="item">
+                                <span style="border-bottom: 1px solid #000;" t-esc="item.name"/><br/>
+                            </t>；
                         </p>
 
                     </div>
@@ -110,14 +115,18 @@
                                 </div>
                             </div>
                             <div class="grid-item-right" style="column-span: 4; width: 80%">
-                                <div class="grid-line" style="column-span: 4;height: 50%">
-                                    <span>　</span>
+                                <div class="grid-line" style="column-span: 4;height: 50%; padding-top: 5px">
+                                    <span>　</span><span t-esc="event.event_company_id.name"/>
                                 </div>
                                 <div class="grid-line" style="column-span: 4;height: 50%">
                                     <div class="grid-item-left" style="column-span: 1; width: 30%; padding-top: 5px">
                                         <span>负责人及联系方式</span>
                                     </div>
-                                    <div class="grid-item-right" style="column-span: 3; width: 70%"/>
+                                    <div class="grid-item-right" style="column-span: 3; width: 70%; padding-top: 5px">
+                                        <span t-esc="event.event_company_charger_id"/>　
+                                        <span t-esc="event.event_company_charger_phone"/>　
+                                        <span t-esc="event.event_company_charger_mobile"/>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -130,12 +139,16 @@
                             </div>
                             <div class="grid-item-left" style="column-span: 2; width: 40%;">
                                 <span>　</span>
+                                <t t-foreach="event.event_location_id" t-as="location">
+                                    <span t-esc="location.name"/>，
+                                </t>
                             </div>
                             <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
                                 <span>参与人数</span>
                             </div>
-                            <div class="grid-item-right" style="column-span: 1; width: 20%;">
+                            <div class="grid-item-right" style="column-span: 1; width: 20%; padding-top: 5px">
                                 <span>　</span>
+                                <span t-esc="event.seats_max"/>
                             </div>
                         </div>
                     </div>
@@ -144,8 +157,9 @@
                         <div class="grid-line">
                             <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
                                 <span>活动内容</span></div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%">
+                            <div class="grid-item-right" style="column-span: 4; width: 80%; padding-top: 5px">
                                 <span>　</span>
+                                <span t-esc="event.note"/>
                             </div>
                         </div>
                     </div>
@@ -158,7 +172,7 @@
                                 </div>
                             </div>
                             <div class="grid-item-right" style="column-span: 4; width: 80%">
-                                <span>　</span>
+                                <span t-esc="event.date_begin"/>-<span t-esc="event.date_end"/>
                             </div>
                         </div>
                     </div>
@@ -168,8 +182,9 @@
                             <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
                                 <span>需用电及功率</span>
                             </div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%">
+                            <div class="grid-item-right" style="column-span: 4; width: 80%; padding-top: 5px">
                                 <span>　</span>
+                                <span t-esc="event.need_electricity_info"/>
                             </div>
                         </div>
                     </div>
@@ -180,8 +195,9 @@
                                     <span>物业部门配合<br/>的内容及时间</span>
                                 </div>
                             </div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%">
+                            <div class="grid-item-right" style="column-span: 4; width: 80%; padding-top: 5px">
                                 <span>　</span>
+                                <span t-esc="event.need_management_dept_assist_info"/>
                             </div>
                         </div>
                     </div>
@@ -193,8 +209,9 @@
                                     <span>运营部意见</span>
                                 </div>
                             </div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%">
+                            <div class="grid-item-right" style="column-span: 4; width: 80%; padding-top: 10px">
                                 <span>　</span>
+                                <span t-esc="event.operation_dep_opinion"/>
                             </div>
                         </div>
                     </div>

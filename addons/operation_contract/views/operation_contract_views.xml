@@ -75,34 +75,35 @@
                                        groups="!operation_contract.estate_management_dep_contract_read"
                                        readonly="not page_editable"/>
                             </group>
-                            <group string="合作方" name="cooperator_info" col="2">
+                            <group string="活动举办单位" name="cooperator_info" col="2">
                                 <field name="partner_id" placeholder="请点击选择合作方" readonly="not page_editable"
                                        options="{'no_open': True}" invisible="page_editable"/>
                                 <field name="partner_id" placeholder="请点击选择合作方" readonly="not page_editable"
                                        invisible="not page_editable"/>
                                 <group col="1">
                                     <field name="partner_contact_id"/>
-                                    <field name="partner_contact_id_no"/>
+                                    <field name="partner_contact_id_no" string="身份证号"/>
                                     <field name="partner_contact_phone"/>
                                     <field name="partner_contact_mobile"/>
-                                    <field name="partner_contact_position"/>
+                                    <field name="partner_contact_position" string="职务"/>
                                 </group>
                                 <group col="1">
                                     <field name="partner_charger_id"/>
-                                    <field name="partner_charger_id_no"/>
+                                    <field name="partner_charger_id_no" string="身份证号"/>
                                     <field name="partner_charger_phone"/>
                                     <field name="partner_charger_mobile"/>
-                                    <field name="partner_charger_position"/>
+                                    <field name="partner_charger_position" string="职务"/>
                                 </group>
                             </group>
                             <group>
-                                <group string="经办人" name="operator_info">
+                                <group string="合同经办人" name="operator_info">
                                     <field name="op_person_id" string="姓名" readonly="not page_editable"
                                            options="{'no_open': True}" invisible="page_editable"/>
                                     <field name="op_person_id" string="姓名" readonly="not page_editable"
                                            invisible="not page_editable"/>
                                     <field name="department_id" options="{'no_open': True}"/>
                                     <field name="job_title"/>
+                                    <field name="op_person_phone"/>
                                 </group>
                                 <group col="1">
                                     <group string="活动举办地点">
@@ -177,8 +178,8 @@
                                     <field name="security_guard_charger_id" string="责任人"/>
                                 </group>
                                 <group>
-                                    <field name="security_guard_charger_phone"/>
-                                    <field name="security_guard_charger_mobile"/>
+                                    <field name="security_guard_charger_phone" string="电话"/>
+                                    <field name="security_guard_charger_mobile" string="手机"/>
                                 </group>
                             </group>
                         </group>
@@ -203,8 +204,8 @@
                                     <field name="security_check_charger_id" string="责任人"/>
                                 </group>
                                 <group>
-                                    <field name="security_check_charger_phone"/>
-                                    <field name="security_check_charger_mobile"/>
+                                    <field name="security_check_charger_phone" string="电话"/>
+                                    <field name="security_check_charger_mobile" string="手机"/>
                                 </group>
                             </group>
                         </group>
@@ -293,7 +294,7 @@
                                         <div>
                                             <t t-esc="luxon.DateTime.fromISO(record.date_begin.raw_value).toFormat('t')"/>
                                         </div>
-                                        <div t-if="record.date_begin.raw_value !== record.date_end.raw_value">
+                                        <div t-if="record.date_begin.raw_value != record.date_end.raw_value">
                                             <i class="oi oi-arrow-right me-2 o_event_fontsize_09" title="End date"/>
                                             <t t-esc="luxon.DateTime.fromISO(record.date_end.raw_value).toFormat('MMM-d')"/>
                                         </div>

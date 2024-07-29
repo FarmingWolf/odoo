@@ -4,7 +4,7 @@
 {
     'name': "活动模型扩展",
     'version': '2.1',
-    'depends': ['event', 'website_event', 'website_event_track', 'event_option'],
+    'depends': ['event', 'website_event', 'website_event_track', 'event_option', 'operation_contract'],
     'category': 'Marketing/Event_Supervisor',
     'summary': '活动模块的扩展',
     'author': '491Tech',

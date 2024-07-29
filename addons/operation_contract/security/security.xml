@@ -3,30 +3,31 @@
     <record id="operation_dep_contract_read" model="res.groups">
         <field name="name">运营部合同查看</field>
         <field name="category_id" ref="base.module_category_operation_operation_contract"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
     </record>
     <record id="operation_dep_contract_operator" model="res.groups">
         <field name="name">运营部合同录入</field>
         <field name="category_id" ref="base.module_category_operation_operation_contract"/>
-        <field name="implied_ids" eval="[(4, ref('operation_dep_contract_read'))]"/>
+        <field name="implied_ids" eval="[(4, ref('operation_contract.operation_dep_contract_read'))]"/>
     </record>
     <record id="operation_dep_contract_supervisor" model="res.groups">
         <field name="name">运营部合同审批</field>
         <field name="category_id" ref="base.module_category_operation_operation_contract"/>
-        <field name="implied_ids" eval="[(4, ref('operation_dep_contract_read'))]"/>
+        <field name="implied_ids" eval="[(4, ref('operation_contract.operation_dep_contract_read'))]"/>
     </record>
     <record id="estate_management_dep_contract_read" model="res.groups">
         <field name="name">物业部合同查看</field>
         <field name="category_id" ref="base.module_category_operation_operation_contract"/>
-        <field name="implied_ids" eval="[(4, ref('operation_dep_contract_read'))]"/>
+        <field name="implied_ids" eval="[(4, ref('operation_contract.operation_dep_contract_read'))]"/>
     </record>
     <record id="park_project_manager_contract_director" model="res.groups">
         <field name="name">项目总合同审批</field>
         <field name="category_id" ref="base.module_category_operation_operation_contract"/>
-        <field name="implied_ids" eval="[(4, ref('operation_dep_contract_read'))]"/>
+        <field name="implied_ids" eval="[(4, ref('operation_contract.operation_dep_contract_read'))]"/>
     </record>
     <record id="park_project_manager_contract_chairman" model="res.groups">
         <field name="name">董事长合同审批</field>
         <field name="category_id" ref="base.module_category_operation_operation_contract"/>
-        <field name="implied_ids" eval="[(4, ref('operation_dep_contract_read'))]"/>
+        <field name="implied_ids" eval="[(4, ref('operation_contract.operation_dep_contract_read'))]"/>
     </record>
 </odoo>

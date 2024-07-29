@@ -1,58 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo><data>
+<odoo>
+    <data>
 
-    <record id="view_event_form_extend" model="ir.ui.view">
-        <field name="name">event.extend.event.view.form</field>
-        <field name="model">event.event</field>
-        <field name="inherit_id" ref="website_event.event_event_view_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[@name='event_menu_configuration']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-            <xpath expr="//field[@name='date_tz']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-            <xpath expr="//field[@name='lang']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-            <xpath expr="//field[@name='event_type_id']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-            <xpath expr="//sheet/group/group" position="inside">
-                <label for="note" string="说明" />
-                <br />
-                <field nolabel="1" colspan="2" name="note"
-                    placeholder="活动详情备注，联系人信息等" />
-            </xpath>
-            <xpath expr="//group[@name='right_event_details']" position="after">
-                <group name="event_details_extend">
-                    <field name="event_location_id" string="活动地点" widget="many2many_tags"/>
-                    <field name="event_map" string="活动地图"/>
-                    <label for="seats_limited" string="人数限制"/>
-                    <div>
-                        <field name="seats_limited"/>
-                        <span invisible="not seats_limited" required="not seats_limited">不超过 <field name="seats_max" class="oe_inline o_input_9ch"/> 人</span>
+        <record id="view_event_form_extend" model="ir.ui.view">
+            <field name="name">event.extend.event.view.form</field>
+            <field name="model">event.event</field>
+            <field name="inherit_id" ref="website_event.event_event_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form" position="attributes">
+                    <attribute name="create">page_editable</attribute>
+                </xpath>
+                <xpath expr="//form//header" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//div[@name='event_menu_configuration']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//form//header" position="after">
+                    <header>
+                        <group>
+                            <field name="page_editable" invisible="1"/>
+                            <field name="date_editable" invisible="1"/>
+                            <label for="contract_visible" string="引用合同"/>
+                            <div>
+                                <field name="contract_visible"/>
+                                <span invisible="not contract_visible" required="not reference_contract_id">
+                                    <field name="reference_contract_id" class="oe_inline" placeholder="请选择运营合同"
+                                           required="contract_visible"/>
+                                </span>
+                            </div>
+                        </group>
+                        <field name="stage_id" widget="statusbar" options="{'clickable': '1'}"/>
+                    </header>
+                </xpath>
+                <xpath expr="//sheet/group/group" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//group[@name='right_event_details']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <!--                <xpath expr="//field[@name='date_tz']" position="attributes">-->
+                <!--                    <attribute name="invisible">1</attribute>-->
+                <!--                </xpath>-->
+                <!--                <xpath expr="//field[@name='date_begin']" position="attributes">-->
+                <!--                    <attribute name="readonly">not date_editable</attribute>-->
+                <!--                </xpath>-->
+                <!--                <xpath expr="//field[@name='date_end']" position="attributes">-->
+                <!--                    <attribute name="readonly">not date_editable</attribute>-->
+                <!--                </xpath>-->
+                <!--                <xpath expr="//field[@name='lang']" position="attributes">-->
+                <!--                    <attribute name="invisible">1</attribute>-->
+                <!--                </xpath>-->
+                <!--                <xpath expr="//field[@name='event_type_id']" position="attributes">-->
+                <!--                    <attribute name="invisible">1</attribute>-->
+                <!--                </xpath>-->
+                <xpath expr="//group[@name='right_event_details']" position="after">
+                    <group name="event_details_extend_left" col="1">
+                        <group>
+                            <field name="date_begin" widget="daterange" options="{'end_date_field': 'date_end'}"
+                                   readonly="not date_editable"/>
+                            <field name="date_end" invisible="1"/>
+                            <label for="note" string="活动内容"/>
+                            <div class="o_field_html">
+                                <h5>
+                                    <field nolabel="1" colspan="2" name="note" placeholder="活动详情备注，联系人信息等"/>
+                                </h5>
+                            </div>
+                        </group>
+                        <group col="2">
+                            <group string="公司信息">
+                                <field name="event_company_id" readonly="not page_editable"/>
+                                <field name="event_company_charger_id" readonly="not page_editable"/>
+                                <field name="event_company_charger_phone" readonly="not page_editable"/>
+                                <field name="event_company_charger_mobile" readonly="not page_editable"/>
+                            </group>
+                            <group string="现场负责人">
+                                <field name="op_person_id" string="现场负责人" readonly="page_editable"
+                                       options="{'no_open': True}" invisible="page_editable"/>
+                                <field name="op_person_id" string="现场负责人" readonly="not page_editable"
+                                       invisible="not page_editable"/>
+                                <field name="op_person_mobile" class="oe_inline"/>
+                            </group>
+                        </group>
+                    </group>
+                    <group name="event_details_extend_right" col="1">
+                        <group>
+                            <field name="event_location_id" string="活动地点" widget="many2many_tags"/>
+                            <field name="tag_ids" string="活动类型" widget="many2many_tags"
+                                   options="{'color_field': 'color', 'no_quick_create': True}"/>
+                            <field name="event_map" string="活动地图"/>
+                            <label for="seats_limited" string="人数限制"/>
+                            <div>
+                                <field name="seats_limited"/>
+                                <span invisible="not seats_limited" required="not seats_limited">不超过
+                                    <field name="seats_max" class="oe_inline o_input_9ch"/>
+                                    人
+                                </span>
+                            </div>
+                            <separator/>
+                            <field name="need_electricity_info" placeholder="请输入用电及功率"/>
+                        </group>
+                    </group>
+                    <group col="1" colspan="4">
+                        <group string="物业部门配合的内容及时间">
+                            <field name="need_management_dept_assist_info" string="" placeholder="请输入物业部门配合的内容及时间"/>
+                        </group>
+                        <group string="运营部意见">
+                            <field name="operation_dep_opinion" string="" placeholder="请输入运营部意见"/>
+                        </group>
+                        <field name="event_attachment_ids" widget="many2many_binary"/>
+                    </group>
+                </xpath>
+                <xpath expr="//notebook" position="before">
+                    <field name="stage_id_sequence" invisible="1"/>
+                    <div name="print_buttons" invisible="stage_id_sequence &lt; 10">
+                        <button name="action_print_venue_application" type="object" class="btn btn-primary"
+                                icon="fa-file-pdf-o"
+                                string="场地使用申请书" title="点击打印场地使用申请书" help="财务确认收款后方可打印场地使用申请书"/>
+                        <span>　</span>
+                        <button name="action_print_entry_exit_form" type="object" class="btn btn-primary"
+                                icon="fa-file-pdf-o"
+                                string="进出场单" title="点击打印进出场单" help="财务确认收款后方可打印进出场单"/>
                     </div>
-                </group>
-            </xpath>
-            <xpath expr="//group[@name='right_event_details']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-            <xpath expr="//notebook" position="before">
-                <field name="stage_id_sequence" invisible="1"/>
-                <div name="print_buttons" invisible="stage_id_sequence &lt; 10">
-                    <button name="action_print_venue_application" type="object" class="btn btn-primary" icon="fa-file-pdf-o"
-                            string="场地使用申请书" title="点击打印场地使用申请书" help="财务确认收款后方可打印场地使用申请书" />
-                    <span>　</span>
-                    <button name="action_print_entry_exit_form" type="object" class="btn btn-primary" icon="fa-file-pdf-o"
-                            string="进出场单" title="点击打印进出场单" help="财务确认收款后方可打印进出场单" />
-                </div>
-            </xpath>
-            <xpath expr="//notebook" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
+                </xpath>
+                <xpath expr="//notebook" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
 
-        </field>
-    </record>
+            </field>
+        </record>
 
-</data></odoo>
+    </data>
+</odoo>
