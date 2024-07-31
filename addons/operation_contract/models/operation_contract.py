@@ -712,50 +712,49 @@ class OperationContract(models.Model):
     #             self._origin._message_untrack(['security_check_method'])
     #             self._origin._message_untrack(['security_equipment_method'])
 
-    # # 轻易不要复写基类这样的方法！！！
-    # def _message_log(self, body, subject=None, message_type='notification', **kwargs):
-    #     self.ensure_one()
-    #     contract_amount_field_id = self.env['ir.model.fields']._get('operation.contract.contract', 'contract_amount').id
-    #     op_contract_attachment_filed_id = self.env['ir.model.fields']._get('operation.contract.contract',
-    #                                                                        'op_contract_attachment_ids').id
-    #     security_guard_method_field_id = self.env['ir.model.fields']._get('operation.contract.contract',
-    #                                                                       'security_guard_method').id
-    #     security_check_method_field_id = self.env['ir.model.fields']._get('operation.contract.contract',
-    #                                                                       'security_check_method').id
-    #     security_equipment_method_field_id = self.env['ir.model.fields']._get('operation.contract.contract',
-    #                                                                           'security_equipment_method').id
-    #     _logger.info(
-    #         f"contract_amount_field_id={contract_amount_field_id},"
-    #         f"op_attachment_filed_id={op_contract_attachment_filed_id},"
-    #         f"security_guard_method_field_id={security_guard_method_field_id}，"
-    #         f"security_check_method_field_id={security_check_method_field_id}，"
-    #         f"security_equipment_method_field_id={security_equipment_method_field_id}")
-    #
-    #     for record in self:
-    #         new_tracked_fields = []
-    #         # 当前非编辑stage时，就不应该有上述几个字段的track
-    #         if record.stage_sequence > 10:
-    #             for tracked_value_id in kwargs['tracking_value_ids']:
-    #                 if tracked_value_id[2]['field_id'] in (
-    #                         contract_amount_field_id, security_guard_method_field_id, security_check_method_field_id,
-    #                         security_equipment_method_field_id, op_contract_attachment_filed_id):
-    #                     pass
-    #                     # # 获取所有订阅者
-    #                     # partners = record.message_partner_ids
-    #                     # _logger.info(f"当前partners={partners}")
-    #                     # # 筛选出没有查看权限的用户
-    #                     # excluded_partners = partners.filtered(
-    #                     #     lambda p: p.user_ids.has_group('operation_contract.estate_management_dep_contract_read'))
-    #                     # _logger.info(f"excluded_partners={excluded_partners}")
-    #                     # # 获取允许查看的伙伴 ID
-    #                     # allowed_partners = partners - excluded_partners
-    #                     # _logger.info(f"allowed_partners={allowed_partners}")
-    #                     # # 更新消息的订阅者
-    #                     # kwargs['partner_ids'] = allowed_partners.ids
-    #                 else:
-    #                     new_tracked_fields.append(tracked_value_id)
-    #
-    #             kwargs['tracking_value_ids'] = new_tracked_fields
-    #
-    #     _logger.info(f"kwargs={kwargs}")
-    #     return super()._message_log(subject=subject, message_type=message_type, **kwargs)
+    def _message_log(self, body, subject=None, message_type='notification', **kwargs):
+        self.ensure_one()
+        contract_amount_field_id = self.env['ir.model.fields']._get('operation.contract.contract', 'contract_amount').id
+        op_contract_attachment_filed_id = self.env['ir.model.fields']._get('operation.contract.contract',
+                                                                           'op_contract_attachment_ids').id
+        security_guard_method_field_id = self.env['ir.model.fields']._get('operation.contract.contract',
+                                                                          'security_guard_method').id
+        security_check_method_field_id = self.env['ir.model.fields']._get('operation.contract.contract',
+                                                                          'security_check_method').id
+        security_equipment_method_field_id = self.env['ir.model.fields']._get('operation.contract.contract',
+                                                                              'security_equipment_method').id
+        _logger.info(
+            f"contract_amount_field_id={contract_amount_field_id},"
+            f"op_attachment_filed_id={op_contract_attachment_filed_id},"
+            f"security_guard_method_field_id={security_guard_method_field_id}，"
+            f"security_check_method_field_id={security_check_method_field_id}，"
+            f"security_equipment_method_field_id={security_equipment_method_field_id}")
+
+        for record in self:
+            new_tracked_fields = []
+            # 当前非编辑stage时，就不应该有上述几个字段的track；而编辑阶段，该怎么记就怎么记
+            if record.stage_sequence > 10:
+                for tracked_value_id in kwargs['tracking_value_ids']:
+                    if tracked_value_id[2]['field_id'] in (
+                            contract_amount_field_id, security_guard_method_field_id, security_check_method_field_id,
+                            security_equipment_method_field_id, op_contract_attachment_filed_id):
+                        pass
+                        # # 获取所有订阅者
+                        # partners = record.message_partner_ids
+                        # _logger.info(f"当前partners={partners}")
+                        # # 筛选出没有查看权限的用户
+                        # excluded_partners = partners.filtered(
+                        #     lambda p: p.user_ids.has_group('operation_contract.estate_management_dep_contract_read'))
+                        # _logger.info(f"excluded_partners={excluded_partners}")
+                        # # 获取允许查看的伙伴 ID
+                        # allowed_partners = partners - excluded_partners
+                        # _logger.info(f"allowed_partners={allowed_partners}")
+                        # # 更新消息的订阅者
+                        # kwargs['partner_ids'] = allowed_partners.ids
+                    else:
+                        new_tracked_fields.append(tracked_value_id)
+
+                kwargs['tracking_value_ids'] = new_tracked_fields
+
+        _logger.info(f"_message_log kwargs={kwargs}")
+        return super()._message_log(subject=subject, message_type=message_type, **kwargs)
