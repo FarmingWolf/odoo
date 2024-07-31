@@ -207,7 +207,7 @@ class EventEvent(models.Model):
 
     def write(self, values):
         """Override the write method to enforce custom security checks."""
-        # # 如果stage_id被修改，则先进行权限检查 todo:暂时取消关于stage_id的校验，关于活动完全由运营部负责人负责控制
+        # 取消关于stage_id的校验，关于活动完全由运营部负责人负责控制，保证最大灵活性
         self.check_and_write(values)
 
         return super(EventEvent, self).write(values)

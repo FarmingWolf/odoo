@@ -99,6 +99,8 @@ h1.title {
 
 .grid-line {
     display: flex;
+    vertical-align: middle;
+    text-align: center;
     align-self: center;
     align-items: center;
     height: 100%;
@@ -137,4 +139,18 @@ h1.title {
     border-bottom: 0;
     height: 100%;
     flex: 1 1 auto;
+}
+
+.page {
+  direction: ltr;
+  width: 700px;
+  height: 1035px;
+  margin: var(--page-margin);
+  position: relative;
+  overflow: visible;
+  border: var(--page-border);
+  -o-border-image: var(--page-border-image);
+     border-image: var(--page-border-image);
+  background-clip: content-box;
+  background-color: rgba(255, 255, 255, 1);
 }

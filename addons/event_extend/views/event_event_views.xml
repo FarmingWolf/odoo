@@ -94,8 +94,7 @@
                             <field name="operation_dep_opinion" string="" placeholder="请输入运营部意见"/>
                         </group>
                         <group string="附件">
-                            <field name="event_attachment_ids" options="{'no_create': True}"
-                                   readonly="not page_editable" string=""/>
+                            <field name="event_attachment_ids" options="{'no_create': True}" string=""/>
                         </group>
                     </group>
                 </xpath>

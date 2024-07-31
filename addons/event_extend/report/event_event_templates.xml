@@ -58,7 +58,7 @@
                             六、活动方案（详见附件）<br/>
                             <t t-foreach="event.event_attachment_ids" t-as="item">
                                 <span style="border-bottom: 1px solid #000;" t-esc="item.name"/><br/>
-                            </t>；
+                            </t>
                         </p>
 
                     </div>
@@ -90,242 +90,256 @@
         </style>
         <t t-call="web.html_container">
             <t t-call="web.internal_layout">
-                <t t-foreach="docs" t-as="event">
-                    <div class="enter_exit_form_div" style="border-top: 2px solid black; height: 55px; ">
-                        <div style="column-span: all; margin-top: 10px;">
-                            <span style="font-size: 18px; font-weight: bold;">491空间活动进出场单</span>
+                <div class="page">
+                    <t t-foreach="docs" t-as="event">
+                        <div class="enter_exit_form_div" style="border-top: 2px solid black; height: 5.31%; ">
+                            <div style="column-span: all; margin-top: 10px;">
+                                <span style="font-size: 18px; font-weight: bold;">491空间活动进出场单</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="enter_exit_form_div" style="height: 38px;">
-                        <div class="grid-line">
-                            <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
-                                <span style="margin-top: 10px;">活动名称</span></div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%; padding-top: 5px">
-                                <span t-esc="event.name"/>
+                        <div class="enter_exit_form_div" style="height: 3.67%;">
+                            <div class="grid-line">
+                                <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
+                                    <span style="margin-top: 10px;">活动名称</span></div>
+                                <div class="grid-item-right" style="column-span: 4; width: 80%; padding-top: 5px">
+                                    <span t-esc="event.name"/>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="enter_exit_form_div" style="height: 66px;">
-                        <div class="grid-line" style="column-span: 5">
-                            <div class="grid-item-left" style="column-span: 1; row-span: 2; width: 20%;">
-                                <div style="margin-top: 20px;">
-                                    <span>公司信息</span>
-                                </div>
-                            </div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%">
-                                <div class="grid-line" style="column-span: 4;height: 50%; padding-top: 5px">
-                                    <span>　</span><span t-esc="event.event_company_id.name"/>
-                                </div>
-                                <div class="grid-line" style="column-span: 4;height: 50%">
-                                    <div class="grid-item-left" style="column-span: 1; width: 30%; padding-top: 5px">
-                                        <span>负责人及联系方式</span>
+                        <div class="enter_exit_form_div" style="height: 6.37%;">
+                            <div class="grid-line" style="column-span: 5">
+                                <div class="grid-item-left" style="column-span: 1; row-span: 2; width: 20%;">
+                                    <div style="margin-top: 20px;">
+                                        <span>公司信息</span>
                                     </div>
-                                    <div class="grid-item-right" style="column-span: 3; width: 70%; padding-top: 5px">
-                                        <span t-esc="event.event_company_charger_id"/>　
-                                        <span t-esc="event.event_company_charger_phone"/>　
-                                        <span t-esc="event.event_company_charger_mobile"/>
+                                </div>
+                                <div class="grid-item-right" style="column-span: 4; width: 80%">
+                                    <div class="grid-line" style="column-span: 4;height: 50%; padding-top: 5px">
+                                        <div style="width: 100%">
+                                            <span t-esc="event.event_company_id.name"/><span>　</span>
+                                        </div>
+                                    </div>
+                                    <div class="grid-line" style="column-span: 4;height: 50%">
+                                        <div class="grid-item-left" style="column-span: 1; width: 30%; padding-top: 5px">
+                                            <span>负责人及联系方式</span>
+                                        </div>
+                                        <div class="grid-item-right" style="column-span: 3; width: 70%; padding-top: 5px">
+                                            <span t-esc="event.event_company_charger_id"/>　
+                                            <span t-esc="event.event_company_charger_phone"/>　
+                                            <span t-esc="event.event_company_charger_mobile"/>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="enter_exit_form_div" style="height: 38px">
-                        <div class="grid-line" style="column-span: 5;">
-                            <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
-                                <span>活动区域</span>
-                            </div>
-                            <div class="grid-item-left" style="column-span: 2; width: 40%;">
-                                <span>　</span>
-                                <t t-foreach="event.event_location_id" t-as="location">
-                                    <span t-esc="location.name"/>，
-                                </t>
-                            </div>
-                            <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
-                                <span>参与人数</span>
-                            </div>
-                            <div class="grid-item-right" style="column-span: 1; width: 20%; padding-top: 5px">
-                                <span>　</span>
-                                <span t-esc="event.seats_max"/>
+                        <div class="enter_exit_form_div" style="height: 3.67%">
+                            <div class="grid-line" style="column-span: 5;">
+                                <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
+                                    <span>活动区域</span>
+                                </div>
+                                <div class="grid-item-left" style="column-span: 2; width: 40%;">
+                                    <t t-foreach="event.event_location_id" t-as="location">
+                                        <span t-esc="location.name"/>，
+                                    </t><span>　</span>
+                                </div>
+                                <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
+                                    <span>参与人数</span>
+                                </div>
+                                <div class="grid-item-right" style="column-span: 1; width: 20%; padding-top: 5px">
+                                    <span>　</span>
+                                    <span t-esc="event.seats_max"/><span>　人</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="enter_exit_form_div" style="height: 38px;">
-                        <div class="grid-line">
-                            <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
-                                <span>活动内容</span></div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%; padding-top: 5px">
-                                <span>　</span>
-                                <span t-esc="event.note"/>
+                        <div class="enter_exit_form_div" style="height: 7.3%;">
+                            <div class="grid-line">
+                                <div class="grid-item-left" style="column-span: 1; width: 20%;">
+                                    <div style="margin-top: 25px">
+                                        <span>活动内容</span>
+                                    </div>
+                                </div>
+                                <div class="grid-item-right" style="column-span: 4; width: 80%;">
+                                    <span>　</span>
+                                    <span t-esc="event.note"/>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="enter_exit_form_div" style="height: 66px;">
-                        <div class="grid-line">
-                            <div class="grid-item-left" style="column-span: 1; width: 20%">
-                                <div style="margin-top: 20px">
-                                    <span>活动期限</span>
+                        <div class="enter_exit_form_div" style="height: 5%;">
+                            <div class="grid-line">
+                                <div class="grid-item-left" style="column-span: 1; width: 20%">
+                                    <div style="margin-top: 15px">
+                                        <span>活动期限</span>
+                                    </div>
+                                </div>
+                                <div class="grid-item-right" style="column-span: 4; width: 80%">
+                                    <span t-esc="event.date_begin"/>-<span t-esc="event.date_end"/>
                                 </div>
                             </div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%">
-                                <span t-esc="event.date_begin"/>-<span t-esc="event.date_end"/>
-                            </div>
                         </div>
-                    </div>
 
-                    <div class="enter_exit_form_div" style="height: 38px;">
-                        <div class="grid-line">
-                            <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
-                                <span>需用电及功率</span>
-                            </div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%; padding-top: 5px">
-                                <span>　</span>
-                                <span t-esc="event.need_electricity_info"/>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="enter_exit_form_div" style="height: 150px;">
-                        <div class="grid-line">
-                            <div class="grid-item-left" style="column-span: 1; width: 20%">
-                                <div style="margin-top: 45px">
-                                    <span>物业部门配合<br/>的内容及时间</span>
+                        <div class="enter_exit_form_div" style="height: 3.67%;">
+                            <div class="grid-line">
+                                <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
+                                    <span>需用电及功率</span>
+                                </div>
+                                <div class="grid-item-right" style="column-span: 4; width: 80%; padding-top: 5px">
+                                    <span>　</span>
+                                    <span t-esc="event.need_electricity_info"/>
                                 </div>
                             </div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%; padding-top: 5px">
-                                <span>　</span>
-                                <span t-esc="event.need_management_dept_assist_info"/>
+                        </div>
+                        <div class="enter_exit_form_div" style="height: 14.48%;">
+                            <div class="grid-line">
+                                <div class="grid-item-left" style="column-span: 1; width: 20%">
+                                    <div style="margin-top: 45px">
+                                        <span>物业部门配合<br/>的内容及时间</span>
+                                    </div>
+                                </div>
+                                <div class="grid-item-right" style="column-span: 4; width: 80%; padding-top: 5px">
+                                    <span>　</span>
+                                    <span t-esc="event.need_management_dept_assist_info"/>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="enter_exit_form_div" style="height: 66px;">
-                        <div class="grid-line">
-                            <div class="grid-item-left" style="column-span: 1; width: 20%">
-                                <div style="margin-top: 20px">
-                                    <span>运营部意见</span>
-                                </div>
-                            </div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%; padding-top: 10px">
-                                <span>　</span>
-                                <span t-esc="event.operation_dep_opinion"/>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="enter_exit_form_div" style="height: 300px;">
-                        <div class="grid-line" style="column-span: 5;">
-                            <div class="grid-item-left" style="column-span: 1; width: 20%;">
-                                <div style="margin-top: 60px">
-                                    <span style="font-weight: bold">进场前请联系</span>
-                                    <br/>
-                                    <span style="font-weight: bold; margin-left: 10px">物业负责人：</span>
-                                    <br/><br/><br/><br/><br/><br/>
-                                    <span>物业部意见：</span>
-                                </div>
-                            </div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%; height: 100%;">
-                                <div class="grid-line" style="column-span: 4; width: 100%; text-align: left; height: 26%">
-                                    <div style="margin-left: 3px">
-                                        <span>进场情况描述：</span>
+                        <div class="enter_exit_form_div" style="height: 4%;">
+                            <div class="grid-line">
+                                <div class="grid-item-left" style="column-span: 1; width: 20%">
+                                    <div style="margin-top: 8px">
+                                        <span>运营部意见</span>
                                     </div>
                                 </div>
-                                <div class="grid-line" style="column-span: 4; width: 100%; height: 12%">
-                                    <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
-                                        <span style="margin-top: 10px">进场时间</span>
-                                    </div>
-                                    <div class="grid-item-left" style="column-span: 1; width: 30%;">
-                                        <span>　</span>
-                                    </div>
-                                    <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
-                                        <span style="margin-top: 10px">起始电表数</span>
-                                    </div>
-                                    <div class="grid-item-right" style="column-span: 1; width: 30%;">
-                                        <span>　</span>
-                                    </div>
-                                </div>
-                                <div class="grid-line" style="column-span: 4; width: 100%; height: 13%">
-                                    <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
-                                        <span style="margin-top: 10px">物业方确认</span>
-                                    </div>
-                                    <div class="grid-item-left" style="column-span: 1; width: 30%;">
-                                        <span>　</span>
-                                    </div>
-                                    <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
-                                        <span style="margin-top: 10px">合作方确认</span>
-                                    </div>
-                                    <div class="grid-item-right" style="column-span: 1; width: 30%;">
-                                        <span>　</span>
-                                    </div>
-                                </div>
-                                <div class="grid-item-right" style="column-span: 4; width: 100%; text-align: left; height: 26%">
-                                    <div style="margin-left: 3px">
-                                        <span>出场情况描述：</span>
-                                    </div>
-                                </div>
-                                <div class="grid-line" style="column-span: 4; width: 100%; height: 12%">
-                                    <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
-                                        <span style="margin-top: 10px">出场时间</span>
-                                    </div>
-                                    <div class="grid-item-left" style="column-span: 1; width: 30%;">
-                                        <span>　</span>
-                                    </div>
-                                    <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
-                                        <span style="margin-top: 10px">结束电表数</span>
-                                    </div>
-                                    <div class="grid-item-right" style="column-span: 1; width: 30%;">
-                                        <span>　</span>
-                                    </div>
-                                </div>
-                                <div class="grid-line" style="column-span: 4; width: 100%; height: 13%">
-                                    <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px;">
-                                        <span style="margin-top: 10px;">物业方确认</span>
-                                    </div>
-                                    <div class="grid-item-left" style="column-span: 1; width: 30%;">
-                                        <span>　</span>
-                                    </div>
-                                    <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
-                                        <span style="margin-top: 10px">合作方确认</span>
-                                    </div>
-                                    <div class="grid-item-right" style="column-span: 1; width: 30%;">
-                                        <span>　</span>
-                                    </div>
+                                <div class="grid-item-right" style="column-span: 4; width: 80%; padding-top: 8px">
+                                    <span>　</span>
+                                    <span t-esc="event.operation_dep_opinion"/>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        <div class="enter_exit_form_div" style="height: 25%;">
+                            <div class="grid-line" style="column-span: 5;">
+                                <div class="grid-item-left" style="column-span: 1; width: 20%; height: 100%;">
+                                    <div style="margin-top: 60px">
+                                        <span style="font-weight: bold">进场前请联系</span>
+                                        <br/>
+                                        <span style="font-weight: bold; margin-left: 10px">物业负责人：</span>
+                                        <br/><br/><br/><br/><br/><br/>
+                                        <span>物业部意见：</span>
+                                    </div>
+                                </div>
+                                <div class="grid-item-right" style="column-span: 4; width: 80%; height: 100%;">
+                                    <div style="height: 50%">
+                                        <div class="grid-line" style="column-span: 4; width: 100%; text-align: left; height: 50%">
+                                            <div style="margin-left: 3px">
+                                                <span>进场情况描述：</span>
+                                            </div>
+                                        </div>
+                                        <div style="height: 50%">
+                                            <div class="grid-line" style="column-span: 4; width: 100%; height: 50%">
+                                                <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
+                                                    <span style="margin-top: 10px">进场时间</span>
+                                                </div>
+                                                <div class="grid-item-left" style="column-span: 1; width: 30%;">
+                                                    <span>　</span>
+                                                </div>
+                                                <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
+                                                    <span style="margin-top: 10px">起始电表数</span>
+                                                </div>
+                                                <div class="grid-item-right" style="column-span: 1; width: 30%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-line" style="column-span: 4; width: 100%; height: 50%">
+                                                <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
+                                                    <span style="margin-top: 10px">物业方确认</span>
+                                                </div>
+                                                <div class="grid-item-left" style="column-span: 1; width: 30%;">
+                                                    <span>　</span>
+                                                </div>
+                                                <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
+                                                    <span style="margin-top: 10px">合作方确认</span>
+                                                </div>
+                                                <div class="grid-item-right" style="column-span: 1; width: 30%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="height: 50%">
+                                        <div class="grid-item-right" style="column-span: 4; width: 100%; text-align: left; height: 50%">
+                                            <div style="margin-left: 3px">
+                                                <span>出场情况描述：</span>
+                                            </div>
+                                        </div>
+                                        <div style="height: 50%">
+                                            <div class="grid-line" style="column-span: 4; width: 100%; height: 50%">
+                                                <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
+                                                    <span style="margin-top: 10px">出场时间</span>
+                                                </div>
+                                                <div class="grid-item-left" style="column-span: 1; width: 30%;">
+                                                    <span>　</span>
+                                                </div>
+                                                <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
+                                                    <span style="margin-top: 10px">结束电表数</span>
+                                                </div>
+                                                <div class="grid-item-right" style="column-span: 1; width: 30%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-line" style="column-span: 4; width: 100%; height: 50%">
+                                                <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px;">
+                                                    <span style="margin-top: 10px;">物业方确认</span>
+                                                </div>
+                                                <div class="grid-item-left" style="column-span: 1; width: 30%;">
+                                                    <span>　</span>
+                                                </div>
+                                                <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 5px">
+                                                    <span style="margin-top: 10px">合作方确认</span>
+                                                </div>
+                                                <div class="grid-item-right" style="column-span: 1; width: 30%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="enter_exit_form_div" style="height: 66px;">
-                        <div class="grid-line">
-                            <div class="grid-item-left" style="column-span: 1; width: 20%">
-                                <div style="margin-top: 20px">
-                                    <span>财务部意见</span>
+                        <div class="enter_exit_form_div" style="height: 6.37%;">
+                            <div class="grid-line">
+                                <div class="grid-item-left" style="column-span: 1; width: 20%">
+                                    <div style="margin-top: 20px">
+                                        <span>财务部意见</span>
+                                    </div>
+                                </div>
+                                <div class="grid-item-right" style="column-span: 4; width: 80%">
+                                    <span>　</span>
                                 </div>
                             </div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%">
-                                <span>　</span>
-                            </div>
                         </div>
-                    </div>
 
-                    <div class="enter_exit_form_div" style="height: 66px; border-bottom: 2px solid black">
-                        <div class="grid-line">
-                            <div class="grid-item-left" style="column-span: 1; width: 20%">
-                                <div style="margin-top: 20px">
-                                    <span>主管领导意见</span>
+                        <div class="enter_exit_form_div" style="height: 6.37%; border-bottom: 2px solid black">
+                            <div class="grid-line">
+                                <div class="grid-item-left" style="column-span: 1; width: 20%">
+                                    <div style="margin-top: 20px">
+                                        <span>主管领导意见</span>
+                                    </div>
+                                </div>
+                                <div class="grid-item-right" style="column-span: 4; width: 80%">
+                                    <span>　</span>
                                 </div>
                             </div>
-                            <div class="grid-item-right" style="column-span: 4; width: 80%">
-                                <span>　</span>
-                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <span>此表格由业务人员发起，最终用于结算押金费用。进场前活动方负责人联系物业负责人，方可进场。无此单据，不可结算押金及退款。</span>
-                    </div>
-                </t>
+                        <div>
+                            <span>此表格由业务人员发起，最终用于结算押金费用。进场前活动方负责人联系物业负责人，方可进场。无此单据，不可结算押金及退款。</span>
+                        </div>
+                    </t>
+                </div>
             </t>
         </t>
     </template>
