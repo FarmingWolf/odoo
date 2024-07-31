@@ -94,6 +94,23 @@ class ResPartner(models.Model):
         return default_result
 
 
+class IrAttachment(models.Model):
+    _name = 'ir.attachment'
+    _description = 'Attachment'
+    _inherit = ['ir.attachment']
+    _order = 'id desc'
+
+    @api.model
+    def default_get(self, fields_list):
+        _logger.info(f"进入ir.attachment form时fields_list={fields_list}")
+
+        default_result = super().default_get(fields_list)
+        if 'public' in fields_list:
+            default_result['public'] = True
+
+        return default_result
+
+
 def _compute_date_begin_end(fields_list, default_result):
     if 'date_begin' in fields_list and 'date_begin' not in default_result:
         now = fields.Datetime.now()
@@ -143,13 +160,13 @@ class OperationContract(models.Model):
                                       default=lambda self: fields.Date.context_today(self))
     date_begin = fields.Datetime(copy=False, string="合同开始日期", tracking=True)
     date_end = fields.Datetime(copy=False, string="合同结束日期", tracking=True)
-    contract_amount = fields.Float(string="合同金额（元）", copy=False, default=0.0, digits=(16, 2))
+    contract_amount = fields.Float(string="合同金额（元）", copy=False, default=0.0, digits=(16, 2), tracking=False)
     description = fields.Html(string='合同详情', store=True, readonly=False)
     event_location_id = fields.Many2many('event.track.location', 'operation_contract_location_rel', 'contract_id',
                                          'location_id', string='活动地点', copy=False, tracking=True)
     event_tag_ids = fields.Many2many('event.tag', 'operation_contract_event_tag_rel', 'contract_id',
                                      'tag_id', string="活动类型", readonly=False, store=True, tracking=True)
-    attachment_ids = fields.Many2many('ir.attachment', string="附件", copy=False)
+    op_contract_attachment_ids = fields.Many2many('ir.attachment', string="附件", copy=False, tracking=False)
 
     def _get_default_stage_id(self):
         return self.env['operation.contract.stage'].search([], limit=1)
@@ -632,26 +649,27 @@ class OperationContract(models.Model):
         _logger.info(f"当前{self.env.user}在更新")
         _logger.info(f"更新内容有：{vals}")
 
-        if not vals.get('security_guard_method'):
-            for record in self:
-                vals['security_guard_method'] = int(record.security_guard_method)
-                track_messages = record.message_ids.filtered(
-                    lambda m: m.subtype_id == self.env.ref('mail.mt_note') and 'security_guard_method' in m.body)
-                track_messages.write({'needaction_partner_ids': [(6, 0, [])]})
+        # if not vals.get('security_guard_method'):
+        #     for record in self:
+        #         vals['security_guard_method'] = int(record.security_guard_method)
+        #         track_messages = record.message_ids.filtered(
+        #             lambda m: m.subtype_id == self.env.ref('mail.mt_note') and 'security_guard_method' in m.body)
+        #         track_messages.write({'needaction_partner_ids': [(6, 0, [])]})
+        #
+        # if not vals.get('security_check_method'):
+        #     for record in self:
+        #         vals['security_check_method'] = int(record.security_check_method)
+        #         track_messages = record.message_ids.filtered(
+        #             lambda m: m.subtype_id == self.env.ref('mail.mt_note') and 'security_check_method' in m.body)
+        #         track_messages.write({'needaction_partner_ids': [(6, 0, [])]})
+        #
+        # if not vals.get('security_equipment_method'):
+        #     for record in self:
+        #         vals['security_equipment_method'] = int(record.security_equipment_method)
+        #         track_messages = record.message_ids.filtered(
+        #             lambda m: m.subtype_id == self.env.ref('mail.mt_note') and 'security_equipment_method' in m.body)
+        #         track_messages.write({'needaction_partner_ids': [(6, 0, [])]})
 
-        if not vals.get('security_check_method'):
-            for record in self:
-                vals['security_check_method'] = int(record.security_check_method)
-                track_messages = record.message_ids.filtered(
-                    lambda m: m.subtype_id == self.env.ref('mail.mt_note') and 'security_check_method' in m.body)
-                track_messages.write({'needaction_partner_ids': [(6, 0, [])]})
-
-        if not vals.get('security_equipment_method'):
-            for record in self:
-                vals['security_equipment_method'] = int(record.security_equipment_method)
-                track_messages = record.message_ids.filtered(
-                    lambda m: m.subtype_id == self.env.ref('mail.mt_note') and 'security_equipment_method' in m.body)
-                track_messages.write({'needaction_partner_ids': [(6, 0, [])]})
 
         res = super(OperationContract, self).write(vals)
         return res
@@ -694,10 +712,12 @@ class OperationContract(models.Model):
     #             self._origin._message_untrack(['security_check_method'])
     #             self._origin._message_untrack(['security_equipment_method'])
 
+    # # 轻易不要复写基类这样的方法！！！
     # def _message_log(self, body, subject=None, message_type='notification', **kwargs):
     #     self.ensure_one()
     #     contract_amount_field_id = self.env['ir.model.fields']._get('operation.contract.contract', 'contract_amount').id
-    #     attachment_filed_id = self.env['ir.model.fields']._get('operation.contract.contract', 'attachment_ids').id
+    #     op_contract_attachment_filed_id = self.env['ir.model.fields']._get('operation.contract.contract',
+    #                                                                        'op_contract_attachment_ids').id
     #     security_guard_method_field_id = self.env['ir.model.fields']._get('operation.contract.contract',
     #                                                                       'security_guard_method').id
     #     security_check_method_field_id = self.env['ir.model.fields']._get('operation.contract.contract',
@@ -705,7 +725,8 @@ class OperationContract(models.Model):
     #     security_equipment_method_field_id = self.env['ir.model.fields']._get('operation.contract.contract',
     #                                                                           'security_equipment_method').id
     #     _logger.info(
-    #         f"contract_amount_field_id={contract_amount_field_id},attachment_filed_id={attachment_filed_id},"
+    #         f"contract_amount_field_id={contract_amount_field_id},"
+    #         f"op_attachment_filed_id={op_contract_attachment_filed_id},"
     #         f"security_guard_method_field_id={security_guard_method_field_id}，"
     #         f"security_check_method_field_id={security_check_method_field_id}，"
     #         f"security_equipment_method_field_id={security_equipment_method_field_id}")
@@ -716,8 +737,8 @@ class OperationContract(models.Model):
     #         if record.stage_sequence > 10:
     #             for tracked_value_id in kwargs['tracking_value_ids']:
     #                 if tracked_value_id[2]['field_id'] in (
-    #                         security_guard_method_field_id, security_check_method_field_id,
-    #                         security_equipment_method_field_id):
+    #                         contract_amount_field_id, security_guard_method_field_id, security_check_method_field_id,
+    #                         security_equipment_method_field_id, op_contract_attachment_filed_id):
     #                     pass
     #                     # # 获取所有订阅者
     #                     # partners = record.message_partner_ids

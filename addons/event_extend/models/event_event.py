@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 class EventEvent(models.Model):
     _inherit = 'event.event'
 
-    event_map = fields.Image(string='活动地图', max_width=1024, max_height=1024, tracking=True)
+    event_map = fields.Image(string='活动地图', max_width=1024, max_height=1024)
     event_location_id = fields.Many2many('event.track.location', 'even_location_rel', 'event_id', 'location_id',
                                          string='Event Location', copy=False, tracking=True, store=True,
                                          compute="_compute_contract_info", precompute=True, readonly=False)
@@ -57,7 +57,7 @@ class EventEvent(models.Model):
     user_id = fields.Many2one('res.users', string='Responsible', tracking=True, store=True,
                               default=lambda self: self.env.user)
     note = fields.Html(string='活动内容', store=True, compute="_compute_contract_info", precompute=True, readonly=False)
-    event_attachment_ids = fields.Many2many('ir.attachment', string="附件", copy=False)
+    event_attachment_ids = fields.Many2many('ir.attachment', string="附件", copy=False, tracking=True)
 
     @api.depends('reference_contract_id', 'event_company_id')
     def _compute_company_info(self):

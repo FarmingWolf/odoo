@@ -2,6 +2,40 @@
 <odoo>
     <data>
 
+        <record id="operation_contract_view_ir_attachment_tree" model="ir.ui.view">
+            <field name="name">operation.contract.ir.attachment.view.tree</field>
+            <field name="model">ir.attachment</field>
+            <field name="inherit_id" ref="website.view_attachment_tree_inherit_website"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree/field[@name='website_id']" position="attributes">
+                    <attribute name="column_invisible">True</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='res_model']" position="attributes">
+                    <attribute name="column_invisible">True</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='res_field']" position="attributes">
+                    <attribute name="column_invisible">True</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='res_id']" position="attributes">
+                    <attribute name="column_invisible">True</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='type']" position="attributes">
+                    <attribute name="column_invisible">True</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="operation_contract_view_ir_attachment_form" model="ir.ui.view">
+            <field name="name">operation.contract.ir.attachment.form</field>
+            <field name="model">ir.attachment</field>
+            <field name="inherit_id" ref="website.view_attachment_form_inherit_website"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='website_id']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+            </field>
+        </record>
+
         <record id="view_partner_form" model="ir.ui.view">
             <field name="name">operation.contract.partner.view.form</field>
             <field name="model">res.partner</field>
@@ -151,9 +185,11 @@
                                     <field nolabel="1" colspan="2" name="description"
                                            placeholder="请输入合同活动内容，如：活动方案、嘉宾流程、搭建方案等"
                                            readonly="not page_editable"/>
-                                    <field name="attachment_ids" widget="many2many_binary" options="{'no_create': True}"
-                                           groups="!operation_contract.estate_management_dep_contract_read"
-                                           readonly="not page_editable"/>
+                                    <group string="附件">
+                                        <field name="op_contract_attachment_ids" options="{'no_create': True}"
+                                               groups="!operation_contract.estate_management_dep_contract_read"
+                                               readonly="not page_editable" string=""/>
+                                    </group>
                                 </h5>
                             </div>
                         </group>
@@ -243,7 +279,7 @@
                         </group>
                     </sheet>
                     <div class="oe_chatter">
-                        <field name="message_follower_ids" groups="base.group_user"/>
+                        <field name="message_follower_ids"/>
                         <field name="activity_ids"/>
                         <field name="message_ids"/>
                     </div>

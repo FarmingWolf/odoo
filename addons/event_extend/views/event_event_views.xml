@@ -39,21 +39,6 @@
                 <xpath expr="//group[@name='right_event_details']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
-                <!--                <xpath expr="//field[@name='date_tz']" position="attributes">-->
-                <!--                    <attribute name="invisible">1</attribute>-->
-                <!--                </xpath>-->
-                <!--                <xpath expr="//field[@name='date_begin']" position="attributes">-->
-                <!--                    <attribute name="readonly">not date_editable</attribute>-->
-                <!--                </xpath>-->
-                <!--                <xpath expr="//field[@name='date_end']" position="attributes">-->
-                <!--                    <attribute name="readonly">not date_editable</attribute>-->
-                <!--                </xpath>-->
-                <!--                <xpath expr="//field[@name='lang']" position="attributes">-->
-                <!--                    <attribute name="invisible">1</attribute>-->
-                <!--                </xpath>-->
-                <!--                <xpath expr="//field[@name='event_type_id']" position="attributes">-->
-                <!--                    <attribute name="invisible">1</attribute>-->
-                <!--                </xpath>-->
                 <xpath expr="//group[@name='right_event_details']" position="after">
                     <group name="event_details_extend_left" col="1">
                         <group>
@@ -108,7 +93,10 @@
                         <group string="运营部意见">
                             <field name="operation_dep_opinion" string="" placeholder="请输入运营部意见"/>
                         </group>
-                        <field name="event_attachment_ids" widget="many2many_binary"/>
+                        <group string="附件">
+                            <field name="event_attachment_ids" options="{'no_create': True}"
+                                   readonly="not page_editable" string=""/>
+                        </group>
                     </group>
                 </xpath>
                 <xpath expr="//notebook" position="before">

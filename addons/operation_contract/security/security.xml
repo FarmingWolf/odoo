@@ -3,7 +3,6 @@
     <record id="operation_dep_contract_read" model="res.groups">
         <field name="name">运营部合同查看</field>
         <field name="category_id" ref="base.module_category_operation_operation_contract"/>
-        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
     </record>
     <record id="operation_dep_contract_operator" model="res.groups">
         <field name="name">运营部合同录入</field>
