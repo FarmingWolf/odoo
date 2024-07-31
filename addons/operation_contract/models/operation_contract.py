@@ -133,7 +133,8 @@ class OperationContract(models.Model):
                               store=True)
 
     page_editable = fields.Boolean("page_editable", readonly=True, store=False, compute="_compute_page_editable")
-    op_person_id = fields.Many2one('hr.employee', string='经办人', default=lambda self: self._get_employee())
+    op_person_id = fields.Many2one('hr.employee', string='经办人', tracking=True,
+                                   default=lambda self: self._get_employee())
     active = fields.Boolean(default=True)
     user_id = fields.Many2one('res.users', string='Responsible', default=lambda self: self.env.user)
 
@@ -154,7 +155,7 @@ class OperationContract(models.Model):
     partner_charger_mobile = fields.Char(string='责任手机', compute='_compute_contact_info', readonly=True)
     partner_charger_position = fields.Char(string='责任人职务', compute='_compute_contact_info', readonly=True)
 
-    comments = fields.Text(string="备注")
+    comments = fields.Text(string="备注", tracking=True)
 
     date_approval_begin = fields.Date(copy=False, string="审批发起日期", readonly=True,
                                       default=lambda self: fields.Date.context_today(self))
@@ -669,7 +670,6 @@ class OperationContract(models.Model):
         #         track_messages = record.message_ids.filtered(
         #             lambda m: m.subtype_id == self.env.ref('mail.mt_note') and 'security_equipment_method' in m.body)
         #         track_messages.write({'needaction_partner_ids': [(6, 0, [])]})
-
 
         res = super(OperationContract, self).write(vals)
         return res
