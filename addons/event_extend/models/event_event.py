@@ -134,7 +134,7 @@ class EventEvent(models.Model):
                 record.event_company_charger_mobile = record.reference_contract_id.partner_charger_mobile
 
             else:
-                record.name = False
+                record.name = ''
                 record.date_begin = fields.Datetime.now().replace(second=0, microsecond=0) + timedelta(
                     minutes=-fields.Datetime.now().minute % 30)
                 record.date_end = record.date_begin + timedelta(days=1)

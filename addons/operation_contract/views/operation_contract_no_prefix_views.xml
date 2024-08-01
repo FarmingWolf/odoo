@@ -39,6 +39,7 @@
     </record>
 
     <record id="operation_contract_no_prefix_menu" model="ir.ui.menu">
+        <field name="name">运营合同编号前缀</field>
         <field name="action" ref="operation_contract_no_prefix_action"/>
     </record>
 
