@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- 列表视图 -->
+        <record id="view_accounting_subject_tree" model="ir.ui.view">
+            <field name="name">accounting.subject.subject.tree</field>
+            <field name="model">accounting.subject.subject</field>
+            <field name="arch" type="xml">
+<!--                <tree string="会计科目" default_group_by="parent_id" expand="True" editable="bottom" 这个分组有点乱-->
+                <tree string="会计科目" editable="bottom"
+                      decoration-bf="level==0" decoration-muted="level==1" decoration-info="level==2"
+                      decoration-success="level==3" decoration-warning="level==4" decoration-danger="level&gt;5">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="level"/>
+                    <field name="parent_id" widget="many2one"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- 表单视图 -->
+        <record id="view_accounting_subject_form" model="ir.ui.view">
+            <field name="name">accounting.subject.subject.form</field>
+            <field name="model">accounting.subject.subject</field>
+            <field name="arch" type="xml">
+                <form string="Accounting Subject">
+                    <sheet>
+                        <group>
+                            <field name="name" required="1"/>
+                            <field name="code" required="1"/>
+                            <field name="description"/>
+                            <field name="parent_id" widget="many2one"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- 动作记录 -->
+        <record id="action_accounting_subject" model="ir.actions.act_window">
+            <field name="name">会计科目</field>
+            <field name="res_model">accounting.subject.subject</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- 菜单项 -->
+        <menuitem id="menu_accounting_subject_subject" groups="base.group_user" name="会计科目"
+                  action="action_accounting_subject"/>
+    </data>
+</odoo>
