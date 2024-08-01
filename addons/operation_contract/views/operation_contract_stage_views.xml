@@ -64,7 +64,7 @@
     </record>
 
     <record id="operation_contract_stage_menu" model="ir.ui.menu">
-        <field name="name">运营合同阶段</field>
+        <field name="name">operation.contract.stage.menu</field>
         <field name="action" ref="operation_contract_stage_action"/>
     </record>
 
