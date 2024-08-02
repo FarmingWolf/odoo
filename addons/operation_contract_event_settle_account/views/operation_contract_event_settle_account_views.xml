@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="operation_contract_event_settle_account_group_view_tree" model="ir.ui.view">
+            <field name="name">operation.contract.event.settle.account.group.view.tree</field>
+            <field name="model">operation.contract.event.settle.account.group</field>
+            <field name="arch" type="xml">
+                <tree string="合同活动结算">
+                    <field name="op_date_time" widget="date"/>
+                    <field name="event_id"/>
+                    <field name="operation_contract_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="operation_contract_event_settle_account_group_view_form" model="ir.ui.view">
+            <field name="name">operation.contract.event.settle.account.group.view.form</field>
+            <field name="model">operation.contract.event.settle.account.group</field>
+            <field name="arch" type="xml">
+                <form string="合同活动结算">
+                    <sheet>
+                        <group colspan="4" col="2">
+                            <group>
+                                <field name="event_id" options="{'no_open': True, 'no_create': True}"/>
+                            </group>
+                            <group>
+                                <field name="operation_contract_id" options="{'no_open': True, 'no_create': True}"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="operation_contract_event_settle_account_ids" context="{'default_group_id': id}">
+                                <tree string="结算事项" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="business_items_id" placeholder='结算事项'/>
+                                    <field name="accounting_subject_id" placeholder='会计科目'/>
+                                    <field name="settle_amount"/>
+                                    <field name="description"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="operation_contract_event_settle_account_group_action_tree" model="ir.actions.act_window" >
+            <field name="name">合同活动结算</field>
+            <field name="res_model">operation.contract.event.settle.account.group</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    创建结算
+                </p><p>
+                    按合同/活动分组管理分别进行结算。
+                </p>
+            </field>
+        </record>
+
+        <!-- operation.contract.event.settle.account VIEWS -->
+        <record id="operation_contract_event_settle_account_view_tree" model="ir.ui.view">
+            <field name="name">operation.contract.event.settle.account.view.tree</field>
+            <field name="model">operation.contract.event.settle.account</field>
+            <field name="arch" type="xml">
+                <tree string="结算事项清单">
+                    <field name="sequence" widget="handle"/>
+                    <field name="group_id" invisible="1"/>
+                    <field name="business_items_id"/>
+                    <field name="accounting_subject_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="operation_contract_event_settle_account_view_form" model="ir.ui.view">
+            <field name="name">operation.contract.event.settle.account.form</field>
+            <field name="model">operation.contract.event.settle.account</field>
+            <field name="arch" type="xml">
+                <form string="结算事项">
+                    <sheet>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="group_id" options="{'no_quick_create':True}" widget="many2one"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_operation_contract_event_settle_account_group" model="ir.actions.act_window">
+            <field name="name">合同活动结算</field>
+            <field name="res_model">operation.contract.event.settle.account.group</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- 菜单项 -->
+        <menuitem id="menu_operation_contract_event_settle_account_group" groups="base.group_user" name="合同活动结算"
+                  action="action_operation_contract_event_settle_account_group"/>
+        <menuitem name="结算事项设置" id="business_items_setting" sequence="3"
+                  parent="menu_operation_contract_event_settle_account_group"
+                  action="business_items.business_items_group_action_tree"/>
+    </data>
+</odoo>

@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="business_items_group_view_tree" model="ir.ui.view">
+            <field name="name">business.items.group.view.tree</field>
+            <field name="model">business.items.group</field>
+            <field name="arch" type="xml">
+                <tree string="Business Items">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="option_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="business_items_group_view_form" model="ir.ui.view">
+            <field name="name">business.items.group.view.form</field>
+            <field name="model">business.items.group</field>
+            <field name="arch" type="xml">
+                <form string="Business Items">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field nolabel="1" name="name" placeholder='例如："运营活动"'/></h1>
+                        </div>
+                        <group>
+                            <field name="option_ids" context="{'default_group_id': id}">
+                                <tree string="Options" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name" placeholder='例如："场景搭建"'/>
+                                    <field name="color" widget="color_picker"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="business_items_group_action_tree" model="ir.actions.act_window" >
+            <field name="name">事项分组</field>
+            <field name="res_model">business.items.group</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    创建日常业务事项分组
+                </p><p>
+                    分组管理业务事项，可用于工程物业、运营、财务等各部门业务事项等等。
+                </p>
+            </field>
+        </record>
+
+        <!-- business.items VIEWS -->
+        <record id="business_items_view_tree" model="ir.ui.view">
+            <field name="name">business.items.view.tree</field>
+            <field name="model">business.items</field>
+            <field name="arch" type="xml">
+                <tree string="Business Items Groups">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="group_id" options="{'no_quick_create':True}"/>
+                    <field name="color" widget="color_picker"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="business_items_view_form" model="ir.ui.view">
+            <field name="name">business.items.view.form</field>
+            <field name="model">business.items</field>
+            <field name="arch" type="xml">
+                <form string="Business Items Option">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="group_id" options="{'no_quick_create':True}" widget="many2one"/>
+                            <field name="color" widget="color_picker"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

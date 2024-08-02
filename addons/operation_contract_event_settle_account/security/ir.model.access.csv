@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_operation_contract_event_settle_account_all,operation.contract.event.settle.account.all,model_operation_contract_event_settle_account,base.group_user,1,0,0,0
+access_operation_contract_event_settle_account_manager,operation.contract.event.settle.account.manager,model_operation_contract_event_settle_account,account.group_account_manager,1,1,1,1
+access_operation_contract_event_settle_account_group_all,operation.contract.event.settle.account.group.all,model_operation_contract_event_settle_account_group,base.group_user,1,0,0,0
+access_operation_contract_event_settle_account_group_manager,operation.contract.event.settle.account.group.manager,model_operation_contract_event_settle_account_group,account.group_account_manager,1,1,1,1
