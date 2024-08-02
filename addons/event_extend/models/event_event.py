@@ -62,30 +62,36 @@ class EventEvent(models.Model):
     @api.depends('reference_contract_id', 'event_company_id')
     def _compute_company_info(self):
         for record in self:
-            # 查找partner的child_ids中is_company=False的记录，这通常代表个人联系人
-            contact = record.event_company_id.child_ids.filtered(lambda r: not r.is_company)
-            if contact:
-                for each_c in contact:
-                    check_str = str(each_c.name) + str(each_c.title.name) + str(each_c.function) + str(each_c.comment)
-                    _logger.info(f"check_str=[{check_str}]")
-                    if '责' in check_str:
-                        record.event_company_charger_id = each_c.name
-                        record.event_company_charger_phone = each_c.phone
-                        record.event_company_charger_mobile = each_c.mobile
-                    elif '联' in check_str:
-                        record.event_company_charger_id = each_c.name
-                        record.event_company_charger_phone = each_c.phone
-                        record.event_company_charger_mobile = each_c.mobile
+            if not record.reference_contract_id.partner_charger_id:
+                # 查找partner的child_ids中is_company=False的记录，这通常代表个人联系人
+                contact = record.event_company_id.child_ids.filtered(lambda r: not r.is_company)
+                if contact:
+                    for each_c in contact:
+                        check_str = str(each_c.name) + str(each_c.title.name) + str(each_c.function) + str(
+                            each_c.comment)
+                        _logger.info(f"check_str=[{check_str}]")
+                        if '责' in check_str:
+                            record.event_company_charger_id = each_c.name
+                            record.event_company_charger_phone = each_c.phone
+                            record.event_company_charger_mobile = each_c.mobile
+                        elif '联' in check_str:
+                            record.event_company_charger_id = each_c.name
+                            record.event_company_charger_phone = each_c.phone
+                            record.event_company_charger_mobile = each_c.mobile
 
-                if not record.partner_charger_id:
-                    record.event_company_charger_id = contact[0].name
-                    record.event_company_charger_phone = contact[0].phone
-                    record.event_company_charger_mobile = contact[0].mobile
+                    if not record.event_company_charger_id:
+                        record.event_company_charger_id = contact[0].name
+                        record.event_company_charger_phone = contact[0].phone
+                        record.event_company_charger_mobile = contact[0].mobile
 
+                else:
+                    record.event_company_charger_id = False
+                    record.event_company_charger_phone = False
+                    record.event_company_charger_mobile = False
             else:
-                record.event_company_charger_id = False
-                record.event_company_charger_phone = False
-                record.event_company_charger_mobile = False
+                record.event_company_charger_id = record.reference_contract_id.partner_charger_id
+                record.event_company_charger_phone = record.reference_contract_id.partner_charger_phone
+                record.event_company_charger_mobile = record.reference_contract_id.partner_charger_mobile
 
     @api.depends("stage_id", "contract_visible")
     def _compute_date_editable(self):
@@ -174,7 +180,7 @@ class EventEvent(models.Model):
     @api.model
     def check_and_write(self, values):
         """Custom logic to check user permissions before writing."""
-        self.ensure_one()
+        # self.ensure_one()
         if 'reference_contract_id' in values:
             tgt_contract_id = values['reference_contract_id']
         else:
