@@ -140,14 +140,6 @@
                                     <field name="op_person_phone"/>
                                 </group>
                                 <group col="1">
-                                    <group string="活动举办地点">
-                                        <field name="event_location_id" widget="many2many_tags" nolabel="1" colspan="2"
-                                               placeholder="选择地点" readonly="not page_editable"
-                                               options="{'no_open': True}" invisible="page_editable"/>
-                                        <field name="event_location_id" widget="many2many_tags" nolabel="1" colspan="2"
-                                               placeholder="选择地点" readonly="not page_editable"
-                                               invisible="not page_editable"/>
-                                    </group>
                                     <group string="活动类型">
                                         <field name="event_tag_ids" widget="many2many_tags"
                                                options="{'color_field': 'color', 'no_open': True}" nolabel="1"
@@ -161,6 +153,23 @@
                                 </group>
                             </group>
                         </group>
+                        <group string="活动举办地点" col="1">
+                            <group>
+                                <field string="" name="contract_venues" context="{'default_group_id': id}"
+                                       readonly="not page_editable">
+                                    <tree string="" editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="operation_contract_id" column_invisible="True"/>
+                                        <field name="contract_venue_id" options="{'no_open': True, 'no_create': True}" widget="contract_venue_id"/>
+                                        <field name="venue_date_begin" string="场地使用时间" widget="datetime"
+                                               options="{'end_date_field': 'venue_date_end'}"
+                                               />
+                                        <field name="venue_date_end" column_invisible="1"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </group>
+
                         <group string="参与人数及控制人数措施" col="2">
                             <group>
                                 <label for="seats_limited" string="人数限制"/>
@@ -308,7 +317,9 @@
             <field name="name">operation.contract.kanban</field>
             <field name="model">operation.contract.contract</field>
             <field name="arch" type="xml">
-                <kanban class="o_event_kanban_view" default_group_by="stage_id" sample="1">
+                <kanban class="o_event_kanban_view" default_group_by="stage_id"
+                        sample="1" group_create="False" group_delete="False" group_edit="False" groups_draggable="False"
+                        records_draggable="False" quick_create="False" quick_create_view="False">
                     <field name="op_person_id"/>
                     <field name="name"/>
                     <field name="stage_id" options='{"group_by_tooltip": {"description": "Description"}}'/>

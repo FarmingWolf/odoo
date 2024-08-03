@@ -164,10 +164,28 @@ class OperationContract(models.Model):
     contract_amount = fields.Float(string="合同金额（元）", copy=False, default=0.0, digits=(16, 2), tracking=False)
     description = fields.Html(string='合同详情', store=True, readonly=False)
     event_location_id = fields.Many2many('event.track.location', 'operation_contract_location_rel', 'contract_id',
-                                         'location_id', string='活动地点', copy=False, tracking=True)
+                                         'location_id', string='活动地点', compute="_compute_event_location_id", store=True)
+    contract_venues = fields.One2many('operation.contract.venues', 'operation_contract_id', string="活动地点",
+                                      tracking=True, required=True)
     event_tag_ids = fields.Many2many('event.tag', 'operation_contract_event_tag_rel', 'contract_id',
                                      'tag_id', string="活动类型", readonly=False, store=True, tracking=True)
     op_contract_attachment_ids = fields.Many2many('ir.attachment', string="附件", copy=False, tracking=False)
+
+    @api.depends('contract_venues')
+    def _compute_event_location_id(self):
+        for record in self:
+            _logger.info(f"record.contract_venues.ids={record.contract_venues.ids}")
+            _logger.info(f"record.contract_venues.contract_venue_id={record.contract_venues.contract_venue_id}")
+            _logger.info(f"record.contract_venues.contract_venue_id.ids={record.contract_venues.contract_venue_id.ids}")
+            record.event_location_id = [(6, 0, record.contract_venues.contract_venue_id.ids)]
+
+    @api.onchange('contract_venues')
+    def onchange_contract_venues(self):
+        for record in self:
+            _logger.info(f"onchange contract_venues.ids={record.contract_venues.ids}")
+            _logger.info(f"onchange contract_venues.contract_venue_id={record.contract_venues.contract_venue_id}")
+            _logger.info(f"onchange contract_venues.contract_venue_id.ids={record.contract_venues.contract_venue_id.ids}")
+            record.event_location_id = [(6, 0, record.contract_venues.contract_venue_id.ids)]
 
     def _get_default_stage_id(self):
         return self.env['operation.contract.stage'].search([], limit=1)
@@ -392,7 +410,7 @@ class OperationContract(models.Model):
                     option_selected = dict_dict_selection.get(int(record.security_guard_method))
                     record.security_guard_method = int(record.security_guard_method)
                     _logger.info(f"security_check_method的option_selected={option_selected}")
-                    show = '另行' in option_selected
+                    show = ('否' != option_selected)
                 else:
                     show = False
                 record.security_guard_company_show = show
@@ -403,7 +421,7 @@ class OperationContract(models.Model):
                     option_selected = dict_dict_selection.get(int(record.security_check_method))
                     record.security_check_method = int(record.security_check_method)
                     _logger.info(f"security_check_method的option_selected={option_selected}")
-                    show = '另行' in option_selected
+                    show = ('否' != option_selected)
                 else:
                     show = False
                 record.security_check_company_show = show
@@ -414,7 +432,7 @@ class OperationContract(models.Model):
                     option_selected = dict_dict_selection.get(int(record.security_equipment_method))
                     record.security_equipment_method = int(record.security_equipment_method)
                     _logger.info(f"security_equipment_method的option_selected={option_selected}")
-                    show = '另行' in option_selected
+                    show = ('否' != option_selected)
                 else:
                     show = False
                 record.security_equipment_company_show = show
