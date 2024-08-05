@@ -158,7 +158,7 @@ def _server_log_sender_handler_filter(log_record):
 # The only other possible case is when the server URL value is "Cleared",
 # in this case we force close the log handler (as it does not make sense anymore)
 _server_log_sender_handler = AsyncHTTPHandler(helpers.get_odoo_server_url(), get_odoo_config_log_to_server_option())
-_server_log_sender_handler.setFormatter(DBFormatter('%(asctime)s %(pid)s %(levelname)s %(dbname)s %(name)s: %(message)s %(perf_info)s'))
+_server_log_sender_handler.setFormatter(DBFormatter('%(asctime)s %(pid)s %(levelname)s %(dbname)s %(name)s %(funcName)s L%(lineno)d: %(message)s %(perf_info)s'))
 _server_log_sender_handler.addFilter(_server_log_sender_handler_filter)
 # Set it in the 'root' logger, on which every logger (including odoo) is a child
 logging.getLogger().addHandler(_server_log_sender_handler)
