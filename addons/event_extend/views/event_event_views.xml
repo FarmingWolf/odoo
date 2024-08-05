@@ -131,5 +131,20 @@
             </field>
         </record>
 
+        <record id="view_event_kanban_extend" model="ir.ui.view">
+            <field name="name">event.extend.event.view.kanban</field>
+            <field name="model">event.event</field>
+            <field name="inherit_id" ref="event.view_event_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban" position="attributes">
+                    <attribute name="group_create">False</attribute>
+                    <attribute name="group_delete">False</attribute>
+                    <attribute name="group_edit">False</attribute>
+                    <attribute name="groups_draggable">False</attribute>
+                    <attribute name="quick_create">False</attribute>
+                    <attribute name="quick_create_view">False</attribute>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>
