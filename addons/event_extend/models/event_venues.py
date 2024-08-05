@@ -30,7 +30,7 @@ class EventVenues(models.Model):
     _order = 'sequence'
 
     name = fields.Char('活动地点名称', related="event_event_id.name")
-    event_event_id = fields.Many2one('event.event', string='活动')
+    event_event_id = fields.Many2one('event.event', string='活动', ondelete="cascade")
 
     event_venue_id = fields.Many2one('event.track.location', string='活动地点', required=True)
     event_venue_date_begin = fields.Datetime(string="使用开始时间", required=True)

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import logging
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from odoo import api, models, SUPERUSER_ID, fields
-from odoo.exceptions import AccessError
+from odoo.exceptions import AccessError, UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -236,6 +236,9 @@ class EventEvent(models.Model):
                 if contract_list and len(contract_list) > 0:
                     raise AccessError(f"本合同已关联至以下活动。若继续引用本合同，需先将这些活动归档：{contract_list}")
 
+        if 'event_event_venues' in vals_list:
+            self._check_event_venues_schedule_create(vals_list['event_event_venues'])
+
         return super().create(vals_list)
 
     def write(self, values):
@@ -252,15 +255,10 @@ class EventEvent(models.Model):
         if 'reference_contract_id' in values:
             _logger.info(f"reference_contract_id={values['reference_contract_id']}")
 
-        _logger.info(f"before write self[0]record.event_event_venues={self[0].event_event_venues}")
-        _logger.info(f"before write reference_contract_id={self[0].reference_contract_id}")
-        _logger.info(f"before write reference_contract_id.name={self[0].reference_contract_id.name}")
+        if 'event_event_venues' in values:
+            self._check_event_venues_schedule_write(values['event_event_venues'])
 
         write_res = super(EventEvent, self).write(values)
-
-        _logger.info(f"after write self[0]record.event_event_venues={self[0].event_event_venues}")
-        _logger.info(f"after write reference_contract_id={self[0].reference_contract_id}")
-        _logger.info(f"after write reference_contract_id.name={self[0].reference_contract_id.name}")
 
         return write_res
 
@@ -294,3 +292,51 @@ class EventEvent(models.Model):
             }))
         _logger.info(f"event_venues from contract={new_event_venues}")
         return new_event_venues
+
+    def _check_event_venues_schedule_create(self, event_venues_tgt):
+        for event_venue_tgt in event_venues_tgt:
+            _logger.info(f"event_venue_tgt={event_venue_tgt}")
+            venues = self.env['event.event.venues'].search([
+                ('event_venue_id', '=', event_venue_tgt[2]['event_venue_id']),
+                ('event_event_id', '!=', event_venue_tgt[2]['event_event_id'])])
+            self._date_conflict_check(event_venue_tgt, venues)
+
+    def _check_event_venues_schedule_write(self, param):
+        for event_venue_tgt in param:
+            _logger.info(f"event_venue_tgt={event_venue_tgt}")
+            if event_venue_tgt[0] == 0:  # create
+                self._check_event_venues_schedule_create([event_venue_tgt])
+            elif event_venue_tgt[0] == 1:  # update
+                venues = self.env['event.event.venues'].search([('id', '!=', event_venue_tgt[1])])
+                self._date_conflict_check(event_venue_tgt, venues)
+
+    def _date_conflict_check(self, event_venue_tgt, venues):
+        venues_conflict = []
+        for venue in venues:
+            date_begin = datetime.strptime(event_venue_tgt[2]['event_venue_date_begin'], '%Y-%m-%d %H:%M:%S')
+            date_end = datetime.strptime(event_venue_tgt[2]['event_venue_date_end'], '%Y-%m-%d %H:%M:%S')
+            if date_begin < venue.event_venue_date_begin < date_end \
+                    or venue.event_venue_date_begin < date_begin < venue.event_venue_date_end:
+                venues_conflict.append({
+                    'event_venue_tgt': event_venue_tgt,
+                    'venue_db': venue,
+                })
+
+        if venues_conflict:
+            user_tz = self._context.get('tz') or self.env.user.partner_id.tz or 'Asia/Shanghai'
+            self_tz = self.with_context(tz=user_tz)
+            warn_msg = ["以下活动地点排期冲突！请确认："]
+            for venue_ille in venues_conflict:
+                db_date_s = fields.Datetime.context_timestamp(self_tz, venue_ille['venue_db'].event_venue_date_begin)
+                date_s = db_date_s.strftime('%Y-%m-%d %H:%M:%S')
+                db_date_e = fields.Datetime.context_timestamp(self_tz, venue_ille['venue_db'].event_venue_date_end)
+                date_e = db_date_e.strftime('%Y-%m-%d %H:%M:%S')
+                warn_msg.append("【")
+                warn_msg.append(venue_ille['venue_db'].event_venue_id.name)
+                warn_msg.append("：")
+                warn_msg.append(date_s + "至" + date_e)
+                warn_msg.append("（")
+                warn_msg.append(venue_ille['venue_db'].event_event_id.name)
+                warn_msg.append("）】")
+
+            raise UserError(warn_msg)
