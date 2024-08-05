@@ -21,6 +21,10 @@
         'views/event_event_views.xml',
     ],
     'assets': {
+        'web.assets_backend': [
+            'event_extend/static/src/scss/event_extend.scss',
+        ],
+
         'web.report_assets_pdf': [
             '/event_extend/static/src/scss/event_extend.scss',
         ],

@@ -15,6 +15,9 @@ class EventEvent(models.Model):
     event_location_id = fields.Many2many('event.track.location', 'even_location_rel', 'event_id', 'location_id',
                                          string='Event Location', copy=False, tracking=True, store=True,
                                          compute="_compute_contract_info", precompute=True, readonly=False)
+    event_event_venues = fields.One2many('event.event.venues', 'event_event_id', string="活动地点", delete="cascade",
+                                         tracking=True, required=True, precompute=True, readonly=False, store=True,
+                                         compute="_compute_contract_info")
     stage_id_sequence = fields.Integer(store=False, related='stage_id.sequence', string='stage_id_sequence')
     reference_contract_id = fields.Many2one(
         'operation.contract.contract', string='运营合同', ondelete='restrict',
@@ -108,16 +111,17 @@ class EventEvent(models.Model):
         self.ensure_one()
         res = False
 
-        if "运营" in self.env.user.employee_ids[0].department_id.name:
+        if "运营" or '信息' in self.env.user.employee_ids[0].department_id.name:
             if self.env.user.has_group('operation_contract.operation_dep_contract_operator'):
                 res = True
 
         for record in self:
             record.page_editable = res
-
+        _logger.info(f"_compute_page_editable res={res}")
         return res
 
     # 来自event.event的fields↑↑↑
+
     @api.depends('reference_contract_id')
     def _compute_contract_info(self):
         for record in self:
@@ -125,6 +129,10 @@ class EventEvent(models.Model):
             if record.contract_visible and record.reference_contract_id:
                 record.name = record.reference_contract_id.name
                 record.event_location_id = record.reference_contract_id.event_location_id
+                # 先删除再新增
+                record.event_event_venues = False
+                record.event_event_venues = self._set_event_venues_from_contract_venues(
+                    record.reference_contract_id.contract_venues, record.id)
                 record.date_begin = record.reference_contract_id.date_begin
                 record.date_end = record.reference_contract_id.date_end
                 record.tag_ids = record.reference_contract_id.event_tag_ids
@@ -139,12 +147,15 @@ class EventEvent(models.Model):
                 record.event_company_charger_phone = record.reference_contract_id.partner_charger_phone
                 record.event_company_charger_mobile = record.reference_contract_id.partner_charger_mobile
 
+                return record.event_event_venues
+
             else:
                 record.name = ''
                 record.date_begin = fields.Datetime.now().replace(second=0, microsecond=0) + timedelta(
                     minutes=-fields.Datetime.now().minute % 30)
                 record.date_end = record.date_begin + timedelta(days=1)
                 record.event_location_id = False
+                record.event_event_venues = False
                 record.tag_ids = False
                 record.seats_max = 0
                 record.seats_limited = False
@@ -156,12 +167,17 @@ class EventEvent(models.Model):
                 record.event_company_charger_phone = False
                 record.event_company_charger_mobile = False
 
-    @api.onchange('contract_visible', 'reference_contract_id')
+                return False
+
+    @api.onchange('contract_visible')
     def _onchange_contract_visible(self):
         for record in self:
+            _logger.info(f"_onchange_contract_visible record.contract_visible={record.contract_visible}")
             if not record.contract_visible:
                 record.reference_contract_id = False
             self._compute_contract_info()
+            self._compute_date_editable()
+            return {'value': {'event_event_venues': record.event_event_venues}}
 
     @api.model
     def _get_employee(self):
@@ -181,12 +197,22 @@ class EventEvent(models.Model):
     def check_and_write(self, values):
         """Custom logic to check user permissions before writing."""
         # self.ensure_one()
+        tgt_contract_id = ''
+        for record in self:
+            tgt_contract_id = record.reference_contract_id.id
+            _logger.info(f"tgt_contract_id in record={record.reference_contract_id}")
+
+        # 如果values里有
         if 'reference_contract_id' in values:
             tgt_contract_id = values['reference_contract_id']
-        else:
-            for record in self:
-                tgt_contract_id = record.reference_contract_id.id
+            _logger.info(f"tgt_contract_id in values={tgt_contract_id}")
+
         if tgt_contract_id:
+            _logger.info(f"tgt_contract_id={tgt_contract_id}")
+            # 再次获取合同相关信息
+            values['event_event_venues'] = self._get_event_event_venues_from_contract(tgt_contract_id, self.ids[0])
+            _logger.info(f"values in check_and_write={values}")
+
             contract_list = self.check_contract_in_use(tgt_contract_id, self.ids[0])
             if contract_list and len(contract_list) > 0:
                 raise AccessError(f"本合同已关联至以下活动。若继续引用本合同，需先将这些活动归档：{contract_list}")
@@ -203,6 +229,7 @@ class EventEvent(models.Model):
 
     @api.model
     def create(self, vals_list):
+        _logger.info(f"vals_list={vals_list}")
         if 'reference_contract_id' in vals_list:
             if vals_list['reference_contract_id']:
                 contract_list = self.check_contract_in_use(vals_list['reference_contract_id'], 0)
@@ -212,14 +239,58 @@ class EventEvent(models.Model):
         return super().create(vals_list)
 
     def write(self, values):
-        """Override the write method to enforce custom security checks."""
-        # 取消关于stage_id的校验，关于活动完全由运营部负责人负责控制，保证最大灵活性
-        self.check_and_write(values)
 
-        return super(EventEvent, self).write(values)
+        _logger.info(f"before check_and_write values={values}")
+
+        for record in self:
+            _logger.info(f"record.event_event_venues len={len(record.event_event_venues)}")
+            _logger.info(f"record.event_event_venues={record.event_event_venues}")
+
+        self.check_and_write(values)
+        _logger.info(f"before write values={values}")
+
+        if 'reference_contract_id' in values:
+            _logger.info(f"reference_contract_id={values['reference_contract_id']}")
+
+        _logger.info(f"before write self[0]record.event_event_venues={self[0].event_event_venues}")
+        _logger.info(f"before write reference_contract_id={self[0].reference_contract_id}")
+        _logger.info(f"before write reference_contract_id.name={self[0].reference_contract_id.name}")
+
+        write_res = super(EventEvent, self).write(values)
+
+        _logger.info(f"after write self[0]record.event_event_venues={self[0].event_event_venues}")
+        _logger.info(f"after write reference_contract_id={self[0].reference_contract_id}")
+        _logger.info(f"after write reference_contract_id.name={self[0].reference_contract_id.name}")
+
+        return write_res
 
     def action_print_venue_application(self):
         return self.env.ref('event_extend.action_print_venue_application').report_action(self)
 
     def action_print_entry_exit_form(self):
         return self.env.ref('event_extend.action_print_entry_exit_form').report_action(self)
+
+    def _get_event_event_venues_from_contract(self, tgt_contract_id, self_event_id):
+
+        contract_venues = self.env['operation.contract.venues'].search(
+            [('operation_contract_id', '=', tgt_contract_id)])
+        event_venues = self._set_event_venues_from_contract_venues(contract_venues, self_event_id)
+        _logger.info(f"event_venues from contract={event_venues}")
+        return event_venues
+
+    def _set_event_venues_from_contract_venues(self, contract_venues, event_id):
+        new_event_venues = []
+        old_event_venues = self.env['event.event.venues'].search([('event_event_id', '=', event_id)])
+        for old_event_venue in old_event_venues:
+            new_event_venues.append((2, old_event_venue.id, 0))
+
+        for contract_venue in contract_venues:
+            new_event_venues.append((0, 0, {
+                'event_event_id': event_id,
+                'event_venue_id': contract_venue.contract_venue_id.id,
+                'sequence': contract_venue.sequence,
+                'event_venue_date_begin': contract_venue.venue_date_begin,
+                'event_venue_date_end': contract_venue.venue_date_end,
+            }))
+        _logger.info(f"event_venues from contract={new_event_venues}")
+        return new_event_venues

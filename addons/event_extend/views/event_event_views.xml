@@ -51,7 +51,22 @@
                                     <field nolabel="1" colspan="2" name="note" placeholder="活动详情备注，联系人信息等"/>
                                 </h5>
                             </div>
+                            <field name="event_location_id" string="活动地点" widget="many2many_tags" invisible="1"/>
+                            <field name="tag_ids" string="活动类型" widget="many2many_tags"
+                                   options="{'color_field': 'color', 'no_quick_create': True}"/>
+                            <field name="event_map" string="活动地图"/>
+                            <label for="seats_limited" string="人数限制"/>
+                            <div>
+                                <field name="seats_limited"/>
+                                <span invisible="not seats_limited" required="not seats_limited">不超过
+                                    <field name="seats_max" class="oe_inline o_input_9ch"/>
+                                    人
+                                </span>
+                            </div>
                         </group>
+
+                    </group>
+                    <group name="event_details_extend_right" col="1">
                         <group col="2">
                             <group string="公司信息">
                                 <field name="event_company_id" readonly="not page_editable"/>
@@ -68,27 +83,26 @@
                             </group>
                         </group>
                     </group>
-                    <group name="event_details_extend_right" col="1">
-                        <group>
-                            <field name="event_location_id" string="活动地点" widget="many2many_tags"/>
-                            <field name="tag_ids" string="活动类型" widget="many2many_tags"
-                                   options="{'color_field': 'color', 'no_quick_create': True}"/>
-                            <field name="event_map" string="活动地图"/>
-                            <label for="seats_limited" string="人数限制"/>
-                            <div>
-                                <field name="seats_limited"/>
-                                <span invisible="not seats_limited" required="not seats_limited">不超过
-                                    <field name="seats_max" class="oe_inline o_input_9ch"/>
-                                    人
-                                </span>
-                            </div>
-                            <separator/>
-                            <field name="need_electricity_info" placeholder="请输入用电及功率"/>
-                        </group>
-                    </group>
                     <group col="1" colspan="4">
-                        <group string="物业部门配合的内容及时间">
-                            <field name="need_management_dept_assist_info" string="" placeholder="请输入物业部门配合的内容及时间"/>
+                        <group string="活动地点及时间">
+                            <field string="" name="event_event_venues" context="{'default_group_id': id}"
+                                   readonly="not date_editable">
+                                <tree string="" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="event_event_id" column_invisible="True"/>
+                                    <field name="event_venue_id" options="{'no_open': True, 'no_create': True}" widget="event_venue_id"/>
+                                    <field name="event_venue_date_begin" string="场地使用时间" widget="datetime"
+                                           options="{'end_date_field': 'event_venue_date_end'}"
+                                           />
+                                    <field name="event_venue_date_end" column_invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group string="物业部门配合的内容及时间" col="1">
+                            <group>
+                                <field name="need_electricity_info" placeholder="请输入用电及功率"/>
+                                <field name="need_management_dept_assist_info" string="其他配合内容" placeholder="请输入物业部门配合的内容及时间"/>
+                            </group>
                         </group>
                         <group string="运营部意见">
                             <field name="operation_dep_opinion" string="" placeholder="请输入运营部意见"/>
