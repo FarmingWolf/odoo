@@ -230,14 +230,16 @@ class EventEvent(models.Model):
     @api.model
     def create(self, vals_list):
         _logger.info(f"vals_list={vals_list}")
+        reference_contract_id = ""
         if 'reference_contract_id' in vals_list:
             if vals_list['reference_contract_id']:
-                contract_list = self.check_contract_in_use(vals_list['reference_contract_id'], 0)
+                reference_contract_id = vals_list['reference_contract_id']
+                contract_list = self.check_contract_in_use(reference_contract_id, 0)
                 if contract_list and len(contract_list) > 0:
                     raise AccessError(f"本合同已关联至以下活动。若继续引用本合同，需先将这些活动归档：{contract_list}")
 
         if 'event_event_venues' in vals_list:
-            self._check_event_venues_schedule_create(vals_list['event_event_venues'])
+            self._check_event_venues_schedule_create(vals_list['event_event_venues'], reference_contract_id)
 
         return super().create(vals_list)
 
@@ -252,11 +254,13 @@ class EventEvent(models.Model):
         self.check_and_write(values)
         _logger.info(f"before write values={values}")
 
+        reference_contract_id = ""
         if 'reference_contract_id' in values:
-            _logger.info(f"reference_contract_id={values['reference_contract_id']}")
+            reference_contract_id = values['reference_contract_id']
+            _logger.info(f"reference_contract_id={reference_contract_id}")
 
         if 'event_event_venues' in values:
-            self._check_event_venues_schedule_write(values['event_event_venues'])
+            self._check_event_venues_schedule_write(values['event_event_venues'], reference_contract_id)
 
         write_res = super(EventEvent, self).write(values)
 
@@ -293,33 +297,61 @@ class EventEvent(models.Model):
         _logger.info(f"event_venues from contract={new_event_venues}")
         return new_event_venues
 
-    def _check_event_venues_schedule_create(self, event_venues_tgt):
+    def _check_event_venues_schedule_create(self, event_venues_tgt, contract_id):
         for event_venue_tgt in event_venues_tgt:
             _logger.info(f"event_venue_tgt={event_venue_tgt}")
-            venues = self.env['event.event.venues'].search([
-                ('event_venue_id', '=', event_venue_tgt[2]['event_venue_id']),
-                ('event_event_id', '!=', event_venue_tgt[2]['event_event_id'])])
-            self._date_conflict_check(event_venue_tgt, venues)
+            if event_venue_tgt[2]['event_event_id']:
+                event_venues = self.env['event.event.venues'].search([
+                    ('event_venue_id', '=', event_venue_tgt[2]['event_venue_id']),
+                    ('event_event_id', '!=', event_venue_tgt[2]['event_event_id'])])
+            else:
+                event_venues = self.env['event.event.venues'].search([
+                    ('event_venue_id', '=', event_venue_tgt[2]['event_venue_id'])])
 
-    def _check_event_venues_schedule_write(self, param):
+            contract_venues = self._select_contract_venues(contract_id, event_venue_tgt[2]['event_venue_id'])
+
+            self._date_conflict_check(event_venue_tgt, event_venues, contract_venues)
+
+    def _check_event_venues_schedule_write(self, param, ref_contract_id):
+
         for event_venue_tgt in param:
             _logger.info(f"event_venue_tgt={event_venue_tgt}")
             if event_venue_tgt[0] == 0:  # create
-                self._check_event_venues_schedule_create([event_venue_tgt])
-            elif event_venue_tgt[0] == 1:  # update
-                venues = self.env['event.event.venues'].search([('id', '!=', event_venue_tgt[1])])
-                self._date_conflict_check(event_venue_tgt, venues)
+                self._check_event_venues_schedule_create([event_venue_tgt], ref_contract_id)
+            elif event_venue_tgt[0] == 1:  # update，要看update对象的venue与该其他行的venue的冲突情况
+                this_venue = self.env['event.event.venues'].search([('id', '=', event_venue_tgt[1])])
+                event_venues = self.env['event.event.venues'].search(
+                    [('event_venue_id', '=', this_venue[0].event_venue_id.id)])
 
-    def _date_conflict_check(self, event_venue_tgt, venues):
+                contract_venues = self._select_contract_venues(ref_contract_id, this_venue[0].event_venue_id.id)
+
+                self._date_conflict_check(event_venue_tgt, event_venues, contract_venues)
+
+    def _date_conflict_check(self, event_venue_tgt, event_venues, contract_venues):
         venues_conflict = []
-        for venue in venues:
+        _logger.info(f"event_venue_tgt={event_venue_tgt}")
+        _logger.info(f"event_venues={event_venues}")
+        _logger.info(f"contract_venues={contract_venues}")
+        for venue in event_venues:
             date_begin = datetime.strptime(event_venue_tgt[2]['event_venue_date_begin'], '%Y-%m-%d %H:%M:%S')
             date_end = datetime.strptime(event_venue_tgt[2]['event_venue_date_end'], '%Y-%m-%d %H:%M:%S')
-            if date_begin < venue.event_venue_date_begin < date_end \
-                    or venue.event_venue_date_begin < date_begin < venue.event_venue_date_end:
+            if date_begin <= venue.event_venue_date_begin <= date_end \
+                    or venue.event_venue_date_begin <= date_begin <= venue.event_venue_date_end:
                 venues_conflict.append({
                     'event_venue_tgt': event_venue_tgt,
                     'venue_db': venue,
+                    'model_name': 'event_venue',
+                })
+
+        for contract_venue in contract_venues:
+            date_begin = datetime.strptime(event_venue_tgt[2]['event_venue_date_begin'], '%Y-%m-%d %H:%M:%S')
+            date_end = datetime.strptime(event_venue_tgt[2]['event_venue_date_end'], '%Y-%m-%d %H:%M:%S')
+            if date_begin <= contract_venue.venue_date_begin <= date_end \
+                    or contract_venue.venue_date_begin <= date_begin <= contract_venue.venue_date_end:
+                venues_conflict.append({
+                    'event_venue_tgt': event_venue_tgt,
+                    'venue_db': contract_venue,
+                    'model_name': 'contract_venue',
                 })
 
         if venues_conflict:
@@ -327,16 +359,36 @@ class EventEvent(models.Model):
             self_tz = self.with_context(tz=user_tz)
             warn_msg = ["以下活动地点排期冲突！请确认："]
             for venue_ille in venues_conflict:
-                db_date_s = fields.Datetime.context_timestamp(self_tz, venue_ille['venue_db'].event_venue_date_begin)
+                db_date_s = fields.Datetime.context_timestamp(
+                    self_tz, venue_ille['venue_db'].event_venue_date_begin if
+                    venue_ille['model_name'] == 'event_venue' else
+                    venue_ille['venue_db'].venue_date_begin)
                 date_s = db_date_s.strftime('%Y-%m-%d %H:%M:%S')
-                db_date_e = fields.Datetime.context_timestamp(self_tz, venue_ille['venue_db'].event_venue_date_end)
+                db_date_e = fields.Datetime.context_timestamp(
+                    self_tz, venue_ille['venue_db'].event_venue_date_end if
+                    venue_ille['model_name'] == 'event_venue' else
+                    venue_ille['venue_db'].venue_date_end)
                 date_e = db_date_e.strftime('%Y-%m-%d %H:%M:%S')
                 warn_msg.append("【")
-                warn_msg.append(venue_ille['venue_db'].event_venue_id.name)
+                warn_msg.append(venue_ille['venue_db'].event_venue_id.name if
+                                venue_ille['model_name'] == 'event_venue' else
+                                venue_ille['venue_db'].contract_venue_id.name)
                 warn_msg.append("：")
                 warn_msg.append(date_s + "至" + date_e)
-                warn_msg.append("（")
-                warn_msg.append(venue_ille['venue_db'].event_event_id.name)
+                warn_msg.append("（活动名：" if venue_ille['model_name'] == 'event_venue' else "（合同名：")
+                warn_msg.append(venue_ille['venue_db'].event_event_id.name if
+                                venue_ille['model_name'] == 'event_venue' else
+                                venue_ille['venue_db'].operation_contract_id.name)
                 warn_msg.append("）】")
 
             raise UserError(warn_msg)
+
+    def _select_contract_venues(self, contract_id, event_venue_id):
+        if contract_id:
+            contract_venues = self.env['operation.contract.venues'].search([
+                ('contract_venue_id', '=', event_venue_id),
+                ('operation_contract_id', '!=', contract_id)])
+        else:
+            contract_venues = self.env['operation.contract.venues'].search([
+                ('contract_venue_id', '=', event_venue_id)])
+        return contract_venues
