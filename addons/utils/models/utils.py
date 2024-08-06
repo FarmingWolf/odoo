@@ -96,6 +96,21 @@ class Utils:
         result = chinese_yuan + ('元' + chinese_decimal if chinese_decimal else '元整')
         return result
 
+    @staticmethod
+    def remove_last_zero(in_num):
+        if in_num:
+            value_str = '{:.2f}'.format(in_num)
+            # 去除末尾的零
+            while value_str.endswith('0'):
+                value_str = value_str[:-1]
+
+            # 如果最后一个字符是小数点，则去掉
+            if value_str.endswith('.'):
+                value_str = value_str[:-1]
+
+            return value_str
+        else:
+            return ''
 
 # 示例
 # print("0={0}".format(Utils.arabic_to_chinese(0)))

@@ -103,7 +103,7 @@ class EstateProperty(models.Model):
     latest_monthly_rent = fields.Float(string="月租金（元）", compute="_compute_latest_info", readonly=True, copy=False)
     latest_annual_rent = fields.Float(string="年租金（元）", compute="_compute_latest_info", readonly=True, copy=False)
     latest_is_renew = fields.Boolean(string="是否续租", copy=False)
-    latest_contact_person = fields.Char(string="联系人", compute="_compute_latest_info", readonly=True, copy=False)
+    latest_contact_person = fields.Char(string="承租人", compute="_compute_latest_info", readonly=True, copy=False)
     latest_contact_person_tel = fields.Char(string="联系电话", compute="_compute_latest_info", readonly=True, copy=False)
     latest_free_days = fields.Date(string="免租期", copy=False)
     more_info_invisible = fields.Boolean(string="更多信息", copy=False, default=False, store=False)

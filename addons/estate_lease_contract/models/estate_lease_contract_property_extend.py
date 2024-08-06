@@ -3,6 +3,7 @@
 import logging
 from typing import Dict, List
 
+from addons.utils.models.utils import Utils
 from odoo import fields, models, api
 from odoo.http import request
 
@@ -222,7 +223,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
     period_percentage_id = fields.Char(string='期间段递增率详情', readonly=True, compute="_get_rent_plan_info")
     turnover_percentage_id = fields.Char(string='营业额抽成详情', readonly=True, compute="_get_rent_plan_info")
     payment_period = fields.Char(string="支付周期", readonly=True, compute="_get_rent_plan_info")
-    rent_price = fields.Char(string="租金单价（元/天/㎡）", readonly=True, compute="_get_rent_plan_info")
+    rent_price = fields.Float(string="租金单价（元/天/㎡）", readonly=True, compute="_get_rent_plan_info")
     rent_amount_monthly_auto = fields.Float(string="月租金（元/月）", readonly=True, compute="_get_rent_plan_info",
                                             help="=租金单价（元/天/㎡）×计租面积（㎡）×365÷12")
     rent_amount_monthly_adjust = fields.Float(string="手调月租金（元/月）", help="可手动调整此金额。若调整后不为0，则系统以此为准。")
@@ -254,7 +255,8 @@ class EstateLeaseContractPropertyExtend(models.Model):
 
                 record.payment_period = dict(record.rent_plan_id._fields['payment_period'].selection).get(
                     record.rent_plan_id.payment_period)
-                record.rent_price = record.rent_plan_id.rent_price
+                record.rent_price = Utils.remove_last_zero(record.rent_plan_id.rent_price)
+                _logger.info(f"record.rent_price={record.rent_price}")
                 record.rent_amount_monthly_auto = round(record.rent_plan_id.rent_price * record.rent_area * 365 / 12, 2)
                 if record.rent_amount_monthly_adjust:
                     pass

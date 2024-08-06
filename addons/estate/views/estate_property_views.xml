@@ -24,7 +24,7 @@
         <field name="arch" type="xml">
             <tree string="properties_tree" decoration-success="state=='sold'" decoration-warning="state=='canceled'">
                 <field name="name" string="资产名称"/>
-                <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}" />
+                <field name="latest_contact_person"/>
                 <field name="state" />
                 <field name="property_type_id" string="资产类型"/>
                 <field name="rent_area" string="面积（㎡）"/>
