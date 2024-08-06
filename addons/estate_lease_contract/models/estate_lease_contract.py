@@ -19,27 +19,25 @@ _logger = logging.getLogger(__name__)
 
 def _cal_date_payment(current_s, current_e, rental_plan, date_e):
     """rental_plan.payment_date:[
-    ('period_end_month_15_pay_next', '租期结束日的15日前付下期费用'),
-   ('period_end_month_20_pay_next', '租期结束日的20日前付下期费用'),
-   ('period_end_month_25_pay_next', '租期结束日的25日前付下期费用'),
-   ('period_end_month_30_pay_next', '租期结束日的30日前付下期费用'),
-    ('period_start_7_pay_pre', '租期开始后的7日内付上期抽成费用'),
-   ('period_start_10_pay_pre', '租期开始后的10日内付上期抽成费用'),
-   ('period_start_15_pay_pre', '租期开始后的15日内付上期抽成费用'),
-   ('period_start_18_pay_pre', '租期开始后的18日内付上期抽成费用'),
-   ('period_start_20_pay_pre', '租期开始后的20日内付上期抽成费用'),
-   ('period_start_25_pay_pre', '租期开始后的25日内付上期抽成费用'),
-   ('period_start_1_pay_this', '租期开始后的1日内付本期费用'),
-   ('period_start_5_pay_this', '租期开始后的5日内付本期费用'),
-   ('period_start_7_pay_this', '租期开始后的7日内付本期费用'),
-   ('period_start_10_pay_this', '租期开始后的10日内付本期费用'),
-   ('period_start_15_pay_this', '租期开始后的15日内付本期费用'),
-   ('period_start_18_pay_this', '租期开始后的18日内付本期费用'),
-   ('period_start_30_pay_this', '租期开始后的30日内付本期费用'),]
+    ('period_start_30_bef_this', '租期开始日的30日前付本期费用'),
+    ('period_start_15_bef_this', '租期开始日的15日前付本期费用'),
+    ('period_start_10_bef_this', '租期开始日的10日前付本期费用'),
+    ('period_start_7_bef_this', '租期开始日的7日前付本期费用'),
+    ('period_start_5_bef_this', '租期开始日的5日前付本期费用'),
+    ('period_start_1_bef_this', '租期开始日的1日前付本期费用'),
+    ('period_start_30_pay_this', '租期开始后的30日内付本期费用'),
+    ('period_start_15_pay_this', '租期开始后的15日内付本期费用'),
+    ('period_start_10_pay_this', '租期开始后的10日内付本期费用'),
+    ('period_start_7_pay_this', '租期开始后的7日内付本期费用'),
+    ('period_start_5_pay_this', '租期开始后的5日内付本期费用'),
+    ('period_start_1_pay_this', '租期开始后的1日内付本期费用'),
     """
     if 'start' in rental_plan.payment_date:
         day_cnt = int(rental_plan.payment_date.split('_')[2])
-        date_payment = current_s + timedelta(days=day_cnt)
+        if 'bef' in rental_plan.payment_date:
+            date_payment = current_s - timedelta(days=day_cnt)
+        else:
+            date_payment = current_s + timedelta(days=day_cnt)
     elif 'end' in rental_plan.payment_date:
         day_cnt = int(rental_plan.payment_date.split('_')[3])
         date_payment = current_e - timedelta(days=day_cnt)

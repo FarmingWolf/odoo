@@ -43,23 +43,19 @@ class EstateLeaseContractRentalPlan(models.Model):
     rent_price = fields.Float(default=0.0, string="租金单价（元/天/㎡）", digits=(12, 0))
 
     payment_date = fields.Selection(string="租金支付日", required=True,
-                                    selection=[('period_end_month_15_pay_next', '租期结束日的15日前付下期费用'),
-                                               ('period_end_month_20_pay_next', '租期结束日的20日前付下期费用'),
-                                               ('period_end_month_25_pay_next', '租期结束日的25日前付下期费用'),
-                                               ('period_end_month_30_pay_next', '租期结束日的30日前付下期费用'),
-                                               ('period_start_7_pay_pre', '租期开始后的7日内付上期抽成费用'),
-                                               ('period_start_10_pay_pre', '租期开始后的10日内付上期抽成费用'),
-                                               ('period_start_15_pay_pre', '租期开始后的15日内付上期抽成费用'),
-                                               ('period_start_18_pay_pre', '租期开始后的18日内付上期抽成费用'),
-                                               ('period_start_20_pay_pre', '租期开始后的20日内付上期抽成费用'),
-                                               ('period_start_25_pay_pre', '租期开始后的25日内付上期抽成费用'),
-                                               ('period_start_1_pay_this', '租期开始后的1日内付本期费用'),
-                                               ('period_start_5_pay_this', '租期开始后的5日内付本期费用'),
-                                               ('period_start_7_pay_this', '租期开始后的7日内付本期费用'),
-                                               ('period_start_10_pay_this', '租期开始后的10日内付本期费用'),
-                                               ('period_start_15_pay_this', '租期开始后的15日内付本期费用'),
-                                               ('period_start_18_pay_this', '租期开始后的18日内付本期费用'),
-                                               ('period_start_30_pay_this', '租期开始后的30日内付本期费用'), ], )
+                                    selection=[
+                                        ('period_start_30_bef_this', '租期开始日的30日前付本期费用'),
+                                        ('period_start_15_bef_this', '租期开始日的15日前付本期费用'),
+                                        ('period_start_10_bef_this', '租期开始日的10日前付本期费用'),
+                                        ('period_start_7_bef_this', '租期开始日的7日前付本期费用'),
+                                        ('period_start_5_bef_this', '租期开始日的5日前付本期费用'),
+                                        ('period_start_1_bef_this', '租期开始日的1日前付本期费用'),
+                                        ('period_start_30_pay_this', '租期开始后的30日内付本期费用'),
+                                        ('period_start_15_pay_this', '租期开始后的15日内付本期费用'),
+                                        ('period_start_10_pay_this', '租期开始后的10日内付本期费用'),
+                                        ('period_start_7_pay_this', '租期开始后的7日内付本期费用'),
+                                        ('period_start_5_pay_this', '租期开始后的5日内付本期费用'),
+                                        ('period_start_1_pay_this', '租期开始后的1日内付本期费用'), ], )
 
     compensation_method = fields.Selection(
         string='补差方式',
