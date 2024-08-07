@@ -224,6 +224,7 @@ class EstateLeaseContract(models.Model):
     _name = "estate.lease.contract"
     _description = "资产租赁合同管理模型"
     _order = "contract_no, id"
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char('合同名称', required=True, translate=True, copy=False, default="")
 
@@ -236,8 +237,8 @@ class EstateLeaseContract(models.Model):
     date_sign = fields.Date("合同签订日期", required=True, copy=False)
     date_start = fields.Date("合同开始日期", required=True, copy=False)
 
-    date_rent_start = fields.Date("计租开始日期", required=True, copy=False)
-    date_rent_end = fields.Date("计租结束日期", required=True, copy=False)
+    date_rent_start = fields.Date("计租开始日期", required=True, copy=False, tracking=True)
+    date_rent_end = fields.Date("计租结束日期", required=True, copy=False, tracking=True)
 
     days_rent_total = fields.Char(string="租赁期限", compute="_calc_days_rent_total")
 
@@ -361,7 +362,7 @@ class EstateLeaseContract(models.Model):
     opening_date = fields.Date(string="计划开业日期")
 
     rental_plan_ids = fields.One2many("estate.lease.contract.rental.plan", compute='_compute_rental_plan_ids',
-                                      string='租金方案', copy=False)
+                                      string='租金方案', copy=False, tracking=True)
 
     @api.depends('property_ids')
     def _compute_rental_plan_ids(self):
@@ -373,7 +374,7 @@ class EstateLeaseContract(models.Model):
 
     property_management_fee_plan_ids = fields.One2many("estate.lease.contract.property.management.fee.plan",
                                                        compute='_compute_property_management_fee_plan_ids',
-                                                       string="物业费方案", copy=False)
+                                                       string="物业费方案", copy=False, tracking=True)
 
     @api.depends('property_ids')
     def _compute_property_management_fee_plan_ids(self):
@@ -393,7 +394,7 @@ class EstateLeaseContract(models.Model):
 
     parking_space_ids = fields.Many2many('parking.space', 'contract_parking_space_rel', 'contract_id',
                                          'parking_space_id',
-                                         string='停车位', copy=False)
+                                         string='停车位', copy=False, tracking=True)
 
     parking_space_count = fields.Integer(default=0, string="分配停车位数量", compute="_calc_parking_space_cnt")
 
@@ -410,10 +411,10 @@ class EstateLeaseContract(models.Model):
     sales_person_id = fields.Many2one('res.users', string='招商员', index=True, default=lambda self: self.env.user)
     opt_person_id = fields.Many2one('res.users', string='录入员', index=True, default=lambda self: self.env.user)
 
-    renter_id = fields.Many2one('res.partner', string='承租人', index=True, copy=False)
+    renter_id = fields.Many2one('res.partner', string='承租人', index=True, copy=False, tracking=True)
 
     property_ids = fields.Many2many('estate.property', 'contract_property_rel', 'contract_id', 'property_id',
-                                    string='租赁标的', copy=False)
+                                    string='租赁标的', copy=False, tracking=True)
 
     rent_count = fields.Integer(default=0, string="租赁标的数量", compute="_calc_rent_total_info", copy=False)
     building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", compute="_calc_rent_total_info", copy=False)
@@ -518,23 +519,23 @@ class EstateLeaseContract(models.Model):
                 record.contract_incentives_description = ""
 
     advance_collection_of_coupon_deposit_guarantee = fields.Float(default=0.0, string="预收卡券保证金（元）")
-    performance_guarantee = fields.Float(default=0.0, string="履约保证金（元）")
-    lease_deposit = fields.Float(default=0.0, string="租赁押金（元）")
-    property_management_fee_guarantee = fields.Float(default=0.0, string="物管费保证金（元）")
+    performance_guarantee = fields.Float(default=0.0, string="履约保证金（元）", tracking=True)
+    lease_deposit = fields.Float(default=0.0, string="租赁押金（元）", tracking=True)
+    property_management_fee_guarantee = fields.Float(default=0.0, string="物管费保证金（元）", tracking=True)
 
-    decoration_deposit = fields.Float(default=0.0, string="装修押金（元）")
-    decoration_management_fee = fields.Float(default=0.0, string="装修管理费（元）")
-    decoration_water_fee = fields.Float(default=0.0, string="装修水费（元）")
-    decoration_electricity_fee = fields.Float(default=0.0, string="装修电费（元）")
-    refuse_collection = fields.Float(default=0.0, string="建筑垃圾清运费（元）")
-    garbage_removal_fee = fields.Float(default=0.0, string="垃圾清运费（元）")
+    decoration_deposit = fields.Float(default=0.0, string="装修押金（元）", tracking=True)
+    decoration_management_fee = fields.Float(default=0.0, string="装修管理费（元）", tracking=True)
+    decoration_water_fee = fields.Float(default=0.0, string="装修水费（元）", tracking=True)
+    decoration_electricity_fee = fields.Float(default=0.0, string="装修电费（元）", tracking=True)
+    refuse_collection = fields.Float(default=0.0, string="建筑垃圾清运费（元）", tracking=True)
+    garbage_removal_fee = fields.Float(default=0.0, string="垃圾清运费（元）", tracking=True)
 
-    description = fields.Text("详细信息", copy=False)
+    description = fields.Text("详细信息", copy=False, tracking=True)
 
-    attachment_ids = fields.Many2many('ir.attachment', string="附件管理", copy=False)
+    attachment_ids = fields.Many2many('ir.attachment', string="附件管理", copy=False, tracking=True)
 
     rental_details = fields.One2many('estate.lease.contract.property.rental.detail', 'contract_id',
-                                     compute='_compute_rental_details', string="租金明细")
+                                     compute='_compute_rental_details', string="租金明细", tracking=True)
 
     @api.depends("property_ids", "rental_plan_ids")
     def _compute_rental_details(self):
@@ -586,7 +587,7 @@ class EstateLeaseContract(models.Model):
     active = fields.Boolean(default=False, copy=False)
     # 合同状态
     state = fields.Selection(
-        string='合同状态',
+        string='合同状态', tracking=True,
         selection=[('recording', '录入中未生效'), ('to_be_released', '已发布待生效'), ('released', '已发布已生效'),
                    ('invalid', '失效')], default="recording", copy=False
     )
