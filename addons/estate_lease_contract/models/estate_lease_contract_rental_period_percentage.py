@@ -23,7 +23,7 @@ class EstateLeaseContractRentalPeriodPercentage(models.Model):
     """
     _name = "estate.lease.contract.rental.period.percentage"
     _description = "递增率设置"
-    _order = "sequence"
+    _order = "billing_progress_info_month_from"
 
     name = fields.Char('期间递增率名', required=True)
     sequence = fields.Integer('排序', default=1)

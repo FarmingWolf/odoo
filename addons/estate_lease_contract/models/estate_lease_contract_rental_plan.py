@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import logging
+import math
 
 from odoo import fields, models, api
+from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 
 class EstateLeaseContractRentalPlan(models.Model):
@@ -69,3 +74,55 @@ class EstateLeaseContractRentalPlan(models.Model):
     _sql_constraints = [
         ('name', 'unique(name)', '租金方案名不能重复')
     ]
+
+    @api.model
+    def create(self, vals_list):
+        # 先做：按期间段递增率的检查，即 从第N月起的每X个月递增百分比，其他分支 todo
+        _logger.info(f"vals_list={vals_list}")
+        if "billing_method" in vals_list:
+            if vals_list['billing_method'] == 'by_progress':
+                if 'billing_progress_method_id' in vals_list:
+                    if vals_list['billing_progress_method_id'] == 'by_period':
+                        if 'period_percentage_id' not in vals_list:
+                            raise UserError("请设置时间段递增规则详情!")
+                        else:
+                            if not vals_list['period_percentage_id']:
+                                raise UserError("请设置时间段递增规则详情!")
+                            else:
+                                self._check_method_by_period(vals_list['period_percentage_id'])
+
+        res = super().create(vals_list)
+        return res
+
+    def _check_method_by_period(self, methods_by_period):
+        _logger.info(f"billing_progress_methods_by_period={methods_by_period}")
+        methods_by_period_ids = []
+        for method in methods_by_period:
+            if len(method) == 2:
+                methods_by_period_ids.append(method[1])
+
+        record_sorted = self.env['estate.lease.contract.rental.period.percentage'].search([
+            ('id', 'in', methods_by_period_ids)], order='billing_progress_info_month_from ASC')
+
+        if not record_sorted or len(record_sorted) == 0:
+            raise UserError("请设置时间段递增规则详情!")
+
+        _logger.info(f"record_sorted={record_sorted}")
+
+        i = 0
+        for by_period_method in record_sorted:
+            _logger.info(f"by_period_method={by_period_method}")
+            if i > 0:
+                df = by_period_method.billing_progress_info_month_from - \
+                     record_sorted[i-1].billing_progress_info_month_from
+                if math.fmod(df, by_period_method.billing_progress_info_month_every) != 0:
+                    err_msg = f"期间段递增率明细设置有误！\n" \
+                              f"【{by_period_method.name}】与【{record_sorted[i-1].name}】的起始月相差月数：" \
+                              f"{by_period_method.billing_progress_info_month_from} - " \
+                              f"{record_sorted[i-1].billing_progress_info_month_from}={df}不是" \
+                              f"{record_sorted[i-1].billing_progress_info_month_every}的整数倍，请调整！"
+
+                    raise UserError(err_msg)
+
+            i += 1
+

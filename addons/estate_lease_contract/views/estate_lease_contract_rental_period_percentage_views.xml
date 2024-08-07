@@ -18,6 +18,7 @@
         <field name="model">estate.lease.contract.rental.period.percentage</field>
         <field name="arch" type="xml">
             <tree string="estate_lease_contract_rental_period_percentage_tree">
+                <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="name_description"/>
             </tree>
