@@ -6,7 +6,8 @@
         <field name="arch" type="xml">
             <form string="estate_lease_contract_form">
                 <header>
-                    <button name="action_release_contract" type="object" string="发布" invisible="context.get('contract_read_only')"/>
+                    <button name="action_release_contract" type="object" string="发布"
+                            invisible="context.get('contract_read_only')"/>
                     <button name="action_cancel_release_contract" type="object" string="取消发布"/>
                     <field name="state" widget="statusbar"/>
                 </header>
@@ -18,16 +19,17 @@
                             <field name="contract_no" readonly="context.get('contract_read_only')"/>
                             <field name="contract_type_id" readonly="context.get('contract_read_only')"/>
                             <field name="renter_id" readonly="context.get('contract_read_only')"/>
+                            <field name="renter_company_id" readonly="context.get('contract_read_only')"/>
                             <field name="sales_person_id" readonly="context.get('contract_read_only')"/>
                             <field name="opt_person_id" readonly="context.get('contract_read_only')"/>
                             <field name="date_sign" readonly="context.get('contract_read_only')"/>
                             <field name="date_start" readonly="context.get('contract_read_only')"/>
-                            <field name="deliver_condition" readonly="context.get('contract_read_only')"/>
                             <field name="lease_deposit" readonly="context.get('contract_read_only')"/>
                             <field name="rent_amount" readonly="context.get('contract_read_only')"/>
                             <field name="rent_amount_year" readonly="context.get('contract_read_only')"/>
                         </group>
                         <group>
+                            <field name="sequence" readonly="context.get('contract_read_only')"/>
                             <field name="date_rent_start" readonly="context.get('contract_read_only')"/>
                             <field name="date_rent_end" readonly="context.get('contract_read_only')"/>
                             <field name="days_rent_total" readonly="1"/>
@@ -39,7 +41,8 @@
                             <field name="rent_amount_first_period" readonly="context.get('contract_read_only')"/>
                             <field name="rent_first_payment_date" readonly="context.get('contract_read_only')"/>
                             <field name="performance_guarantee" readonly="context.get('contract_read_only')"/>
-                            <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}" readonly="context.get('contract_read_only')"/>
+                            <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}"
+                                   readonly="context.get('contract_read_only')"/>
                         </group>
                     </group>
                     <notebook>
@@ -58,7 +61,7 @@
                             <group>
                                 <field name="parking_space_count"/>
                             </group>
-                            <field name="parking_space_ids" />
+                            <field name="parking_space_ids"/>
                         </page>
                         <page string="租金方案">
                             <button name="action_refresh_rental_plan" type="object" string="点击刷新"/>
@@ -66,11 +69,11 @@
                         </page>
                         <page string="物业费方案" id="page_management_fee_plan">
                             <button name="action_refresh_management_fee_plan" type="object" string="点击刷新"/>
-                            <field name="property_management_fee_plan_ids" />
+                            <field name="property_management_fee_plan_ids"/>
                         </page>
                         <page string="优惠方案" id="page_incentives">
                             <group>
-                                <field name="contract_incentives_ids" />
+                                <field name="contract_incentives_ids"/>
                             </group>
                             <sheet>
                                 <group>
@@ -146,8 +149,8 @@
                                 <field name="attachment_ids" widget="many2many_binary" options="{'no_create': True}"/>
                             </group>
                         </page>
-                        <page string="金额汇总">
-                            <group col="1">
+                        <page string="每期金额明细">
+                            <group col="1" invisible="context.get('contract_read_only')">
                                 <button name="action_refresh_all_money" type="object" string="点击刷新"/>
                             </group>
                             <sheet readonly="1">
@@ -164,14 +167,33 @@
 
                                         </group>
                                     </group>
-                                    <field name="rental_details"/>
+                                    <field name="rental_details" readonly="context.get('contract_read_only')">
+                                        <tree string="" decoration-danger="rental_amount != rental_receivable"
+                                              decoration-success="rental_received &gt; 0 and rental_received == rental_receivable"
+                                              decoration-warning="rental_received != 0 and rental_received != rental_receivable"
+                                              readonly="context.get('contract_read_only')">
+                                            <field name="property_id" readonly="context.get('contract_read_only')"/>
+                                            <field name="rental_period_no"
+                                                   readonly="context.get('contract_read_only')"/>
+                                            <field name="period_date_from"
+                                                   readonly="context.get('contract_read_only')"/>
+                                            <field name="period_date_to" readonly="context.get('contract_read_only')"/>
+                                            <field name="date_payment" readonly="context.get('contract_read_only')"/>
+                                            <field name="rental_amount" sum="合计租金：根据资产面积、租金方案自动计算"
+                                                   readonly="context.get('contract_read_only')"/>
+                                            <field name="rental_receivable" sum="合计应收：请谨慎调整，系统自动记录调整历史"
+                                                   readonly="context.get('contract_read_only')"/>
+                                            <field name="rental_received" sum="合计实收：每期租金收款后，请回填，以保证业务数据一致性"
+                                                   readonly="context.get('contract_read_only')"/>
+                                        </tree>
+                                    </field>
                                 </group>
                             </sheet>
                         </page>
                     </notebook>
 
                 </sheet>
-                <div class="oe_chatter">
+                <div class="oe_chatter" groups="estate.estate_group_tutorial_research">
                     <field name="message_follower_ids"/>
                     <field name="activity_ids"/>
                     <field name="message_ids"/>
@@ -190,21 +212,18 @@
                   create="False" delete="False" edit="False" import="False" open_form_view="False">
 
                 <field name="default_context_contract_id" column_invisible="1"/>
+                <field name="sequence" widget="handle"/>
                 <field name="contract_no"/>
-                <field name="name"/>
+                <!--                <field name="name"/>-->
                 <field name="date_sign"/>
                 <field name="date_start"/>
                 <field name="date_rent_start"/>
                 <field name="date_rent_end"/>
-                <field name="date_decorate_start"/>
-                <field name="date_decorate_end"/>
                 <field name="state"/>
-                <field name="contract_type_id"/>
-                <field name="property_ids" widget="many2many_tags" string="租赁场地" options="{'color_field': 'color'}" />
-                <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}" />
+                <field name="property_ids" widget="many2many_tags" string="租赁场地" options="{'color_field': 'color'}"/>
+                <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}"/>
                 <field name="renter_id"/>
-                <field name="sales_person_id"/>
-                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
+                <field name="renter_company_id"/>
             </tree>
         </field>
     </record>
@@ -218,21 +237,18 @@
                   decoration-warning="date_rent_end &lt;= (context_today() + relativedelta(days=+30))"
                   create="True" delete="True" edit="True">
                 <field name="default_context_contract_id" column_invisible="1"/>
+                <field name="sequence" widget="handle"/>
                 <field name="contract_no"/>
-                <field name="name"/>
+                <!--                <field name="name"/>-->
                 <field name="date_sign"/>
                 <field name="date_start"/>
                 <field name="date_rent_start"/>
                 <field name="date_rent_end"/>
-                <field name="date_decorate_start"/>
-                <field name="date_decorate_end"/>
                 <field name="state"/>
-                <field name="contract_type_id"/>
-                <field name="property_ids" widget="many2many_tags" string="租赁场地" options="{'color_field': 'color'}" />
-                <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}" />
+                <field name="property_ids" widget="many2many_tags" string="租赁场地" options="{'color_field': 'color'}"/>
+                <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}"/>
                 <field name="renter_id"/>
-                <field name="sales_person_id"/>
-                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
+                <field name="renter_company_id"/>
             </tree>
         </field>
     </record>
@@ -242,12 +258,13 @@
         <field name="res_model">estate.lease.contract</field>
         <field name="view_mode">tree,form,kanban</field>
         <field name="views">[False, "tree"]</field>
-        <field name="view_id" ref="estate_lease_contract_view_tree" />
+        <field name="view_id" ref="estate_lease_contract_view_tree"/>
         <field name="context">{
             'search_default_active': True,
             'contract_read_only': True,
             'menu_root': 'estate.lease.contract',
-            }</field>
+            }
+        </field>
         <field name="domain">[('active', '=', True)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -263,12 +280,13 @@
         <field name="name">资产租赁合同列表（录入）</field>
         <field name="res_model">estate.lease.contract</field>
         <field name="views">[False, "tree"]</field>
-        <field name="view_id" ref="estate_lease_contract_view_inactive_tree" />
+        <field name="view_id" ref="estate_lease_contract_view_inactive_tree"/>
         <field name="view_mode">tree,form,kanban</field>
         <field name="context">{
             'search_default_active': False,
             'contract_read_only': False,
-            'menu_root': 'estate.lease.contract',}</field>
+            'menu_root': 'estate.lease.contract',}
+        </field>
         <field name="domain">[('active', '=', False)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

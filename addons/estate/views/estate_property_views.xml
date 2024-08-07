@@ -23,6 +23,7 @@
         <field name="model">estate.property</field>
         <field name="arch" type="xml">
             <tree string="properties_tree" decoration-success="state=='sold'" decoration-warning="state=='canceled'">
+                <field name="sequence" widget="handle"/>
                 <field name="name" string="资产名称"/>
                 <field name="latest_contact_person"/>
                 <field name="state" />
@@ -60,8 +61,13 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
-                    <group>
-                        <field name="name" default_focus="True"/>
+                    <group col="2">
+                        <group>
+                            <field name="name" default_focus="True"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                        </group>
                     </group>
                     <group>
                         <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />

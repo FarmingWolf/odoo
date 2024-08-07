@@ -198,10 +198,12 @@ def _generate_details_from_rent_plan(record_self):
                 'period_date_to': f"{current_e.strftime('%Y-%m-%d')}",
                 'date_payment': date_payment,
                 'rental_amount': f"{rental_amount}",
+                'rental_receivable': f"{rental_amount}",  # 创建时，应收=租金计算值
                 'rental_amount_zh': f"{rental_amount_zh}",
                 'rental_period_no': f"{period_no}",
-                'description': f"{rental_plan.name}-{billing_method_str}-"
+                'description': f"{rental_plan.name}-{billing_method_str}-{property_id.latest_payment_method}-"
                                f"{payment_date_str}",
+                'active': f"{True}",
             })
 
             # 下期开始日
@@ -223,10 +225,11 @@ class EstateLeaseContract(models.Model):
 
     _name = "estate.lease.contract"
     _description = "资产租赁合同管理模型"
-    _order = "contract_no, id"
+    _order = "sequence"
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _mail_post_access = 'read'
 
-    name = fields.Char('合同名称', required=True, translate=True, copy=False, default="")
+    name = fields.Char('合同名称', required=True, translate=True, copy=False, default="四九一空间房屋租赁合同")
 
     contract_no = fields.Char('合同编号', required=True, translate=True, copy=False, default="")
     # contract_amount = fields.Float("合同金额", default=0.0)
@@ -256,7 +259,7 @@ class EstateLeaseContract(models.Model):
 
     rental_plans_for_property = fields.One2many('estate.lease.contract.rental.plan.rel',
                                                 compute='_compute_rental_plans_for_property',
-                                                default=_compute_rental_plans_for_property,
+                                                default=lambda self: self._compute_rental_plans_for_property,
                                                 string='合同-资产-租金方案', store=False)
     """ 这俩函数就是个废柴
     @api.onchange("contract_no")
@@ -412,6 +415,7 @@ class EstateLeaseContract(models.Model):
     opt_person_id = fields.Many2one('res.users', string='录入员', index=True, default=lambda self: self.env.user)
 
     renter_id = fields.Many2one('res.partner', string='承租人', index=True, copy=False, tracking=True)
+    renter_company_id = fields.Many2one('res.partner', string='经营公司', index=True, copy=False, tracking=True)
 
     property_ids = fields.Many2many('estate.property', 'contract_property_rel', 'contract_id', 'property_id',
                                     string='租赁标的', copy=False, tracking=True)
@@ -419,6 +423,18 @@ class EstateLeaseContract(models.Model):
     rent_count = fields.Integer(default=0, string="租赁标的数量", compute="_calc_rent_total_info", copy=False)
     building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", compute="_calc_rent_total_info", copy=False)
     rent_area = fields.Float(default=0.0, string="总计租面积（㎡）", compute="_calc_rent_total_info", copy=False)
+
+    sequence = fields.Integer(compute='_compute_sorted_sequence', store=True, string='排序')
+
+    @api.depends('property_ids')
+    def _compute_sorted_sequence(self):
+        for record in self:
+            if record.property_ids:
+                # 获取所有关联 model_b 记录的 sequence 字段中的最小值
+                min_sequence = min(estate_property.sequence for estate_property in record.property_ids)
+                record.sequence = min_sequence
+            else:
+                record.sequence = 0
 
     # 检查该合同的资产是否在其他合同中，且与其计租期重叠
     def _check_property_in_contract(self, rent_property, self_record):
@@ -534,8 +550,8 @@ class EstateLeaseContract(models.Model):
 
     attachment_ids = fields.Many2many('ir.attachment', string="附件管理", copy=False, tracking=True)
 
-    rental_details = fields.One2many('estate.lease.contract.property.rental.detail', 'contract_id',
-                                     compute='_compute_rental_details', string="租金明细", tracking=True)
+    rental_details = fields.One2many('estate.lease.contract.property.rental.detail', 'contract_id', store=True,
+                                     compute='_compute_rental_details', string="租金明细", readonly=False)
 
     @api.depends("property_ids", "rental_plan_ids")
     def _compute_rental_details(self):
@@ -568,7 +584,7 @@ class EstateLeaseContract(models.Model):
                 # 先删除旧纪录
                 print("删除掉estate.lease.contract.property.rental.detail其中的contract_id={0}的记录".format(record.id))
                 self.env['estate.lease.contract.property.rental.detail'].search(
-                    [('contract_id', '=', record.id)]).unlink()
+                    [('contract_id', '=', record.id)]).write({'active': False})
                 # 根据租金方案生成的租金明细，逐条生成model：estate.lease.contract.property.rental.detail
                 for rental_detail in generated_rental_details:
                     self.env['estate.lease.contract.property.rental.detail'].create({
@@ -576,11 +592,13 @@ class EstateLeaseContract(models.Model):
                         'property_id': rental_detail['property_id'],
                         'rental_amount': rental_detail['rental_amount'],
                         'rental_amount_zh': rental_detail['rental_amount_zh'],
+                        'rental_receivable': rental_detail['rental_amount'],  # 创建按时，应收=租金值
                         'rental_period_no': rental_detail['rental_period_no'],
                         'period_date_from': rental_detail['period_date_from'],
                         'period_date_to': rental_detail['period_date_to'],
                         'date_payment': rental_detail['date_payment'],
                         'description': rental_detail['description'],
+                        'active': rental_detail['active'],
                     })
 
     # 合同新建时默认不生效，需要手动修改
@@ -589,7 +607,7 @@ class EstateLeaseContract(models.Model):
     state = fields.Selection(
         string='合同状态', tracking=True,
         selection=[('recording', '录入中未生效'), ('to_be_released', '已发布待生效'), ('released', '已发布已生效'),
-                   ('invalid', '失效')], default="recording", copy=False
+                   ('invalid', '过期/失效')], default="recording", copy=False
     )
 
     # 合同终止状态
@@ -675,11 +693,19 @@ class EstateLeaseContract(models.Model):
 
     @api.model
     def write(self, vals):
-        records = super().write(vals)
+        _logger.info(f"write1 vals=：{vals}")
+        for record in self:
+            _logger.info(f"write1 record=个数：{len(record.rental_details)}-{record.rental_details}")
+
+        res = super().write(vals)
+        _logger.info(f"write2 vals=：{vals}")
+        for record in self:
+            _logger.info(f"write2 record=个数：{len(record.rental_details)}-{record.rental_details}")
+
         self._delete_contract_property_rental_plan_rel()
         self._insert_contract_property_rental_plan_rel(None)
 
-        return records
+        return res
 
     def _delete_contract_property_rental_plan_rel(self):
 

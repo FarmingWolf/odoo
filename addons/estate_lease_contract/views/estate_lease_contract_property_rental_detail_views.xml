@@ -18,7 +18,12 @@
         <field name="name">estate.lease.contract.property.rental.detail.tree</field>
         <field name="model">estate.lease.contract.property.rental.detail</field>
         <field name="arch" type="xml">
-            <tree string="estate_lease_contract_property_rental_detail_view_tree" create="false" delete="false" edit="false">
+            <tree string="estate_lease_contract_property_rental_detail_view_tree"
+                  create="context.get('contract_read_only')" delete="context.get('contract_read_only')"
+                  edit="context.get('contract_read_only')"
+                  decoration-danger="rental_amount != rental_receivable"
+                  decoration-success="rental_received &gt; 0 and rental_received == rental_receivable"
+                  decoration-warning="rental_received != 0 and rental_received != rental_receivable">
                 <field name="contract_id"/>
                 <field name="property_id"/>
                 <field name="rental_period_no"/>
@@ -38,22 +43,32 @@
         <field name="name">estate.lease.contract.property.rental.detail.form</field>
         <field name="model">estate.lease.contract.property.rental.detail</field>
         <field name="arch" type="xml">
-            <form string="estate_lease_contract_property_rental_detail_view_form" create="false" delete="false" edit="false">
-                <group>
-                    <field name="contract_id"/>
-                    <field name="property_id"/>
-                    <field name="rental_period_no"/>
-                    <field name="period_date_from"/>
-                    <field name="period_date_to"/>
-                    <field name="date_payment"/>
-                </group>
-                <group>
-                    <field name="rental_amount"/>
-                    <field name="rental_amount_zh"/>
-                    <field name="rental_receivable"/>
-                    <field name="rental_received"/>
-                    <field name="description"/>
-                </group>
+            <form string="estate_lease_contract_property_rental_detail_view_form"
+                  create="context.get('contract_read_only')" delete="context.get('contract_read_only')"
+                  edit="context.get('contract_read_only')">
+                <sheet>
+                    <group>
+                        <field name="contract_id" readonly="1"/>
+                        <field name="property_id"/>
+                        <field name="rental_period_no"/>
+                        <field name="period_date_from" string="开始与结束日期" widget="daterange"
+                               options="{'end_date_field': 'period_date_to'}"/>
+                        <field name="period_date_to" invisible="1"/>
+                        <field name="date_payment"/>
+                    </group>
+                    <group>
+                        <field name="rental_amount"/>
+                        <field name="rental_amount_zh"/>
+                        <field name="rental_receivable"/>
+                        <field name="rental_received"/>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>
