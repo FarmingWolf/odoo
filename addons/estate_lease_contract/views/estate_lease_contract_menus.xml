@@ -19,5 +19,8 @@
         <menuitem id="estate_lease_contract_menu_rental" name="租金明细">
             <menuitem id="estate_lease_contract_menu_rental_details" action="estate_lease_contract_property_rental_detail_action"/>
         </menuitem>
+        <menuitem id="estate_lease_contract_menu_rental_reminder" name="租金催缴">
+            <menuitem id="estate_lease_contract_menu_rental_details_reminder" action="estate_lease_contract_property_rental_detail_reminder_action"/>
+        </menuitem>
     </menuitem>
 </odoo>

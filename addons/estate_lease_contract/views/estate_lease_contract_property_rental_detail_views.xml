@@ -3,6 +3,7 @@
     <record id="estate_lease_contract_property_rental_detail_action" model="ir.actions.act_window">
         <field name="name">租金明细</field>
         <field name="res_model">estate.lease.contract.property.rental.detail</field>
+        <field name="view_id" ref="estate_lease_contract_property_rental_detail_view_tree"/>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -71,4 +72,49 @@
             </form>
         </field>
     </record>
+
+    <record id="estate_lease_contract_property_rental_detail_reminder_tree" model="ir.ui.view">
+        <field name="name">租金催缴明细</field>
+        <field name="model">estate.lease.contract.property.rental.detail</field>
+        <field name="arch" type="xml">
+            <tree string="租金催缴明细"
+                  create="False" delete="False"
+                  edit="context.get('contract_read_only')"
+                  decoration-danger="rental_amount != rental_receivable"
+                  decoration-success="rental_received &gt; 0 and rental_received == rental_receivable"
+                  decoration-warning="rental_received != 0 and rental_received != rental_receivable">
+                <field name="property_id"/>
+                <field name="renter_id"/>
+                <field name="renter_id_phone"/>
+                <field name="renter_id_mobile"/>
+                <field name="rental_period_no"/>
+                <field name="period_date_from"/>
+                <field name="period_date_to"/>
+                <field name="date_payment"/>
+                <field name="rental_amount"/>
+                <field name="rental_receivable"/>
+                <field name="rental_received"/>
+                <field name="rental_arrears"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_property_rental_detail_reminder_action" model="ir.actions.act_window">
+        <field name="name">租金催缴</field>
+        <field name="res_model">estate.lease.contract.property.rental.detail</field>
+        <field name="views">[False, "tree"]</field>
+        <field name="view_id" ref="estate_lease_contract_property_rental_detail_reminder_tree"/>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="domain">[
+            ('active', '=', True),
+            ('rental_arrears', '!=', 0),
+            ('date_payment', '&lt;', (context_today() + datetime.timedelta(days=7))),
+            ]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                近期代缴费租金明细
+            </p>
+        </field>
+    </record>
+
 </odoo>
