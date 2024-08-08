@@ -50,22 +50,27 @@ def _cal_date_payment(current_s, current_e, rental_plan, date_e):
 
 
 # 最后一期有可能不是一整期
-def _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, property_id, rental_plan):
+def _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, property_id, rent_price_adapt,
+                            rent_amount_monthly_adapt):
     last_period_rental = 0.0
     current_tmp = _get_current_e(current_s)
+
+    # 以手调月租为准
+    if property_id.rent_amount_monthly_adjust:
+        rent_price_adapt = rent_amount_monthly_adapt * 12 / 365 / property_id.rent_area
 
     # 最后一期不足一个月，则按天算
     if current_e < current_tmp:
         period_days = current_e - current_s
-        last_period_rental = property_id.rent_area * rental_plan.rent_price * (period_days.days + 1)
+        last_period_rental = property_id.rent_area * rent_price_adapt * (period_days.days + 1)
         return last_period_rental
 
     # 如果足月，则直接取月金额
     while current_tmp < current_e:
         if property_id.rent_amount_monthly_adjust:
-            last_period_rental += property_id.rent_amount_monthly_adjust
+            last_period_rental += rent_amount_monthly_adapt
         else:
-            last_period_rental += property_id.rent_area * rental_plan.rent_price * 365 / 12
+            last_period_rental += property_id.rent_area * rent_price_adapt * 365 / 12
         current_s = current_tmp + timedelta(days=1)
         current_tmp = _get_current_e(current_s)
 
@@ -73,22 +78,23 @@ def _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, pro
     if current_tmp > current_e:
         if date_e.day == date_s.day - 1:
             if property_id.rent_amount_monthly_adjust:
-                last_period_rental += property_id.rent_amount_monthly_adjust
+                last_period_rental += rent_amount_monthly_adapt
             else:
-                last_period_rental += property_id.rent_area * rental_plan.rent_price * 365 / 12
+                last_period_rental += property_id.rent_area * rent_price_adapt * 365 / 12
         else:
             period_days = current_e - current_s
-            last_period_rental += property_id.rent_area * rental_plan.rent_price * (period_days.days + 1)
+            last_period_rental += property_id.rent_area * rent_price_adapt * (period_days.days + 1)
     else:
         if property_id.rent_amount_monthly_adjust:
-            last_period_rental += property_id.rent_amount_monthly_adjust
+            last_period_rental += rent_amount_monthly_adapt
         else:
-            last_period_rental += property_id.rent_area * rental_plan.rent_price * 365 / 12
+            last_period_rental += property_id.rent_area * rent_price_adapt * 365 / 12
 
     return last_period_rental
 
 
-def _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property_id, rental_plan):
+def _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property_id, rent_price_adapt,
+                       rent_amount_monthly_adapt):
     """
     租金计算方法：先计算年租金，再计算每月租金或每期租金
     年租金=租金单价×计租面积×365
@@ -97,19 +103,20 @@ def _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property
     三个月租金=月租金×3
     以此类推
     """
-    rental_amount_year = property_id.rent_area * rental_plan.rent_price * 365
-    rental_amount_month = rental_amount_year / 12
+    # rental_amount_year = property_id.rent_area * rent_price_val * 365
+    # rental_amount_month = rental_amount_year / 12
 
-    if property_id.rent_amount_monthly_adjust:
-        rental_amount_month = property_id.rent_amount_monthly_adjust
+    # if property_id.rent_amount_monthly_adjust:
+    #     rental_amount_month = property_id.rent_amount_monthly_adjust
+    rental_amount_month = rent_amount_monthly_adapt
 
     if date_e > current_e:
         rental_amount = rental_amount_month * month_cnt
     else:  # 最后一期租金
         rental_amount = _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, property_id,
-                                                rental_plan)
+                                                rent_price_adapt, rent_amount_monthly_adapt)
 
-    return rental_amount
+    return round(rental_amount, 2)
 
 
 def _get_current_e(current_tmp):
@@ -122,6 +129,145 @@ def _get_current_e(current_tmp):
             current_e = (current_tmp.replace(day=28) + timedelta(days=4)).replace(day=current_tmp.day - 1)
         else:  # 当前月是1月30、31，下个月就是2月，2月的月末必须是3月1号-1天
             current_e = (current_tmp.replace(month=3)).replace(day=1) - timedelta(days=1)
+
+    return current_e
+
+
+def _cal_rent_price_and_amount_monthly_val(current_s, rent_price_period_lst):
+    for rent_price_period in rent_price_period_lst:
+        if rent_price_period.get('period_from') <= current_s <= rent_price_period.get('period_to'):
+            _logger.info(
+                f"当前日期：{current_s}，"
+                f"租金适配{rent_price_period.get('rent_amount_adapt')}, "
+                f"适配单价{rent_price_period.get('rent_price_adapt')}")
+            return rent_price_period.get('rent_amount_adapt'), rent_price_period.get('rent_price_adapt')
+    raise UserWarning(f'租金适配期间出错：当前日期：{current_s}，租金适配表{rent_price_period_lst}')
+
+
+def _prepare_rent_price_period_lst(property_id, rent_amount_monthly_val, rental_plan, record_self):
+    """
+    根据租金方案、计租开始日、计租结束日计算各期间的适配租金
+    [
+        {资产ID, 基础月租金, 基础单价, 计费方式, 递进方式, 从第N月起, 每X个月, 递增百分比,
+        适配后月租金, 适配后单价, 期间开始日期, 期间结束日期}
+    ]
+    """
+    # 默认固定金额的方式
+    rtn_lst = [{'property_id': property_id,
+                'rent_amount_monthly_val': rent_amount_monthly_val,
+                'rent_price_val': rental_plan.rent_price,
+                'billing_method': rental_plan.billing_method,
+                'progress_method': False, 'from_n_month': False, 'every_x_month': False, 'up_percentage': 0,
+                'rent_amount_adapt': rent_amount_monthly_val,
+                'rent_price_adapt': rental_plan.rent_price,
+                'period_from': record_self.date_rent_start,
+                'period_to': record_self.date_rent_end}]
+    _logger.info(f'先设置默认的固定金额模式={rtn_lst}')
+    if rental_plan.billing_method == 'by_fixed_price':
+        return rtn_lst
+    elif rental_plan.billing_method == 'by_progress':
+        if rental_plan.billing_progress_method_id == 'by_period':
+            if not rental_plan.period_percentage_id:
+                return rtn_lst
+
+            rtn_lst = []
+
+            for i in range(len(rental_plan.period_percentage_id)):
+                period_percentage = rental_plan.period_percentage_id[i]
+
+                if i == 0:
+                    # 从开始日到”第N月“之间，还是初始利率
+
+                    temp_date_e = _get_period_total_e(record_self.date_rent_start,
+                                                      period_percentage.billing_progress_info_month_from - 1,
+                                                      record_self.date_rent_end)
+                    period_data = {
+                        'property_id': property_id,
+                        'rent_amount_monthly_val': rent_amount_monthly_val,
+                        'rent_price_val': rental_plan.rent_price,
+                        'billing_method': rental_plan.billing_method,
+                        'progress_method': rental_plan.billing_progress_method_id,
+                        'from_n_month': period_percentage.billing_progress_info_month_from,
+                        'every_x_month': period_percentage.billing_progress_info_month_every,
+                        'up_percentage': period_percentage.billing_progress_info_up_percentage,
+                        'rent_amount_adapt': rent_amount_monthly_val,
+                        'rent_price_adapt': rental_plan.rent_price,
+                        'period_from': record_self.date_rent_start,
+                        'period_to': temp_date_e}
+                    _logger.info(f"第一个无增期间={period_data}")
+                    rtn_lst.append(period_data)
+                    _logger.info(f"第一个无增期间lst={rtn_lst}")
+                    if temp_date_e >= record_self.date_rent_end:
+                        return rtn_lst
+
+                # 这才开始进入第一条递增期间
+                temp_date_s = temp_date_e + timedelta(days=1)
+
+                next_date_s_or_total_end = record_self.date_rent_end
+
+                next_date_s = next_date_s_or_total_end + timedelta(days=1)  # 这只是虚拟值，最后一行才用得上
+                # 看看有没有下一条递增率规则
+                if i < len(rental_plan.period_percentage_id) - 1:
+                    next_period_percentage = rental_plan.period_percentage_id[i + 1]
+                    # 下一条规则的开始日
+                    next_date_s = _get_period_total_e(record_self.date_rent_start,
+                                                      next_period_percentage.billing_progress_info_month_from - 1,
+                                                      record_self.date_rent_end) + timedelta(days=1)
+                    next_date_s_or_total_end = min(record_self.date_rent_end, next_date_s)
+
+                while temp_date_s < next_date_s_or_total_end:
+                    # 本条规则的结束日的最大值
+                    this_period_e_max = min(record_self.date_rent_end, next_date_s - timedelta(days=1))
+
+                    temp_date_e = _get_period_total_e(temp_date_s,
+                                                      period_percentage.billing_progress_info_month_every,
+                                                      this_period_e_max)
+                    # 上一条的适配后租金是本条的基础租金
+                    base_rent_amount_monthly_val = rtn_lst[len(rtn_lst) - 1].get('rent_amount_adapt')
+                    base_rent_price = rtn_lst[len(rtn_lst) - 1].get('rent_price_adapt')
+                    period_data = {'property_id': property_id,
+                                   'rent_amount_monthly_val': base_rent_amount_monthly_val,
+                                   'rent_price_val': base_rent_price,
+                                   'billing_method': rental_plan.billing_method,
+                                   'progress_method': rental_plan.billing_progress_method_id,
+                                   'from_n_month': period_percentage.billing_progress_info_month_from,
+                                   'every_x_month': period_percentage.billing_progress_info_month_every,
+                                   'up_percentage': period_percentage.billing_progress_info_up_percentage,
+                                   'rent_amount_adapt': round(base_rent_amount_monthly_val * (
+                                           1 + (period_percentage.billing_progress_info_up_percentage / 100)), 2),
+                                   'rent_price_adapt': round(base_rent_price * (
+                                           1 + (period_percentage.billing_progress_info_up_percentage / 100)), 2),
+                                   'period_from': temp_date_s,
+                                   'period_to': temp_date_e}
+
+                    rtn_lst.append(period_data)
+                    temp_date_s = temp_date_e + timedelta(days=1)
+
+        return rtn_lst  # todo 非期间段递增的情况，也按照固定金额走
+
+    else:  # todo 其他情况暂且按照固定金额走
+        return rtn_lst
+
+
+def _get_period_total_e(current_s, month_cnt, date_e):
+    current_tmp = current_s
+    for i in range(month_cnt):
+        current_e = _get_current_e(current_tmp)
+        current_tmp = current_e + timedelta(days=1)
+
+    # 循环后，再调整结束日期的日至开始日期的日-1
+    if current_s.day == 1:  # 1号开始的期间，按照上述逻辑，最后的current_e就是月末，不用调整
+        pass
+    elif current_s.day <= 29:  # 开始月的日期为29号以下，那么结束月的日子应该是28号
+        current_e = current_e.replace(day=current_s.day - 1)
+    else:  # 开始日期的日为30或者31日
+        if current_e.month != 2:  # 结束日期不是在2月，那么其结束日期可以是N-1
+            current_e = current_e.replace(day=current_s.day - 1)
+        else:  # 结束日期在2月，那么上边逻辑已经计算好了2月末的最后一天小于30、31
+            pass
+
+    if current_e > date_e:
+        current_e = date_e
 
     return current_e
 
@@ -147,48 +293,37 @@ def _generate_details_from_rent_plan(record_self):
         else:
             continue
 
-        # todo 这里仅对固定金额的月租金进行累加并显示，完整的逻辑应该根据租金方案逐条计算
+        # 20240808 之前 这里仅对固定金额的月租金进行累加并显示，完整的逻辑应该根据租金方案逐条计算
+        # 20240808 增加按期间段递增率的计算，其他分支 todo
         if property_id.rent_amount_monthly_adjust:
             rent_amount_monthly_val = property_id.rent_amount_monthly_adjust
         else:
             rent_amount_monthly_val = round(rental_plan.rent_price * property_id.rent_area * 365 / 12, 2)
 
-        temp_rent_amount += rent_amount_monthly_val
-
         temp_deposit_amount += property_id.deposit_amount if property_id.deposit_amount else 0
 
         month_cnt = int(rental_plan.payment_period) if rental_plan.payment_period else 1
 
+        # 预备出当前资产的租金方案的租金适配期间
+        rent_price_period_lst = _prepare_rent_price_period_lst(property_id, rent_amount_monthly_val, rental_plan,
+                                                               record_self)
+        _logger.info(f"rent_price_period_lst={rent_price_period_lst}")
+
         current_s = date_s
         period_no = 1
         while current_s <= date_e:
-
             # 计算本期结束日
-            current_tmp = current_s
-            for i in range(month_cnt):
-                current_e = _get_current_e(current_tmp)
-                current_tmp = current_e + timedelta(days=1)
+            current_e = _get_period_total_e(current_s, month_cnt, date_e)
 
-            # 循环后，再调整结束日期的日至开始日期的日-1
-            if current_s.day == 1:  # 1号开始的期间，按照上述逻辑，最后的current_e就是月末，不用调整
-                pass
-            elif current_s.day <= 29:  # 开始月的日期为29号以下，那么结束月的日子应该是28号
-                current_e = current_e.replace(day=current_s.day - 1)
-            else:  # 开始日期的日为30或者31日
-                if current_e.month != 2:  # 结束日期不是在2月，那么其结束日期可以是N-1
-                    current_e = current_e.replace(day=current_s.day - 1)
-                else:  # 结束日期在2月，那么上边逻辑已经计算好了2月末的最后一天小于30、31
-                    pass
-
-            if current_e > date_e:
-                current_e = date_e
-
+            rent_amount_monthly_adapt, rent_price_adapt = _cal_rent_price_and_amount_monthly_val(current_s,
+                                                                                                 rent_price_period_lst)
+            _logger.info(f"{period_no}期-月租={rent_amount_monthly_adapt}，单价={rent_price_adapt}")
             # 计算支付日期
             date_payment = _cal_date_payment(current_s, current_e, rental_plan, date_e)
             billing_method_str = dict(rental_plan._fields['billing_method'].selection).get(rental_plan.billing_method)
             payment_date_str = dict(rental_plan._fields['payment_date'].selection).get(rental_plan.payment_date)
             rental_amount = _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property_id,
-                                               rental_plan)
+                                               rent_price_adapt, rent_amount_monthly_adapt)
             rental_amount_zh = Utils.arabic_to_chinese(rental_amount)
 
             rental_periods_details.append({
@@ -210,7 +345,9 @@ def _generate_details_from_rent_plan(record_self):
             current_s = current_e + timedelta(days=1)
             period_no += 1
 
+        temp_rent_amount += rent_amount_monthly_val  # 这里还是显示基础月租
         print("{1}.rental_periods={0}".format(rental_periods_details, rental_plan.name))
+        _logger.info(f"temp_rent_amount={temp_rent_amount}")
 
     record_self.rent_amount = temp_rent_amount
     record_self.rent_amount_year = temp_rent_amount * 12
