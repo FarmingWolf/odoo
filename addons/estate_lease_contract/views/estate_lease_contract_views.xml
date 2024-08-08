@@ -64,11 +64,11 @@
                             <field name="parking_space_ids"/>
                         </page>
                         <page string="租金方案">
-                            <button name="action_refresh_rental_plan" type="object" string="点击刷新"/>
+                            <button name="action_refresh_rental_plan" type="object" string="点击刷新" invisible=""/>
                             <field name="rental_plan_ids"/>
                         </page>
                         <page string="物业费方案" id="page_management_fee_plan">
-                            <button name="action_refresh_management_fee_plan" type="object" string="点击刷新"/>
+                            <button name="action_refresh_management_fee_plan" type="object" string="点击刷新" invisible="context.get('contract_read_only')"/>
                             <field name="property_management_fee_plan_ids"/>
                         </page>
                         <page string="优惠方案" id="page_incentives">

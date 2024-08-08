@@ -23,16 +23,24 @@ class EstateLeaseContractRentalPeriodPercentage(models.Model):
     """
     _name = "estate.lease.contract.rental.period.percentage"
     _description = "递增率设置"
-    _order = "billing_progress_info_month_from"
+    _order = "billing_progress_info_month_from ASC"
 
     name = fields.Char('期间递增率名', required=True)
-    sequence = fields.Integer('排序', default=1)
+
     # 按时间段递增的情况下：
     billing_progress_info_month_from = fields.Integer(string="从第N月起")
     billing_progress_info_month_every = fields.Integer(string="每X个月")
     billing_progress_info_up_percentage = fields.Float(default=0.0, string="递增百分比")
 
     name_description = fields.Char(string="时间段递增率描述", readonly=True, compute="_combine_description")
+    sequence = fields.Integer(default='_compute_sequence', store=True, string='排序')
+
+    def _compute_sequence(self):
+        for record in self:
+            if record.billing_progress_info_month_from:
+                record.sequence = record.billing_progress_info_month_from
+            else:
+                record.sequence = 1
 
     _sql_constraints = [
         ('name',

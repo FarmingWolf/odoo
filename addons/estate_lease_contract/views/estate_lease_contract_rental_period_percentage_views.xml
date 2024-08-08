@@ -17,7 +17,7 @@
         <field name="name">estate.lease.contract.rental.period.percentage.tree</field>
         <field name="model">estate.lease.contract.rental.period.percentage</field>
         <field name="arch" type="xml">
-            <tree string="estate_lease_contract_rental_period_percentage_tree">
+            <tree string="estate_lease_contract_rental_period_percentage_tree" default_order="billing_progress_info_month_from">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="name_description"/>

@@ -5,8 +5,24 @@ import math
 
 from odoo import fields, models, api
 from odoo.exceptions import UserError
+from odoo.netsvc import log
 
 _logger = logging.getLogger(__name__)
+
+
+def _check_is_period_percentage(vals):
+    if "billing_method" in vals:
+        if vals['billing_method'] == 'by_progress':
+            if 'billing_progress_method_id' in vals:
+                if vals['billing_progress_method_id'] == 'by_period':
+                    if 'period_percentage_id' not in vals:
+                        raise UserError("请设置时间段递增规则详情!")
+                    else:
+                        if not vals['period_percentage_id']:
+                            raise UserError("请设置时间段递增规则详情!")
+                        else:
+                            return True
+    return False
 
 
 class EstateLeaseContractRentalPlan(models.Model):
@@ -77,19 +93,11 @@ class EstateLeaseContractRentalPlan(models.Model):
 
     @api.model
     def create(self, vals_list):
-        # 先做：按期间段递增率的检查，即 从第N月起的每X个月递增百分比，其他分支 todo
         _logger.info(f"vals_list={vals_list}")
-        if "billing_method" in vals_list:
-            if vals_list['billing_method'] == 'by_progress':
-                if 'billing_progress_method_id' in vals_list:
-                    if vals_list['billing_progress_method_id'] == 'by_period':
-                        if 'period_percentage_id' not in vals_list:
-                            raise UserError("请设置时间段递增规则详情!")
-                        else:
-                            if not vals_list['period_percentage_id']:
-                                raise UserError("请设置时间段递增规则详情!")
-                            else:
-                                self._check_method_by_period(vals_list['period_percentage_id'])
+        if _check_is_period_percentage(vals_list):
+            self._check_method_by_period(vals_list['period_percentage_id'])
+        else:
+            pass  # 先做：按期间段递增率的检查，即 从第N月起的每X个月递增百分比，其他分支 todo
 
         res = super().create(vals_list)
         return res
@@ -114,15 +122,63 @@ class EstateLeaseContractRentalPlan(models.Model):
             _logger.info(f"by_period_method={by_period_method}")
             if i > 0:
                 df = by_period_method.billing_progress_info_month_from - \
-                     record_sorted[i-1].billing_progress_info_month_from
-                if math.fmod(df, by_period_method.billing_progress_info_month_every) != 0:
+                     record_sorted[i - 1].billing_progress_info_month_from
+                if df == 0 or math.fmod(df, by_period_method.billing_progress_info_month_every) != 0:
                     err_msg = f"期间段递增率明细设置有误！\n" \
-                              f"【{by_period_method.name}】与【{record_sorted[i-1].name}】的起始月相差月数：" \
+                              f"【{by_period_method.name}】与【{record_sorted[i - 1].name}】的起始月相差月数：" \
                               f"{by_period_method.billing_progress_info_month_from} - " \
-                              f"{record_sorted[i-1].billing_progress_info_month_from}={df}不是" \
-                              f"{record_sorted[i-1].billing_progress_info_month_every}的整数倍，请调整！"
+                              f"{record_sorted[i - 1].billing_progress_info_month_from}={df}" \
+                              f"{'不是' if df > 0 else ''}" \
+                              f"{record_sorted[i - 1].billing_progress_info_month_every if df > 0 else ''}" \
+                              f"{'的整数倍，请调整！' if df > 0 else ''}"
 
                     raise UserError(err_msg)
 
             i += 1
 
+    @api.model
+    def write(self, vals):
+        _logger.info(f"vals={vals}")
+        _logger.info(f'old period_percentage_id={self.period_percentage_id}')
+
+        # 先检查是否按时间段递增的设置
+        if self._check_is_period_percentage_4_update(vals):
+            tgt_period_percentage = list(self.period_percentage_id.ids)
+            if 'period_percentage_id' in vals:
+                for period_percentage in vals['period_percentage_id']:  # 目前看只有3：UNLINK和4：LINK
+                    _logger.info(f"in for period_percentage={period_percentage}")
+                    _logger.info(f"before +- tgt_period_percentage={tgt_period_percentage}")
+                    if period_percentage[0] in (3, 2):
+                        tgt_period_percentage.remove(period_percentage[1])
+                        _logger.info(f"after - tgt_period_percentage={tgt_period_percentage}")
+                    elif period_percentage[0] == 4:
+                        tgt_period_percentage.append(period_percentage[1])
+                        _logger.info(f"after + tgt_period_percentage={tgt_period_percentage}")
+                    else:
+                        raise UserWarning(f"时间段递增率受到了一种未知设置！{period_percentage}")
+
+            period_percentage_2_check = [[0, item] for item in tgt_period_percentage]
+            self._check_method_by_period(period_percentage_2_check)
+        else:
+            pass  # 先做：按期间段递增率的检查，即 从第N月起的每X个月递增百分比，其他分支 todo
+
+        res = super().write(vals)
+        return res
+
+    def _check_is_period_percentage_4_update(self, vals):
+        if ("billing_method" in vals and vals['billing_method'] == 'by_progress') or \
+                ("billing_method" not in vals and self.billing_method == 'by_progress'):
+            if ('billing_progress_method_id' in vals and vals['billing_progress_method_id'] == 'by_period') or \
+                    ('billing_progress_method_id' not in vals and self.billing_progress_method_id == 'by_period'):
+                if 'period_percentage_id' not in vals:
+                    if not self.period_percentage_id:
+                        raise UserError("请设置时间段递增规则详情!")
+                    else:
+                        return True
+                else:
+                    if not vals['period_percentage_id']:
+                        raise UserError("请设置时间段递增规则详情!")
+                    else:
+                        return True
+
+        return False
