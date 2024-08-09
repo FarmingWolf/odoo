@@ -280,7 +280,7 @@
     </xpath>
 </template>
 
-<template id="brand_promotion" inherit_id="web.brand_promotion" name="Brand Promotion">
+<template id="brand_promotion" inherit_id="web.brand_promotion" name="Brand Promotion" invisible="1">
     <xpath expr="//t[@t-call='web.brand_promotion_message']" position="replace">
         <t t-call="web.brand_promotion_message">
             <t t-set="_message">
