@@ -75,7 +75,7 @@
                                 <div class="col-sm text-center text-sm-start text-muted">
                                     <span class="o_footer_copyright_name me-2">Copyright &amp;copy; <span t-field="res_company.name" itemprop="name">Company name</span></span>
                                 </div>
-                                <div class="col-sm text-center text-sm-end">
+                                <div class="col-sm text-center text-sm-end" style="display: none;">
                                     <t t-call="web.brand_promotion"/>
                                 </div>
                             </div>
