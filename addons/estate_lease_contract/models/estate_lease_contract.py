@@ -374,11 +374,11 @@ class EstateLeaseContract(models.Model):
     # contract_tax_per = fields.Float("税率", default=0.0)
     # contract_tax_out = fields.Float("不含税合同额", default=0.0)
 
-    date_sign = fields.Date("合同签订日期", required=True, copy=False)
-    date_start = fields.Date("合同开始日期", required=True, copy=False)
+    date_sign = fields.Date("合同签订日期", required=True, copy=False, default=fields.Date.context_today)
+    date_start = fields.Date("合同开始日期", required=True, copy=False, default=fields.Date.context_today)
 
-    date_rent_start = fields.Date("计租开始日期", required=True, copy=False, tracking=True)
-    date_rent_end = fields.Date("计租结束日期", required=True, copy=False, tracking=True)
+    date_rent_start = fields.Date("计租开始日期", required=True, copy=False, tracking=True, default=fields.Date.context_today)
+    date_rent_end = fields.Date("计租结束日期", required=True, copy=False, tracking=True, default=fields.Date.context_today)
 
     days_rent_total = fields.Char(string="租赁期限", compute="_calc_days_rent_total")
 
@@ -509,7 +509,7 @@ class EstateLeaseContract(models.Model):
     opening_date = fields.Date(string="计划开业日期")
 
     rental_plan_ids = fields.One2many("estate.lease.contract.rental.plan", compute='_compute_rental_plan_ids',
-                                      string='租金方案', copy=False, tracking=True)
+                                      string='租金方案', copy=True, tracking=True)
 
     @api.depends('property_ids')
     def _compute_rental_plan_ids(self):
@@ -521,7 +521,7 @@ class EstateLeaseContract(models.Model):
 
     property_management_fee_plan_ids = fields.One2many("estate.lease.contract.property.management.fee.plan",
                                                        compute='_compute_property_management_fee_plan_ids',
-                                                       string="物业费方案", copy=False, tracking=True)
+                                                       string="物业费方案", copy=True, tracking=True)
 
     @api.depends('property_ids')
     def _compute_property_management_fee_plan_ids(self):
@@ -541,7 +541,7 @@ class EstateLeaseContract(models.Model):
 
     parking_space_ids = fields.Many2many('parking.space', 'contract_parking_space_rel', 'contract_id',
                                          'parking_space_id',
-                                         string='停车位', copy=False, tracking=True)
+                                         string='停车位', copy=True, tracking=True)
 
     parking_space_count = fields.Integer(default=0, string="分配停车位数量", compute="_calc_parking_space_cnt")
 
@@ -552,17 +552,17 @@ class EstateLeaseContract(models.Model):
             if record.parking_space_ids:
                 record.parking_space_count = len(record.parking_space_ids)
 
-    invoicing_address = fields.Char('发票邮寄地址', translate=True, copy=False)
-    invoicing_email = fields.Char('电子发票邮箱', translate=True, copy=False)
+    invoicing_address = fields.Char('发票邮寄地址', translate=True, copy=True)
+    invoicing_email = fields.Char('电子发票邮箱', translate=True, copy=True)
 
     sales_person_id = fields.Many2one('res.users', string='招商员', index=True, default=lambda self: self.env.user)
     opt_person_id = fields.Many2one('res.users', string='录入员', index=True, default=lambda self: self.env.user)
 
-    renter_id = fields.Many2one('res.partner', string='承租人', index=True, copy=False, tracking=True)
-    renter_company_id = fields.Many2one('res.partner', string='经营公司', index=True, copy=False, tracking=True)
+    renter_id = fields.Many2one('res.partner', string='承租人', index=True, copy=True, tracking=True)
+    renter_company_id = fields.Many2one('res.partner', string='经营公司', index=True, copy=True, tracking=True)
 
     property_ids = fields.Many2many('estate.property', 'contract_property_rel', 'contract_id', 'property_id',
-                                    string='租赁标的', copy=False, tracking=True)
+                                    string='租赁标的', copy=True, tracking=True)
 
     rent_count = fields.Integer(default=0, string="租赁标的数量", compute="_calc_rent_total_info", copy=False)
     building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", compute="_calc_rent_total_info", copy=False)
@@ -698,9 +698,23 @@ class EstateLeaseContract(models.Model):
                                      compute='_compute_rental_details', string="租金明细", readonly=False)
 
     def _compute_edit_on_hist_page(self):
-        return self.env.user.has_group('estate_lease_contract.estate_lease_contract_group_manager')
+        """合同管理员希望在合同发布后，在查看界面也可以随时修改"""
+        if self.env.user.has_group('estate_lease_contract.estate_lease_contract_group_manager'):
+            for record in self:
+                record.edit_on_hist_page = True
+            return True
 
-    edit_on_hist_page = fields.Boolean(string='历史页面可编辑', default=_compute_edit_on_hist_page, store=False)
+        if self.env.context.get('contract_read_only'):
+            for record in self:
+                record.edit_on_hist_page = False
+            return False
+
+        for record in self:
+            record.edit_on_hist_page = True
+        return True
+
+    edit_on_hist_page = fields.Boolean(string='历史页面可编辑', default=_compute_edit_on_hist_page,
+                                       compute=_compute_edit_on_hist_page, store=False)
 
     @api.depends("property_ids", "rental_plan_ids")
     def _compute_rental_details(self):
@@ -884,12 +898,42 @@ class EstateLeaseContract(models.Model):
     # 手动续租
     def action_contract_renewal(self):
         # 续租，延用字段：
-        default = {"contract_no": f"{self.contract_no}-xz-01"}
-        self.copy(default)
+        default = {
+            "contract_no": f"{self.contract_no}-xz-01",
+            "date_rent_start": self.date_rent_end + timedelta(days=1),
+            "date_rent_end": self.date_rent_end + timedelta(days=1) + (self.date_rent_end - self.date_rent_start),
+        }
+        return self.copy(default)
 
     @api.returns('self', lambda value: value.id)
     def copy(self, default=None):
 
         default = dict(default or {})
 
-        return super().copy(default)
+        new_record = super().copy(default)
+        title = "资产租赁合同列表（续租录入）"
+        # 设置上下文
+        context = {
+            'search_default_active': False,
+            'contract_read_only': False,
+            'menu_root': 'estate.lease.contract'
+        }
+        # 设置域
+        domain = [('id', '=', new_record.id), ('active', '=', False)]
+
+        # 跳转到新记录的表单视图
+        return self._action_view_record(new_record.id, title, context, domain)
+
+    def _action_view_record(self, record_id, title, context, domain):
+        """ 返回一个 action，用于显示指定 ID 的记录的表单视图 """
+        action = {
+            'name': title,
+            'type': 'ir.actions.act_window',
+            'res_model': 'estate.lease.contract',
+            'view_mode': 'form',
+            'res_id': record_id,
+            'context': context,
+            'domain': domain,
+            'target': 'current',
+        }
+        return action
