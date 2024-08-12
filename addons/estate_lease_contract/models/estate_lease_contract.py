@@ -382,6 +382,8 @@ class EstateLeaseContract(models.Model):
 
     days_rent_total = fields.Char(string="租赁期限", compute="_calc_days_rent_total")
 
+    """
+    rental_plans_for_property 貌似在哪都没用到
     def _compute_rental_plans_for_property(self):
         print("进入_compute_rental_plans_for_property")
         print(f"self.env.context.get('active_id')={self.env.context.get('active_id')}")
@@ -394,10 +396,15 @@ class EstateLeaseContract(models.Model):
             ])
             return contract.rental_plans_for_property
 
+        return False
+
     rental_plans_for_property = fields.One2many('estate.lease.contract.rental.plan.rel',
                                                 compute='_compute_rental_plans_for_property',
                                                 default=lambda self: self._compute_rental_plans_for_property,
                                                 string='合同-资产-租金方案', store=False)
+    
+    """
+
     """ 这俩函数就是个废柴
     @api.onchange("contract_no")
     def _onchange_contract_no(self):
@@ -608,7 +615,7 @@ class EstateLeaseContract(models.Model):
     contract_incentives_ids = fields.Many2one('estate.lease.contract.incentives', string='优惠方案', copy=False)
     date_incentives_start = fields.Char(string="优惠政策开始日期", readonly=True, compute="_get_incentives_info")
     date_incentives_end = fields.Char(string="优惠政策结束日期", readonly=True, compute="_get_incentives_info")
-    days_free = fields.Char(string="免租期天数", readonly=True, compute="_get_incentives_info")
+    days_free = fields.Integer(string="免租期天数", readonly=True, compute="_get_incentives_info")
     business_discount_days = fields.Char(string="经营优惠（天）", readonly=True, compute="_get_incentives_info")
     business_discount_amount = fields.Char(string="经营优惠（元）", readonly=True, compute="_get_incentives_info")
     decoration_discount_days = fields.Char(string="装修优惠（天）", readonly=True, compute="_get_incentives_info")
@@ -689,6 +696,11 @@ class EstateLeaseContract(models.Model):
 
     rental_details = fields.One2many('estate.lease.contract.property.rental.detail', 'contract_id', store=True,
                                      compute='_compute_rental_details', string="租金明细", readonly=False)
+
+    def _compute_edit_on_hist_page(self):
+        return self.env.user.has_group('estate_lease_contract.estate_lease_contract_group_manager')
+
+    edit_on_hist_page = fields.Boolean(string='历史页面可编辑', default=_compute_edit_on_hist_page, store=False)
 
     @api.depends("property_ids", "rental_plan_ids")
     def _compute_rental_details(self):
@@ -868,3 +880,16 @@ class EstateLeaseContract(models.Model):
 
         self._delete_contract_property_rental_plan_rel()
         return super().unlink()
+
+    # 手动续租
+    def action_contract_renewal(self):
+        # 续租，延用字段：
+        default = {"contract_no": f"{self.contract_no}-xz-01"}
+        self.copy(default)
+
+    @api.returns('self', lambda value: value.id)
+    def copy(self, default=None):
+
+        default = dict(default or {})
+
+        return super().copy(default)

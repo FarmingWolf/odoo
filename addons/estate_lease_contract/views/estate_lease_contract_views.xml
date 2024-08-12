@@ -4,20 +4,22 @@
         <field name="name">estate.lease.contract.form</field>
         <field name="model">estate.lease.contract</field>
         <field name="arch" type="xml">
-            <form string="estate_lease_contract_form">
+            <form string="estate_lease_contract_form" duplicate="False">
                 <header>
                     <button name="action_release_contract" type="object" string="发布"
                             invisible="context.get('contract_read_only')"/>
                     <button name="action_cancel_release_contract" type="object" string="取消发布"/>
+                    <button name="action_contract_renewal" type="object" string="续租" groups="estate_lease_contract.estate_lease_contract_group_manager" invisible="1"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
                     <group col="2">
                         <group>
+                            <field name="edit_on_hist_page" invisible="1"/>
                             <field name="default_context_contract_id" invisible="1"/>
                             <field name="name" readonly="context.get('contract_read_only')"/>
-                            <field name="contract_no" readonly="context.get('contract_read_only')"/>
-                            <field name="contract_type_id" readonly="context.get('contract_read_only')"/>
+                            <field name="contract_no" readonly="context.get('contract_read_only') and not edit_on_hist_page"/>
+                            <field name="contract_type_id" readonly="context.get('contract_read_only') and not edit_on_hist_page"/>
                             <field name="renter_id" readonly="context.get('contract_read_only')"/>
                             <field name="renter_company_id" readonly="context.get('contract_read_only')"/>
                             <field name="sales_person_id" readonly="context.get('contract_read_only')"/>
