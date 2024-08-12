@@ -325,8 +325,10 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 if each_property.state == "sold":
                     if current_contract.date_rent_end:
                         if current_date > current_contract.date_rent_end:
-                            each_property.state == "out_dated"
+                            each_property.state = "out_dated"
                             state_change = True
+                            # 合同状态更新为invalid=过期/失效
+                            current_contract.write({'state': 'invalid'})
                 else:
                     if current_contract.date_start and current_contract.date_rent_end:
                         if current_contract.date_start <= current_date <= current_contract.date_rent_end:
