@@ -40,7 +40,6 @@
                             <field name="opening_date" readonly="context.get('contract_read_only')"/>
                             <field name="rent_amount_first_period" readonly="context.get('contract_read_only')"/>
                             <field name="rent_first_payment_date" readonly="context.get('contract_read_only')"/>
-                            <field name="performance_guarantee" readonly="context.get('contract_read_only')"/>
                             <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}"
                                    readonly="context.get('contract_read_only')"/>
                         </group>
@@ -213,14 +212,13 @@
 
                 <field name="default_context_contract_id" column_invisible="1"/>
                 <field name="sequence" widget="handle"/>
+                <field name="property_ids" widget="many2many_tags" string="租赁房屋" options="{'color_field': 'color'}"/>
                 <field name="contract_no"/>
-                <!--                <field name="name"/>-->
                 <field name="date_sign"/>
                 <field name="date_start"/>
                 <field name="date_rent_start"/>
                 <field name="date_rent_end"/>
                 <field name="state"/>
-                <field name="property_ids" widget="many2many_tags" string="租赁场地" options="{'color_field': 'color'}"/>
                 <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}"/>
                 <field name="renter_id"/>
                 <field name="renter_company_id"/>
@@ -238,14 +236,13 @@
                   create="True" delete="True" edit="True">
                 <field name="default_context_contract_id" column_invisible="1"/>
                 <field name="sequence" widget="handle"/>
+                <field name="property_ids" widget="many2many_tags" string="租赁房屋" options="{'color_field': 'color'}"/>
                 <field name="contract_no"/>
-                <!--                <field name="name"/>-->
                 <field name="date_sign"/>
                 <field name="date_start"/>
                 <field name="date_rent_start"/>
                 <field name="date_rent_end"/>
                 <field name="state"/>
-                <field name="property_ids" widget="many2many_tags" string="租赁场地" options="{'color_field': 'color'}"/>
                 <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}"/>
                 <field name="renter_id"/>
                 <field name="renter_company_id"/>

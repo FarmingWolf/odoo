@@ -366,7 +366,7 @@ class EstateLeaseContract(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _mail_post_access = 'read'
 
-    name = fields.Char('合同名称', required=True, translate=True, copy=False, default="四九一空间房屋租赁合同")
+    name = fields.Char('合同名称', required=True, translate=True, copy=True, default="491空间房屋租赁合同")
 
     contract_no = fields.Char('合同编号', required=True, translate=True, copy=False, default="")
     # contract_amount = fields.Float("合同金额", default=0.0)
