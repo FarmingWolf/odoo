@@ -52,8 +52,10 @@ class EstateProperty(models.Model):
     property_type_id = fields.Many2one("estate.property.type", string="资产类型")
     tag_ids = fields.Many2many("estate.property.tag", string="标签")
     sales_person_id = fields.Many2one('res.users', string='销售员', index=True,
-                                      default=lambda self: self.env.user)
-    buyer_id = fields.Many2one('res.partner', string='购买人', index=True)
+                                      default=lambda self: self.env.user,
+                                      domain="[('company_id', '=', company_id)]")
+    buyer_id = fields.Many2one('res.partner', string='购买人', index=True,
+                               domain="[('company_id', '=', company_id)]")
     offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价")
     building_no = fields.Char(string='楼号')
     floor = fields.Char(default=1, string='楼层')

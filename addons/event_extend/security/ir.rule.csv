@@ -1,0 +1,8 @@
+id,name,model_id:id,domain_force
+event_company_account_rule,Restrict Event by Company,model_event_event,"[('company_id','=',user.company_id.id)]"
+event_venues_company_account_rule,Restrict Event Venues by Company,model_event_event_venues,"[('company_id','=',user.company_id.id)]"
+event_track_location_account_rule,Restrict Event Track Location by Company,model_event_track_location,"[('company_id','=',user.company_id.id)]"
+event_track_stage_account_rule,Restrict Event Track Stage by Company,model_event_track_stage,"[('company_id','=',user.company_id.id)]"
+event_stage_account_rule,Restrict Event Stage by Company,model_event_stage,"[('company_id','=',user.company_id.id)]"
+event_tag_account_rule,Restrict Event Tag by Company,model_event_tag,"[('company_id','=',user.company_id.id)]"
+event_tag_category_account_rule,Restrict Event Tag Category by Company,model_event_tag_category,"[('company_id','=',user.company_id.id)]"

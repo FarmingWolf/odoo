@@ -19,6 +19,7 @@ class ParkingSpace(models.Model):
     parking_space_type_id = fields.Many2one("parking.space.type", string="停车位类型", store=True)
     parking_lot_id = fields.Many2one("parking.lot", string="园区停车场")
     color = fields.Integer()
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     @api.depends('parking_lot_id')
     def _compute_park_id(self):

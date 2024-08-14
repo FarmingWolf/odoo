@@ -31,7 +31,8 @@ class OperationContractVenues(models.Model):
     name = fields.Char('合同名称', related="operation_contract_id.name")
     operation_contract_id = fields.Many2one('operation.contract.contract', string='合同')
 
-    contract_venue_id = fields.Many2one('event.track.location', string='活动地点', required=True)
+    contract_venue_id = fields.Many2one('event.track.location', string='活动地点', required=True,
+                                        domain=lambda self: [('company_id', '=', self.env.user.company_id.id)])
     venue_date_begin = fields.Datetime(string="使用开始时间", required=True)
     venue_date_end = fields.Datetime(string="使用结束时间", required=True)
 
@@ -45,6 +46,7 @@ class OperationContractVenues(models.Model):
         return (self.search([], order="sequence desc", limit=1).sequence or 0) + 1
 
     sequence = fields.Integer(string='序号', default=_default_sequence)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     _sql_constraints = [("venue_date_s_e_check",
                          "CHECK(venue_date_end > venue_date_begin)", "结束时间必须在开始时间之后！"),

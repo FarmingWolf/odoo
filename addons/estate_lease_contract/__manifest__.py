@@ -26,6 +26,7 @@
         'security/ir.model.access.csv',
         'security/estate.lease.contract.rental.business.type.csv',
         'security/estate.lease.contract.rental.main.category.csv',
+        'security/ir.rule.csv',
 
         'views/estate_lease_contract_bank_account_views.xml',
         'views/estate_lease_contract_incentives_views.xml',

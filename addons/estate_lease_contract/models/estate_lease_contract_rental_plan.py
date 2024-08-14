@@ -86,9 +86,10 @@ class EstateLeaseContractRentalPlan(models.Model):
         string='补差周期',
         selection=[('by_payment_period', '支付周期补差'), ('by_natural_half_year', '自然半年补差'),
                    ('by_natural_year', '自然年补差'), ('by_contract_year', '租约年补差')], )
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     _sql_constraints = [
-        ('name', 'unique(name)', '租金方案名不能重复')
+        ('name', 'unique(name, company_id)', '租金方案名不能重复')
     ]
 
     @api.model
@@ -109,8 +110,9 @@ class EstateLeaseContractRentalPlan(models.Model):
             if len(method) == 2:
                 methods_by_period_ids.append(method[1])
 
-        record_sorted = self.env['estate.lease.contract.rental.period.percentage'].search([
-            ('id', 'in', methods_by_period_ids)], order='billing_progress_info_month_from ASC')
+        domain = [('company_id', '=', self.env.user.company_id.id), ('id', 'in', methods_by_period_ids)]
+        record_sorted = self.env['estate.lease.contract.rental.period.percentage'].\
+            search(domain, order='billing_progress_info_month_from ASC')
 
         if not record_sorted or len(record_sorted) == 0:
             raise UserError("请设置时间段递增规则详情!")

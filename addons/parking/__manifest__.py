@@ -13,6 +13,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'security/ir.rule.csv',
 
         'views/parking_views.xml',
         'views/parking_lot_views.xml',

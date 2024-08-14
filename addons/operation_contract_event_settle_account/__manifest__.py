@@ -15,7 +15,8 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
-        
+        'security/ir.rule.csv',
+
         'views/operation_contract_event_settle_account_views.xml',
     ],
     'assets': {

@@ -13,7 +13,8 @@ class EstateLeaseContractTag(models.Model):
     color = fields.Integer()
     active = fields.Boolean(default=True)
     sequence = fields.Integer('排序', default=1)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     _sql_constraints = [
-        ('name', 'unique(name)', '合同标签不能重复')
+        ('name', 'unique(name, company_id)', '合同标签不能重复')
     ]

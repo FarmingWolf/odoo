@@ -1,0 +1,4 @@
+id,name,model_id:id,domain_force
+operation_contract_event_settle_account_rule,Restrict Operation Contract Event Settle Account by Company,model_operation_contract_event_settle_account,"[('company_id','=',user.company_id.id)]"
+operation_contract_event_settle_account_group_rule,Restrict Operation Contract Event Settle Account Group by Company,model_operation_contract_event_settle_account_group,"[('company_id','=',user.company_id.id)]"
+

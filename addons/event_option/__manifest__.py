@@ -15,6 +15,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'security/ir.rule.csv',
 
         'views/event_option_group_views.xml',
     ],

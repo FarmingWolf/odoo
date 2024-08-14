@@ -48,12 +48,30 @@
             </field>
         </record>
 
+
+        <record id="view_partner_tree" model="ir.ui.view">
+            <field name="name">operation.contract.partner.view.tree</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='company_id']"
+                       position="attributes">
+                    <attribute name="column_invisible">True</attribute>
+                </xpath>
+                <xpath expr="//field[@name='company_id']"
+                       position="after">
+                    <field name="is_company"/>
+                </xpath>
+            </field>
+        </record>
+
         <record model="ir.ui.view" id="view_operation_contract_form">
             <field name="name">operation.contract.form</field>
             <field name="model">operation.contract.contract</field>
             <field name="arch" type="xml">
                 <form string="运营合同" class="o_event_form_view">
                     <header>
+                        <field name="company_id" invisible="1"/>
                         <field name="page_editable" invisible="1"/>
                         <field name="stage_sequence" invisible="1"/>
                         <field name="stage_op_department_id" invisible="1"/>
@@ -194,10 +212,9 @@
                                     <field nolabel="1" colspan="2" name="description"
                                            placeholder="请输入合同活动内容，如：活动方案、嘉宾流程、搭建方案等"
                                            readonly="not page_editable"/>
-                                    <group string="附件">
-                                        <field name="op_contract_attachment_ids" options="{'no_create': True}"
-                                               groups="!operation_contract.estate_management_dep_contract_read"
-                                               readonly="not page_editable" string=""/>
+                                    <group string="附件" groups="!operation_contract.estate_management_dep_contract_read">
+                                        <field name="op_contract_attachment_ids" options="{'no_create': False}"
+                                               readonly="not page_editable" string="" />
                                     </group>
                                 </h5>
                             </div>

@@ -7,10 +7,7 @@
         <field name="context">{'search_default_active': True}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                这里可以展示0些文本信息。
-            </p>
-            <p>
-                这里可以展示一些文本信息。
+                在园区下创建停车场。
             </p>
         </field>
     </record>
@@ -26,4 +23,28 @@
             </tree>
         </field>
     </record>
+
+    <record id="parking_lot_view_form" model="ir.ui.view">
+        <field name="name">parking.lot.form</field>
+        <field name="model">parking.lot</field>
+        <field name="arch" type="xml">
+            <form string="parking_lot_form">
+                <group>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                    <group>
+                        <field name="parking_space_cnt"/>
+                    </group>
+                </group>
+                <field name="parking_space_ids">
+                    <tree>
+                        <field name="name"/>
+                        <field name="parking_space_type_id"/>
+                    </tree>
+                </field>
+            </form>
+        </field>
+    </record>
+
 </odoo>

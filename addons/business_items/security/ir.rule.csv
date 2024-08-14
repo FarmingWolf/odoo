@@ -1,0 +1,3 @@
+id,name,model_id:id,domain_force
+business_items_account_rule,Restrict Business Items by Company,model_business_items,"[('company_id','=',user.company_id.id)]"
+business_items_group_account_rule,Restrict Business Items Group by Company,model_business_items_group,"[('company_id','=',user.company_id.id)]"

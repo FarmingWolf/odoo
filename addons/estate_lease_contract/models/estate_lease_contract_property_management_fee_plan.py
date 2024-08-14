@@ -21,6 +21,7 @@ class EstateLeaseContractPropertyManagementFeePlan(models.Model):
     billing_progress_info_up_percentage = fields.Float(default=0.0, string="递增百分比")
     name_description = fields.Char(string="方案描述", compute="_get_name_description")
     rent_targets = fields.One2many("estate.property", "management_fee_plan_id", string='对应标的')
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     @api.depends("name", "property_management_fee_price", "billing_progress_method_id",
                  "billing_progress_info_month_from", "billing_progress_info_month_every",
@@ -41,5 +42,5 @@ class EstateLeaseContractPropertyManagementFeePlan(models.Model):
                                    record.billing_progress_info_up_percentage)
 
     _sql_constraints = [
-        ('name', 'unique(name)', '物业费方案名不能重复')
+        ('name', 'unique(name, company_id)', '物业费方案名不能重复')
     ]

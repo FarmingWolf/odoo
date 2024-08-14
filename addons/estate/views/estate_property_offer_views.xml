@@ -23,6 +23,7 @@
             <form string="RealEstatePropertyOffer" create="True" edit="True" duplicate="True" delete="True">
                 <sheet>
                     <group>
+                        <field name="company_id" invisible="1"/>
                         <field name="property_id" string="资产对象" readonly="True" options="{'no_open': True}"/>
                         <field name="property_type_id" string="资产类别" readonly="True" options="{'no_open': True}"/>
                         <field name="price"  string="报价"/>

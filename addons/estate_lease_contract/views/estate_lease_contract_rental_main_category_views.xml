@@ -6,11 +6,41 @@
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                这里可以展示一些文本信息。
+                设置租金方案中该资产的经营主品类。
             </p>
             <p>
-                这里可以展示二些文本信息。
+                同一资产在不同租赁合同中可能处于不同的经营主品类，从而影响合同租金单价。设置经营业态便于管理者掌握各品类与资产租赁价格匹配状况。
             </p>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_rental_main_category_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.rental.main.category.tree</field>
+        <field name="model">estate.lease.contract.rental.main.category</field>
+        <field name="arch" type="xml">
+            <tree string="主品类">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_rental_main_category_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.rental.main.category.form</field>
+        <field name="model">estate.lease.contract.rental.main.category</field>
+        <field name="arch" type="xml">
+            <form string="主品类" create="True" edit="True" duplicate="False" delete="True">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
         </field>
     </record>
 </odoo>

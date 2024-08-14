@@ -28,12 +28,11 @@ class EstateLeaseContractRentalPeriodPercentage(models.Model):
     name = fields.Char('期间递增率名', required=True)
 
     # 按时间段递增的情况下：
-    billing_progress_info_month_from = fields.Integer(string="从第N月起")
+    billing_progress_info_month_from = fields.Integer(string="从第N月起", copy=False)
     billing_progress_info_month_every = fields.Integer(string="每X个月")
     billing_progress_info_up_percentage = fields.Float(default=0.0, string="递增百分比")
 
     name_description = fields.Char(string="时间段递增率描述", readonly=True, compute="_combine_description")
-    sequence = fields.Integer(default='_compute_sequence', store=True, string='排序')
 
     def _compute_sequence(self):
         for record in self:
@@ -41,11 +40,16 @@ class EstateLeaseContractRentalPeriodPercentage(models.Model):
                 record.sequence = record.billing_progress_info_month_from
             else:
                 record.sequence = 1
+            return record.sequence
+        return 0
+
+    sequence = fields.Integer(default=_compute_sequence, store=True, string='排序')
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     _sql_constraints = [
         ('name',
          'unique(billing_progress_info_month_from, billing_progress_info_month_every, '
-         'billing_progress_info_up_percentage)',
+         'billing_progress_info_up_percentage, company_id)',
          '相同期间段，相同递增比例已存在')
     ]
 

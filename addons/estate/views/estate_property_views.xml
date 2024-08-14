@@ -60,6 +60,7 @@
                 <sheet>
                     <group col="2">
                         <group>
+                            <field name="company_id" invisible="1"/>
                             <field name="name" default_focus="True"/>
                         </group>
                         <group>

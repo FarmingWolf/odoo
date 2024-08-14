@@ -93,6 +93,13 @@ class ResPartner(models.Model):
         """
         return default_result
 
+    @api.model
+    def create(self, vals_list):
+        # 设置res.partner的创建人所属company_id
+        vals_list['company_id'] = self.env.user.company_id.id
+
+        return super().create(vals_list)
+
 
 class IrAttachment(models.Model):
     _name = 'ir.attachment'
@@ -103,7 +110,7 @@ class IrAttachment(models.Model):
     @api.model
     def default_get(self, fields_list):
         _logger.info(f"进入ir.attachment form时fields_list={fields_list}")
-
+        # todo 待验证是否这里导致的附件被传送至tracking
         default_result = super().default_get(fields_list)
         if 'public' in fields_list:
             default_result['public'] = True
@@ -127,6 +134,7 @@ class OperationContract(models.Model):
     _description = "运营合同模型"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'date_begin, id'
+    _mail_post_access = 'read'
 
     name = fields.Char('合同名称', required=True, translate=True, tracking=True)
     contract_no = fields.Char(string='合同编号', readonly=True, default=lambda self: self._get_contract_no(False),
@@ -136,14 +144,16 @@ class OperationContract(models.Model):
     op_person_id = fields.Many2one('hr.employee', string='经办人', tracking=True,
                                    default=lambda self: self._get_employee())
     active = fields.Boolean(default=True)
-    user_id = fields.Many2one('res.users', string='Responsible', default=lambda self: self.env.user)
+    user_id = fields.Many2one('res.users', string='Responsible', default=lambda self: self.env.user,
+                              domain="[('company_id', '=', company_id)]")
 
     # 使用related属性将employee_id中的某些字段映射到custom.model中
     department_id = fields.Many2one('hr.department', related='op_person_id.department_id', string="部门")
     job_title = fields.Char(related='op_person_id.job_title', string="职务")
     op_person_phone = fields.Char(related='op_person_id.mobile_phone', string="电话")
 
-    partner_id = fields.Many2one('res.partner', string='公司名称', tracking=True)
+    partner_id = fields.Many2one('res.partner', string='公司名称', tracking=True,
+                                 domain="[('company_id', '=', company_id)]")
     partner_contact_id = fields.Char(string='联系人', compute='_compute_contact_info', readonly=True)
     partner_contact_id_no = fields.Char(string='联系人身份证号', compute='_compute_contact_info', readonly=True)
     partner_contact_phone = fields.Char(string='联系电话', compute='_compute_contact_info', readonly=True)
@@ -169,7 +179,6 @@ class OperationContract(models.Model):
                                       tracking=True, required=True)
     event_tag_ids = fields.Many2many('event.tag', 'operation_contract_event_tag_rel', 'contract_id',
                                      'tag_id', string="活动类型", readonly=False, store=True, tracking=True)
-    op_contract_attachment_ids = fields.Many2many('ir.attachment', string="附件", copy=False, tracking=False)
 
     @api.depends('contract_venues')
     def _compute_event_location_id(self):
@@ -184,11 +193,17 @@ class OperationContract(models.Model):
         for record in self:
             _logger.info(f"onchange contract_venues.ids={record.contract_venues.ids}")
             _logger.info(f"onchange contract_venues.contract_venue_id={record.contract_venues.contract_venue_id}")
-            _logger.info(f"onchange contract_venues.contract_venue_id.ids={record.contract_venues.contract_venue_id.ids}")
+            _logger.info(
+                f"onchange contract_venues.contract_venue_id.ids={record.contract_venues.contract_venue_id.ids}")
             record.event_location_id = [(6, 0, record.contract_venues.contract_venue_id.ids)]
 
     def _get_default_stage_id(self):
-        return self.env['operation.contract.stage'].search([], limit=1)
+        _logger.info(f"len(self.env.user.company_ids)={len(self.env.user.company_ids)}")
+        _logger.info(f"self.env.user.company_ids={self.env.user.company_ids}")
+        for each_comp in self.env.user.company_ids:
+            _logger.info(f"self.each_comp={each_comp}")
+
+        return self.env['operation.contract.stage'].search([('company_id', '=', self.env.user.company_id.id)], limit=1)
 
     stage_id = fields.Many2one(
         'operation.contract.stage', ondelete='restrict', default=_get_default_stage_id,
@@ -208,11 +223,27 @@ class OperationContract(models.Model):
 
     approval_detail_ids = fields.One2many('operation.contract.approval.detail', 'contract_id', string="审批情况")
 
+    def _ir_attachment_domain(self):
+        domain = [('company_id', '=', self.env.user.company_id.id), ('create_uid', '=', self.env.user.id)]
+        # 只有新建阶段，有可能打开”添加行“附件列表，这时只看自己的
+        _logger.info(f"当前stage_sequence={self.stage_sequence}")
+        if not self.stage_sequence or self.stage_sequence == 0:
+            return domain
+
+        # 其他阶段，在form的附件列表中，不用添加create_uid作为约束条件
+        domain = [('company_id', '=', self.env.user.company_id.id)]
+        _logger.info(f"ir_attachment_domain={domain}")
+        return domain
+
+    op_contract_attachment_ids = fields.Many2many('ir.attachment', string="附件", copy=False, tracking=False,
+                                                  domain=_ir_attachment_domain)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+
     @api.model
     def _get_event_options(self, param):
         rs = self.env['event.option'].search(
             [('group_id', 'in', self.env['event.option.group'].search(
-                [('name', '=', param)]).mapped('id'))])
+                [('name', '=', param), ('company_id', '=', self.env.user.company_id.id)]).mapped('id'))])
         _logger.info(f"param=[{param}],rs=[{rs}]")
         option_created = [(r.id, r.name) for r in rs]
         _logger.info(f"option_created=[{option_created}]")
@@ -222,7 +253,7 @@ class OperationContract(models.Model):
     def _get_event_options_crowd(self, param):
         rs = self.env['event.option'].search(
             [('group_id', 'in', self.env['event.option.group'].search(
-                [('name', '=', param)]).mapped('id'))])
+                [('name', '=', param), ('company_id', '=', self.env.user.company_id.id)]).mapped('id'))])
         _logger.info(f"param-crowd=[{param}],rs=[{rs}]")
         return rs.ids
 
@@ -258,7 +289,8 @@ class OperationContract(models.Model):
 
     security_guard_method = fields.Selection(selection=_get_security_guard_method_options, string="雇佣安保人员",
                                              tracking=True, store=True)
-    security_guard_company = fields.Many2one('res.partner', string='安保公司', tracking=True)
+    security_guard_company = fields.Many2one('res.partner', string='安保公司', tracking=True,
+                                             domain="[('company_id', '=', company_id)]")
     security_guard_company_show = fields.Boolean(
         string='显示安保公司', compute=lambda self: self._compute_company_show('security_guard_method'))
 
@@ -268,7 +300,8 @@ class OperationContract(models.Model):
 
     security_check_method = fields.Selection(selection=_get_security_check_method_options, string="雇佣安检人员",
                                              tracking=True, store=True)
-    security_check_company = fields.Many2one('res.partner', string='安检公司', tracking=True)
+    security_check_company = fields.Many2one('res.partner', string='安检公司', tracking=True,
+                                             domain="[('company_id', '=', company_id)]")
     security_check_company_show = fields.Boolean(
         string='显示安检公司', compute=lambda self: self._compute_company_show('security_check_method'))
 
@@ -278,7 +311,8 @@ class OperationContract(models.Model):
 
     security_equipment_method = fields.Selection(selection=_get_security_equipment_method_options, string="使用安检器材",
                                                  tracking=True, store=True)
-    security_equipment_company = fields.Many2one('res.partner', string='安检器材公司', tracking=True)
+    security_equipment_company = fields.Many2one('res.partner', string='安检器材公司', tracking=True,
+                                                 domain="[('company_id', '=', company_id)]")
     security_equipment_comment = fields.Text(string="安检设备种类及数量", tracking=True)
     security_equipment_company_show = fields.Boolean(
         string='显示安检器材公司', compute=lambda self: self._compute_company_show('security_equipment_method'))
@@ -295,9 +329,12 @@ class OperationContract(models.Model):
         self.ensure_one()
         res = False
         for record in self:
-            if "运营" in record.stage_id.op_department_id.name:
-                if self.env.user.has_group('operation_contract.operation_dep_contract_operator'):
-                    res = True
+            if record.stage_id and record.stage_id.op_department_id:
+                if "运营" in record.stage_id.op_department_id.name:
+                    if self.env.user.has_group('operation_contract.operation_dep_contract_operator'):
+                        res = True
+            else:
+                raise UserError("新建合同需要的基础信息尚未配置！请先配置合同阶段、合同活动选项等基础信息。")
             record.page_editable = res
         return res
 
@@ -509,7 +546,8 @@ class OperationContract(models.Model):
         if not last_write:
             return "保存时将自动获取合同号"
 
-        prefix_rcd = self.env["operation.contract.no.prefix"].search([], limit=1)
+        prefix_rcd = self.env["operation.contract.no.prefix"].search([('company_id', '=', self.env.user.company_id.id)],
+                                                                     limit=1)
         _logger.info(f"prefix_rcd=[{prefix_rcd}]")
         prefix_str = ""
         for rcd in prefix_rcd:
@@ -559,7 +597,7 @@ class OperationContract(models.Model):
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
-        return self.env['operation.contract.stage'].search([])
+        return self.env['operation.contract.stage'].search([('company_id', '=', self.env.user.company_id.id)])
 
     @api.model
     def default_get(self, fields_list):
@@ -585,7 +623,7 @@ class OperationContract(models.Model):
 
             # 先创建当前阶段的审批记录
             _create_approval_detail(self, record, True, False)
-            all_stages = self.env['operation.contract.stage'].search([])
+            all_stages = self.env['operation.contract.stage'].search([('company_id', '=', self.env.user.company_id.id)])
             for each_stage in all_stages:
                 # 同意则进入下一阶段
                 if each_stage.sequence > record.stage_id.sequence:
@@ -603,7 +641,7 @@ class OperationContract(models.Model):
             # 先创建当前阶段的驳回记录
             _create_approval_detail(self, record, False, False)
 
-            all_stages = self.env['operation.contract.stage'].search([])
+            all_stages = self.env['operation.contract.stage'].search([('company_id', '=', self.env.user.company_id.id)])
             for each_stage in all_stages:
                 if each_stage.sequence < record.stage_id.sequence:
                     tmp_stage = each_stage
@@ -620,7 +658,7 @@ class OperationContract(models.Model):
                 raise UserError("当前数据状态超出您的操作权限！")
 
             _create_approval_detail(self, record, False, True)
-            all_stages = self.env['operation.contract.stage'].search([])
+            all_stages = self.env['operation.contract.stage'].search([('company_id', '=', self.env.user.company_id.id)])
             for each_stage in all_stages:
                 if each_stage.sequence == 1000:
                     record.stage_id = each_stage

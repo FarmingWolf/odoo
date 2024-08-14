@@ -26,9 +26,11 @@ class OperationContractStage(models.Model):
         '正常', default=lambda s: _('In Progress'), translate=True, prefetch='legend', required=True,
         help='正常表示本阶段正常推进中')
 
-    op_department_id = fields.Many2one('hr.department', string="部门", help='选择部门后，限制该阶段只能该部门人员处理。')
+    op_department_id = fields.Many2one('hr.department', string="部门", help='选择部门后，限制该阶段只能该部门人员处理。',
+                                       domain=lambda self: [('company_id', '=', self.env.user.company_id.id)])
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     _sql_constraints = [
-        ('name', 'unique(name)', '阶段名称不能重复'),
-        ('sequence', 'unique(sequence)', '阶段序号不能重复'),
+        ('name', 'unique(name, company_id)', '阶段名称不能重复'),
+        ('sequence', 'unique(sequence, company_id)', '阶段序号不能重复'),
     ]

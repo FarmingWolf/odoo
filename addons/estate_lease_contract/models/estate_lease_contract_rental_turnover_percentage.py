@@ -43,9 +43,11 @@ class EstateLeaseContractRentalTurnoverPercentage(models.Model):
     turnover_to = fields.Float(default=0.0, string="营业额（元）到（<）")
     percentage = fields.Float(default=0.0, string="抽成比例（%）")
     name_description = fields.Char(string="抽成比例描述", readonly=True, compute="_combine_description")
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     _sql_constraints = [
-        ('name', 'unique(turnover_type, turnover_from, turnover_to, percentage)', '相同营业额范围，相同抽成比例已存在')
+        ('name', 'unique(turnover_type, turnover_from, turnover_to, percentage, company_id)',
+         '相同营业额范围，相同抽成比例已存在')
     ]
 
     # ↓↓↓不应该用这个方法，经过比较，不如dict方法精准

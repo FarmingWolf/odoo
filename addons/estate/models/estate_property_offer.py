@@ -21,8 +21,10 @@ class EstatePropertyOffer(models.Model):
         help="点击下拉框处理报价状态",
         copy=False
     )
-    partner_id = fields.Many2one('res.partner', string='报价人', index=True, required=True)
-    property_id = fields.Many2one('estate.property', string='报价资产', index=True, required=True, readonly=True)
+    partner_id = fields.Many2one('res.partner', string='报价人', index=True, required=True,
+                                 domain="[('company_id', '=', company_id)]")
+    property_id = fields.Many2one('estate.property', string='报价资产', index=True, required=True, readonly=True,
+                                  domain="[('company_id', '=', company_id)]")
     property_type_id = fields.Many2one(related="property_id.property_type_id")
 
     validity = fields.Integer(default=0, string="报价有效期天数")

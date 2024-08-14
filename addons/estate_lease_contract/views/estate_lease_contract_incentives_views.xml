@@ -6,10 +6,7 @@
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                这里可以展示一些文本信息。
-            </p>
-            <p>
-                这里可以展示二些文本信息。
+                灵活定制资产租赁合同优惠方案。
             </p>
         </field>
     </record>

@@ -34,6 +34,7 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     renter_id_phone = fields.Char(string="电话", related='contract_id.renter_id.phone', readonly=True)
     renter_id_mobile = fields.Char(string="手机", related='contract_id.renter_id.mobile', readonly=True)
     rental_arrears = fields.Float(string="欠缴金额", compute='_compute_rental_arrears', readonly=True)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     @api.depends("rental_amount", "rental_received")
     def _compute_rental_arrears(self):

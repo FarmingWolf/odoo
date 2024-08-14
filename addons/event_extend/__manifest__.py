@@ -15,6 +15,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'security/ir.rule.csv',
 
         'report/event_event_templates.xml',
         'report/event_event_reports.xml',

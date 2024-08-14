@@ -23,6 +23,7 @@ class OperationContractEventSettleAccountGroup(models.Model):
     operation_contract_event_settle_account_ids = fields.One2many('operation.contract.event.settle.account', 'group_id',
                                                                   string="事项清单")
     op_date_time = fields.Date('结算日期', default=lambda self: fields.Date.today())
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     @api.depends('operation_contract_id')
     def _compute_event_id(self):
@@ -144,6 +145,7 @@ class OperationContractEventSettleAccount(models.Model):
     accounting_subject_id = fields.Many2one('accounting.subject.subject', string="会计科目", required=True)
     settle_amount = fields.Float(string="金额（元）", required=True, digits=(12, 2))
     description = fields.Text(string='备注', translate=True)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     def _default_sequence(self):
         return (self.search([], order="sequence desc", limit=1).sequence or 0) + 1

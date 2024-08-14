@@ -12,6 +12,7 @@
     'auto_install': False,
     'data': [
         'security/security.xml',
+        'security/ir.rule.csv',
         'security/ir.model.access.csv',
 
         'views/operation_contract_approval_detail_views.xml',

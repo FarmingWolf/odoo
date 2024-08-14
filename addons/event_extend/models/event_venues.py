@@ -35,6 +35,7 @@ class EventVenues(models.Model):
     event_venue_id = fields.Many2one('event.track.location', string='活动地点', required=True)
     event_venue_date_begin = fields.Datetime(string="使用开始时间", required=True)
     event_venue_date_end = fields.Datetime(string="使用结束时间", required=True)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     @api.model
     def default_get(self, fields_list):

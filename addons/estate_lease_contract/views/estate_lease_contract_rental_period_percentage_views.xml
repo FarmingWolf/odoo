@@ -6,10 +6,7 @@
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                这里可以展示一些文本信息。
-            </p>
-            <p>
-                这里可以展示二些文本信息。
+                按需设置租金方案的期间递增率。
             </p>
         </field>
     </record>
@@ -17,11 +14,47 @@
         <field name="name">estate.lease.contract.rental.period.percentage.tree</field>
         <field name="model">estate.lease.contract.rental.period.percentage</field>
         <field name="arch" type="xml">
-            <tree string="estate_lease_contract_rental_period_percentage_tree" default_order="billing_progress_info_month_from">
+            <tree string="estate_lease_contract_rental_period_percentage_tree"
+                  default_order="billing_progress_info_month_from">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="name_description"/>
             </tree>
+        </field>
+    </record>
+    <record id="estate_lease_contract_rental_period_percentage_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.rental.period.percentage.form</field>
+        <field name="model">estate.lease.contract.rental.period.percentage</field>
+        <field name="arch" type="xml">
+            <form string="期间递增率设置">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group col="3">
+                            <group>
+                                <field name="billing_progress_info_month_from"/>
+                            </group>
+                            <group>
+                                <field name="billing_progress_info_month_every"/>
+                            </group>
+                            <group>
+                                <field name="billing_progress_info_up_percentage"/>
+                            </group>
+                        </group>
+
+                        <group>
+                            <field name="name_description"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
         </field>
     </record>
 </odoo>

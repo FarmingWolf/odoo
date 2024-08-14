@@ -13,15 +13,18 @@ class OperationContractApprovalDetail(models.Model):
     _order = "id DESC"
 
     contract_id = fields.Many2one('operation.contract.contract', string="运营合同", ondelete="restrict")  # 拒绝删除
-    approved_by_id = fields.Many2one('hr.employee', string='审批人ID', default=lambda self: self._get_employee())
+    approved_by_id = fields.Many2one('hr.employee', string='审批人ID', default=lambda self: self._get_employee(),
+                                     domain="[('company_id', '=', company_id)]")
     approved_by_nm = fields.Char(string='审批人')
-    approval_stage = fields.Many2one('operation.contract.stage', string="阶段")  # 这个字段先放在这，可能有用处
+    approval_stage = fields.Many2one('operation.contract.stage', string="阶段",
+                                     domain=lambda self: [('company_id', '=', self.env.user.company_id.id)])
     approval_stage_id = fields.Integer(string="审批阶段ID")
     approval_stage_nm = fields.Char(string="审批阶段")
     approval_comments = fields.Char(string="审批意见")
     approval_decision = fields.Boolean(string="审批结果Y/N")
     approval_decision_txt = fields.Char(string="审批结果", store="False")
     approval_date_time = fields.Datetime(string="审批日期")
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     @api.model
     def _get_employee(self):

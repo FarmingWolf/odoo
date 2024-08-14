@@ -35,6 +35,7 @@ class EstateLeaseContractIncentives(models.Model):
     incentives_amount_total = fields.Integer(string="总优惠金额（元）", readonly=True, compute="_compute_incentives_total")
 
     name_description = fields.Text("详细信息")
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     @api.depends("days_free", "business_discount_days", "business_discount_amount", "decoration_discount_days",
                  "decoration_discount_amount",

@@ -555,14 +555,19 @@ class EstateLeaseContract(models.Model):
     invoicing_address = fields.Char('发票邮寄地址', translate=True, copy=True)
     invoicing_email = fields.Char('电子发票邮箱', translate=True, copy=True)
 
-    sales_person_id = fields.Many2one('res.users', string='招商员', index=True, default=lambda self: self.env.user)
-    opt_person_id = fields.Many2one('res.users', string='录入员', index=True, default=lambda self: self.env.user)
+    sales_person_id = fields.Many2one('res.users', string='招商员', index=True, default=lambda self: self.env.user,
+                                      domain="[('company_id', '=', company_id)]")
+    opt_person_id = fields.Many2one('res.users', string='录入员', index=True, default=lambda self: self.env.user,
+                                    domain="[('company_id', '=', company_id)]")
 
-    renter_id = fields.Many2one('res.partner', string='承租人', index=True, copy=True, tracking=True)
-    renter_company_id = fields.Many2one('res.partner', string='经营公司', index=True, copy=True, tracking=True)
+    renter_id = fields.Many2one('res.partner', string='承租人', index=True, copy=True, tracking=True,
+                                domain="[('company_id', '=', company_id)]")
+    renter_company_id = fields.Many2one('res.partner', string='经营公司', index=True, copy=True, tracking=True,
+                                        domain="[('company_id', '=', company_id)]")
 
     property_ids = fields.Many2many('estate.property', 'contract_property_rel', 'contract_id', 'property_id',
-                                    string='租赁标的', copy=True, tracking=True)
+                                    string='租赁标的', copy=True, tracking=True,
+                                    domain="[('company_id', '=', company_id)]")
 
     rent_count = fields.Integer(default=0, string="租赁标的数量", compute="_calc_rent_total_info", copy=False)
     building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", compute="_calc_rent_total_info", copy=False)
@@ -775,6 +780,7 @@ class EstateLeaseContract(models.Model):
 
     # 合同终止状态
     terminated = fields.Boolean(default=False, copy=False)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     def action_release_contract(self):
         for record in self:

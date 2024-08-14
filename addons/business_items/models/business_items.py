@@ -22,6 +22,7 @@ class BusinessItemsGroup(models.Model):
     name = fields.Char(string="分组名", required=True, translate=True)
     sequence = fields.Integer(string='序号', default=_default_sequence)
     option_ids = fields.One2many('business.items', 'group_id', string="选项")
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
 
 class BusinessItems(models.Model):
@@ -37,3 +38,4 @@ class BusinessItems(models.Model):
     group_id = fields.Many2one("business.items.group", string="组别", required=True, ondelete='cascade')
     group_sequence = fields.Integer(related='group_id.sequence', string='分组序号', store=True)
     color = fields.Integer(string='设置颜色', default=lambda self: self._default_color())
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)

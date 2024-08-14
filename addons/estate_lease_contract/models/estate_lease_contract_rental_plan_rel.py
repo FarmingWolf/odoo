@@ -12,6 +12,7 @@ class EstateLeaseContractRentalPlanRel(models.Model):
     contract_id = fields.Many2one('estate.lease.contract', string='合同', required=True)
     property_id = fields.Many2one('estate.property', string='资产', required=True)
     rental_plan_id = fields.Many2one('estate.lease.contract.rental.plan', string='租金方案')
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     _sql_constraints = [
         ('contract_property_rental_plan_unique', 'unique(contract_id, property_id)',

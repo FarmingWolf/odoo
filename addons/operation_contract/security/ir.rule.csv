@@ -1,0 +1,6 @@
+id,name,model_id:id,domain_force
+operation_contract_account_rule,Restrict Operation Contract Group by Company,model_operation_contract_contract,"[('company_id','=',user.company_id.id)]"
+operation_contract_approval_detail_account_rule,Restrict Operation Contract Approval Detail by Company,model_operation_contract_approval_detail,"[('company_id','=',user.company_id.id)]"
+operation_contract_no_prefix_account_rule,Restrict Operation Contract NO Prefix by Company,model_operation_contract_no_prefix,"[('company_id','=',user.company_id.id)]"
+operation_contract_stage_account_rule,Restrict Operation Contract Stage by Company,model_operation_contract_stage,"[('company_id','=',user.company_id.id)]"
+operation_contract_venues_account_rule,Restrict Operation Contract Venues by Company,model_operation_contract_venues,"[('company_id','=',user.company_id.id)]"

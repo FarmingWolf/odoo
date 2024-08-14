@@ -18,6 +18,7 @@ class Park(models.Model):
     parking_lot_ids = fields.One2many("parking.lot", "park_id", string="停车场")
     parking_lot_cnt = fields.Integer(string='停车场数量', compute='_compute_parking_lot_count', store=True)
     parking_space_cnt = fields.Integer(string='停车位数量', compute='_compute_parking_space_count', store=True)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     @api.depends('parking_lot_ids')
     def _compute_parking_lot_count(self):

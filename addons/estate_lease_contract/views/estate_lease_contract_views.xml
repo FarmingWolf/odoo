@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <form string="estate_lease_contract_form" duplicate="False">
                 <header>
+                    <field name="company_id" invisible="1"/>
                     <field name="edit_on_hist_page" invisible="1"/>
                     <button name="action_release_contract" type="object" string="发布"
                             invisible="not edit_on_hist_page"/>

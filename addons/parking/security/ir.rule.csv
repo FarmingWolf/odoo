@@ -1,0 +1,5 @@
+id,name,model_id:id,domain_force
+parking_account_rule,Restrict Parking by Company,model_park,"[('company_id','=',user.company_id.id)]"
+parking_lot_account_rule,Restrict Parking Lot by Company,model_parking_lot,"[('company_id','=',user.company_id.id)]"
+parking_space_account_rule,Restrict Parking Space by Company,model_parking_space,"[('company_id','=',user.company_id.id)]"
+parking_space_type_account_rule,Restrict Parking Space Type by Company,model_parking_space_type,"[('company_id','=',user.company_id.id)]"

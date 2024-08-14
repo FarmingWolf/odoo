@@ -22,10 +22,12 @@ class EstateDashboard(http.Controller):
         """
         latest_property_detail = []
         latest_property_detail_ids = []
-        request.env.cr.execute("""
-            SELECT * FROM estate_lease_contract_property_daily_status
-            WHERE status_date = ( SELECT MAX(status_date) FROM estate_lease_contract_property_daily_status LIMIT 1 );
-        """)
+        request.env.cr.execute(
+            f"SELECT * FROM estate_lease_contract_property_daily_status "
+            f"WHERE status_date = "
+            f"( SELECT MAX(status_date) FROM estate_lease_contract_property_daily_status "
+            f"WHERE company_id =  {request.env.user.company_id.id} LIMIT 1 ) "
+            f"AND company_id =  {request.env.user.company_id.id};")
         latest_property_detail_record = request.env.cr.fetchall()
         for record_tuple in latest_property_detail_record:
             latest_property_detail_ids.append(record_tuple[0])  # 假设id是每条记录的第一个元素

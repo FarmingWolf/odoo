@@ -15,7 +15,8 @@ class EstateLeaseContractRentalBusinessType(models.Model):
 
     name = fields.Char('租金方案经营业态', required=True)
     sequence = fields.Integer('排序', default=1)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     _sql_constraints = [
-        ('name', 'unique(name)', '经营业态不能重复')
+        ('name', 'unique(name, company_id)', '经营业态不能重复')
     ]

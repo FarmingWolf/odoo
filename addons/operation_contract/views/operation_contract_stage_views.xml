@@ -9,6 +9,7 @@
                 <sheet>
                     <group>
                         <group>
+                            <field name="company_id" invisible="1"/>
                             <field name="name" placeholder='例如："新建"'/>
                             <field name="pipe_end"/>
                         </group>

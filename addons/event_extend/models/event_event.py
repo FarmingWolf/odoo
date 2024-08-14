@@ -23,7 +23,8 @@ class EventEvent(models.Model):
         'operation.contract.contract', string='运营合同', ondelete='restrict',
         domain="[('stage_id.sequence', '>=', 50), ('stage_id.sequence', '<=', 100)]", tracking=True)
     event_company_id = fields.Many2one('res.partner', string='公司名称', tracking=True, compute='_compute_company_info',
-                                       readonly=False, store=True)
+                                       readonly=False, store=True,
+                                       domain="[('company_id', '=', company_id)]")
     event_company_charger_id = fields.Char(string='负责人', compute='_compute_company_info', readonly=False,
                                            tracking=True, store=True)
     event_company_charger_phone = fields.Char(string='联系电话', compute='_compute_company_info', readonly=False,
@@ -37,7 +38,8 @@ class EventEvent(models.Model):
     operation_dep_opinion = fields.Text(string="运营部意见", tracking=True)
     op_person_id = fields.Many2one('hr.employee', string='现场负责人', default=lambda self: self._get_employee(),
                                    readonly=False, store=True, compute="_compute_contract_info",
-                                   tracking=True, precompute=True)
+                                   tracking=True, precompute=True,
+                                   domain="[('company_id', '=', company_id)]")
     op_person_mobile = fields.Char(related='op_person_id.mobile_phone', string="电话", readonly=False, store=True,
                                    compute="_compute_contract_info", tracking=True, precompute=True)
 
@@ -58,9 +60,25 @@ class EventEvent(models.Model):
     seats_limited = fields.Boolean('Limit Attendees', required=True, precompute=True, readonly=False, store=True,
                                    tracking=True, compute="_compute_contract_info")
     user_id = fields.Many2one('res.users', string='Responsible', tracking=True, store=True,
-                              default=lambda self: self.env.user)
+                              default=lambda self: self.env.user,
+                              domain="[('company_id', '=', company_id)]")
     note = fields.Html(string='活动内容', store=True, compute="_compute_contract_info", precompute=True, readonly=False)
-    event_attachment_ids = fields.Many2many('ir.attachment', string="附件", copy=False, tracking=True)
+
+    def _ir_attachment_domain(self):
+        # 只有新建阶段，有可能打开”添加行“附件列表，这时只看自己的
+        domain = [('company_id', '=', self.env.user.company_id.id), ('create_uid', '=', self.env.user.id)]
+        if not self.stage_id_sequence or self.stage_id_sequence == 0:
+            _logger.info(f"event_attachment_ids_domain={domain}")
+            return domain
+
+        # 其他阶段，在form的附件列表中，不用添加create_uid作为约束条件
+        domain = [('company_id', '=', self.env.user.company_id.id)]
+        _logger.info(f"event_attachment_ids_domain={domain}")
+        return domain
+
+    event_attachment_ids = fields.Many2many('ir.attachment', string="附件", copy=False, tracking=True,
+                                            domain=_ir_attachment_domain)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     @api.depends('reference_contract_id', 'event_company_id')
     def _compute_company_info(self):

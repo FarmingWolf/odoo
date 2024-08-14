@@ -19,6 +19,7 @@
         <field name="model">operation.contract.approval.detail</field>
         <field name="arch" type="xml">
             <tree string="operation_contract_approval_detail_view_tree" create="False" edit="True" delete="False">
+                <field name="company_id" column_invisible="1"/>
                 <field name="approval_decision" column_invisible="1"/>
                 <field name="contract_id" column_invisible="1"/>
                 <field name="approval_stage_nm"/>
@@ -37,6 +38,7 @@
         <field name="arch" type="xml">
             <form string="operation_contract_approval_detail_view_form" create="false" delete="false" edit="false">
                 <group>
+                    <field name="company_id" invisible="1"/>
                     <field name="contract_id" invisible="1"/>
                     <field name="approval_decision" invisible="1"/>
                     <field name="approval_stage_nm"/>

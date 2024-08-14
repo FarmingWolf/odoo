@@ -1,0 +1,3 @@
+id,name,model_id:id,domain_force
+event_option_group_account_rule,Restrict Event Option Group by Company,model_event_option_group,"[('company_id','=',user.company_id.id)]"
+event_option_account_rule,Restrict Event Option by Company,model_event_option,"[('company_id','=',user.company_id.id)]"

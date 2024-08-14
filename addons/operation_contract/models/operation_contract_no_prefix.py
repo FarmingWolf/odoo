@@ -10,6 +10,7 @@ class OperationContractNoPrefix(models.Model):
     _description = '运营合同号前缀'
 
     prefix = fields.Char(string='运营合同号前缀', required=True, help='前后空格将被清除，中间空格将被"-"替代')
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     def write(self, vals):
 

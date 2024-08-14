@@ -31,6 +31,7 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
 
     cal_date_s = fields.Date(string="重计算开始日期")
     cal_date_e = fields.Date(string="重计算结束日期")
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     @api.model
     def create(self, vals):
@@ -50,7 +51,8 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
     def automatic_daily_calc_status(self):
         _logger.info("开始做成资产租赁状态每日数据")
         # 每日JOB从数据库里记录的最新一天开始往后按天计算
-        latest_date = self.env['estate.lease.contract.property.daily.status'].search([], order='status_date DESC',
+        domain = [('company_id', '=', self.env.user.company_id.id)]
+        latest_date = self.env['estate.lease.contract.property.daily.status'].search(domain, order='status_date DESC',
                                                                                      limit=1)
         # 如果数据库中有数据，则重新计算其最大日期数据，计算至date.today()
         if latest_date:
@@ -78,15 +80,17 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
         record_status_date_s = record_status_date
         _logger.info("计算开始日期{0},计算结束日期{1}".format(record_status_date_s, record_status_date_end))
         int_cnt = 0
+
+        property_ids = self.env['estate.property'].search(domain)
         while record_status_date < record_status_date_end:
             # 先删除重计算目标日期数据
-            self_domain = ['|', ('status_date', '=', record_status_date), ('property_id', '=', False)]
+            self_domain = ['&', ('company_id', '=', self.env.user.company_id.id),
+                           '|', ('status_date', '=', record_status_date), ('property_id', '=', False)]
             search_cnt = self.env['estate.lease.contract.property.daily.status'].search_count(self_domain)
             if search_cnt:
                 _logger.info("即将删除{0}条记录".format(search_cnt))
                 self.env['estate.lease.contract.property.daily.status'].search(self_domain).unlink()
 
-            property_ids = self.env['estate.property'].search([])
             for each_property in property_ids:
                 record_name = f"{record_status_date}-{each_property.name}"
                 record_property_id = each_property
@@ -141,6 +145,7 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                     'contract_date_rent_end': record_contract_date_rent_end,
                     'cal_date_s': record_status_date_s,
                     'cal_date_e': record_status_date_end,
+                    'company_id': self.env.user.company_id.id,
                 })
                 int_cnt += 1
 

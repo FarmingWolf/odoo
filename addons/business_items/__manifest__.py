@@ -15,6 +15,7 @@
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
+        'security/ir.rule.csv',
 
         'views/business_items_views.xml',
     ],
