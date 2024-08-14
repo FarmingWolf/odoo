@@ -14,6 +14,7 @@ from odoo.tools import float_compare
 
 _logger = logging.getLogger(__name__)
 
+
 def _check_current_contract_valid(record):
     if record.current_contract_id:
         if record.latest_rent_date_s and record.latest_rent_date_e:
@@ -89,8 +90,8 @@ class EstateProperty(models.Model):
 
     total_area = fields.Float(compute="_compute_total_area", string="总使用面积（㎡）", readonly=True, copy=False)
 
-    current_contract_id = fields.Many2one(string='当前合同', compute="_compute_latest_info",
-                                          readonly=True, copy=False, store=False)
+    current_contract_id = fields.Char(string='当前合同', compute="_compute_latest_info", readonly=True, copy=False,
+                                      store=False)
 
     current_contract_no = fields.Char(string='当前合同号', compute="_compute_latest_info", readonly=True, copy=False)
     current_contract_nm = fields.Char(string='当前合同名称', compute="_compute_latest_info", readonly=True, copy=False)
@@ -112,6 +113,7 @@ class EstateProperty(models.Model):
     latest_contact_person_tel = fields.Char(string="联系电话", compute="_compute_latest_info", readonly=True, copy=False)
     latest_free_days = fields.Date(string="免租期", copy=False)
     more_info_invisible = fields.Boolean(string="更多信息", copy=False, default=False, store=False)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     @api.depends("_id")
     def _get_context(self):
@@ -210,7 +212,7 @@ class EstateProperty(models.Model):
             record.property_offer_count = len(record.offer_ids)
 
     _sql_constraints = [
-        ('name', 'unique(name)', '资产名称不能重复'),
+        ('name', 'unique(name, company_id)', '资产名称不能重复'),
         ('expected_price', 'CHECK(expected_price > 0)', '期待售价必须大于零'),
         ('selling_price', 'CHECK(selling_price >= 0)', '实际售价不能小于零'),
     ]

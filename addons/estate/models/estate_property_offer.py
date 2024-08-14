@@ -27,6 +27,7 @@ class EstatePropertyOffer(models.Model):
 
     validity = fields.Integer(default=0, string="报价有效期天数")
     date_deadline = fields.Date(compute="_compute_date_deadline", inverse="_inverse_validity", string="报价有效期至")
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     _sql_constraints = [
         ('price', 'CHECK(price > 0)', '报价必须大于零')

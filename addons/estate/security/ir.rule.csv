@@ -1,2 +1,5 @@
 id,name,model_id:id,domain_force
-property_salesperson_rule,Restrict Properties by Salesperson,model_estate_property,"['|',('sales_person_id','=',False),('sales_person_id','=',user.id)]"
+property_company_account_rule,Restrict Properties by Company,model_estate_property,"[('company_id','=',user.company_id.id)]"
+property_offer_company_account_rule,Restrict Properties Offer by Company,model_estate_property_offer,"[('company_id','=',user.company_id.id)]"
+property_tag_company_account_rule,Restrict Properties Tag by Company,model_estate_property_tag,"[('company_id','=',user.company_id.id)]"
+property_type_company_account_rule,Restrict Properties Type by Company,model_estate_property_type,"[('company_id','=',user.company_id.id)]"

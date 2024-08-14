@@ -1,0 +1,10 @@
+<odoo noupdate="1">
+
+    <record id="estate_property_user_company_account" model="ir.rule">
+      <field name="name">Estate Property User Company Account</field>
+      <field name="model_id" ref="model_estate_property"/>
+      <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+      <field name="domain_force">[('company_id', '=', user.company_id.id)]</field>
+    </record>
+
+</odoo>

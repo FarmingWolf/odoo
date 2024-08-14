@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="491_real_estate_action" model="ir.actions.act_window">
-        <field name="name">491资产管理</field>
+        <field name="name">租赁资产管理</field>
         <field name="res_model">estate.property</field>
         <field name="view_mode">tree,form,kanban</field>
         <field name="context">{
@@ -10,10 +10,7 @@
             'menu_root': 'estate.property',}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                这句话来自estate_property_views.xml
-            </p>
-            <p>
-                这里可以展示一些文本信息。
+                点击“新建”按钮，创建资产。建立资产体系是资产租赁业务的基础。
             </p>
         </field>
     </record>

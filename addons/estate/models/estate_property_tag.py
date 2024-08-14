@@ -12,7 +12,8 @@ class EstatePropertyTag(models.Model):
     name = fields.Char('资产标签', required=True)
     color = fields.Integer()
     active = fields.Boolean(default=True)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     _sql_constraints = [
-        ('name', 'unique(name)', '资产标签不能重复')
+        ('name', 'unique(name, company_id)', '资产标签不能重复')
     ]

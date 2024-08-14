@@ -12,10 +12,17 @@ class EstatePropertyType(models.Model):
 
     name = fields.Char('资产类型', required=True)
     property_ids = fields.One2many('estate.property', 'property_type_id', string="资产条目")
+    property_count = fields.Integer(compute="_compute_property_count", default=0)
     sequence = fields.Integer('Sequence', default=1, help="按类型排序")
 
     offer_ids = fields.One2many('estate.property.offer', 'property_type_id', string="报价")
     offer_count = fields.Integer(compute="_compute_offer_count", default=0)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+
+    @api.depends("property_ids")
+    def _compute_property_count(self):
+        for record in self:
+            record.property_count = len(record.property_ids)
 
     @api.depends("offer_ids")
     def _compute_offer_count(self):
@@ -25,7 +32,7 @@ class EstatePropertyType(models.Model):
 
     active = fields.Boolean(default=True)
     _sql_constraints = [
-        ('name', 'unique(name)', '资产类型不能重复')
+        ('name', 'unique(name, company_id)', '资产类型不能重复')
     ]
 
     def action_toggle_show_offer(self):

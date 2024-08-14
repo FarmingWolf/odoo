@@ -15,7 +15,7 @@ class EventEvent(models.Model):
     event_location_id = fields.Many2many('event.track.location', 'even_location_rel', 'event_id', 'location_id',
                                          string='Event Location', copy=False, tracking=True, store=True,
                                          compute="_compute_contract_info", precompute=True, readonly=False)
-    event_event_venues = fields.One2many('event.event.venues', 'event_event_id', string="活动地点", delete="cascade",
+    event_event_venues = fields.One2many('event.event.venues', 'event_event_id', string="活动地点",
                                          tracking=True, required=True, precompute=True, readonly=False, store=True,
                                          compute="_compute_contract_info")
     stage_id_sequence = fields.Integer(store=False, related='stage_id.sequence', string='stage_id_sequence')

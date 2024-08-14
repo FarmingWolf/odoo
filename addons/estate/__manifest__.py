@@ -10,9 +10,11 @@
     'installable': True,
     'application': True,
     'auto_install': False,
+    'version': '2.11',
     'data': [
         'security/security.xml',
-        # 'security/ir.rule.csv',
+        'security/ir.rule.csv',
+        'security/ir.rule.xml',
         'security/ir.model.access.csv',
         'security/estate.property.type.csv',
         'security/estate.property.tag.csv',
