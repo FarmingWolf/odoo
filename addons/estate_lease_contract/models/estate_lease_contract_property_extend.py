@@ -4,7 +4,8 @@ import logging
 from typing import Dict, List
 
 from addons.utils.models.utils import Utils
-from odoo import fields, models, api
+from odoo import fields, models, api, SUPERUSER_ID
+from odoo.cli.scaffold import env
 from odoo.http import request
 
 _logger = logging.getLogger(__name__)
@@ -310,7 +311,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
     def automatic_daily_calc_property_status(self):
         _logger.info("开始计算资产状态")
         current_date = fields.Date.context_today(self)
-
+        self = self.with_user(SUPERUSER_ID)
         property_ids = self.env['estate.property'].search([])
         for each_property in property_ids:
             _logger.info(f"资产{each_property.name}状态={each_property.state}")
@@ -349,6 +350,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                             each_property.state = "offer_received"
                             state_change = True
 
-            _logger.info(f"资产{each_property.name}状态={each_property.state},是否需要更新【{state_change}】")
+            _logger.info(f"公司{each_property.company_id},资产{each_property.name}状态={each_property.state},"
+                         f"{'【不】' if not state_change else ''}需要更新")
             if state_change:
                 each_property.write({'state': each_property.state})

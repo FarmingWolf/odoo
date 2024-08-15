@@ -4,7 +4,8 @@ import logging
 from datetime import date, timedelta
 from typing import Dict, List
 
-from odoo import fields, models, api
+from odoo import fields, models, api, SUPERUSER_ID
+from odoo.cli.scaffold import env
 
 _logger = logging.getLogger(__name__)
 
@@ -50,105 +51,112 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
 
     def automatic_daily_calc_status(self):
         _logger.info("开始做成资产租赁状态每日数据")
-        # 每日JOB从数据库里记录的最新一天开始往后按天计算
-        domain = [('company_id', '=', self.env.user.company_id.id)]
-        latest_date = self.env['estate.lease.contract.property.daily.status'].search(domain, order='status_date DESC',
-                                                                                     limit=1)
-        # 如果数据库中有数据，则重新计算其最大日期数据，计算至date.today()
-        if latest_date:
-            if latest_date[0].status_date:
-                record_status_date = latest_date[0].status_date
+        self = self.with_user(SUPERUSER_ID)
+        self.env.cr.execute(f'SELECT DISTINCT company_id FROM estate_property')
+        property_companies = set(self.env.cr.fetchall())
+
+        for company_id in property_companies:
+            # 每日JOB从数据库里记录的最新一天开始往后按天计算
+            domain = ('company_id', '=', company_id[0])
+            latest_date = self.env['estate.lease.contract.property.daily.status'].search([domain],
+                                                                                         order='status_date DESC',
+                                                                                         limit=1)
+            # 如果数据库中有数据，则重新计算其最大日期数据，计算至date.today()
+            if latest_date:
+                if latest_date[0].status_date:
+                    record_status_date = latest_date[0].status_date
+                else:
+                    record_status_date = date.today() - timedelta(days=1)
             else:
                 record_status_date = date.today() - timedelta(days=1)
-        else:
-            record_status_date = date.today() - timedelta(days=1)
 
-        # 默认计算到当前日期前一天
-        record_status_date_end = date.today()
+            # 默认计算到当前日期前一天
+            record_status_date_end = date.today()
 
-        # 如果是来自form视图的刷新按钮，则以cal_date_s和cal_date_e为计算对象日期范围
-        for self_record in self:
-            _logger.info("cal_date_s={0},cal_date_e={1}".format(self_record.cal_date_s, self_record.cal_date_e))
-            if self_record.cal_date_s:
-                record_status_date = self_record.cal_date_s
-                record_status_date_end = record_status_date + timedelta(days=1)
+            # 如果是来自form视图的刷新按钮，则以cal_date_s和cal_date_e为计算对象日期范围
+            for self_record in self:
+                _logger.info("cal_date_s={0},cal_date_e={1}".format(self_record.cal_date_s, self_record.cal_date_e))
+                if self_record.cal_date_s:
+                    record_status_date = self_record.cal_date_s
+                    record_status_date_end = record_status_date + timedelta(days=1)
 
-            if self_record.cal_date_e:
-                if self_record.cal_date_e >= record_status_date_end:
-                    record_status_date_end = self_record.cal_date_e + timedelta(days=1)
+                if self_record.cal_date_e:
+                    if self_record.cal_date_e >= record_status_date_end:
+                        record_status_date_end = self_record.cal_date_e + timedelta(days=1)
 
-        record_status_date_s = record_status_date
-        _logger.info("计算开始日期{0},计算结束日期{1}".format(record_status_date_s, record_status_date_end))
-        int_cnt = 0
+            record_status_date_s = record_status_date
+            _logger.info("计算开始日期{0},计算结束日期{1}".format(record_status_date_s, record_status_date_end))
+            int_cnt = 0
 
-        property_ids = self.env['estate.property'].search(domain)
-        while record_status_date < record_status_date_end:
-            # 先删除重计算目标日期数据
-            self_domain = ['&', ('company_id', '=', self.env.user.company_id.id),
-                           '|', ('status_date', '=', record_status_date), ('property_id', '=', False)]
-            search_cnt = self.env['estate.lease.contract.property.daily.status'].search_count(self_domain)
-            if search_cnt:
-                _logger.info("即将删除{0}条记录".format(search_cnt))
-                self.env['estate.lease.contract.property.daily.status'].search(self_domain).unlink()
+            property_ids = self.env['estate.property'].search([domain])
+            while record_status_date < record_status_date_end:
+                # 先删除重计算目标日期数据
+                self_domain = ['&', domain,
+                               '|', ('status_date', '=', record_status_date), ('property_id', '=', False)]
+                search_cnt = self.env['estate.lease.contract.property.daily.status'].search_count(self_domain)
+                if search_cnt:
+                    _logger.info("即将删除{0}条记录".format(search_cnt))
+                    self.env['estate.lease.contract.property.daily.status'].search(self_domain).unlink()
 
-            for each_property in property_ids:
-                record_name = f"{record_status_date}-{each_property.name}"
-                record_property_id = each_property
-                # 先把资产状态设置为空
-                record_property_state = None
-                record_property_date_availability = each_property.date_availability
-                record_property_building_area = each_property.building_area
-                record_property_rent_area = each_property.rent_area
+                for each_property in property_ids:
+                    record_name = f"{record_status_date}-{each_property.name}"
+                    record_property_id = each_property
+                    # 先把资产状态设置为空
+                    record_property_state = None
+                    record_property_date_availability = each_property.date_availability
+                    record_property_building_area = each_property.building_area
+                    record_property_rent_area = each_property.rent_area
 
-                # 查询该日期对应的有效合同
-                contract_domain = [('property_ids', '=', each_property.id), ('active', '=', True),
-                                   ('state', '=', 'released'), ('date_rent_start', '<=', record_status_date),
-                                   ('date_rent_end', '>=', record_status_date), ]
-                property_contract = self.env['estate.lease.contract'].search(contract_domain, order='id DESC',
-                                                                             limit=1)
-                # 默认没有合同，则先设置每个字段为空
-                record_contract_id = None
-                record_contract_state = None
-                record_contract_date_sign = None
-                record_contract_date_start = None
-                record_contract_date_rent_start = None
-                record_contract_date_rent_end = None
+                    # 查询该日期对应的有效合同
+                    contract_domain = [('property_ids', '=', each_property.id), ('active', '=', True),
+                                       ('state', '=', 'released'), ('date_rent_start', '<=', record_status_date),
+                                       ('date_rent_end', '>=', record_status_date), ]
+                    property_contract = self.env['estate.lease.contract'].search(contract_domain, order='id DESC',
+                                                                                 limit=1)
+                    # 默认没有合同，则先设置每个字段为空
+                    record_contract_id = None
+                    record_contract_state = None
+                    record_contract_date_sign = None
+                    record_contract_date_start = None
+                    record_contract_date_rent_start = None
+                    record_contract_date_rent_end = None
 
-                for contract in property_contract:
-                    # 有合同时再设置其资产状态
-                    record_property_state = dict(each_property._fields['state'].selection).get(each_property.state)
-                    record_contract_id = contract
-                    record_contract_state = dict(contract._fields['state'].selection).get(contract.state)
-                    record_contract_date_sign = contract.date_sign
-                    record_contract_date_start = contract.date_start
-                    record_contract_date_rent_start = contract.date_rent_start
-                    record_contract_date_rent_end = contract.date_rent_end
+                    for contract in property_contract:
+                        # 有合同时再设置其资产状态
+                        record_property_state = dict(
+                            each_property._fields['state'].selection).get(each_property.state)
+                        record_contract_id = contract
+                        record_contract_state = dict(contract._fields['state'].selection).get(contract.state)
+                        record_contract_date_sign = contract.date_sign
+                        record_contract_date_start = contract.date_start
+                        record_contract_date_rent_start = contract.date_rent_start
+                        record_contract_date_rent_end = contract.date_rent_end
 
-                if record_contract_id:
-                    record_contract_id_id = record_contract_id.id
-                else:
-                    record_contract_id_id = None
+                    if record_contract_id:
+                        record_contract_id_id = record_contract_id.id
+                    else:
+                        record_contract_id_id = None
 
-                self.env['estate.lease.contract.property.daily.status'].create({
-                    'name': record_name,
-                    'status_date': record_status_date,
-                    'property_id': record_property_id.id,
-                    'property_building_area': record_property_building_area,
-                    'property_rent_area': record_property_rent_area,
-                    'property_state': record_property_state,
-                    'property_date_availability': record_property_date_availability,
-                    'contract_id': record_contract_id_id,
-                    'contract_state': record_contract_state,
-                    'contract_date_sign': record_contract_date_sign,
-                    'contract_date_start': record_contract_date_start,
-                    'contract_date_rent_start': record_contract_date_rent_start,
-                    'contract_date_rent_end': record_contract_date_rent_end,
-                    'cal_date_s': record_status_date_s,
-                    'cal_date_e': record_status_date_end,
-                    'company_id': self.env.user.company_id.id,
-                })
-                int_cnt += 1
+                    self.env['estate.lease.contract.property.daily.status'].create({
+                        'name': record_name,
+                        'status_date': record_status_date,
+                        'property_id': record_property_id.id,
+                        'property_building_area': record_property_building_area,
+                        'property_rent_area': record_property_rent_area,
+                        'property_state': record_property_state,
+                        'property_date_availability': record_property_date_availability,
+                        'contract_id': record_contract_id_id,
+                        'contract_state': record_contract_state,
+                        'contract_date_sign': record_contract_date_sign,
+                        'contract_date_start': record_contract_date_start,
+                        'contract_date_rent_start': record_contract_date_rent_start,
+                        'contract_date_rent_end': record_contract_date_rent_end,
+                        'cal_date_s': record_status_date_s,
+                        'cal_date_e': record_status_date_end,
+                        'company_id': company_id[0],
+                    })
+                    int_cnt += 1
 
-            record_status_date = record_status_date + timedelta(days=1)
-        _logger.info("资产租赁状态{0}至{1}数据做成{2}条。".format(record_status_date_s,
-                                                     record_status_date_end - timedelta(days=1), int_cnt))
+                record_status_date = record_status_date + timedelta(days=1)
+            _logger.info(f"公司{company_id[0]},"
+                         f"{record_status_date_s}至{record_status_date_end - timedelta(days=1)}数据做成{int_cnt}条。")
