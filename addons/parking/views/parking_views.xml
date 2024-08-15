@@ -29,14 +29,16 @@
         <field name="model">park</field>
         <field name="arch" type="xml">
             <form string="park_form">
-                <field name="name"/>
-                <field name="parking_lot_ids">
-                    <tree>
-                        <field name="name"/>
-                        <field name="parking_space_cnt" sum="总计停车位数量"/>
-                    </tree>
-                </field>
-
+                <group>
+                    <field name="name"/>
+                    <field name="parking_lot_ids">
+                        <tree>
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                            <field name="parking_space_cnt" sum="总计停车位数量"/>
+                        </tree>
+                    </field>
+                </group>
             </form>
         </field>
     </record>

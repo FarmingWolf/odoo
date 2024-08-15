@@ -15,6 +15,7 @@ class ParkingSpace(models.Model):
     _description = "园区停车位"
 
     name = fields.Char('园区停车位', required=True, translate=True)
+    sequence = fields.Integer("排序", default=1)
     park_id = fields.Many2one("park", string="园区", compute="_compute_park_id", store=True)
     parking_space_type_id = fields.Many2one("parking.space.type", string="停车位类型", store=True)
     parking_lot_id = fields.Many2one("parking.lot", string="园区停车场")
