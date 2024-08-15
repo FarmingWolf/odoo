@@ -835,20 +835,29 @@ class EstateLeaseContract(models.Model):
         else:
             rgt_rcd = self
 
+        contract_rental_plan_rel = []
         for record in rgt_rcd:
-            self.env['estate.lease.contract.rental.plan.rel'].flush_model(['contract_id'])
-            self.env['estate.lease.contract.rental.plan.rel'].flush_model(['property_id'])
-            self.env['estate.lease.contract.rental.plan.rel'].flush_model(['rental_plan_id'])
+            # self.env['estate.lease.contract.rental.plan.rel'].flush_model(['contract_id'])
+            # self.env['estate.lease.contract.rental.plan.rel'].flush_model(['property_id'])
+            # self.env['estate.lease.contract.rental.plan.rel'].flush_model(['rental_plan_id'])
 
             for each_property in record.property_ids:
-                self.env.cr.execute("INSERT INTO estate_lease_contract_rental_plan_rel ("
-                                    "contract_id, property_id, rental_plan_id ) VALUES (%s, %s, %s)",
-                                    [record.id, each_property.id,
-                                     each_property.rent_plan_id.id if each_property.rent_plan_id.id else None])
-
-            self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['contract_id'])
-            self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['property_id'])
-            self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['rental_plan_id'])
+                contract_rental_plan_rel.append({
+                    "contract_id": record.id,
+                    "property_id": each_property.id,
+                    "rental_plan_id": each_property.rent_plan_id.id if each_property.rent_plan_id.id else None,
+                    "company_id": self.env.user.company_id.id,
+                })
+                # self.env.cr.execute("INSERT INTO estate_lease_contract_rental_plan_rel ("
+                #                     "contract_id, property_id, rental_plan_id, company_id) VALUES (%s, %s, %s, %s)",
+                #                     [record.id, each_property.id,
+                #                      each_property.rent_plan_id.id if each_property.rent_plan_id.id else None,
+                #                      self.env.user.company_id.id])
+            # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['contract_id'])
+            # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['property_id'])
+            # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['rental_plan_id'])
+        if contract_rental_plan_rel:
+            self.env['estate.lease.contract.rental.plan.rel'].create(contract_rental_plan_rel)
 
     @api.model
     def create(self, vals):
@@ -879,16 +888,17 @@ class EstateLeaseContract(models.Model):
     def _delete_contract_property_rental_plan_rel(self):
 
         for record in self:
-            self.env['estate.lease.contract.rental.plan.rel'].flush_model(['contract_id'])
-            self.env['estate.lease.contract.rental.plan.rel'].flush_model(['property_id'])
-            self.env['estate.lease.contract.rental.plan.rel'].flush_model(['rental_plan_id'])
-
-            self.env.cr.execute("DELETE FROM estate_lease_contract_rental_plan_rel "
-                                "WHERE contract_id=%s", [record.id])
-
-            self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['contract_id'])
-            self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['property_id'])
-            self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['rental_plan_id'])
+            self.env['estate.lease.contract.rental.plan.rel'].search([('contract_id', '=', record.id)]).unlink()
+            # self.env['estate.lease.contract.rental.plan.rel'].flush_model(['contract_id'])
+            # self.env['estate.lease.contract.rental.plan.rel'].flush_model(['property_id'])
+            # self.env['estate.lease.contract.rental.plan.rel'].flush_model(['rental_plan_id'])
+            #
+            # self.env.cr.execute("DELETE FROM estate_lease_contract_rental_plan_rel "
+            #                     "WHERE contract_id=%s", [record.id])
+            #
+            # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['contract_id'])
+            # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['property_id'])
+            # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['rental_plan_id'])
 
     @api.model
     def ondelete(self):
