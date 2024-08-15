@@ -96,7 +96,9 @@ class ResPartner(models.Model):
     @api.model
     def create(self, vals_list):
         # 设置res.partner的创建人所属company_id
-        vals_list['company_id'] = self.env.user.company_id.id
+        if 'company_id' in vals_list:
+            if not vals_list['company_id']:
+                vals_list['company_id'] = self.env.user.company_id.id
 
         return super().create(vals_list)
 
