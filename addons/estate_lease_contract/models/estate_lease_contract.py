@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
 from datetime import timedelta, datetime, date
+import random
 from typing import Dict, List
 
 from odoo.http import request
@@ -266,7 +267,7 @@ def _get_period_total_e(current_s, month_cnt, date_e):
         else:  # 结束日期在2月，那么上边逻辑已经计算好了2月末的最后一天小于30、31
             pass
 
-    if current_e > date_e:
+    if date_e and current_e > date_e:
         current_e = date_e
 
     return current_e
@@ -366,9 +367,11 @@ class EstateLeaseContract(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _mail_post_access = 'read'
 
-    name = fields.Char('合同名称', required=True, translate=True, copy=True, default="491空间房屋租赁合同")
+    name = fields.Char('合同名称', required=True, translate=True, copy=True,
+                       default=lambda self: self._get_default_name())
 
-    contract_no = fields.Char('合同编号', required=True, translate=True, copy=False, default="")
+    contract_no = fields.Char('合同编号', required=True, translate=True, copy=False,
+                              default=lambda self: self._get_contract_no(False))
     # contract_amount = fields.Float("合同金额", default=0.0)
     # contract_tax = fields.Float("税额", default=0.0)
     # contract_tax_per = fields.Float("税率", default=0.0)
@@ -377,8 +380,10 @@ class EstateLeaseContract(models.Model):
     date_sign = fields.Date("合同签订日期", required=True, copy=False, default=fields.Date.context_today)
     date_start = fields.Date("合同开始日期", required=True, copy=False, default=fields.Date.context_today)
 
-    date_rent_start = fields.Date("计租开始日期", required=True, copy=False, tracking=True, default=fields.Date.context_today)
-    date_rent_end = fields.Date("计租结束日期", required=True, copy=False, tracking=True, default=fields.Date.context_today)
+    date_rent_start = fields.Date("计租开始日期", required=True, copy=False, tracking=True,
+                                  default=fields.Date.context_today)
+    date_rent_end = fields.Date("计租结束日期", required=True, copy=False, tracking=True,
+                                default=lambda self: self._get_default_date_rent_end())
 
     days_rent_total = fields.Char(string="租赁期限", compute="_calc_days_rent_total")
 
@@ -600,18 +605,33 @@ class EstateLeaseContract(models.Model):
 
     @api.depends("property_ids")
     def _calc_rent_total_info(self):
+        rent_cnt_total = 0
+        building_area_total = 0
+        rent_area_total = 0
+        rent_amount_total = 0
+        rent_amount_year_total = 0
+        deposit_total = 0
         for record in self:
-            record.rent_count = 0
-            record.building_area = 0
-            record.rent_area = 0
             if record.property_ids:
                 for rent_property in record.property_ids:
-                    record.rent_count += 1
-                    record.building_area += rent_property.building_area
-                    record.rent_area += rent_property.rent_area
+                    rent_cnt_total += 1
+                    building_area_total += rent_property.building_area
+                    rent_area_total += rent_property.rent_area
+                    rent_amount_total += rent_property.rent_amount_monthly_adjust if \
+                        rent_property.rent_amount_monthly_adjust else rent_property.rent_amount_monthly_auto
+                    rent_amount_year_total += 12 * rent_property.rent_amount_monthly_adjust if \
+                        rent_property.rent_amount_monthly_adjust else rent_property.rent_amount_monthly_auto
+                    deposit_total += rent_property.deposit_amount
 
-    rent_amount = fields.Float(default=0.0, string="总月租金（元/月）", readonly=True)
-    rent_amount_year = fields.Float(default=0.0, string="总年租金（元/年）", readonly=True)
+            record.rent_count = rent_cnt_total
+            record.building_area = building_area_total
+            record.rent_area = rent_area_total
+            record.rent_amount = rent_amount_total
+            record.rent_amount_year = rent_amount_year_total
+            record.lease_deposit = deposit_total
+
+    rent_amount = fields.Float(default=0.0, string="总月租金（元/月）", compute="_calc_rent_total_info", readonly=True)
+    rent_amount_year = fields.Float(default=0.0, string="总年租金（元/年）", compute="_calc_rent_total_info", readonly=True)
     rent_amount_first_period = fields.Float(default=0.0, string="首期租金（元）")
     rent_first_period_from = fields.Date(string="首期租金期间（开始日）")
     rent_first_period_to = fields.Date(string="首期租金期间（结束日）")
@@ -685,7 +705,7 @@ class EstateLeaseContract(models.Model):
 
     advance_collection_of_coupon_deposit_guarantee = fields.Float(default=0.0, string="预收卡券保证金（元）")
     performance_guarantee = fields.Float(default=0.0, string="履约保证金（元）", tracking=True)
-    lease_deposit = fields.Float(default=0.0, string="租赁押金（元）", tracking=True)
+    lease_deposit = fields.Float(default=0.0, string="租赁押金（元）", compute="_calc_rent_total_info", tracking=True)
     property_management_fee_guarantee = fields.Float(default=0.0, string="物管费保证金（元）", tracking=True)
 
     decoration_deposit = fields.Float(default=0.0, string="装修押金（元）", tracking=True)
@@ -953,3 +973,27 @@ class EstateLeaseContract(models.Model):
             'target': 'current',
         }
         return action
+
+    def _get_contract_no(self, last_write):
+        _logger.info("开始计算合同编号")
+        prefix_str = "ZCZL-HT-"
+
+        formatted_date = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y%m%d-%H%M%S')
+        random_number = '{:03d}'.format(random.randint(0, 999))
+        str_ret = prefix_str + formatted_date + '-' + random_number
+        _logger.info(f"str_ret=[{str_ret}]")
+
+        return str_ret
+
+    def _get_default_date_rent_end(self):
+        return _get_period_total_e(fields.Date.from_string(fields.Date.context_today(self)), 12, False)
+
+    def _get_default_name(self):
+        contract_name = "房屋租赁合同"
+        self_company = self.env.user.company_id
+        contract_name = f"{self_company.name}{contract_name}"
+        if self_company.id == 3:
+            if "四九一" in self_company.name:
+                contract_name = "491空间房屋租赁合同"
+
+        return contract_name

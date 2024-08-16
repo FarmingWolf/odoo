@@ -5,6 +5,7 @@ from datetime import timedelta
 from typing import Dict, List
 from . import estate_lease_contract
 from odoo import fields, models, api
+from ...utils.models.utils import Utils
 
 _logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     contract_id = fields.Many2one('estate.lease.contract', string="合同")
     property_id = fields.Many2one('estate.property', string="租赁标的")
     rental_amount = fields.Float(default=0.0, string="本期租金(元)", tracking=True)
-    rental_amount_zh = fields.Char(string="本期租金(元)大写")
+    rental_amount_zh = fields.Char(string="本期租金(元)大写", compute="_cal_rental_amount_zh")
     rental_receivable = fields.Float(default=0.0, string="本期应收(元)", compute="_get_default_rental_receivable",
                                      readonly=False, store=True, digits=(12, 2), tracking=True)
     rental_received = fields.Float(default=0.0, string="本期实收(元)", tracking=True)
@@ -35,6 +36,11 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     renter_id_mobile = fields.Char(string="手机", related='contract_id.renter_id.mobile', readonly=True)
     rental_arrears = fields.Float(string="欠缴金额", compute='_compute_rental_arrears', readonly=True)
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+
+    @api.depends("rental_amount")
+    def _cal_rental_amount_zh(self):
+        for record in self:
+            record.rental_amount_zh = Utils.arabic_to_chinese(record.rental_amount)
 
     @api.depends("rental_amount", "rental_received")
     def _compute_rental_arrears(self):

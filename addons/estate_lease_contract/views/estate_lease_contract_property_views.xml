@@ -14,6 +14,8 @@
                 </xpath>
                 <xpath expr="//field[@name='selling_price']" position="replace">
                 </xpath>
+                <xpath expr="//field[@name='property_type_id']" position="replace">
+                </xpath>
                 <xpath expr="//field[@name='building_no']" position="replace">
                     <field name="latest_payment_method"/>
                 </xpath>

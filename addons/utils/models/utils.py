@@ -50,51 +50,68 @@ class Utils:
     @staticmethod
     def arabic_to_chinese(amount):
         # 将阿拉伯数字金额转换为汉字大写表示，遵循财务书写规范。
-        # 分离整数和小数部分
-        _logger.debug("amount=[{0}]".format(amount))
-        parts = str(amount).split('.')
-        yuan = int(parts[0])  # 整数部分
-        decimal = parts[1] if len(parts) > 1 else '00'  # 小数部分，不足两位补0
+        _logger.debug(f"amount=[{amount}]")
 
-        # 处理整数部分
-        chinese_yuan = []
+        if not amount or amount == 0:
+            return "零元整"
 
-        while yuan > 0:
-            # 首次进入时，个十百千
-            segment = yuan % 10000
-            segment_str = str(segment).zfill(4)
-            chinese_segment = ''.join([
-                Utils.chinese_digits[digit] + ('' + Utils.units[str(len(segment_str) - idx)] if digit != '0' else '')
-                for idx, digit in enumerate(segment_str)])
+        try:
+            is_minus = False
+            if str(amount).startswith('-'):
+                is_minus = True
+                amount = str(amount).strip('-')
 
-            chinese_yuan.insert(0, chinese_segment.strip('零').replace('零零', '零'))
-            yuan //= 10000
+            # 分离整数和小数部分
+            parts = str(amount).split('.')
+            yuan = int(parts[0])  # 整数部分
+            decimal = parts[1] if len(parts) > 1 else '00'  # 小数部分，不足两位补0
 
-        # _logger.info("chinese_yuan=[{0}]".format(chinese_yuan))
-        # 添加单位
-        for idx, segment in enumerate(chinese_yuan):
-            if segment:
-                chinese_yuan[idx] += Utils.big_units[str(len(chinese_yuan) - idx - 1)]
+            # 处理整数部分
+            chinese_yuan = []
 
-        for i in range(1, len(chinese_yuan)):  # 从第二个元素开始遍历
+            while yuan > 0:
+                # 首次进入时，个十百千
+                segment = yuan % 10000
+                segment_str = str(segment).zfill(4)
+                chinese_segment = ''.join([
+                    Utils.chinese_digits[digit] + (
+                        '' + Utils.units[str(len(segment_str) - idx)] if digit != '0' else '')
+                    for idx, digit in enumerate(segment_str)])
 
-            if chinese_yuan[i]:
-                chinese_yuan[i].strip('零')
-                if len(chinese_yuan[i]) > 2 and chinese_yuan[i][1] == '仟':  # 检查当前字符串的第二个字符是否为'仟'
-                    pass
-                else:
-                    chinese_yuan[i] = '零' + chinese_yuan[i]  # 不是'仟'则在字符串前插入'零'
+                chinese_yuan.insert(0, chinese_segment.strip('零').replace('零零', '零'))
+                yuan //= 10000
 
-        chinese_yuan = ''.join(filter(None, chinese_yuan)) or '零'
+            # _logger.info("chinese_yuan=[{0}]".format(chinese_yuan))
+            # 添加单位
+            for idx, segment in enumerate(chinese_yuan):
+                if segment:
+                    chinese_yuan[idx] += Utils.big_units[str(len(chinese_yuan) - idx - 1)]
 
-        # 处理小数部分
-        chinese_decimal = ''.join([
-            Utils.chinese_digits[digit] + ('角' if idx == 0 else '分')
-            for idx, digit in enumerate(decimal) if digit != '0'])
+            for i in range(1, len(chinese_yuan)):  # 从第二个元素开始遍历
 
-        # 拼接结果
-        result = chinese_yuan + ('元' + chinese_decimal if chinese_decimal else '元整')
-        return result
+                if chinese_yuan[i]:
+                    chinese_yuan[i].strip('零')
+                    if len(chinese_yuan[i]) > 2 and chinese_yuan[i][1] == '仟':  # 检查当前字符串的第二个字符是否为'仟'
+                        pass
+                    else:
+                        chinese_yuan[i] = '零' + chinese_yuan[i]  # 不是'仟'则在字符串前插入'零'
+
+            chinese_yuan = ''.join(filter(None, chinese_yuan)) or '零'
+
+            # 处理小数部分
+            chinese_decimal = ''.join([
+                Utils.chinese_digits[digit] + ('角' if idx == 0 else '分')
+                for idx, digit in enumerate(decimal) if digit != '0'])
+
+            # 拼接结果
+            result = chinese_yuan + ('元' + chinese_decimal if chinese_decimal else '元整')
+            if is_minus:
+                result = "负" + result
+
+            return result
+
+        except:
+            return ""
 
     @staticmethod
     def remove_last_zero(in_num):
@@ -111,6 +128,7 @@ class Utils:
             return value_str
         else:
             return ''
+
 
 # 示例
 # print("0={0}".format(Utils.arabic_to_chinese(0)))
