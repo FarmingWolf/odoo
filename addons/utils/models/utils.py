@@ -110,7 +110,8 @@ class Utils:
 
             return result
 
-        except:
+        except Exception as exc:
+            _logger.info(f"金额转换中文出错：{exc}")
             return ""
 
     @staticmethod

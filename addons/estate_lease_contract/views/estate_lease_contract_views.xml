@@ -18,8 +18,9 @@
                     <field name="company_id" invisible="1"/>
                     <field name="edit_on_hist_page" invisible="1"/>
                     <button name="action_release_contract" type="object" string="发布"
-                            invisible="not edit_on_hist_page"/>
-                    <button name="action_cancel_release_contract" type="object" string="取消发布"/>
+                            invisible="(not edit_on_hist_page) or (state != 'recording')"/>
+                    <button name="action_cancel_release_contract" type="object" string="取消发布"
+                            invisible="(not edit_on_hist_page) or (state not in ['released', 'to_be_released'])"/>
                     <button name="action_contract_renewal" type="object" string="续租"
                             groups="estate_lease_contract.estate_lease_contract_group_manager"
                             invisible="not edit_on_hist_page"/>
@@ -171,8 +172,13 @@
                             </group>
                         </page>
                         <page string="每期金额明细">
-                            <group col="1" invisible="context.get('contract_read_only')">
-                                <button name="action_refresh_all_money" type="object" string="点击刷新"/>
+                            <group col="6">
+                                <group col="1" colspan="1" invisible="context.get('contract_read_only')">
+                                    <button name="action_refresh_all_money" type="object" string="点击刷新"/>
+                                </group>
+                                <group col="1" colspan="5">
+                                    <field name="warn_msg" string="" readonly="1"/>
+                                </group>
                             </group>
                             <sheet readonly="1">
                                 <group>
@@ -189,10 +195,11 @@
                                         </group>
                                     </group>
                                     <field name="rental_details" readonly="not edit_on_hist_page">
-                                        <tree string="" decoration-danger="rental_amount != rental_receivable"
+                                        <tree string="" decoration-danger="(rental_amount != rental_receivable) or edited"
                                               decoration-success="rental_received &gt; 0 and rental_received == rental_receivable"
                                               decoration-warning="rental_received != 0 and rental_received != rental_receivable"
                                               readonly="not parent.edit_on_hist_page">
+                                            <field name="edited" column_invisible="True"/>
                                             <field name="property_id"/>
                                             <field name="rental_period_no"/>
                                             <field name="period_date_from"/>

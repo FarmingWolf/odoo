@@ -339,7 +339,8 @@ def _generate_details_from_rent_plan(record_self):
                 'rental_period_no': f"{period_no}",
                 'description': f"{rental_plan.name}-{billing_method_str}-{property_id.latest_payment_method}-"
                                f"{payment_date_str}",
-                'active': f"{True}",
+                'active': True,
+                'edited': False,
             })
 
             # 下期开始日
@@ -347,8 +348,8 @@ def _generate_details_from_rent_plan(record_self):
             period_no += 1
 
         temp_rent_amount += rent_amount_monthly_val  # 这里还是显示基础月租
-        print("{1}.rental_periods={0}".format(rental_periods_details, rental_plan.name))
-        _logger.info(f"temp_rent_amount={temp_rent_amount}")
+        _logger.info(f"{rental_plan.name}.rental_periods={rental_periods_details}")
+        _logger.debug(f"temp_rent_amount={temp_rent_amount}")
 
     record_self.rent_amount = temp_rent_amount
     record_self.rent_amount_year = temp_rent_amount * 12
@@ -519,10 +520,24 @@ class EstateLeaseContract(models.Model):
     @api.depends('property_ids')
     def _compute_rental_plan_ids(self):
         for record in self:
+            _logger.debug(f"_compute_rental_plan_ids called record.id={record.id}")
             # 获取所有关联的property的rent_plan_id，并去重
             rent_plans = self.env['estate.property'].search([('id', 'in', record.property_ids.ids)]).mapped(
                 'rent_plan_id')
             record.rental_plan_ids = rent_plans
+
+            # 排除页面上做了删除动作的租赁标的
+            _logger.debug(f"record.property_ids.ids={record.property_ids.ids}")
+            for rent_plan in record.rental_plan_ids:
+                _logger.debug(f"开始清理{rent_plan.name}其中rent_plan.rent_targets={rent_plan.rent_targets.ids}")
+                tgt_keep = []
+                for rent_tgt in rent_plan.rent_targets:
+                    _logger.debug(f"rent_tgt.id={rent_tgt.id}")
+                    tgt_id = rent_tgt._origin.id if isinstance(rent_tgt.id, models.NewId) else rent_tgt.id
+                    if tgt_id in record.property_ids.ids:
+                        tgt_keep.append(tgt_id)
+                _logger.debug(f"tgt_keep={tgt_keep}")
+                rent_plan.rent_targets = tgt_keep
 
     property_management_fee_plan_ids = fields.One2many("estate.lease.contract.property.management.fee.plan",
                                                        compute='_compute_property_management_fee_plan_ids',
@@ -741,21 +756,27 @@ class EstateLeaseContract(models.Model):
     edit_on_hist_page = fields.Boolean(string='历史页面可编辑', default=_compute_edit_on_hist_page,
                                        compute=_compute_edit_on_hist_page, store=False)
 
-    @api.depends("property_ids", "rental_plan_ids")
+    @api.depends("property_ids", "rental_details")
     def _compute_rental_details(self):
         # 把计算结果付回给rental_details
         for record in self:
-            rental_details = self.env['estate.lease.contract.property.rental.detail'].search(
-                [('contract_id', '=', record.id)])
-            record.rental_details = rental_details
+            tgt_id = record._origin.id if isinstance(record.id, models.NewId) else record.id
+            _logger.info(f"_compute_rental_details called property_ids={record.property_ids.ids};contract={tgt_id}")
+            rent_details = self.env['estate.lease.contract.property.rental.detail'].search(
+                [('contract_id', '=', tgt_id), ('property_id', 'in', record.property_ids.ids)]).mapped('id')
+            _logger.info(f"searched rental_details={len(rent_details)}条")
+            record.rental_details = rent_details
 
     # 合同页面金额汇总标签页的刷新按钮动作
     def action_refresh_all_money(self):
+        _logger.info(f"action_refresh_all_money called")
         self._compute_property_rental_detail_ids()
         self._compute_rental_details()
+        self._compute_warn_msg()
 
     # 刷新租金方案
     def action_refresh_rental_plan(self):
+        _logger.info(f"action_refresh_rental_plan called")
         self._compute_rental_plan_ids()
         self.action_refresh_all_money()
 
@@ -764,15 +785,15 @@ class EstateLeaseContract(models.Model):
         self._compute_property_management_fee_plan_ids()
 
     # 根据租期和租金方案计算租金明细
-    @api.depends("date_rent_start", "date_rent_end", "property_ids", "rental_plan_ids")
+    @api.depends("property_ids", "date_rent_start", "date_rent_end", "rental_plan_ids")
     def _compute_property_rental_detail_ids(self):
         for record in self:
             if record.date_rent_start and record.date_rent_end and record.property_ids and record.rental_plan_ids:
                 generated_rental_details = _generate_details_from_rent_plan(record)
                 # 先删除旧纪录
-                print("删除掉estate.lease.contract.property.rental.detail其中的contract_id={0}的记录".format(record.id))
+                _logger.info(f"删掉estate.lease.contract.property.rental.detail中contract_id={record.id}的not edit记录")
                 self.env['estate.lease.contract.property.rental.detail'].search(
-                    [('contract_id', '=', record.id)]).write({'active': False})
+                    [('contract_id', '=', record.id), ('edited', '=', False)]).write({'active': False})
                 # 根据租金方案生成的租金明细，逐条生成model：estate.lease.contract.property.rental.detail
                 for rental_detail in generated_rental_details:
                     self.env['estate.lease.contract.property.rental.detail'].create({
@@ -787,6 +808,7 @@ class EstateLeaseContract(models.Model):
                         'date_payment': rental_detail['date_payment'],
                         'description': rental_detail['description'],
                         'active': rental_detail['active'],
+                        'edited': rental_detail['edited'],
                     })
 
     # 合同新建时默认不生效，需要手动修改
@@ -801,6 +823,29 @@ class EstateLeaseContract(models.Model):
     # 合同终止状态
     terminated = fields.Boolean(default=False, copy=False)
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+    # 因租金明细修改后的警告提示信息
+    warn_msg = fields.Text(string="提示", default="", store=False, compute="_compute_warn_msg")
+
+    @api.depends("rental_details", "property_ids")
+    def _compute_warn_msg(self):
+        for record in self:
+            record.warn_msg = ""
+            # 是否有重复明细数据
+            combination_counts = {}
+            for detail in record.rental_details:
+                combination = (detail.property_id.name,
+                               f"开日日期{detail.period_date_from}", f"结束日期{detail.period_date_to}")
+                if combination in combination_counts:
+                    combination_counts[combination] += 1
+                else:
+                    combination_counts[combination] = 1
+
+            duplicates = {k: v for k, v in combination_counts.items() if v > 1}
+            if duplicates:
+                for combi, cnt in duplicates.items():
+                    record.warn_msg += f"{combi}出现{cnt}次;"
+
+                record.warn_msg += "这种情况一般是由于修改了租金明细数据后重新生成租金明细数据而造成的。请根据实际情况调整或删除租金明细"
 
     def action_release_contract(self):
         for record in self:
@@ -820,8 +865,8 @@ class EstateLeaseContract(models.Model):
                                         f"租赁期间：【{each_contract.date_rent_start}~{each_contract.date_rent_end}】")
 
                 if current_contract_list:
-                    warn_msg = '；'.join(current_contract_list)
-                    raise UserError(_('不能发布本合同，因为房屋在其他租赁合同中租赁期重叠：{0}'.format(warn_msg)))
+                    msg = '；'.join(current_contract_list)
+                    raise UserError(_('不能发布本合同，因为房屋在其他租赁合同中租赁期重叠：{0}'.format(msg)))
 
             else:
                 raise UserError(_('发布合同需要至少绑定一个租赁标的'))
@@ -845,7 +890,7 @@ class EstateLeaseContract(models.Model):
     @api.constrains('property_ids')
     def _check_update(self):
         for record in self:
-            if record.state in ['released', 'released']:
+            if record.state in ['to_be_released', 'released']:
                 self.action_release_contract()
 
     def _insert_contract_property_rental_plan_rel(self, records):
