@@ -720,22 +720,23 @@ class EstateLeaseContract(models.Model):
 
     advance_collection_of_coupon_deposit_guarantee = fields.Float(default=0.0, string="预收卡券保证金（元）")
     performance_guarantee = fields.Float(default=0.0, string="履约保证金（元）", tracking=True)
-    lease_deposit = fields.Float(default=0.0, string="租赁押金（元）", compute="_calc_rent_total_info", tracking=True)
+    lease_deposit = fields.Float(default=0.0, string="租赁押金（元）", compute="_calc_rent_total_info", tracking=True,
+                                 copy=False)
     property_management_fee_guarantee = fields.Float(default=0.0, string="物管费保证金（元）", tracking=True)
 
-    decoration_deposit = fields.Float(default=0.0, string="装修押金（元）", tracking=True)
-    decoration_management_fee = fields.Float(default=0.0, string="装修管理费（元）", tracking=True)
-    decoration_water_fee = fields.Float(default=0.0, string="装修水费（元）", tracking=True)
-    decoration_electricity_fee = fields.Float(default=0.0, string="装修电费（元）", tracking=True)
-    refuse_collection = fields.Float(default=0.0, string="建筑垃圾清运费（元）", tracking=True)
-    garbage_removal_fee = fields.Float(default=0.0, string="垃圾清运费（元）", tracking=True)
+    decoration_deposit = fields.Float(default=0.0, string="装修押金（元）", tracking=True, copy=False)
+    decoration_management_fee = fields.Float(default=0.0, string="装修管理费（元）", tracking=True, copy=False)
+    decoration_water_fee = fields.Float(default=0.0, string="装修水费（元）", tracking=True, copy=False)
+    decoration_electricity_fee = fields.Float(default=0.0, string="装修电费（元）", tracking=True, copy=False)
+    refuse_collection = fields.Float(default=0.0, string="建筑垃圾清运费（元）", tracking=True, copy=False)
+    garbage_removal_fee = fields.Float(default=0.0, string="垃圾清运费（元）", tracking=True, copy=False)
 
     description = fields.Text("详细信息", copy=False, tracking=True)
 
     attachment_ids = fields.Many2many('ir.attachment', string="附件管理", copy=False, tracking=True)
 
     rental_details = fields.One2many('estate.lease.contract.property.rental.detail', 'contract_id', store=True,
-                                     compute='_compute_rental_details', string="租金明细", readonly=False)
+                                     compute='_compute_rental_details', string="租金明细", readonly=False, copy=False)
 
     def _compute_edit_on_hist_page(self):
         """合同管理员希望在合同发布后，在查看界面也可以随时修改"""
@@ -1003,6 +1004,15 @@ class EstateLeaseContract(models.Model):
         }
         # 设置域
         domain = [('id', '=', new_record.id), ('active', '=', False)]
+
+        # 续租不收押金，设置之前要判断当前日期是否在当前合同的租赁期间内！！！设置后，该资产的这些属性就影响所有历史合同中的该资产了，所以，理论上
+        # 修改对象应该是合同中的资产（另作一张表来存）而不应该是直接修改资产master。这也意味着，合同做成/修改时，只要不修改资产的基础信息，那么
+        # 业务上来说，针对该资产的修改内容应该针对的是这张保存了合同-资产的新表中的资产信息
+        for rcd in new_record:
+            for property_id in rcd.property_ids:
+                property_id.deposit_months = 0
+                property_id.deposit_amount = 0
+        new_record.lease_deposit = 0
 
         # 跳转到新记录的表单视图
         return self._action_view_record(new_record.id, title, context, domain)
