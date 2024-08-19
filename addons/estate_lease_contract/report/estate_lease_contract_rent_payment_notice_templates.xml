@@ -19,7 +19,7 @@
                         </h1>
 
                         <p class="greetings" >
-                            <span style="border-bottom: 1px solid #000;">尊敬的<span t-esc="rent.property_id.name"/></span>租户：
+                            <span style="border-bottom: 1px solid #000;">尊敬的<span t-esc="rent.property_id.name"/> </span>租户：
                         </p>
 
                         <p class="report_paragraph">
