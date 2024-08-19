@@ -33,9 +33,10 @@ def _check_current_contract_valid(record):
 
 
 def _get_payment_method_str(record):
-    if record.deposit_months and record.rent_plan_id:
+    if record.rent_plan_id:
+        deposit_months = record.deposit_months if record.deposit_months else 0
         if record.rent_plan_id.payment_period:
-            return f"押{'{:.2f}'.format(round(record.deposit_months, 2)).rstrip('0').rstrip('.')}" \
+            return f"押{'{:.2f}'.format(round(deposit_months, 2)).rstrip('0').rstrip('.')}" \
                    f"付{record.rent_plan_id.payment_period}"
     else:
         return None

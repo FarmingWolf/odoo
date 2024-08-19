@@ -17,13 +17,14 @@
                 <header>
                     <field name="company_id" invisible="1"/>
                     <field name="edit_on_hist_page" invisible="1"/>
+                    <field name="contract_hist" invisible="1"/>
                     <button name="action_release_contract" type="object" string="发布"
                             invisible="(not edit_on_hist_page) or (state != 'recording')"/>
                     <button name="action_cancel_release_contract" type="object" string="取消发布"
                             invisible="(not edit_on_hist_page) or (state not in ['released', 'to_be_released'])"/>
                     <button name="action_contract_renewal" type="object" string="续租"
                             groups="estate_lease_contract.estate_lease_contract_group_manager"
-                            invisible="not edit_on_hist_page"/>
+                            invisible="state not in ['released', 'invalid']"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -48,7 +49,7 @@
                             <field name="date_rent_start" readonly="not edit_on_hist_page"/>
                             <field name="date_rent_end" readonly="not edit_on_hist_page"/>
                             <field name="days_rent_total" readonly="1"/>
-                            <field name="days_free" readonly="not edit_on_hist_page"/>
+                            <field name="days_free" readonly="not edit_on_hist_page" invisible="1"/>
                             <field name="date_decorate_start" readonly="not edit_on_hist_page"/>
                             <field name="date_decorate_end" readonly="not edit_on_hist_page"/>
                             <field name="days_decorate" readonly="1"/>
@@ -75,7 +76,20 @@
                                     <field name="rent_amount_year"/>
                                 </group>
                             </group>
-                            <field name="property_ids" readonly="not edit_on_hist_page"/>
+                            <field name="property_ids" readonly="not edit_on_hist_page" invisible="state != 'recording'"/>
+                            <field name="contract_hist" readonly="1" invisible="state == 'recording'">
+                                <tree string="" decoration-success="contract_property_state=='sold'" decoration-warning="contract_property_state=='canceled'">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="contract_property_name"/>
+                                    <field name="contract_renter_id"/>
+                                    <field name="contract_property_state"/>
+                                    <field name="contract_property_area"/>
+                                    <field name="contract_property_rent_price"/>
+                                    <field name="contract_rent_amount_monthly"/>
+                                    <field name="contract_rent_amount_year"/>
+                                    <field name="contract_rent_payment_method"/>
+                                </tree>
+                            </field>
                         </page>
                         <page string="停车位">
                             <group>

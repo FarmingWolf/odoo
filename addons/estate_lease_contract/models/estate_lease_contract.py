@@ -388,28 +388,10 @@ class EstateLeaseContract(models.Model):
 
     days_rent_total = fields.Char(string="租赁期限", compute="_calc_days_rent_total")
 
-    """
-    rental_plans_for_property 貌似在哪都没用到
-    def _compute_rental_plans_for_property(self):
-        print("进入_compute_rental_plans_for_property")
-        print(f"self.env.context.get('active_id')={self.env.context.get('active_id')}")
-        print(f"self.env.context.get('contract_read_only')={self.env.context.get('contract_read_only')}")
-        print(f"self.env.context.get('context_contract_id')={self.env.context.get('context_contract_id')}")
-        for contract in self:
-            contract.rental_plans_for_property = self.env['estate.lease.contract.rental.plan.rel'].search([
-                ('contract_id', '=', contract.id),
-                ('property_id', 'in', contract.property_ids.ids),
-            ])
-            return contract.rental_plans_for_property
-
-        return False
-
-    rental_plans_for_property = fields.One2many('estate.lease.contract.rental.plan.rel',
-                                                compute='_compute_rental_plans_for_property',
-                                                default=lambda self: self._compute_rental_plans_for_property,
-                                                string='合同-资产-租金方案', store=False)
-    
-    """
+    # 相当于合同历史信息：资产名称、计租面积、押金月数、押金金额，其他信息还是从资产和租赁方案中取（资产和租赁方案修改保存时，做覆盖和影响的提示）
+    # *********在查看界面（也就是说只要合同发布），那么就应该显示历史数据，录入中的则显示关联master property和rental plan的信息*********
+    contract_hist = fields.One2many('estate.lease.contract.rental.plan.rel', 'contract_id',
+                                    string='合同-资产-租金方案历史信息', copy=False)
 
     """ 这俩函数就是个废柴
     @api.onchange("contract_no")
@@ -628,15 +610,24 @@ class EstateLeaseContract(models.Model):
         deposit_total = 0
         for record in self:
             if record.property_ids:
-                for rent_property in record.property_ids:
-                    rent_cnt_total += 1
-                    building_area_total += rent_property.building_area
-                    rent_area_total += rent_property.rent_area
-                    rent_amount_total += rent_property.rent_amount_monthly_adjust if \
-                        rent_property.rent_amount_monthly_adjust else rent_property.rent_amount_monthly_auto
-                    rent_amount_year_total += 12 * rent_property.rent_amount_monthly_adjust if \
-                        rent_property.rent_amount_monthly_adjust else rent_property.rent_amount_monthly_auto
-                    deposit_total += rent_property.deposit_amount
+                if record.state == "recording":
+                    for rent_property in record.property_ids:
+                        rent_cnt_total += 1
+                        building_area_total += rent_property.building_area
+                        rent_area_total += rent_property.rent_area
+                        rent_amount_total += rent_property.rent_amount_monthly_adjust if \
+                            rent_property.rent_amount_monthly_adjust else rent_property.rent_amount_monthly_auto
+                        rent_amount_year_total += 12 * rent_property.rent_amount_monthly_adjust if \
+                            rent_property.rent_amount_monthly_adjust else rent_property.rent_amount_monthly_auto
+                        deposit_total += rent_property.deposit_amount
+                else:
+                    for each_hist in record.contract_hist:
+                        rent_cnt_total += 1
+                        building_area_total += each_hist.contract_property_building_area
+                        rent_area_total += each_hist.contract_property_area
+                        rent_amount_total += each_hist.contract_rent_amount_monthly
+                        rent_amount_year_total += 12 * each_hist.contract_rent_amount_monthly
+                        deposit_total += each_hist.contract_deposit_amount
 
             record.rent_count = rent_cnt_total
             record.building_area = building_area_total
@@ -910,11 +901,23 @@ class EstateLeaseContract(models.Model):
             # self.env['estate.lease.contract.rental.plan.rel'].flush_model(['rental_plan_id'])
 
             for each_property in record.property_ids:
+                contract_rent_amount_monthly = each_property.rent_amount_monthly_adjust \
+                    if each_property.rent_amount_monthly_adjust else each_property.rent_amount_monthly_auto
+
                 contract_rental_plan_rel.append({
                     "contract_id": record.id,
                     "property_id": each_property.id,
                     "rental_plan_id": each_property.rent_plan_id.id if each_property.rent_plan_id.id else None,
                     "company_id": self.env.user.company_id.id,
+                    "contract_property_name": each_property.name,
+                    "contract_property_state": each_property.state,
+                    "contract_property_area": each_property.rent_area,
+                    "contract_property_building_area": each_property.building_area,
+                    "contract_deposit_months": each_property.deposit_months,
+                    "contract_deposit_amount": each_property.deposit_amount,
+                    "contract_rent_amount_monthly": contract_rent_amount_monthly,
+                    "contract_rent_amount_year": contract_rent_amount_monthly * 12,
+                    "contract_rent_payment_method": each_property.latest_payment_method,
                 })
                 # self.env.cr.execute("INSERT INTO estate_lease_contract_rental_plan_rel ("
                 #                     "contract_id, property_id, rental_plan_id, company_id) VALUES (%s, %s, %s, %s)",
