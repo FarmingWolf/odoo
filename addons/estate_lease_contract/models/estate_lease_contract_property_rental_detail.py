@@ -43,21 +43,12 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     comment = fields.Text(string="修改备注")
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
-    rent_bank_account_id = fields.Many2one(comodel_name="estate.lease.contract.bank.account", store=False,
-                                           compute="_get_rent_bank_account_id")
-
     report_print_date = fields.Date("房租缴费通知书打印日", store=False, compute="_get_report_print_date")
 
     @api.depends("contract_id")
     def _get_report_print_date(self):
         for record in self:
             record.report_print_date = fields.Date.context_today(self)
-
-    @api.depends("contract_id")
-    def _get_rent_bank_account_id(self):
-        for record in self:
-            domain = [('name', 'like', '%租金%')]
-            record.rent_bank_account_id = self.env['estate.lease.contract.bank.account'].search(domain, limit=1)
 
     @api.depends("period_date_from")
     def _get_period_date_to_prev(self):

@@ -493,6 +493,10 @@ class EstateLeaseContract(models.Model):
     tag_ids = fields.Many2many("estate.lease.contract.tag", string='合同标签', copy=False)
 
     rent_account = fields.Many2one("estate.lease.contract.bank.account", string='租金收缴账户')
+    rent_account_bank_name = fields.Char("租金户银行名称", related="rent_account.bank_name")
+    rent_account_bank_branch_name = fields.Char("租金户分行名称", related="rent_account.bank_branch_name")
+    rent_account_bank_account_name = fields.Char("租金户银行账户名", related="rent_account.bank_account_name")
+    rent_account_bank_account_id = fields.Char("租金户银行账号", related="rent_account.bank_account_id")
 
     opening_date = fields.Date(string="计划开业日期")
 
@@ -533,13 +537,39 @@ class EstateLeaseContract(models.Model):
             record.property_management_fee_plan_ids = management_fee_plans
 
     property_management_fee_account = fields.Many2one("estate.lease.contract.bank.account", string='物业费收缴账户名')
+    property_management_fee_account_bank_name = fields.Char(
+        "物业费账户银行名称", related="property_management_fee_account.bank_name")
+    property_management_fee_account_bank_branch_name = fields.Char(
+        "物业费账户分行名称", related="property_management_fee_account.bank_branch_name")
+    property_management_fee_account_bank_account_name = fields.Char(
+        "物业费账户银行账户名", related="property_management_fee_account.bank_account_name")
+    property_management_fee_account_bank_account_id = fields.Char(
+        "物业费账户银行账号", related="property_management_fee_account.bank_account_id")
 
     electricity_account = fields.Many2one("estate.lease.contract.bank.account", string='电费收缴账户名')
+    electricity_account_bank_name = fields.Char("电费账户银行名称", related="electricity_account.bank_name")
+    electricity_account_bank_branch_name = fields.Char("电费账户分行名称", related="electricity_account.bank_branch_name")
+    electricity_account_bank_account_name = fields.Char("电费账户银行账户名",
+                                                        related="electricity_account.bank_account_name")
+    electricity_account_bank_account_id = fields.Char("电费账户银行账号", related="electricity_account.bank_account_id")
 
     water_bill_account = fields.Many2one("estate.lease.contract.bank.account", string='水费收缴账户名')
+    water_bill_account_bank_name = fields.Char("水费账户银行名称", related="water_bill_account.bank_name")
+    water_bill_account_bank_branch_name = fields.Char("水费账户分行名称", related="water_bill_account.bank_branch_name")
+    water_bill_account_bank_account_name = fields.Char("水费账户银行账户名", related="water_bill_account.bank_account_name")
+    water_bill_account_bank_account_id = fields.Char("水费账户银行账号", related="water_bill_account.bank_account_id")
 
     parking_fee_account = fields.Many2one("estate.lease.contract.bank.account", string='停车费收缴账户名')
+    parking_fee_account_bank_name = fields.Char("停车费账户银行名称", related="parking_fee_account.bank_name")
+    parking_fee_account_bank_branch_name = fields.Char("停车费账户分行名称", related="parking_fee_account.bank_branch_name")
+    parking_fee_account_bank_account_name = fields.Char("停车费账户银行账户名", related="parking_fee_account.bank_account_name")
+    parking_fee_account_bank_account_id = fields.Char("停车费账户银行账号", related="parking_fee_account.bank_account_id")
+
     pledge_account = fields.Many2one("estate.lease.contract.bank.account", string='押金收缴账户名')
+    pledge_account_bank_name = fields.Char("押金户银行名称", related="pledge_account.bank_name")
+    pledge_account_bank_branch_name = fields.Char("押金户分行名称", related="pledge_account.bank_branch_name")
+    pledge_account_bank_account_name = fields.Char("押金户银行账户名", related="pledge_account.bank_account_name")
+    pledge_account_bank_account_id = fields.Char("押金户银行账号", related="pledge_account.bank_account_id")
 
     parking_space_ids = fields.Many2many('parking.space', 'contract_parking_space_rel', 'contract_id',
                                          'parking_space_id',

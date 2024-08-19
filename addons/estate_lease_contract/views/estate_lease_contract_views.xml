@@ -76,9 +76,11 @@
                                     <field name="rent_amount_year"/>
                                 </group>
                             </group>
-                            <field name="property_ids" readonly="not edit_on_hist_page" invisible="state != 'recording'"/>
+                            <field name="property_ids" readonly="not edit_on_hist_page"
+                                   invisible="state != 'recording'"/>
                             <field name="contract_hist" readonly="1" invisible="state == 'recording'">
-                                <tree string="" decoration-success="contract_property_state=='sold'" decoration-warning="contract_property_state=='canceled'">
+                                <tree string="" decoration-success="contract_property_state=='sold'"
+                                      decoration-warning="contract_property_state=='canceled'">
                                     <field name="sequence" widget="handle"/>
                                     <field name="contract_property_name"/>
                                     <field name="contract_renter_id"/>
@@ -166,17 +168,80 @@
                                 </group>
                             </sheet>
                         </page>
-                        <page string="收款账户" id="page_bank_account" invisible="1">
-                            <group>
-                                <group>
-                                    <field name="rent_account"/>
-                                    <field name="pledge_account"/>
-                                    <field name="property_management_fee_account"/>
+                        <page string="收款账户" id="page_bank_account">
+                            <group col="2">
+                                <group col="1">
+                                    <group col="1">
+                                        <group string="租金账户" col="1">
+                                            <field name="rent_account" placeholder="请选择"/>
+                                            <group invisible="rent_account == False">
+                                                <field name="rent_account_bank_name" string="银行名称"/>
+                                                <field name="rent_account_bank_branch_name" string="分行名称"/>
+                                                <field name="rent_account_bank_account_name" string="账户名称"/>
+                                                <field name="rent_account_bank_account_id" string="账号"/>
+                                            </group>
+                                        </group>
+                                    </group>
+                                    <group col="1">
+                                        <group string="物业费账户" col="1">
+                                            <field name="property_management_fee_account" placeholder="请选择"/>
+                                            <group invisible="property_management_fee_account == False">
+                                                <field name="property_management_fee_account_bank_name" string="银行名称"/>
+                                                <field name="property_management_fee_account_bank_branch_name"
+                                                       string="分行名称"/>
+                                                <field name="property_management_fee_account_bank_account_name"
+                                                       string="账户名称"/>
+                                                <field name="property_management_fee_account_bank_account_id"
+                                                       string="账号"/>
+                                            </group>
+                                        </group>
+                                    </group>
+                                    <group col="1">
+                                        <group string="停车费账户" col="1">
+                                            <field name="parking_fee_account" placeholder="请选择"/>
+                                            <group invisible="parking_fee_account == False">
+                                                <field name="parking_fee_account_bank_name" string="银行名称"/>
+                                                <field name="parking_fee_account_bank_branch_name" string="分行名称"/>
+                                                <field name="parking_fee_account_bank_account_name" string="账户名称"/>
+                                                <field name="parking_fee_account_bank_account_id" string="账号"/>
+                                            </group>
+                                        </group>
+                                    </group>
                                 </group>
-                                <group>
-                                    <field name="parking_fee_account"/>
-                                    <field name="electricity_account"/>
-                                    <field name="water_bill_account"/>
+                                <group col="1">
+                                    <group col="1">
+                                        <group string="押金账户" col="1">
+                                            <field name="pledge_account" placeholder="请选择"/>
+                                            <group invisible="pledge_account == False">
+                                                <field name="pledge_account_bank_name" string="银行名称"/>
+                                                <field name="pledge_account_bank_branch_name" string="分行名称"/>
+                                                <field name="pledge_account_bank_account_name" string="账户名称"/>
+                                                <field name="pledge_account_bank_account_id" string="账号"/>
+                                            </group>
+                                        </group>
+                                    </group>
+                                    <group col="1">
+                                        <group string="电费账户" col="1">
+                                            <field name="electricity_account" placeholder="请选择"/>
+                                            <group invisible="electricity_account == False">
+                                                <field name="electricity_account_bank_name" string="银行名称"/>
+                                                <field name="electricity_account_bank_branch_name" string="分行名称"/>
+                                                <field name="electricity_account_bank_account_name" string="账户名称"/>
+                                                <field name="electricity_account_bank_account_id" string="账号"/>
+                                            </group>
+                                        </group>
+                                    </group>
+                                    <group col="1">
+                                        <group string="水费账户" col="1">
+                                            <field name="water_bill_account" placeholder="请选择"/>
+                                            <group invisible="water_bill_account == False">
+                                                <field name="water_bill_account_bank_name" string="银行名称"/>
+                                                <field name="water_bill_account_bank_branch_name" string="分行名称"/>
+                                                <field name="water_bill_account_bank_account_name" string="账户名称"/>
+                                                <field name="water_bill_account_bank_account_id" string="账号"/>
+                                            </group>
+                                        </group>
+                                    </group>
                                 </group>
                             </group>
                         </page>
@@ -209,7 +274,8 @@
                                         </group>
                                     </group>
                                     <field name="rental_details" readonly="not edit_on_hist_page">
-                                        <tree string="" decoration-danger="(rental_amount != rental_receivable) or edited"
+                                        <tree string=""
+                                              decoration-danger="(rental_amount != rental_receivable) or edited"
                                               decoration-success="rental_received &gt; 0 and rental_received == rental_receivable"
                                               decoration-warning="rental_received != 0 and rental_received != rental_receivable"
                                               readonly="not parent.edit_on_hist_page">

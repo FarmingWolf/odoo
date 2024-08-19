@@ -49,13 +49,13 @@
                             望您/贵公司接到通知后，尽快向我公司/我缴纳房屋租金及物业费用。并将付款凭证复印件交于我公司/我。
                         </p>
                         <p class="report_paragraph">
-                            甲方账户名：<span t-esc="rent.rent_bank_account_id.bank_account_name"/>
+                            甲方账户名：<span t-esc="rent.contract_id.rent_account_bank_account_name"/>
                         </p>
                         <p class="report_paragraph">
-                            开　户　行：<span t-esc="rent.rent_bank_account_id.bank_name"/><span t-esc="rent.rent_bank_account_id.bank_branch_name"/>
+                            开　户　行：<span t-esc="rent.contract_id.rent_account_bank_name"/><span t-esc="rent.contract_id.rent_account_bank_branch_name"/>
                         </p>
                         <p class="report_paragraph">
-                            账　　　号：　<span t-esc="rent.rent_bank_account_id.bank_account_id"/>
+                            账　　　号：　<span t-esc="rent.contract_id.rent_account_bank_account_id"/>
                         </p>
 
                         <p class="report_paragraph">
