@@ -834,7 +834,7 @@ class EstateLeaseContract(models.Model):
             combination_counts = {}
             for detail in record.rental_details:
                 combination = (detail.property_id.name,
-                               f"开日日期{detail.period_date_from}", f"结束日期{detail.period_date_to}")
+                               f"开始：{detail.period_date_from}", f"结束：{detail.period_date_to}")
                 if combination in combination_counts:
                     combination_counts[combination] += 1
                 else:
@@ -843,9 +843,11 @@ class EstateLeaseContract(models.Model):
             duplicates = {k: v for k, v in combination_counts.items() if v > 1}
             if duplicates:
                 for combi, cnt in duplicates.items():
-                    record.warn_msg += f"{combi}出现{cnt}次;"
+                    record.warn_msg += f"{combi}出现{cnt}次；"
 
-                record.warn_msg += "这种情况一般是由于修改了租金明细数据后重新生成租金明细数据而造成的。请根据实际情况调整或删除租金明细"
+                record.warn_msg += f"这种情况一般是由于修改了租金明细数据后重新生成租金明细数据而造成的。" \
+                                   f"请根据实际情况调整或删除租金明细。" \
+                                   f"一般情况下应删除掉新生成的本期数据（黑色行），而保留修改过的数据（红色行）。"
 
     def action_release_contract(self):
         for record in self:

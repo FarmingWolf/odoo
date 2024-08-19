@@ -27,7 +27,8 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     rental_received = fields.Float(default=0.0, string="本期实收(元)", tracking=True)
     rental_period_no = fields.Integer(default=0, string="期数", tracking=True)
     period_date_from = fields.Date(string="开始日期", default=lambda self: fields.Datetime.today(), tracking=True)
-
+    period_date_to_prev = fields.Date(string="上期结束日期", compute="_get_period_date_to_prev",
+                                      store=False)
     period_date_to = fields.Date(string="结束日期", default=lambda self: self._get_default_date_end(), tracking=True)
     date_payment = fields.Date(string="支付日期", tracking=True)
     description = fields.Char(string="租金描述", readonly=True)
@@ -39,8 +40,29 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     rental_arrears = fields.Float(string="欠缴金额", compute='_compute_rental_arrears', readonly=True)
     edited = fields.Boolean(string="有无优惠", readonly=True)
     edited_display = fields.Char(string="有优惠", compute="_get_display_edited", store=False)
-    comment = fields.Text(string="修改备注", required=True)
+    comment = fields.Text(string="修改备注")
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+
+    rent_bank_account_id = fields.Many2one(comodel_name="estate.lease.contract.bank.account", store=False,
+                                           compute="_get_rent_bank_account_id")
+
+    report_print_date = fields.Date("房租缴费通知书打印日", store=False, compute="_get_report_print_date")
+
+    @api.depends("contract_id")
+    def _get_report_print_date(self):
+        for record in self:
+            record.report_print_date = fields.Date.context_today(self)
+
+    @api.depends("contract_id")
+    def _get_rent_bank_account_id(self):
+        for record in self:
+            domain = [('name', 'like', '%租金%')]
+            record.rent_bank_account_id = self.env['estate.lease.contract.bank.account'].search(domain, limit=1)
+
+    @api.depends("period_date_from")
+    def _get_period_date_to_prev(self):
+        for record in self:
+            record.period_date_to_prev = record.period_date_from + timedelta(-1)
 
     @api.depends("edited")
     def _get_display_edited(self):
@@ -91,7 +113,7 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
                             vals['edited'] = True
                             break
                         else:
-                            raise UserError('本期租金、本期应收、本期开始结束日期、支付日期的调整，视为优惠，必须填写备注！')
+                            raise UserError('本期租金、本期应收、本期开始结束日期、支付日期的调整，视为优惠。修改这些字段必须填写备注！')
 
         res = super().write(vals)
         return res
@@ -102,3 +124,6 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
         res = super().create(vals_list)
 
         return res
+
+    def action_print_payment_notice(self):
+        return self.env.ref('estate_lease_contract.action_print_payment_notice').report_action(self)

@@ -20,6 +20,10 @@
             'estate_lease_contract/static/src/js/estate_lease_contract_property_status_load.js',
             'estate_lease_contract/static/src/js/estate_lease_contract_rental_plan_load.js',
         ],
+
+        'web.report_assets_pdf': [
+            '/estate_lease_contract/static/src/css/estate_lease_contract_report.scss',
+        ],
     },
     'data': [
         'security/security.xml',
@@ -44,6 +48,9 @@
         'views/estate_lease_contract_menus.xml',
 
         'data/cron_daily_property_status.xml',
+
+        'report/estate_lease_contract_rent_payment_notice_reports.xml',
+        'report/estate_lease_contract_rent_payment_notice_templates.xml',
     ],
     'license': 'AGPL-3'
 }

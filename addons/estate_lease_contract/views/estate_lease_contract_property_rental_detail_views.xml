@@ -86,6 +86,9 @@
                         <field name="description"/>
                         <field name="comment" placeholder="若修改本页内容，请填写备注！如：优惠政策描述等"/>
                     </group>
+                    <button name="action_print_payment_notice" type="object" class="btn btn-primary"
+                            icon="fa-file-pdf-o"
+                            string="缴费通知单" title="点击打印缴费通知单" />
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids"/>
