@@ -27,7 +27,9 @@
                         </p>
 
                         <p class="report_paragraph">
-                            贵公司的已付的房屋租金将于　<span t-esc="rent.period_date_to_prev.strftime('%Y年%m月%d日')" style="border-bottom: 1px solid #000;"/>　到期，
+                            贵公司的已付的房屋租金
+                            <t t-if="rent.period_date_to_prev &gt; rent.report_print_date">将</t><t t-else="">已</t>
+                            于　<span t-esc="rent.period_date_to_prev.strftime('%Y年%m月%d日')" style="border-bottom: 1px solid #000;"/>　到期，
                             根据贵公司同我公司签署的房屋租赁协议，贵公司需在　<span t-esc="rent.date_payment.strftime('%Y年%m月%d日')" style="border-bottom: 1px solid #000;"/>　
                             前支付　<span style="border-bottom: 1px solid #000;"><span t-esc="rent.period_date_from.strftime('%Y年%m月%d日')"/>　至　<span t-esc="rent.period_date_to.strftime('%Y年%m月%d日')"/></span>
                             的房屋租金及物业费。
