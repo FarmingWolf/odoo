@@ -37,7 +37,7 @@
 
                         <p class="report_paragraph">
                             房屋租金总计：
-                            <span style="border-bottom: 1px solid #000;" t-esc="rent.rental_amount_zh"/>。(￥<span t-esc="rent.rental_amount"/>)
+                            <span style="border-bottom: 1px solid #000;" t-esc="rent.rental_amount_zh"/>。(￥<span t-esc="round(rent.rental_amount, 2)"/>)
                         </p>
                         <p class="report_paragraph">
                             如逾期缴纳，将按合同相关条款，产生滞纳金等相关费用。

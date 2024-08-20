@@ -51,7 +51,7 @@
                     <notebook>
                         <page string="租金计费详情：固定金额" invisible="billing_method != 'by_fixed_price'">
                             <group>
-                                <field name="rent_price"/>
+                                <field name="rent_price" digits="[12, 2]"/>
                             </group>
                         </page>
                         <page string="租金计费详情：纯抽成" invisible="billing_method != 'by_percentage'">
@@ -66,7 +66,7 @@
 
                             <group string="按时间段递增" invisible="billing_progress_method_id != 'by_period'" col="2">
                                 <group>
-                                    <field name="rent_price" string="起始单价（元/天/㎡）"/>
+                                    <field name="rent_price" string="起始单价（元/天/㎡）" digits="[12, 2]"/>
                                 </group>
                                 <field name="period_percentage_id"/>
                             </group>
@@ -76,13 +76,13 @@
                             </group>
                             <group string="固定单价" invisible="billing_progress_method_id != 'no_progress'" col="2">
                                 <group>
-                                    <field name="rent_price" string="固定单价（元/天/㎡）"/>
+                                    <field name="rent_price" string="固定单价（元/天/㎡）" digits="[12, 2]"/>
                                 </group>
                             </group>
                         </page>
                         <page string="租金计费详情：保底抽成两者取高" invisible="billing_method != 'by_fixed_price_percentage_higher'">
                             <group col="4">
-                                <field name="rent_price" string="保底单价（元/天/㎡）"/>
+                                <field name="rent_price" string="保底单价（元/天/㎡）" digits="[12, 2]"/>
                             </group>
                             <group col="2">
                                 <group>

@@ -25,15 +25,14 @@ class EstateLeaseContractRentalPlanRel(models.Model):
                                                           ('sold', '已租'), ('canceled', '已取消'),
                                                           ('out_dated', '租约已到期')],
                                                )
-    contract_property_rent_price = fields.Float(related="rental_plan_id.rent_price", string="租金单价（元/天/㎡）",
-                                                digits=(12, 2))
-    contract_property_building_area = fields.Float(default=0.0, digits=(12, 2), string="建筑面积（㎡）")  # 可能拆铺合铺
-    contract_property_area = fields.Float(default=0.0, digits=(12, 2), string="面积（㎡）")
-    contract_rent_amount_monthly = fields.Float(string="月租金（元）", digits=(12, 2), default=0)
-    contract_rent_amount_year = fields.Float(string="年租金(元)", digits=(12, 2), default=0)
+    contract_property_rent_price = fields.Float(related="rental_plan_id.rent_price", string="租金单价（元/天/㎡）")
+    contract_property_building_area = fields.Float(default=0.0, string="建筑面积（㎡）")  # 可能拆铺合铺
+    contract_property_area = fields.Float(default=0.0, string="面积（㎡）")
+    contract_rent_amount_monthly = fields.Float(string="月租金（元）", default=0)
+    contract_rent_amount_year = fields.Float(string="年租金(元)", default=0)
     contract_rent_payment_method = fields.Char(string="付款方式")
-    contract_deposit_months = fields.Float(string="押金月数", digits=(3, 1), default=0)
-    contract_deposit_amount = fields.Float(string="押金金额", digits=(12, 2), default=0)
+    contract_deposit_months = fields.Float(string="押金月数", default=0)
+    contract_deposit_amount = fields.Float(string="押金金额", default=0)
 
     _sql_constraints = [
         ('contract_property_rental_plan_unique', 'unique(contract_id, property_id)',

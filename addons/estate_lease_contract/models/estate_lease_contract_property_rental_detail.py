@@ -23,7 +23,7 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     rental_amount = fields.Float(default=0.0, string="本期租金(元)", tracking=True)
     rental_amount_zh = fields.Char(string="本期租金(元)大写", compute="_cal_rental_amount_zh", store=True)
     rental_receivable = fields.Float(default=0.0, string="本期应收(元)", compute="_get_default_rental_receivable",
-                                     readonly=False, store=True, digits=(12, 2), tracking=True)
+                                     readonly=False, store=True, tracking=True)
     rental_received = fields.Float(default=0.0, string="本期实收(元)", tracking=True)
     rental_period_no = fields.Integer(default=0, string="期数", tracking=True)
     period_date_from = fields.Date(string="开始日期", default=lambda self: fields.Datetime.today(), tracking=True)
@@ -66,12 +66,12 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     @api.depends("rental_amount")
     def _cal_rental_amount_zh(self):
         for record in self:
-            record.rental_amount_zh = Utils.arabic_to_chinese(record.rental_amount)
+            record.rental_amount_zh = Utils.arabic_to_chinese(round(record.rental_amount, 2))
 
     @api.depends("rental_amount", "rental_received")
     def _compute_rental_arrears(self):
         for record in self:
-            record.rental_arrears = round(record.rental_amount - record.rental_received)
+            record.rental_arrears = record.rental_amount - record.rental_received
 
     @api.depends("rental_amount")
     def _get_default_rental_receivable(self):

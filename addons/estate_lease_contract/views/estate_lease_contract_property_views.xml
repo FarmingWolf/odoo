@@ -73,9 +73,10 @@
                                         <field name="billing_method"/>
                                     </group>
                                     <group invisible="billing_method_fixed_price_invisible">
-                                        <field name="rent_price"/>
-                                        <field name="rent_amount_monthly_auto"/>
-                                        <field name="rent_amount_monthly_adjust" readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"/>
+                                        <field name="rent_price" digits="[12, 2]"/>
+                                        <field name="rent_amount_monthly_auto" digits="[12, 2]"/>
+                                        <field name="rent_amount_monthly_adjust" readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"
+                                               digits="[12, 2]"/>
                                     </group>
                                     <group invisible="billing_method_progress_invisible">
                                         <field name="billing_progress_method_id"/>
@@ -92,9 +93,9 @@
                                         <field name="payment_date"/>
                                     </group>
                                     <group col="1" invisible="billing_method_progress_invisible or billing_progress_method_period_invisible">
-                                        <field name="rent_price" string="起始单价（元/天/㎡）"/>
-                                        <field name="rent_amount_monthly_auto"/>
-                                        <field name="rent_amount_monthly_adjust"/>
+                                        <field name="rent_price" string="起始单价（元/天/㎡）" digits="[12, 2]"/>
+                                        <field name="rent_amount_monthly_auto" digits="[12, 2]"/>
+                                        <field name="rent_amount_monthly_adjust" digits="[12, 2]"/>
                                     </group>
                                 </group>
                             </group>
@@ -113,18 +114,18 @@
                                     <field name="turnover_percentage_id"/>
                                 </group>
                                 <group string="固定单价" col="2" invisible="billing_progress_method_no_progress_invisible">
-                                    <field name="rent_price" string="无递增固定单价（元/天/㎡）"/>
-                                    <field name="rent_amount_monthly_auto"/>
-                                    <field name="rent_amount_monthly_adjust"/>
+                                    <field name="rent_price" string="无递增固定单价（元/天/㎡）" digits="[12, 2]"/>
+                                    <field name="rent_amount_monthly_auto" digits="[12, 2]"/>
+                                    <field name="rent_amount_monthly_adjust" digits="[12, 2]"/>
                                 </group>
                             </group>
 
                             <group string="取高" col="1" invisible="billing_method_fixed_price_percentage_higher_invisible">
                                 <group col="2">
                                     <group col="1">
-                                        <field name="rent_price" string="保底单价（元/天/㎡）"/>
-                                        <field name="rent_amount_monthly_auto"/>
-                                        <field name="rent_amount_monthly_adjust"/>
+                                        <field name="rent_price" string="保底单价（元/天/㎡）" digits="[12, 2]"/>
+                                        <field name="rent_amount_monthly_auto" digits="[12, 2]"/>
+                                        <field name="rent_amount_monthly_adjust" digits="[12, 2]"/>
                                     </group>
                                     <group col="2">
                                         <group>
@@ -142,10 +143,12 @@
                             </group>
                             <group string="押金" col="2">
                                 <group col="2">
-                                    <field name="deposit_months" readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"/>
+                                    <field name="deposit_months" readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"
+                                           digits="[3, 1]"/>
                                 </group>
                                 <group col="2">
-                                    <field name="deposit_amount" readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"/>
+                                    <field name="deposit_amount" readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"
+                                           digits="[12, 2]"/>
                                 </group>
                             </group>
                         </page>

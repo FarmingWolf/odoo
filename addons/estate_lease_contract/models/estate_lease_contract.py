@@ -117,7 +117,7 @@ def _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property
         rental_amount = _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, property_id,
                                                 rent_price_adapt, rent_amount_monthly_adapt)
 
-    return round(rental_amount, 2)
+    return rental_amount
 
 
 def _get_current_e(current_tmp):
@@ -325,7 +325,7 @@ def _generate_details_from_rent_plan(record_self):
             payment_date_str = dict(rental_plan._fields['payment_date'].selection).get(rental_plan.payment_date)
             rental_amount = _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property_id,
                                                rent_price_adapt, rent_amount_monthly_adapt)
-            rental_amount_zh = Utils.arabic_to_chinese(rental_amount)
+            rental_amount_zh = Utils.arabic_to_chinese(round(rental_amount, 2))
 
             rental_periods_details.append({
                 'contract_id': f"{record_self.id}",

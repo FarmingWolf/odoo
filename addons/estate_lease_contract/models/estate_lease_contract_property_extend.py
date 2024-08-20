@@ -88,8 +88,8 @@ class EstateLeaseContractPropertyExtend(models.Model):
     billing_method_fixed_price_percentage_higher_invisible = \
         fields.Boolean(string="计费方式保底抽成取高组不可见",
                        compute="_compute_billing_method_group_invisible")
-    deposit_months = fields.Float(string="押金月数", digits=(3, 1), default=0)
-    deposit_amount = fields.Float(string="押金金额", digits=(12, 2), default=0)
+    deposit_months = fields.Float(string="押金月数", default=0)
+    deposit_amount = fields.Float(string="押金金额", default=0)
     # 物业费信息
     management_fee_name_description = fields.Char(string="方案描述", readonly=True,
                                                   compute="_get_property_management_fee_info")
@@ -98,13 +98,13 @@ class EstateLeaseContractPropertyExtend(models.Model):
     def _cal_deposit(self):
         for record in self:
             if record.rent_amount_monthly_adjust:
-                record.deposit_amount = round(record.deposit_months * record.rent_amount_monthly_adjust, 2)
-                record.deposit_months = round(record.deposit_amount / record.rent_amount_monthly_adjust, 1)
+                record.deposit_amount = record.deposit_months * record.rent_amount_monthly_adjust
+                record.deposit_months = record.deposit_amount / record.rent_amount_monthly_adjust
 
             else:
-                record.deposit_amount = round(record.deposit_months * record.rent_amount_monthly_auto, 2)
+                record.deposit_amount = record.deposit_months * record.rent_amount_monthly_auto
                 if record.rent_amount_monthly_auto:
-                    record.deposit_months = round(record.deposit_amount / record.rent_amount_monthly_auto, 1)
+                    record.deposit_months = record.deposit_amount / record.rent_amount_monthly_auto
                 else:
                     record.deposit_months = 0
 
@@ -114,9 +114,9 @@ class EstateLeaseContractPropertyExtend(models.Model):
     def _cal_month_2_amount_change(self):
         for record in self:
             if record.rent_amount_monthly_adjust:
-                record.deposit_amount = round(record.deposit_months * record.rent_amount_monthly_adjust, 2)
+                record.deposit_amount = record.deposit_months * record.rent_amount_monthly_adjust
             else:
-                record.deposit_amount = round(record.deposit_months * record.rent_amount_monthly_auto, 2)
+                record.deposit_amount = record.deposit_months * record.rent_amount_monthly_auto
 
             record.latest_payment_method = _set_payment_method_str(record)
 
@@ -124,10 +124,10 @@ class EstateLeaseContractPropertyExtend(models.Model):
     def _cal_amount_2_month_change(self):
         for record in self:
             if record.rent_amount_monthly_adjust:
-                record.deposit_months = round(record.deposit_amount / record.rent_amount_monthly_adjust, 1)
+                record.deposit_months = record.deposit_amount / record.rent_amount_monthly_adjust
             else:
                 if record.rent_amount_monthly_auto:
-                    record.deposit_months = round(record.deposit_amount / record.rent_amount_monthly_auto, 1)
+                    record.deposit_months = record.deposit_amount / record.rent_amount_monthly_auto
                 else:
                     record.deposit_months = 0
 
@@ -258,12 +258,11 @@ class EstateLeaseContractPropertyExtend(models.Model):
                     record.rent_plan_id.payment_period)
                 record.rent_price = Utils.remove_last_zero(record.rent_plan_id.rent_price)
                 _logger.info(f"record.rent_price={record.rent_price}")
-                record.rent_amount_monthly_auto = round(record.rent_plan_id.rent_price * record.rent_area * 365 / 12, 2)
+                record.rent_amount_monthly_auto = record.rent_plan_id.rent_price * record.rent_area * 365 / 12
                 if record.rent_amount_monthly_adjust:
                     pass
                 else:
-                    record.rent_amount_monthly_adjust = round(
-                        record.rent_plan_id.rent_price * record.rent_area * 365 / 12, 2)
+                    record.rent_amount_monthly_adjust = record.rent_plan_id.rent_price * record.rent_area * 365 / 12
 
                 record.payment_date = dict(record.rent_plan_id._fields['payment_date'].selection).get(
                     record.rent_plan_id.payment_date)

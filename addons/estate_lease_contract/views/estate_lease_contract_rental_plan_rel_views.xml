@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="estate_lease_contract_rental_plan_rel_action" model="ir.actions.act_window">
+        <field name="name">资产租赁合同租金方案详情（历史信息）</field>
+        <field name="res_model">estate.lease.contract.rental.plan.rel</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                合同发布后，合同-租赁标的（房屋）-租金方案的关联关系的历史信息。
+            </p>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_rental_plan_rel_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.rental.plan.rel.tree</field>
+        <field name="model">estate.lease.contract.rental.plan.rel</field>
+        <field name="arch" type="xml">
+            <tree string="estate_lease_contract_rental_plan_rel_tree">
+                <field name="sequence" widget="handle"/>
+                <field name="contract_id"/>
+                <field name="contract_property_name"/>
+                <field name="rental_plan_id"/>
+                <field name="contract_renter_id"/>
+                <field name="contract_property_state"/>
+                <field name="contract_property_rent_price"/>
+                <field name="contract_property_building_area"/>
+                <field name="contract_property_area"/>
+                <field name="contract_rent_amount_monthly" digits="[12, 2]"/>
+                <field name="contract_rent_amount_year" digits="[12, 2]"/>
+                <field name="contract_deposit_amount" digits="[12, 2]"/>
+                <field name="contract_deposit_months" digits="[3, 1]"/>
+                <field name="contract_rent_payment_method"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_rental_plan_rel_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.rental.plan.rel.form</field>
+        <field name="model">estate.lease.contract.rental.plan.rel</field>
+        <field name="arch" type="xml">
+            <form string="estate_lease_contract_rental_plan_rel_form" readonly="1">
+                <sheet>
+                    <group col="2">
+                        <group>
+                            <field name="contract_id"/>
+                            <field name="contract_property_name"/>
+                            <field name="rental_plan_id"/>
+                            <field name="contract_renter_id"/>
+                            <field name="contract_property_state"/>
+                            <field name="contract_rent_payment_method"/>
+                        </group>
+                        <group>
+                            <field name="contract_property_area"/>
+                            <field name="contract_property_rent_price"/>
+                            <field name="contract_rent_amount_monthly" digits="[12, 2]"/>
+                            <field name="contract_rent_amount_year" digits="[12, 2]"/>
+                            <field name="contract_deposit_amount" digits="[12, 2]"/>
+                            <field name="contract_deposit_months" digits="[3, 1]"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -285,9 +285,9 @@
                                             <field name="period_date_from"/>
                                             <field name="period_date_to"/>
                                             <field name="date_payment"/>
-                                            <field name="rental_amount" sum="合计租金：根据资产面积、租金方案自动计算"/>
-                                            <field name="rental_receivable" sum="合计应收：请谨慎调整，系统自动记录调整历史"/>
-                                            <field name="rental_received" sum="合计实收：每期租金收款后，请回填，以保证业务数据一致性"/>
+                                            <field name="rental_amount" digits="[12, 2]" sum="合计租金：根据资产面积、租金方案自动计算"/>
+                                            <field name="rental_receivable" digits="[12, 2]" sum="合计应收：请谨慎调整，系统自动记录调整历史"/>
+                                            <field name="rental_received" digits="[12, 2]" sum="合计实收：每期租金收款后，请回填，以保证业务数据一致性"/>
                                         </tree>
                                     </field>
                                 </group>
