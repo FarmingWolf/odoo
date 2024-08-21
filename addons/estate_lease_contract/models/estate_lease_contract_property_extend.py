@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
+from datetime import datetime
 from typing import Dict, List
 
 from addons.utils.models.utils import Utils
 from odoo import fields, models, api, SUPERUSER_ID
 from odoo.cli.scaffold import env
 from odoo.http import request
+
 
 _logger = logging.getLogger(__name__)
 
@@ -17,6 +19,9 @@ def _set_payment_method_str(record):
     if record.rent_plan_id and record.rent_plan_id.payment_period:
         return f"{yax}付{record.rent_plan_id.payment_period}"
     else:
+        if record.set_rent_plan_on_this_page and record.set_rent_plan_payment_period:
+            return f"{yax}付{record.set_rent_plan_payment_period}"
+
         return yax
 
 
@@ -34,43 +39,48 @@ class EstateLeaseContractPropertyExtend(models.Model):
         _logger.info(f"资产管理模型：session_contract_id=[{session_contract_id}]")
 
         for record in self:
-            # 如果不是只读查看模式
+            # 如果不是只读查看模式，即编辑模式的时候，合同尚未激活
             _logger.info(f"租赁标的-contract_read_only=[{request.session.get('contract_read_only')}]")
             if not request.session.get('contract_read_only'):
-                record.default_rental_plan = None
-                # 如果从合同录入页面过来，设置合同相关信息
-                if request.session.get('menu_root') == 'estate.lease.contract' and session_contract_id:
-                    contract_rcd = self.env['estate.lease.contract'].search(
-                        [('id', '=', session_contract_id), ('active', '=', False)], limit=1)
-
-                    for rcd in contract_rcd:
-                        _logger.info(f"设置本资产的合同相关信息：{rcd.name}")
-                        record.current_contract_no = rcd.contract_no
-                        record.current_contract_nm = rcd.name
-                        record.latest_rent_date_s = rcd.date_rent_start
-                        record.latest_rent_date_e = rcd.date_rent_end
-                        record.latest_rent_days = rcd.days_rent_total
-                        record.latest_contact_person = rcd.renter_id.name
-                        record.latest_contact_person_tel = rcd.renter_id.phone
-
-                return
-
-            # 如果session_contract_id存在，从contract_property_rental_plan_rel中查找
-            rel_model = self.env['estate.lease.contract.rental.plan.rel']
-            rel_rcd = rel_model.search([('contract_id', '=', session_contract_id), ('property_id', '=', record.id)],
-                                       limit=1)
-            if rel_rcd:
-                record.default_rental_plan = rel_rcd.rental_plan_id
-                record.rent_plan_id = rel_rcd.rental_plan_id
+                active_flg = False
             else:
-                # 不存在就是不存在，也不能拿生效合同的数据来用
-                record.default_rental_plan = None
-                record.rent_plan_id = None
+                active_flg = True
 
-    default_rental_plan = fields.Integer(string="根据context contract找到的租金计划", store=False,
-                                         default=_get_default_rent_plan)
-    # rental_plan_rel_id = fields.Many2one('estate.lease.contract.rental.plan_rel', string="租金方案关系")
-    rent_plan_id = fields.Many2one('estate.lease.contract.rental.plan', string="租金方案")
+            record.default_rental_plan = None
+            record.rental_plan_rel_id = None
+            # 如果从合同录入页面过来，设置合同相关信息
+            if request.session.get('menu_root') == 'estate.lease.contract' and session_contract_id:
+                contract_rcd = self.env['estate.lease.contract'].search([('id', '=', session_contract_id),
+                                                                         ('active', '=', active_flg)], limit=1)
+                for rcd in contract_rcd:
+                    _logger.info(f"设置本资产的合同相关信息：{rcd.name},id:{rcd.id}")
+                    record.current_contract_no = rcd.contract_no
+                    record.current_contract_nm = rcd.name
+                    record.latest_rent_date_s = rcd.date_rent_start
+                    record.latest_rent_date_e = rcd.date_rent_end
+                    record.latest_rent_days = rcd.days_rent_total
+                    record.latest_contact_person = rcd.renter_id.name
+                    record.latest_contact_person_tel = rcd.renter_id.phone
+
+                # 如果session_contract_id存在，从contract_property_rental_plan_rel中查找
+                rel_model = self.env['estate.lease.contract.rental.plan.rel']
+                rel_rcd = rel_model.search([('contract_id', '=', session_contract_id), ('property_id', '=', record.id)],
+                                           limit=1)
+                for rcd in rel_rcd:
+                    record.default_rental_plan = rcd.rental_plan_id.id
+                    _logger.info(f"设置合同-资产-租金方案历史信息record.default_rental_plan={record.default_rental_plan}")
+                    record.rent_plan_id = rcd.rental_plan_id.id
+                    _logger.info(f"设置合同-资产-租金方案历史信息record.rent_plan_id={record.rent_plan_id}")
+
+    default_rental_plan = fields.Many2one('estate.lease.contract.rental.plan',
+                                          string="根据context contract找到的租金计划", store=False,
+                                          default=_get_default_rent_plan, compute="_get_default_rent_plan")
+    # 该字段用于存储合同-资产-租金方案关系，理论上只能有一条
+    rental_plan_rel_id = fields.Many2one('estate.lease.contract.rental.plan.rel', string="合同-资产-租金方案关系",
+                                         domain=[('contract_id', '=', request.session.get('session_contract_id')),
+                                                 ('property_id', '=', id)])
+    rent_plan_id = fields.Many2one('estate.lease.contract.rental.plan', string="租金方案",
+                                   default=lambda self: self._get_default_rent_plan())
     property_rental_detail_ids = fields.One2many('estate.lease.contract.property.rental.detail', 'property_id',
                                                  string="租金明细")
     management_fee_plan_id = fields.Many2one('estate.lease.contract.property.management.fee.plan', string="物业费方案")
@@ -93,6 +103,123 @@ class EstateLeaseContractPropertyExtend(models.Model):
     # 物业费信息
     management_fee_name_description = fields.Char(string="方案描述", readonly=True,
                                                   compute="_get_property_management_fee_info")
+    # 本页面设置固定金额方案（生成新方案并保存至rental_plan）
+    set_rent_plan_on_this_page = fields.Boolean(string="固定金额方案", compute="_compute_set_rent_plan_on_this_page",
+                                                store=False, readonly=False)
+    set_rent_plan_plan_name = fields.Char(string="固定租金方案", store=False, compute="_compute_set_rent_plan_plan_name",
+                                          readonly=False)
+    set_rent_plan_business_method_id = fields.Selection(string="经营性质",
+                                                        selection=[('direct_sale', '直营'), ('franchisee', '加盟'),
+                                                                   ('agent', '代理'), ('direct_and_agent', '直营+代理'),
+                                                                   ('direct_and_franchisee', '直营+加盟')],
+                                                        default='direct_sale', store=False)
+    set_rent_plan_business_type_id = fields.Many2one("estate.lease.contract.rental.business.type", string="经营业态",
+                                                     store=False)
+    set_rent_plan_main_category = fields.Many2one("estate.lease.contract.rental.main.category", string="主品类",
+                                                  store=False)
+    set_rent_plan_billing_method = fields.Selection(string='计费方式', store=False,
+                                                    selection=[('by_fixed_price', '固定金额'), ('by_percentage', '纯抽成'),
+                                                               ('by_progress', '按递增率'),
+                                                               ('by_fixed_price_percentage_higher', '保底抽成两者取高')],
+                                                    default='by_fixed_price')
+    set_rent_plan_payment_period = fields.Selection(string="支付周期", default='3', store=False,
+                                                    selection=[('1', '月付'), ('2', '双月付'), ('3', '季付'),
+                                                               ('4', '四个月付'), ('6', '半年付'), ('12', '年付')])
+
+    set_rent_plan_payment_date = fields.Selection(string="租金支付日", default='period_start_15_bef_this', store=False,
+                                                  selection=[
+                                                      ('period_start_30_bef_this', '租期开始日的30日前付本期费用'),
+                                                      ('period_start_15_bef_this', '租期开始日的15日前付本期费用'),
+                                                      ('period_start_10_bef_this', '租期开始日的10日前付本期费用'),
+                                                      ('period_start_7_bef_this', '租期开始日的7日前付本期费用'),
+                                                      ('period_start_5_bef_this', '租期开始日的5日前付本期费用'),
+                                                      ('period_start_1_bef_this', '租期开始日的1日前付本期费用'),
+                                                      ('period_start_30_pay_this', '租期开始后的30日内付本期费用'),
+                                                      ('period_start_15_pay_this', '租期开始后的15日内付本期费用'),
+                                                      ('period_start_10_pay_this', '租期开始后的10日内付本期费用'),
+                                                      ('period_start_7_pay_this', '租期开始后的7日内付本期费用'),
+                                                      ('period_start_5_pay_this', '租期开始后的5日内付本期费用'),
+                                                      ('period_start_1_pay_this', '租期开始后的1日内付本期费用'), ])
+    set_rent_plan_rent_price = fields.Float(default=0.0, string="单价（元/天/㎡）", stroe=False,
+                                            help="可设置精确到小数点后若干位，以确保月租金、年租金符合期望值")
+    set_rent_plan_rent_amount_monthly_adjust = fields.Float(string="月租金（元）", stroe=False, default=0.0,
+                                                            help="=租金单价（元/天/㎡）×计租面积（㎡）×365÷12")
+    set_rent_plan_annual_rent = fields.Float(string="年租金（元）", stroe=False, default=0.0)
+
+    @api.onchange("set_rent_plan_payment_period")
+    def _onchange_set_rent_plan_payment_period(self):
+        for record in self:
+            record.latest_payment_method = _set_payment_method_str(record)
+
+    @api.onchange("set_rent_plan_rent_price")
+    def _onchange_set_rent_plan_rent_price(self):
+        for record in self:
+            if record.set_rent_plan_rent_price:
+                record.set_rent_plan_annual_rent = record.set_rent_plan_rent_price * 365 * record.rent_area
+                record.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_annual_rent / 12
+            else:
+                record.set_rent_plan_annual_rent = 0
+                record.set_rent_plan_rent_amount_monthly_adjust = 0
+
+            self._set_back_set_rent_plan_values()
+
+    @api.onchange("set_rent_plan_rent_amount_monthly_adjust")
+    def _onchange_set_rent_plan_rent_amount_monthly_adjust(self):
+        for record in self:
+            if record.set_rent_plan_rent_amount_monthly_adjust:
+                record.set_rent_plan_annual_rent = record.set_rent_plan_rent_amount_monthly_adjust * 12
+                record.set_rent_plan_rent_price = record.set_rent_plan_annual_rent / 365 / record.rent_area
+            else:
+                record.set_rent_plan_annual_rent = 0
+                record.set_rent_plan_rent_price = 0
+
+            self._set_back_set_rent_plan_values()
+
+    @api.onchange("set_rent_plan_annual_rent")
+    def _onchange_set_rent_plan_annual_rent(self):
+        for record in self:
+            if record.set_rent_plan_annual_rent:
+                record.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_annual_rent / 12
+                record.set_rent_plan_rent_price = record.set_rent_plan_annual_rent / 365 / record.rent_area
+            else:
+                record.set_rent_plan_rent_amount_monthly_adjust = 0
+                record.set_rent_plan_rent_price = 0
+
+            self._set_back_set_rent_plan_values()
+
+    def _compute_set_rent_plan_plan_name(self):
+        for record in self:
+            record.set_rent_plan_plan_name = \
+                str(record.name) + "-固定金额-" + \
+                fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y%m%d%H%M%S')
+
+    def _set_back_set_rent_plan_values(self):
+        for record in self:
+            if record.set_rent_plan_on_this_page:
+                record.rent_price = record.set_rent_plan_rent_price
+                record.rent_amount_monthly_auto = record.set_rent_plan_rent_amount_monthly_adjust
+                record.rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
+                record.latest_annual_rent = record.set_rent_plan_annual_rent
+                record.latest_payment_method = _set_payment_method_str(record)
+
+    @api.onchange("set_rent_plan_on_this_page")
+    def _onchange_set_rent_plan_on_this_page(self):
+        for record in self:
+            if record.set_rent_plan_on_this_page:
+                self._compute_set_rent_plan_plan_name()
+                self._onchange_set_rent_plan_rent_price()
+                self._set_back_set_rent_plan_values()
+            else:
+                # 按照租金方案下拉框中的value
+                self.action_refresh_rent_plan()
+
+    @api.depends("rent_plan_id")
+    def _compute_set_rent_plan_on_this_page(self):
+        for record in self:
+            if record.rent_plan_id:
+                record.set_rent_plan_on_this_page = False
+            else:
+                record.set_rent_plan_on_this_page = True
 
     @api.depends("rent_amount_monthly_auto", "rent_amount_monthly_adjust", "deposit_months", "deposit_amount")
     def _cal_deposit(self):
@@ -353,3 +480,82 @@ class EstateLeaseContractPropertyExtend(models.Model):
                          f"{'【不】' if not state_change else ''}需要更新")
             if state_change:
                 each_property.write({'state': each_property.state})
+
+    @api.model
+    def create(self, vals):
+        res = super().create(vals)
+        # 如果是在本页设置固定金额方案
+        _logger.info(f"create vals={vals}")
+        if 'set_rent_plan_on_this_page' in vals and vals['set_rent_plan_on_this_page']:
+            # 租金方案写库 并 回写
+            set_rent_plan_plan_name = vals['set_rent_plan_plan_name']
+            if 'False' in set_rent_plan_plan_name:
+                set_rent_plan_plan_name = vals['set_rent_plan_plan_name'].replace('False', vals['name'])
+            rental_plan = self._set_rent_plan_on_this_page_2_db(vals, res, set_rent_plan_plan_name)
+            vals['rent_plan_id'] = rental_plan.id
+            _logger.info(f"create 租金方案写库 并 回写rental_plan.id={rental_plan.id}")
+            res.rent_plan_id = rental_plan.id
+
+        return res
+
+    def write(self, vals):
+        # 如果是在本页设置固定金额方案
+        _logger.info(f"write vals={vals}")
+        for record in self:
+            if 'set_rent_plan_on_this_page' in vals and vals['set_rent_plan_on_this_page']:
+                # 租金方案写库 并 回写
+
+                rental_plan = self._set_rent_plan_on_this_page_2_db(vals, record, record.set_rent_plan_plan_name)
+                vals['rent_plan_id'] = rental_plan
+                _logger.info(f"write 租金方案写库 并 回写rental_plan.id={rental_plan.id}")
+
+        return super().write(vals)
+
+    def _set_rent_plan_on_this_page_2_db(self, vals, record_id, plan_name):
+        # 只有几个设置了缺省值的没变化就不在vals里，没缺省值的要么null要么在vals里
+        if 'set_rent_plan_business_method_id' in vals:
+            set_rent_plan_business_method_id = vals['set_rent_plan_business_method_id']
+        else:
+            set_rent_plan_business_method_id = self._origin.set_rent_plan_business_method_id
+
+        if 'set_rent_plan_payment_period' in vals:
+            set_rent_plan_payment_period = vals['set_rent_plan_payment_period']
+        else:
+            set_rent_plan_payment_period = self._origin.set_rent_plan_payment_period
+
+        if 'set_rent_plan_payment_date' in vals:
+            set_rent_plan_payment_date = vals['set_rent_plan_payment_date']
+        else:
+            set_rent_plan_payment_date = self._origin.set_rent_plan_payment_date
+
+        if 'set_rent_plan_business_type_id' in vals:
+            set_rent_plan_business_type_id = vals['set_rent_plan_business_type_id']
+        else:
+            set_rent_plan_business_type_id = self._origin.set_rent_plan_business_type_id
+
+        if 'set_rent_plan_main_category' in vals:
+            set_rent_plan_main_category = vals['set_rent_plan_main_category']
+        else:
+            set_rent_plan_main_category = self._origin.set_rent_plan_main_category
+
+        set_rent_plan_billing_method = 'by_fixed_price'
+
+        if 'set_rent_plan_rent_price' in vals:
+            set_rent_plan_rent_price = vals['set_rent_plan_rent_price']
+        else:
+            set_rent_plan_rent_price = self._origin.set_rent_plan_rent_price
+
+        rental_plan = {
+            "name": plan_name,
+            "rent_targets": record_id,
+            "business_method_id": set_rent_plan_business_method_id,
+            "business_type_id": set_rent_plan_business_type_id,
+            "main_category": set_rent_plan_main_category,
+            "billing_method": set_rent_plan_billing_method,
+            "payment_period": set_rent_plan_payment_period,
+            "payment_date": set_rent_plan_payment_date,
+            "rent_price": set_rent_plan_rent_price,
+            "company_id": self.env.user.company_id.id,
+        }
+        return self.env['estate.lease.contract.rental.plan'].create(rental_plan)
+
