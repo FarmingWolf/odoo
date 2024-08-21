@@ -68,18 +68,19 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 rel_rcd = rel_model.search([('contract_id', '=', session_contract_id), ('property_id', '=', record.id)],
                                            limit=1)
                 for rcd in rel_rcd:
-                    record.default_rental_plan = rcd.rental_plan_id.id
-                    _logger.info(f"设置合同-资产-租金方案历史信息record.default_rental_plan={record.default_rental_plan}")
-                    record.rent_plan_id = rcd.rental_plan_id.id
-                    _logger.info(f"设置合同-资产-租金方案历史信息record.rent_plan_id={record.rent_plan_id}")
+                    if rcd.rental_plan_id.id:
+                        record.default_rental_plan = rcd.rental_plan_id.id
+                        _logger.info(f"设置合同-资产-租金方案历史default_rental_plan={record.default_rental_plan}")
+                        record.rent_plan_id = rcd.rental_plan_id.id
+                        record.rental_plan_rel_id = rcd.rental_plan_id.id
+                        _logger.info(f"设置合同-资产-租金方案历史rent_plan_id={record.rent_plan_id}")
 
     default_rental_plan = fields.Many2one('estate.lease.contract.rental.plan',
                                           string="根据context contract找到的租金计划", store=False,
                                           default=_get_default_rent_plan, compute="_get_default_rent_plan")
     # 该字段用于存储合同-资产-租金方案关系，理论上只能有一条
     rental_plan_rel_id = fields.Many2one('estate.lease.contract.rental.plan.rel', string="合同-资产-租金方案关系",
-                                         domain=[('contract_id', '=', request.session.get('session_contract_id')),
-                                                 ('property_id', '=', id)])
+                                         default=_get_default_rent_plan, compute="_get_default_rent_plan")
     rent_plan_id = fields.Many2one('estate.lease.contract.rental.plan', string="租金方案",
                                    default=lambda self: self._get_default_rent_plan())
     property_rental_detail_ids = fields.One2many('estate.lease.contract.property.rental.detail', 'property_id',
@@ -106,7 +107,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                                                   compute="_get_property_management_fee_info")
     # 本页面设置固定金额方案（生成新方案并保存至rental_plan）
     set_rent_plan_on_this_page = fields.Boolean(string="固定金额方案", compute="_compute_set_rent_plan_on_this_page",
-                                                readonly=False)
+                                                readonly=False, store=True)
     set_rent_plan_plan_name = fields.Char(string="固定租金方案", store=False, compute="_compute_set_rent_plan_plan_name",
                                           readonly=False)
     set_rent_plan_business_method_id = fields.Selection(string="经营性质",
@@ -159,6 +160,10 @@ class EstateLeaseContractPropertyExtend(models.Model):
             if record.set_rent_plan_rent_price:
                 record.set_rent_plan_annual_rent = record.set_rent_plan_rent_price * 365 * record.rent_area
                 record.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_annual_rent / 12
+
+                record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
+                record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
+                record._origin.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
             else:
                 record.set_rent_plan_annual_rent = 0
                 record.set_rent_plan_rent_amount_monthly_adjust = 0
@@ -171,6 +176,10 @@ class EstateLeaseContractPropertyExtend(models.Model):
             if record.set_rent_plan_rent_amount_monthly_adjust:
                 record.set_rent_plan_annual_rent = record.set_rent_plan_rent_amount_monthly_adjust * 12
                 record.set_rent_plan_rent_price = record.set_rent_plan_annual_rent / 365 / record.rent_area
+
+                record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
+                record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
+                record._origin.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
             else:
                 record.set_rent_plan_annual_rent = 0
                 record.set_rent_plan_rent_price = 0
@@ -183,6 +192,10 @@ class EstateLeaseContractPropertyExtend(models.Model):
             if record.set_rent_plan_annual_rent:
                 record.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_annual_rent / 12
                 record.set_rent_plan_rent_price = record.set_rent_plan_annual_rent / 365 / record.rent_area
+
+                record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
+                record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
+                record._origin.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
             else:
                 record.set_rent_plan_rent_amount_monthly_adjust = 0
                 record.set_rent_plan_rent_price = 0
@@ -501,11 +514,13 @@ class EstateLeaseContractPropertyExtend(models.Model):
         return res
 
     def write(self, vals):
+
         # 如果是在本页设置固定金额方案，那么一定是一个新的固定金额方案，就不应该存在重复
         _logger.info(f"write vals={vals}")
+
         for record in self:
             if record.set_rent_plan_on_this_page or \
-                    'set_rent_plan_on_this_page' in vals and vals['set_rent_plan_on_this_page']:
+                    ('set_rent_plan_on_this_page' in vals and vals['set_rent_plan_on_this_page']):
                 # 只有当设置了价格，才有保存的意义
                 if ('set_rent_plan_rent_price' in vals and vals['set_rent_plan_rent_price']) or \
                         ('set_rent_plan_rent_amount_monthly_adjust' in vals and vals[
@@ -513,11 +528,23 @@ class EstateLeaseContractPropertyExtend(models.Model):
                         ('set_rent_plan_annual_rent' in vals and vals['set_rent_plan_annual_rent']):
                     # 租金方案写库 并 回写
                     rental_plan = self._set_rent_plan_on_this_page_2_db(vals, record, record.set_rent_plan_plan_name)
-                    vals['rent_plan_id'] = rental_plan
-                    record.rent_plan_id = rental_plan
-                    _logger.info(f"write 租金方案写库 并 回写rental_plan.id={rental_plan.id}")
+                    vals['rent_plan_id'] = rental_plan.id
+                    # 既然已保存租金方案，则设置本页编辑开关关闭
+                    vals['set_rent_plan_on_this_page'] = False
 
-        return super().write(vals)
+                    _logger.info(f"write vals 再做成={vals}")
+
+        res = super().write(vals)
+        _logger.info(f"write after vals={vals}")
+        # for record in self:
+        #     # 如果vals有rent_plan_id
+        #     if 'rent_plan_id' in vals and vals['rent_plan_id']:
+        #         rcd = self.env['estate.property'].browse(record.id).mapped('rent_plan_id')
+        #         for r in rcd:
+        #             if not r.id:
+        #                 self.env['estate.property'].browse(record.id).write({'rent_plan_id': vals['rent_plan_id'].id})
+
+        return res
 
     def _set_rent_plan_on_this_page_2_db(self, vals, record_id, plan_name):
         # 只有几个设置了缺省值的没变化就不在vals里，没缺省值的要么null要么在vals里
@@ -565,5 +592,6 @@ class EstateLeaseContractPropertyExtend(models.Model):
             "rent_price": set_rent_plan_rent_price,
             "company_id": self.env.user.company_id.id,
         }
-
-        return self.env['estate.lease.contract.rental.plan'].create(rental_plan)
+        _logger.info(f"write 2 db rental_plan={rental_plan}")
+        res = self.env['estate.lease.contract.rental.plan'].create(rental_plan)
+        return res
