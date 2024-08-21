@@ -53,7 +53,7 @@
                 </xpath>
 
                 <xpath expr="//page" position="before">
-                    <page string="租金方案" invisible="state not in ['offer_received', 'offer_accepted', 'sold']">
+                    <page string="租金方案" invisible="state not in ['offer_received', 'offer_accepted', 'sold'] and context.get('contract_read_only') and context.get('menu_root') == 'estate.property'">
                         <field name="default_rental_plan" invisible="1"/>
                         <field name="billing_method_fixed_price_invisible" invisible="1"/>
                         <field name="billing_method_percentage_invisible" invisible="1"/>

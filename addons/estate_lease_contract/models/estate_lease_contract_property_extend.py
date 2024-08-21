@@ -9,7 +9,6 @@ from odoo import fields, models, api, SUPERUSER_ID
 from odoo.cli.scaffold import env
 from odoo.http import request
 
-
 _logger = logging.getLogger(__name__)
 
 
@@ -50,6 +49,8 @@ class EstateLeaseContractPropertyExtend(models.Model):
             record.rental_plan_rel_id = None
             # 如果从合同录入页面过来，设置合同相关信息
             if request.session.get('menu_root') == 'estate.lease.contract' and session_contract_id:
+                # 当从合同录入界面过来时，看当前资产状态只要不是在在租，那么就把他设置为可以设置租金方案的状态
+
                 contract_rcd = self.env['estate.lease.contract'].search([('id', '=', session_contract_id),
                                                                          ('active', '=', active_flg)], limit=1)
                 for rcd in contract_rcd:
@@ -105,7 +106,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                                                   compute="_get_property_management_fee_info")
     # 本页面设置固定金额方案（生成新方案并保存至rental_plan）
     set_rent_plan_on_this_page = fields.Boolean(string="固定金额方案", compute="_compute_set_rent_plan_on_this_page",
-                                                store=False, readonly=False)
+                                                readonly=False)
     set_rent_plan_plan_name = fields.Char(string="固定租金方案", store=False, compute="_compute_set_rent_plan_plan_name",
                                           readonly=False)
     set_rent_plan_business_method_id = fields.Selection(string="经营性质",
@@ -140,11 +141,12 @@ class EstateLeaseContractPropertyExtend(models.Model):
                                                       ('period_start_7_pay_this', '租期开始后的7日内付本期费用'),
                                                       ('period_start_5_pay_this', '租期开始后的5日内付本期费用'),
                                                       ('period_start_1_pay_this', '租期开始后的1日内付本期费用'), ])
-    set_rent_plan_rent_price = fields.Float(default=0.0, string="单价（元/天/㎡）", stroe=False,
+    # 这三个字段需要用store=True的方式来进一步确定“在本页设置了固定金额租金方案”
+    set_rent_plan_rent_price = fields.Float(default=0.0, string="单价（元/天/㎡）",
                                             help="可设置精确到小数点后若干位，以确保月租金、年租金符合期望值")
-    set_rent_plan_rent_amount_monthly_adjust = fields.Float(string="月租金（元）", stroe=False, default=0.0,
+    set_rent_plan_rent_amount_monthly_adjust = fields.Float(string="月租金（元）", default=0.0,
                                                             help="=租金单价（元/天/㎡）×计租面积（㎡）×365÷12")
-    set_rent_plan_annual_rent = fields.Float(string="年租金（元）", stroe=False, default=0.0)
+    set_rent_plan_annual_rent = fields.Float(string="年租金（元）", default=0.0)
 
     @api.onchange("set_rent_plan_payment_period")
     def _onchange_set_rent_plan_payment_period(self):
@@ -499,15 +501,20 @@ class EstateLeaseContractPropertyExtend(models.Model):
         return res
 
     def write(self, vals):
-        # 如果是在本页设置固定金额方案
+        # 如果是在本页设置固定金额方案，那么一定是一个新的固定金额方案，就不应该存在重复
         _logger.info(f"write vals={vals}")
         for record in self:
-            if 'set_rent_plan_on_this_page' in vals and vals['set_rent_plan_on_this_page']:
-                # 租金方案写库 并 回写
-
-                rental_plan = self._set_rent_plan_on_this_page_2_db(vals, record, record.set_rent_plan_plan_name)
-                vals['rent_plan_id'] = rental_plan
-                _logger.info(f"write 租金方案写库 并 回写rental_plan.id={rental_plan.id}")
+            if record.set_rent_plan_on_this_page or \
+                    'set_rent_plan_on_this_page' in vals and vals['set_rent_plan_on_this_page']:
+                # 只有当设置了价格，才有保存的意义
+                if ('set_rent_plan_rent_price' in vals and vals['set_rent_plan_rent_price']) or \
+                        ('set_rent_plan_rent_amount_monthly_adjust' in vals and vals[
+                            'set_rent_plan_rent_amount_monthly_adjust']) or \
+                        ('set_rent_plan_annual_rent' in vals and vals['set_rent_plan_annual_rent']):
+                    # 租金方案写库 并 回写
+                    rental_plan = self._set_rent_plan_on_this_page_2_db(vals, record, record.set_rent_plan_plan_name)
+                    vals['rent_plan_id'] = rental_plan
+                    _logger.info(f"write 租金方案写库 并 回写rental_plan.id={rental_plan.id}")
 
         return super().write(vals)
 
@@ -557,5 +564,5 @@ class EstateLeaseContractPropertyExtend(models.Model):
             "rent_price": set_rent_plan_rent_price,
             "company_id": self.env.user.company_id.id,
         }
-        return self.env['estate.lease.contract.rental.plan'].create(rental_plan)
 
+        return self.env['estate.lease.contract.rental.plan'].create(rental_plan)

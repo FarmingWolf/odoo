@@ -74,7 +74,7 @@ class EstateProperty(models.Model):
     unit_living_area = fields.Float(default=0.0, string="套内使用面积（㎡）")
     share_area = fields.Float(default=0.0, string="公摊面积（㎡）")
     actual_living_area = fields.Float(default=0.0, string="实际使用面积（㎡）")
-    rent_area = fields.Float(default=0.0, string="计租面积（㎡）", help="租赁合同用面积")
+    rent_area = fields.Float(default=100, string="计租面积（㎡）", help="租赁合同用面积")
     facades = fields.Integer(default=0)
     garage = fields.Boolean(default=False)
     garden = fields.Boolean(default=False)
@@ -216,7 +216,7 @@ class EstateProperty(models.Model):
 
     _sql_constraints = [
         ('name', 'unique(name, company_id)', '资产名称不能重复'),
-        ('expected_price', 'CHECK(expected_price > 0)', '期待售价必须大于零'),
+        ('expected_price', 'CHECK(expected_price >= 0)', '期待售价必须大于零'),
         ('selling_price', 'CHECK(selling_price >= 0)', '实际售价不能小于零'),
     ]
 
