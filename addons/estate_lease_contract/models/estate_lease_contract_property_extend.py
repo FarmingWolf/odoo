@@ -514,6 +514,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                     # 租金方案写库 并 回写
                     rental_plan = self._set_rent_plan_on_this_page_2_db(vals, record, record.set_rent_plan_plan_name)
                     vals['rent_plan_id'] = rental_plan
+                    record.rent_plan_id = rental_plan
                     _logger.info(f"write 租金方案写库 并 回写rental_plan.id={rental_plan.id}")
 
         return super().write(vals)
