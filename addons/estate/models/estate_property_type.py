@@ -13,7 +13,7 @@ class EstatePropertyType(models.Model):
     name = fields.Char('资产类型', required=True)
     property_ids = fields.One2many('estate.property', 'property_type_id', string="资产条目")
     property_count = fields.Integer(compute="_compute_property_count", default=0)
-    sequence = fields.Integer('Sequence', default=1, help="按类型排序")
+    sequence = fields.Integer('Sequence', default=1, help="排序")
 
     offer_ids = fields.One2many('estate.property.offer', 'property_type_id', string="报价")
     offer_count = fields.Integer(compute="_compute_offer_count", default=0)

@@ -89,7 +89,7 @@ class EstateProperty(models.Model):
     def _default_sequence(self):
         return (self.search([], order="sequence", limit=1).sequence or 0) + 1
 
-    sequence = fields.Integer(string='序号', default=_default_sequence, help="可拖拽排序")
+    sequence = fields.Integer(string='序号', default=_default_sequence, help="可在列表页面拖拽排序")
 
     total_area = fields.Float(compute="_compute_total_area", string="总使用面积（㎡）", readonly=True, copy=False)
 

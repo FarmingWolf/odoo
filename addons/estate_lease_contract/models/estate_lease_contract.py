@@ -605,7 +605,7 @@ class EstateLeaseContract(models.Model):
     building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", compute="_calc_rent_total_info", copy=False)
     rent_area = fields.Float(default=0.0, string="总计租面积（㎡）", compute="_calc_rent_total_info", copy=False)
 
-    sequence = fields.Integer(compute='_compute_sorted_sequence', store=True, string='排序')
+    sequence = fields.Integer(compute='_compute_sorted_sequence', store=True, string='可在列表页面拖拽排序')
 
     @api.depends('property_ids')
     def _compute_sorted_sequence(self):

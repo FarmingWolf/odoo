@@ -49,7 +49,8 @@
                             <field name="date_rent_start" readonly="not edit_on_hist_page"/>
                             <field name="date_rent_end" readonly="not edit_on_hist_page"/>
                             <field name="days_rent_total" readonly="1"/>
-                            <field name="days_free" readonly="not edit_on_hist_page" invisible="1"/>
+                            <field name="days_free" readonly="not edit_on_hist_page"
+                                   help="目前仅用于记录合同中约定的免租期天数，系统暂不据此计算租金"/>
                             <field name="date_decorate_start" readonly="not edit_on_hist_page"/>
                             <field name="date_decorate_end" readonly="not edit_on_hist_page"/>
                             <field name="days_decorate" readonly="1"/>
