@@ -3,24 +3,52 @@
 
     <t t-name="estate_dashboard.EstateDashboard">
         <Layout display="display" className="'o_dashboard h-100'">
-            <t t-set-slot="layout-buttons">
-                <button class="btn btn-primary" t-on-click="openEstatePropertyDailyStatus">打开资产租赁状态明细列表</button>
-            </t>
-
             <t t-set-slot="control-panel-additional-actions">
                 <button t-on-click="openConfiguration" class="btn p-0 ms-1 border-0">
                     <i class="fa fa-cog"/>
                 </button>
             </t>
 
-            <div class="d-flex flex-wrap" t-if="statistics.isReady">
-                <t t-foreach="items" t-as="item" t-key="item.id">
-                    <DashboardItem t-if="!state.disabledItems.includes(item.id)" size="item.size || 1">
-                        <t t-set="itemProp" t-value="item.props ? item.props(statistics) : {'data': statistics}"/>
-                        <t t-component="item.Component" t-props="itemProp" />
-                    </DashboardItem>
+<!--            <t t-if="statistics.isReady">-->
+<!--                <t t-foreach="companies" t-as="company" t-key="company.id">-->
+<!--                    <div t-esc="company"/>-->
+<!--                    <div class="d-flex flex-wrap">-->
+<!--                        <t t-foreach="items" t-as="item" t-key="item.id">-->
+<!--                            <DashboardItem t-if="!state.disabledItems.includes(item.id)" size="item.size || 1">-->
+<!--                                <t t-set="itemProp" t-value="item.props ? item.props(statistics.data[company]) : {'data': statistics.data[company]}"/>-->
+<!--                                <t t-component="item.Component" t-props="itemProp"/>-->
+<!--                            </DashboardItem>-->
+<!--                        </t>-->
+<!--                    </div>-->
+<!--                </t>-->
+<!--            </t>-->
+<!--            -->
+            <!-- 这11行可以显示多公司数据  -->
+<!--            <div class="d-flex flex-wrap" t-if="statistics.isReady">-->
+<!--                <t t-foreach="statistics.data" t-as="each_company_data" t-key="each_company_data">-->
+<!--                    <t t-foreach="items" t-as="item" t-key="item.id">-->
+<!--                        <DashboardItem t-if="!state.disabledItems.includes(item.id)" size="item.size || 1">-->
+<!--                            <t t-set="itemProp" t-value="item.props ? item.props(statistics.data[each_company_data]) : {'data': statistics.data[each_company_data]}"/>-->
+<!--                            <t t-component="item.Component" t-props="itemProp"/>-->
+<!--                        </DashboardItem>-->
+<!--                    </t>-->
+<!--                </t>-->
+<!--            </div>-->
+            <t t-if="statistics.isReady">
+                <t t-foreach="statistics.data" t-as="each_company_data" t-key="each_company_data">
+                    <t t-if="Object.values(companies).length &gt; 1">
+                        <div t-esc="companies[each_company_data].name" class="o_company_name"/>
+                    </t>
+                    <div class="d-flex flex-wrap">
+                        <t t-foreach="items" t-as="item" t-key="item.id">
+                            <DashboardItem t-if="!state.disabledItems.includes(item.id)" size="item.size || 1">
+                                <t t-set="itemProp" t-value="item.props ? item.props(statistics.data[each_company_data]) : {'data': statistics.data[each_company_data]}"/>
+                                <t t-component="item.Component" t-props="itemProp"/>
+                            </DashboardItem>
+                        </t>
+                    </div>
                 </t>
-            </div>
+            </t>
         </Layout>
     </t>
 

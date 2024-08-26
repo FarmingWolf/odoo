@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="estate_group_directorate" model="res.groups">
+        <field name="name">董事会专用组</field>
+        <field name="category_id" ref="base.module_category_real_estate_brokerage"/>
+    </record>
+</odoo>

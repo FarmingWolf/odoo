@@ -6,34 +6,40 @@ from datetime import date
 
 import dateutil.utils
 
-from odoo import http
+from odoo import http, SUPERUSER_ID
 from odoo.http import request
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 class EstateDashboard(http.Controller):
     @http.route('/estate_dashboard/statistics', type='json', auth='user')
-    def get_statistics(self):
+    def get_statistics(self, company_id=None):
         """
         返回资产租赁各指标：
         资产总数（房屋间数）、资产总面积（㎡）、在租资产总数（房屋间数）、在租资产总面积（㎡）、在租比率（房屋间数 %）、在租比率（㎡ %）、
         在租空置比图（房屋间数）、在租空置比图（㎡）、
         """
+        _logger.info(f"param company_id={company_id}")
+
+        if not company_id:
+            company_id = request.env.user.company_id.id
+
         latest_property_detail = []
         latest_property_detail_ids = []
-        request.env.cr.execute(
+        env = request.env(user=SUPERUSER_ID, su=True)
+        env.cr.execute(
             f"SELECT * FROM estate_lease_contract_property_daily_status "
             f"WHERE status_date = "
             f"( SELECT MAX(status_date) FROM estate_lease_contract_property_daily_status "
-            f"WHERE company_id =  {request.env.user.company_id.id} LIMIT 1 ) "
-            f"AND company_id =  {request.env.user.company_id.id};")
+            f"WHERE company_id =  {company_id} LIMIT 1 ) "
+            f"AND company_id =  {company_id};")
         latest_property_detail_record = request.env.cr.fetchall()
         for record_tuple in latest_property_detail_record:
             latest_property_detail_ids.append(record_tuple[0])  # 假设id是每条记录的第一个元素
 
         if latest_property_detail_ids:
-            latest_property_detail = request.env['estate.lease.contract.property.daily.status'].browse(
+            latest_property_detail = env['estate.lease.contract.property.daily.status'].browse(
                 latest_property_detail_ids)
 
         estate_property_quantity = 0
@@ -56,7 +62,7 @@ class EstateDashboard(http.Controller):
         if estate_property_area_quantity != 0:
             ratio_property_area_quantity = estate_property_area_lease_quantity / estate_property_area_quantity
 
-        logger.info(f"estate_property_area_quantity=【{estate_property_area_quantity}】")
+        _logger.info(f"estate_property_area_quantity=【{estate_property_area_quantity}】")
 
         return {
             'estate_property_quantity': estate_property_quantity,
@@ -74,3 +80,26 @@ class EstateDashboard(http.Controller):
                 '空置面积(㎡)': round(estate_property_area_quantity - estate_property_area_lease_quantity, 2),
             },
         }
+
+    @http.route('/estate_dashboard/statistic_super', type='json', auth='user')
+    def get_statistic_super(self):
+
+        allowed_company_ids = request.env.context.get('allowed_company_ids', request.env.companies.ids)
+        _logger.info(f"request.env.companies={request.env.companies}")
+        _logger.info(f"request.env.companies.ids={request.env.companies.ids}")
+        _logger.info(f"allowed_company_ids={allowed_company_ids}")
+        allowed_company_data = {}
+        for each_company in allowed_company_ids:
+            # _logger.info(f"each_company={each_company}")
+            # _logger.info(f"each_company is int = {isinstance(each_company, int)}")
+            each_company_data = self.get_statistics(each_company)
+            # statistics = {
+            #     "company_id": each_company,
+            #     "company_data": each_company_data,
+            # }
+            # allowed_company_data[each_company] = statistics
+            allowed_company_data[each_company] = each_company_data
+
+        _logger.info(f"allowed_company_data={allowed_company_data}")
+
+        return allowed_company_data

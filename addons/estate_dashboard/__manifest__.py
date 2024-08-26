@@ -19,6 +19,7 @@
     'depends': ['base', 'web', 'estate', 'estate_lease_contract'],
 
     'data': [
+        'security/security.xml',
         'views/views.xml',
     ],
     'assets': {
