@@ -15,6 +15,7 @@
             <menuitem id="estate_lease_contract_menu_setting_rental_plan" action="estate_lease_contract_rental_plan_action"/>
             <menuitem id="estate_lease_contract_menu_setting_property_management_fee_plan" action="estate_lease_contract_property_management_fee_plan_action"/>
             <menuitem id="estate_lease_contract_menu_setting_contract_incentives" action="estate_lease_contract_incentives_action"/>
+            <menuitem id="estate_lease_contract_menu_setting_party_a_unit" action="estate_lease_contract_party_a_unit_action"/>
             <menuitem id="estate_lease_contract_menu_setting_contract_accounts" action="estate_lease_contract_bank_account_action"/>
         </menuitem>
         <menuitem id="estate_lease_contract_menu_rental" name="租金明细" sequence="40">

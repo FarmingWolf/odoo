@@ -18,6 +18,7 @@
                     <field name="company_id" invisible="1"/>
                     <field name="edit_on_hist_page" invisible="1"/>
                     <field name="contract_hist" invisible="1"/>
+                    <field name="party_a_unit_invisible" invisible="1"/>
                     <button name="action_release_contract" type="object" string="发布"
                             invisible="(not edit_on_hist_page) or (state != 'recording')"/>
                     <button name="action_cancel_release_contract" type="object" string="取消发布"
@@ -32,9 +33,9 @@
                         <group>
                             <field name="default_context_contract_id" invisible="1"/>
                             <field name="name" readonly="context.get('contract_read_only')"/>
-                            <field name="contract_no" readonly="not edit_on_hist_page"/>
                             <field name="contract_type_id" readonly="not edit_on_hist_page"/>
-                            <field name="renter_id" readonly="not edit_on_hist_page"/>
+                            <field name="party_a_unit_id" readonly="not edit_on_hist_page" invisible="party_a_unit_invisible"/>
+                            <field name="renter_id" string="乙方" readonly="not edit_on_hist_page"/>
                             <field name="renter_company_id" readonly="not edit_on_hist_page"/>
                             <field name="sales_person_id" readonly="not edit_on_hist_page"/>
                             <field name="opt_person_id" readonly="not edit_on_hist_page"/>
@@ -45,7 +46,7 @@
                             <field name="rent_amount_year"/>
                         </group>
                         <group>
-                            <field name="sequence" readonly="not edit_on_hist_page"/>
+                            <field name="contract_no" readonly="not edit_on_hist_page"/>
                             <field name="date_rent_start" readonly="not edit_on_hist_page"/>
                             <field name="date_rent_end" readonly="not edit_on_hist_page"/>
                             <field name="days_rent_total" readonly="1"/>
@@ -318,9 +319,10 @@
                   create="False" delete="False" edit="False" import="False" open_form_view="False">
 
                 <field name="default_context_contract_id" column_invisible="1"/>
+                <field name="party_a_unit_invisible" column_invisible="1"/>
                 <field name="sequence" widget="handle"/>
                 <field name="property_ids" widget="many2many_tags" string="租赁房屋" options="{'color_field': 'color'}"/>
-                <field name="contract_no"/>
+                <field name="party_a_unit_id" invisible="party_a_unit_invisible" string=""/>
                 <field name="date_sign"/>
                 <field name="date_start"/>
                 <field name="date_rent_start"/>
@@ -344,9 +346,10 @@
                   decoration-muted="date_rent_end &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')"
                   create="True" delete="True" edit="True">
                 <field name="default_context_contract_id" column_invisible="1"/>
+                <field name="party_a_unit_invisible" column_invisible="1"/>
                 <field name="sequence" widget="handle"/>
                 <field name="property_ids" widget="many2many_tags" string="租赁房屋" options="{'color_field': 'color'}"/>
-                <field name="contract_no"/>
+                <field name="party_a_unit_id" invisible="party_a_unit_invisible" string=""/>
                 <field name="date_sign"/>
                 <field name="date_start"/>
                 <field name="date_rent_start"/>

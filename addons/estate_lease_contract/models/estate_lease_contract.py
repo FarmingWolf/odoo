@@ -370,7 +370,9 @@ class EstateLeaseContract(models.Model):
 
     name = fields.Char('合同名称', required=True, translate=True, copy=True,
                        default=lambda self: self._get_default_name())
-
+    party_a_unit_id = fields.Many2one(comodel_name="estate.lease.contract.party.a.unit", string="甲方", required=True,
+                                      default=lambda self: self._get_party_a_unit_id())
+    party_a_unit_invisible = fields.Boolean(store=False, default=lambda self: self._get_party_a_unit_invisible())
     contract_no = fields.Char('合同编号', required=True, translate=True, copy=False,
                               default=lambda self: self._get_contract_no(False))
     # contract_amount = fields.Float("合同金额", default=0.0)
@@ -419,6 +421,15 @@ class EstateLeaseContract(models.Model):
                 res['context'] = dict(self.env.context, default_contract_id=None, default_contract_exist=False)
         return res
     """
+    def _get_party_a_unit_id(self):
+        return self.env['estate.lease.contract.party.a.unit'].search([], limit=1)
+
+    def _get_party_a_unit_invisible(self):
+        result = self.env['estate.lease.contract.party.a.unit'].search([])
+        if result:
+            return False
+        else:
+            return True
 
     def _set_context(self):
         # 把contract_read_only和session_contract_id写进session
@@ -486,7 +497,7 @@ class EstateLeaseContract(models.Model):
             else:
                 record.days_decorate = 0
 
-    contract_type_id = fields.Selection(string="合同类型",
+    contract_type_id = fields.Selection(string="合同类型", default="lease",
                                         selection=[('lease', '租赁合同'), ('property_management', '物业合同'),
                                                    ('lease_property_management', '租赁及物业合同')], )
 
