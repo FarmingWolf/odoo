@@ -369,12 +369,14 @@
         <field name="views">[False, "tree"]</field>
         <field name="view_id" ref="estate_lease_contract_view_tree"/>
         <field name="context">{
+            'search_default_group_by_property_ids': True,
             'search_default_active': True,
             'contract_read_only': True,
             'menu_root': 'estate.lease.contract',
+            'from_menu_click_tree': True,
             }
         </field>
-        <field name="domain">[('active', '=', True)]</field>
+        <field name="domain">[('active', '=', True), ('state', '!=', 'invalid')]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 还没有合同信息。
@@ -401,6 +403,18 @@
             <p class="o_view_nocontent_smiling_face">
                 录入中的合同都在这里。
             </p>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_view_search" model="ir.ui.view">
+        <field name="name">estate.lease.contract.view.search</field>
+        <field name="model">estate.lease.contract</field>
+        <field name="arch" type="xml">
+            <search string="合同检索">
+                <group expand='1' string='按资产分组'>
+                    <filter string='按资产分组' name="property_ids" context="{'group_by': 'property_ids'}"/>
+                </group>
+            </search>
         </field>
     </record>
 

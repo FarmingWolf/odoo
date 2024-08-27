@@ -212,8 +212,11 @@
             <search string="资产检索">
                 <filter name="active" string="数据可用" domain="[('active','=','true')]" />
                 <separator/>
-                <field name="total_area" filter_domain="[('living_area', '>=', self)]"/>
+                <field name="rent_area" string="面积>=" filter_domain="[('rent_area', '>=', self)]"/>
                 <separator/>
+                <group expand='1' string='按资产状态'>
+                    <filter string='状态' name="state" context="{'group_by': 'state'}"/>
+                </group>
             </search>
         </field>
     </record>

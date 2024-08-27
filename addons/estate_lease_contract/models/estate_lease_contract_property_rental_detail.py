@@ -34,7 +34,7 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     description = fields.Char(string="租金描述", readonly=True)
     active = fields.Boolean(default=True)
 
-    renter_id = fields.Many2one('res.partner', string="承租人", related='contract_id.renter_id', readonly=True)
+    renter_id = fields.Many2one('res.partner', string="承租人", related='contract_id.renter_id', readonly=True, store=True)
     renter_id_phone = fields.Char(string="电话", related='contract_id.renter_id.phone', readonly=True)
     renter_id_mobile = fields.Char(string="手机", related='contract_id.renter_id.mobile', readonly=True)
     rental_arrears = fields.Float(string="欠缴金额", compute='_compute_rental_arrears', readonly=True)

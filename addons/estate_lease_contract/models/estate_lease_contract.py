@@ -12,7 +12,7 @@ from dateutil.utils import today
 
 from addons.utils.models.utils import Utils
 from odoo import fields, models, api, exceptions
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import UserError, ValidationError, AccessError
 from odoo.tools import float_compare
 
 _logger = logging.getLogger(__name__)
@@ -364,7 +364,7 @@ class EstateLeaseContract(models.Model):
 
     _name = "estate.lease.contract"
     _description = "资产租赁合同管理模型"
-    _order = "sequence"
+    _order = "property_ids ASC, sequence ASC, renter_id ASC, date_rent_end DESC"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _mail_post_access = 'read'
 
@@ -421,6 +421,7 @@ class EstateLeaseContract(models.Model):
                 res['context'] = dict(self.env.context, default_contract_id=None, default_contract_exist=False)
         return res
     """
+
     def _get_party_a_unit_id(self):
         return self.env['estate.lease.contract.party.a.unit'].search([], limit=1)
 
@@ -632,6 +633,7 @@ class EstateLeaseContract(models.Model):
     def _check_property_in_contract(self, rent_property, self_record):
         property_current_contract = self.env['estate.lease.contract'].search(
             [('property_ids', '=', rent_property.id), ('active', '=', True), ('terminated', '=', False),
+             ('state', 'in', ['released', 'to_be_released']),
              '|', '&', ('date_rent_start', '>=', self_record.date_rent_start),
              ('date_rent_start', '<=', self_record.date_rent_end),
              '|', '&', ('date_rent_end', '>=', self_record.date_rent_start),
@@ -774,17 +776,17 @@ class EstateLeaseContract(models.Model):
         """合同管理员希望在合同发布后，在查看界面也可以随时修改"""
         if self.env.user.has_group('estate_lease_contract.estate_lease_contract_group_manager'):
             for record in self:
-                record.edit_on_hist_page = True
-            return True
+                if record.state != 'invalid':
+                    record.edit_on_hist_page = True
+                    return True
+                else:
+                    record.edit_on_hist_page = False
+                    return False
 
         if self.env.context.get('contract_read_only'):
             for record in self:
                 record.edit_on_hist_page = False
-            return False
-
-        for record in self:
-            record.edit_on_hist_page = True
-        return True
+                return False
 
     edit_on_hist_page = fields.Boolean(string='历史页面可编辑', default=_compute_edit_on_hist_page,
                                        compute=_compute_edit_on_hist_page, store=False)
@@ -895,9 +897,11 @@ class EstateLeaseContract(models.Model):
                         if property_current_contract:
                             for each_contract in property_current_contract:
                                 if each_contract.id != record.id:
-                                    current_contract_list.append(
-                                        f"房屋：【 {property_id.name}】合同：【{each_contract.name}】"
-                                        f"租赁期间：【{each_contract.date_rent_start}~{each_contract.date_rent_end}】")
+                                    if each_contract.state in ('released', 'to_be_released'):
+                                        current_contract_list.append(
+                                            f"房屋：【 {property_id.name}】合同：【{each_contract.name}】"
+                                            f"承租人：【 {each_contract.renter_id.name}】"
+                                            f"租赁期间：【{each_contract.date_rent_start}~{each_contract.date_rent_end}】")
 
                 if current_contract_list:
                     msg = '；'.join(current_contract_list)
@@ -907,7 +911,8 @@ class EstateLeaseContract(models.Model):
                 raise UserError(_('发布合同需要至少绑定一个租赁标的'))
 
             if record.date_rent_start and record.date_start and record.date_rent_start < record.date_start:
-                raise UserError("合同开始日期不能晚于计租开始日期！")
+                record.date_start = record.date_rent_start
+                # raise UserError("合同开始日期不能晚于计租开始日期！")
 
             record.active = True
             # 根据合同生效日期判断state
@@ -979,7 +984,8 @@ class EstateLeaseContract(models.Model):
         # 将contract_id,property_id,rental_plan_id 写进 estate.lease.contract.rental.plan.rel 表
         if 'date_rent_start' in vals and 'date_start' in vals and vals['date_rent_start'] and vals['date_start'] and \
                 vals['date_rent_start'] < vals['date_start']:
-            raise UserError("合同开始日期不能晚于计租开始日期！")
+            vals['date_start'] = vals['date_rent_start']
+            # raise UserError("合同开始日期不能晚于计租开始日期！")
 
         records = super().create(vals)
 
@@ -999,26 +1005,35 @@ class EstateLeaseContract(models.Model):
                     if 'date_rent_start' in vals:
                         if vals['date_rent_start']:
                             if vals['date_rent_start'] < vals['date_start']:
-                                raise UserError("合同开始日期不能晚于计租开始日期！")
+                                vals['date_start'] = vals['date_rent_start']
+                                # raise UserError("合同开始日期不能晚于计租开始日期！")
                     else:
                         if record.date_rent_start:
-                            if record.date_rent_start < datetime.strptime(vals['date_start'], '%Y-%m-%d').date():
-                                raise UserError("合同开始日期不能晚于计租开始日期！")
+                            # if record.date_rent_start < datetime.strptime(vals['date_start'], '%Y-%m-%d').date():
+                            #     vals['date_start'] = record.date_rent_start.strftime('%Y-%m-%d')
+                            if record.date_rent_start < vals['date_start']:
+                                vals['date_start'] = record.date_rent_start
+                                # raise UserError("合同开始日期不能晚于计租开始日期！")
 
             if 'date_rent_start' in vals:
                 if vals['date_rent_start']:
                     if 'date_start' in vals:
                         if vals['date_start']:
                             if vals['date_rent_start'] < vals['date_start']:
-                                raise UserError("合同开始日期不能晚于计租开始日期！")
+                                vals['date_start'] = vals['date_rent_start']
+                                # raise UserError("合同开始日期不能晚于计租开始日期！")
                     else:
                         if record.date_start:
-                            if datetime.strptime(vals['date_rent_start'], '%Y-%m-%d').date() < record.date_start:
-                                raise UserError("合同开始日期不能晚于计租开始日期！")
+                            # if datetime.strptime(vals['date_rent_start'], '%Y-%m-%d').date() < record.date_start:
+                            #     record.date_start = datetime.strptime(vals['date_rent_start'], '%Y-%m-%d').date()
+                            if vals['date_rent_start'] < record.date_start:
+                                record.date_start = vals['date_rent_start']
+                                # raise UserError("合同开始日期不能晚于计租开始日期！")
 
             if ('date_start' not in vals) and ('date_rent_start' not in vals):
                 if record.date_rent_start and record.date_start and record.date_rent_start < record.date_start:
-                    raise UserError("合同开始日期不能晚于计租开始日期！")
+                    record.date_start = record.date_rent_start
+                    # raise UserError("合同开始日期不能晚于计租开始日期！")
 
         res = super().write(vals)
         _logger.info(f"write2 vals=：{vals}")
@@ -1131,3 +1146,80 @@ class EstateLeaseContract(models.Model):
                 contract_name = "491空间房屋租赁合同"
 
         return contract_name
+
+    @api.model
+    def _search(self, domain, *args, is_from_self=None, **kwargs):
+
+        _logger.info(f"search domain={domain}")
+        _logger.info(f"search args={args}")
+        _logger.info(f"search kwargs={kwargs}")
+        if is_from_self:
+            return super()._search(domain, *args, **kwargs)
+
+        # 针对非list的场景
+        if len(domain) == 1:
+            for token in domain:
+                left, operator, right = token
+                if left == 'id' and operator == '=':
+                    _logger.info(f"直接返回了")
+                    return super()._search(domain, *args, **kwargs)
+
+        if not self.env.context.get('contract_read_only') or self.env.context.get('contract_read_only') is False:
+            return super()._search(domain, *args, **kwargs)
+
+        # 当进行分组时，应以租赁标的为基础筛选无效合同
+        tgt_property_ids = []
+        for token in domain:
+            if len(token) == 3:
+                left, operator, right = token
+                if left == 'property_ids':
+                    tgt_property_ids.append(right)
+        var_temp = 0 if tgt_property_ids else 1
+        # 先做好条件1=1，然后防止 in (空) 出错
+        if not tgt_property_ids:
+            tgt_property_ids = [-1]
+        # 已经过期的合同不显示，但是希望那些虽然已经过期无效，但是由于有续租而为了显示连续性而继续保留显示，即使不是续租，原租户继续租原房也行
+        # 先选出已失效合同
+        self.env.cr.execute("""
+                            SELECT t_c.id, t_c.renter_id, t_r.property_id 
+                            FROM estate_lease_contract t_c, contract_property_rel t_r 
+                            WHERE t_c.company_id = %s 
+                              AND (t_c.terminated IS NULL or t_c.terminated IS FALSE) 
+                              AND t_c.active IS TRUE 
+                              AND t_c.state = 'invalid' 
+                              AND t_c.renter_id IS not NULL 
+                              AND t_c.id = t_r.contract_id 
+                              AND (1 = %s or t_r.property_id in %s) 
+                            ORDER BY t_r.property_id, t_c.renter_id, t_c.date_rent_end DESC
+                """, [self.env.user.company_id.id, var_temp, tuple(tgt_property_ids)])
+        invalid_rcds = self.env.cr.fetchall()
+        valid_ids = []
+        _logger.info(f"invalid_rcds={invalid_rcds}")
+
+        for contract_id, renter_id, property_id in invalid_rcds:
+            self.env.cr.execute("""
+                SELECT COUNT(1) FROM estate_lease_contract t_c, contract_property_rel t_r
+                WHERE t_c.company_id = %s
+                  AND (t_c.terminated IS NULL or t_c.terminated IS FALSE)
+                  AND t_c.active IS TRUE
+                  AND t_c.state in ('released', 'to_be_released')
+                  AND (t_c.renter_id = %s and t_c.renter_id is not NULL) 
+                  AND t_r.property_id = %s
+                  AND t_c.id = t_r.contract_id
+            """, (self.env.user.company_id.id, renter_id, property_id))
+
+            valid_rcds = self.env.cr.dictfetchone()['COUNT']
+            _logger.info(f"回查的valid_rcds={valid_rcds}")
+            if valid_rcds > 0:
+                valid_ids.append(contract_id)
+
+        _logger.info(f"原domain={domain}")
+        _logger.info(f"补充的valid_ids={valid_ids}")
+
+        if valid_ids:
+            ids_origin = self.env['estate.lease.contract']._search(domain, *args, is_from_self=True, **kwargs)
+            valid_domain = [('id', 'in', valid_ids)]
+            ids_added = self.env['estate.lease.contract']._search(valid_domain, *args, is_from_self=True, **kwargs)
+            return super()._search(['|', ('id', 'in', ids_origin), ('id', 'in', ids_added)], *args, **kwargs)
+        else:
+            return super()._search(domain, *args, **kwargs)
