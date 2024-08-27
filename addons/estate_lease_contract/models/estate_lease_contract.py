@@ -380,8 +380,8 @@ class EstateLeaseContract(models.Model):
     # contract_tax_per = fields.Float("税率", default=0.0)
     # contract_tax_out = fields.Float("不含税合同额", default=0.0)
 
-    date_sign = fields.Date("合同签订日期", required=True, copy=False, default=fields.Date.context_today)
-    date_start = fields.Date("合同开始日期", required=True, copy=False, default=fields.Date.context_today)
+    date_sign = fields.Date("合同签订日期", required=True, copy=False, default=fields.Date.context_today, tracking=True)
+    date_start = fields.Date("合同开始日期", required=True, copy=False, default=fields.Date.context_today, tracking=True)
 
     date_rent_start = fields.Date("计租开始日期", required=True, copy=False, tracking=True,
                                   default=fields.Date.context_today)
