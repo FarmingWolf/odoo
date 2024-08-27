@@ -370,7 +370,7 @@ class EstateLeaseContract(models.Model):
 
     name = fields.Char('合同名称', required=True, translate=True, copy=True,
                        default=lambda self: self._get_default_name())
-    party_a_unit_id = fields.Many2one(comodel_name="estate.lease.contract.party.a.unit", string="甲方", required=True,
+    party_a_unit_id = fields.Many2one(comodel_name="estate.lease.contract.party.a.unit", string="甲方",
                                       default=lambda self: self._get_party_a_unit_id())
     party_a_unit_invisible = fields.Boolean(store=False, default=lambda self: self._get_party_a_unit_invisible())
     contract_no = fields.Char('合同编号', required=True, translate=True, copy=False,
