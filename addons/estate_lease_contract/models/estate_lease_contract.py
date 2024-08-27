@@ -1208,7 +1208,7 @@ class EstateLeaseContract(models.Model):
                   AND t_c.id = t_r.contract_id
             """, (self.env.user.company_id.id, renter_id, property_id))
 
-            valid_rcds = self.env.cr.dictfetchone()['COUNT']
+            valid_rcds = self.env.cr.dictfetchone()['count']
             _logger.info(f"回查的valid_rcds={valid_rcds}")
             if valid_rcds > 0:
                 valid_ids.append(contract_id)
