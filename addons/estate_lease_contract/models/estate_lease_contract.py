@@ -631,7 +631,7 @@ class EstateLeaseContract(models.Model):
     # 检查该合同的资产是否在其他合同中，且与其计租期重叠
     def _check_property_in_contract(self, rent_property, self_record):
         property_current_contract = self.env['estate.lease.contract'].search(
-            [('property_ids', '=', rent_property.id), ('active', '=', True),
+            [('property_ids', '=', rent_property.id), ('active', '=', True), ('terminated', '=', False),
              '|', '&', ('date_rent_start', '>=', self_record.date_rent_start),
              ('date_rent_start', '<=', self_record.date_rent_end),
              '|', '&', ('date_rent_end', '>=', self_record.date_rent_start),

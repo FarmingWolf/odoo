@@ -109,7 +109,8 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
 
                     # 查询该日期对应的有效合同
                     contract_domain = [('property_ids', '=', each_property.id), ('active', '=', True),
-                                       ('state', '=', 'released'), ('date_rent_start', '<=', record_status_date),
+                                       ('terminated', '=', False), ('state', '=', 'released'),
+                                       ('date_rent_start', '<=', record_status_date),
                                        ('date_rent_end', '>=', record_status_date), ]
                     property_contract = self.env['estate.lease.contract'].search(contract_domain, order='id DESC',
                                                                                  limit=1)

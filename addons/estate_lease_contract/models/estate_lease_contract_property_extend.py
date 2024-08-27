@@ -457,9 +457,10 @@ class EstateLeaseContractPropertyExtend(models.Model):
         for each_property in property_ids:
             _logger.info(f"资产{each_property.name}状态={each_property.state}")
             state_change = False
-            # 本property对应的所有contract，原则上只能有一条active的contract
+            # 本property对应的所有contract，原则上只能有一条active的contract，且未终止的
             current_contract = self.env['estate.lease.contract'].search([('property_ids', 'in', each_property.id),
                                                                          ('active', '=', True),
+                                                                         ('terminated', '=', False),
                                                                          ('state', '=', 'released')],
                                                                         order='date_rent_end DESC', limit=1)
             # 根据最新发布的合同
@@ -470,6 +471,8 @@ class EstateLeaseContractPropertyExtend(models.Model):
                             each_property.state = "out_dated"
                             state_change = True
                             # 合同状态更新为invalid=过期/失效
+                            _logger.info(f"公司{each_property.company_id},合同{current_contract.name}"
+                                         f"原状态=released,更新为invalid")
                             current_contract.write({'state': 'invalid'})
                 else:
                     if current_contract.date_start and current_contract.date_rent_end:
@@ -477,18 +480,49 @@ class EstateLeaseContractPropertyExtend(models.Model):
                             each_property.state = "sold"
                             state_change = True
 
-            else:  # 未发布的最新合同
+            else:  # 未发布的最新合同，且未终止的
                 unreleased_contract = self.env['estate.lease.contract'].search(
                     [('property_ids', 'in', each_property.id),
                      ('active', '=', True),
+                     ('terminated', '=', False),
                      ('state', '!=', 'released')],
                     order='date_rent_end DESC', limit=1)
                 # 只关注未发布的新合同
                 if unreleased_contract:
-                    if (unreleased_contract.date_start and unreleased_contract.date_start > current_date) or \
+                    # 未来生效的合同
+                    if unreleased_contract.date_start and unreleased_contract.date_start > current_date:
+                        if unreleased_contract.state != 'recording':
+                            if each_property.state not in ("offer_received", "offer_accepted"):
+                                each_property.state = "offer_received"
+                                state_change = True
+
+                            _logger.info(f"公司{each_property.company_id},合同{unreleased_contract.name}"
+                                         f"原状态={unreleased_contract.state},更新为to_be_released")
+                            unreleased_contract.write({'state': 'to_be_released'})
+
+                    # 按日期，已经生效的合同
+                    if (unreleased_contract.date_start and unreleased_contract.date_start <= current_date) and \
                             (unreleased_contract.date_rent_end and unreleased_contract.date_rent_end >= current_date):
-                        if each_property.state not in ("offer_received", "offer_accepted"):
-                            each_property.state = "offer_received"
+                        # 如果合同处于已发布待生效状态，那么可以更新合同为生效状态，资产为已租状态
+                        if unreleased_contract.state != 'recording':
+                            _logger.info(f"公司{each_property.company_id},合同{unreleased_contract.name}"
+                                         f"原状态={unreleased_contract.state},更新为released")
+                            unreleased_contract.write({'state': 'released'})
+
+                        if each_property.state != 'sold':
+                            each_property.state = "sold"
+                            state_change = True
+                else:
+                    # 在以上已发布的合同，未发布的合同，都没有的情况下，看已终止的合同
+                    terminated_contract = self.env['estate.lease.contract'].search(
+                        [('property_ids', 'in', each_property.id),
+                         ('active', '=', True),
+                         ('terminated', '=', True)],
+                        order='date_rent_end DESC', limit=1)
+                    if terminated_contract:
+                        # 如果合同已终止，资产状态就不能sold
+                        if each_property.state == "sold":
+                            each_property.state = 'out_dated'
                             state_change = True
 
             _logger.info(f"公司{each_property.company_id},资产{each_property.name}状态={each_property.state},"

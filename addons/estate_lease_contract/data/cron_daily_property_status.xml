@@ -6,7 +6,7 @@
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field> <!-- -1 表示无限次执行 -->
-        <field name="nextcall" eval="(DateTime.now().replace(hour=0, minute=0)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="nextcall" eval="(DateTime.now().replace(hour=0, minute=30)).strftime('%Y-%m-%d %H:%M:%S')" />
         <field name="doall" eval="False"/> <!-- True表示即使服务器关闭期间错过执行也会补执行 -->
         <field name="code">model.automatic_daily_calc_status()</field>
         <field name="user_id" eval="2"/><!--admin-->
@@ -19,7 +19,7 @@
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field> <!-- -1 表示无限次执行 -->
-        <field name="nextcall" eval="(DateTime.now().replace(hour=0, minute=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="nextcall" eval="(DateTime.now().replace(hour=0, minute=0)).strftime('%Y-%m-%d %H:%M:%S')" />
         <field name="doall" eval="False"/> <!-- True表示即使服务器关闭期间错过执行也会补执行 -->
         <field name="code">model.automatic_daily_calc_property_status()</field>
         <field name="user_id" eval="2"/><!--admin-->
