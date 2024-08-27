@@ -107,7 +107,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                                                   compute="_get_property_management_fee_info")
     # 本页面设置固定金额方案（生成新方案并保存至rental_plan）
     set_rent_plan_on_this_page = fields.Boolean(string="固定金额方案", compute="_compute_set_rent_plan_on_this_page",
-                                                readonly=False, store=True)
+                                                readonly=False, store=True, default=False)
     set_rent_plan_plan_name = fields.Char(string="固定租金方案", store=False, compute="_compute_set_rent_plan_plan_name",
                                           readonly=False)
     set_rent_plan_business_method_id = fields.Selection(string="经营性质",
@@ -520,15 +520,29 @@ class EstateLeaseContractPropertyExtend(models.Model):
 
         for record in self:
             if record.set_rent_plan_on_this_page or \
-                    ('set_rent_plan_on_this_page' in vals and vals['set_rent_plan_on_this_page']):
-                # 只有当设置了价格，才有保存的意义
+                    ('set_rent_plan_on_this_page' in vals and vals['set_rent_plan_on_this_page'] is True):
+                # 20240826 发现有的操作者仅仅在此修改支付周期，所以判断所有字段修改
                 if ('set_rent_plan_rent_price' in vals and vals['set_rent_plan_rent_price']) or \
                         ('set_rent_plan_rent_amount_monthly_adjust' in vals and vals[
                             'set_rent_plan_rent_amount_monthly_adjust']) or \
-                        ('set_rent_plan_annual_rent' in vals and vals['set_rent_plan_annual_rent']):
+                        ('set_rent_plan_annual_rent' in vals and vals['set_rent_plan_annual_rent']) or \
+                        ('set_rent_plan_business_method_id' in vals and vals['set_rent_plan_business_method_id']) or \
+                        ('set_rent_plan_business_type_id' in vals and vals['set_rent_plan_business_type_id']) or \
+                        ('set_rent_plan_main_category' in vals and vals['set_rent_plan_main_category']) or \
+                        ('set_rent_plan_billing_method' in vals and vals['set_rent_plan_billing_method']) or \
+                        ('set_rent_plan_payment_period' in vals and vals['set_rent_plan_payment_period']) or \
+                        ('set_rent_plan_payment_date' in vals and vals['set_rent_plan_payment_date']):
                     # 租金方案写库 并 回写
                     rental_plan = self._set_rent_plan_on_this_page_2_db(vals, record, record.set_rent_plan_plan_name)
                     vals['rent_plan_id'] = rental_plan.id
+                    # 也回写到本Record
+                    record.rent_plan_id = rental_plan.id
+                    # 还要写到rental_plan_rel表
+                    # 还要更新关系表estate_lease_contract_rental_plan_rel
+                    rel_model = self.env['estate.lease.contract.rental.plan.rel']
+                    session_contract_id = request.session.get('session_contract_id')
+                    rel_model.search([('contract_id', '=', session_contract_id),
+                                      ('property_id', '=', record.id)]).write({'rental_plan_id': rental_plan.id})
                     # 既然已保存租金方案，则设置本页编辑开关关闭
                     vals['set_rent_plan_on_this_page'] = False
 

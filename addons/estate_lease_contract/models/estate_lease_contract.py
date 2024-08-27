@@ -906,6 +906,9 @@ class EstateLeaseContract(models.Model):
             else:
                 raise UserError(_('发布合同需要至少绑定一个租赁标的'))
 
+            if record.date_rent_start and record.date_start and record.date_rent_start < record.date_start:
+                raise UserError("合同开始日期不能晚于计租开始日期！")
+
             record.active = True
             # 根据合同生效日期判断state
             if record.date_start <= date.today():
@@ -974,6 +977,9 @@ class EstateLeaseContract(models.Model):
     @api.model
     def create(self, vals):
         # 将contract_id,property_id,rental_plan_id 写进 estate.lease.contract.rental.plan.rel 表
+        if 'date_rent_start' in vals and 'date_start' in vals and vals['date_rent_start'] and vals['date_start'] and \
+                vals['date_rent_start'] < vals['date_start']:
+            raise UserError("合同开始日期不能晚于计租开始日期！")
 
         records = super().create(vals)
 
@@ -984,8 +990,35 @@ class EstateLeaseContract(models.Model):
     @api.model
     def write(self, vals):
         _logger.info(f"write1 vals=：{vals}")
+
         for record in self:
             _logger.info(f"write1 record=个数：{len(record.rental_details)}-{record.rental_details}")
+
+            if 'date_start' in vals:
+                if vals['date_start']:
+                    if 'date_rent_start' in vals:
+                        if vals['date_rent_start']:
+                            if vals['date_rent_start'] < vals['date_start']:
+                                raise UserError("合同开始日期不能晚于计租开始日期！")
+                    else:
+                        if record.date_rent_start:
+                            if record.date_rent_start < datetime.strptime(vals['date_start'], '%Y-%m-%d').date():
+                                raise UserError("合同开始日期不能晚于计租开始日期！")
+
+            if 'date_rent_start' in vals:
+                if vals['date_rent_start']:
+                    if 'date_start' in vals:
+                        if vals['date_start']:
+                            if vals['date_rent_start'] < vals['date_start']:
+                                raise UserError("合同开始日期不能晚于计租开始日期！")
+                    else:
+                        if record.date_start:
+                            if datetime.strptime(vals['date_rent_start'], '%Y-%m-%d').date() < record.date_start:
+                                raise UserError("合同开始日期不能晚于计租开始日期！")
+
+            if ('date_start' not in vals) and ('date_rent_start' not in vals):
+                if record.date_rent_start and record.date_start and record.date_rent_start < record.date_start:
+                    raise UserError("合同开始日期不能晚于计租开始日期！")
 
         res = super().write(vals)
         _logger.info(f"write2 vals=：{vals}")
