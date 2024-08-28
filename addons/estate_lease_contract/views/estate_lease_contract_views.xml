@@ -369,6 +369,7 @@
         <field name="views">[False, "tree"]</field>
         <field name="view_id" ref="estate_lease_contract_view_tree"/>
         <field name="context">{
+            'search_default_state_valid': True,
             'search_default_group_by_property_ids': True,
             'search_default_active': True,
             'contract_read_only': True,
@@ -376,7 +377,7 @@
             'from_menu_click_tree': True,
             }
         </field>
-        <field name="domain">[('active', '=', True), ('state', '!=', 'invalid')]</field>
+        <field name="domain">[('active', '=', True)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 还没有合同信息。
@@ -411,9 +412,16 @@
         <field name="model">estate.lease.contract</field>
         <field name="arch" type="xml">
             <search string="合同检索">
+                <filter string="有效合同" name="state_valid" domain="[('state','!=', 'invalid')]"/>
+                <filter string="包含过期/失效合同" name="state_all" domain="[('state','in',['to_be_released', 'released', 'invalid'])]"/>
                 <group expand='1' string='按资产分组'>
                     <filter string='按资产分组' name="property_ids" context="{'group_by': 'property_ids'}"/>
+                    <filter string='按承租人组' name="renter_id" context="{'group_by': 'renter_id'}"/>
+                    <filter string='按甲方单位分组' name="party_a_unit_id" context="{'group_by': 'party_a_unit_id'}"/>
                 </group>
+                <searchpanel>
+                    <field string='承租人合同文件夹' name="renter_id" context="{'group_by': 'renter_id'}"/>
+                </searchpanel>
             </search>
         </field>
     </record>

@@ -847,7 +847,7 @@ class EstateLeaseContract(models.Model):
                     })
 
     # 合同新建时默认不生效，需要手动修改
-    active = fields.Boolean(default=False, copy=False)
+    active = fields.Boolean(default=False, copy=False, string="录入完成")
     # 合同状态
     state = fields.Selection(
         string='合同状态', tracking=True,
@@ -856,7 +856,7 @@ class EstateLeaseContract(models.Model):
     )
 
     # 合同终止状态
-    terminated = fields.Boolean(default=False, copy=False)
+    terminated = fields.Boolean(default=False, copy=False, string="合同终止")
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
     # 因租金明细修改后的警告提示信息
     warn_msg = fields.Text(string="提示", default="", store=False, compute="_compute_warn_msg")
@@ -1147,8 +1147,11 @@ class EstateLeaseContract(models.Model):
 
         return contract_name
 
-    @api.model
-    def _search(self, domain, *args, is_from_self=None, **kwargs):
+    """@api.model
+    private_search应该是 _search 属于系统底层函数，在tree、form、create、update等很多场景下有调用，控制逻辑太复杂，不建议触碰底层函数
+    """
+
+    def private_search(self, domain, *args, is_from_self=None, **kwargs):
 
         _logger.info(f"search domain={domain}")
         _logger.info(f"search args={args}")
