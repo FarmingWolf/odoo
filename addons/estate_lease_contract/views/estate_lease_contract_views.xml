@@ -34,10 +34,12 @@
                             <field name="default_context_contract_id" invisible="1"/>
                             <field name="name" readonly="context.get('contract_read_only')"/>
                             <field name="contract_type_id" readonly="not edit_on_hist_page"/>
-                            <field name="party_a_unit_id" readonly="not edit_on_hist_page" invisible="party_a_unit_invisible"/>
+                            <field name="party_a_unit_id" readonly="not edit_on_hist_page"
+                                   invisible="party_a_unit_invisible"/>
                             <field name="renter_id" string="乙方" readonly="not edit_on_hist_page"/>
                             <field name="renter_company_id" readonly="not edit_on_hist_page"/>
                             <field name="sales_person_id" readonly="not edit_on_hist_page"/>
+                            <field name="brokerage_fee" readonly="not edit_on_hist_page"/>
                             <field name="opt_person_id" readonly="not edit_on_hist_page"/>
                             <field name="date_sign" readonly="not edit_on_hist_page"/>
                             <field name="date_start" readonly="not edit_on_hist_page"/>
@@ -62,19 +64,29 @@
                                    readonly="not edit_on_hist_page"/>
                         </group>
                     </group>
+                    <group>
+                        <label for="comments" string=""/>
+                        <div class="o_field_html">
+                            <h5>
+                                <field nolabel="1" colspan="2" name="comments"
+                                       placeholder="合同详情与备注"
+                                       readonly="not edit_on_hist_page"/>
+                            </h5>
+                        </div>
+                    </group>
                     <notebook>
                         <page string="租赁标的">
-                            <group col="4">
-                                <group>
-                                    <field name="rent_count"/>
+                            <group col="3">
+                                <group col="1">
+                                    <button name="action_refresh_rental_plan" type="object" string="点击刷新"
+                                            invisible="context.get('contract_read_only')"/>
                                 </group>
                                 <group>
-                                    <field name="rent_area" string="面积（㎡）"/>
+                                    <field name="rent_count"/>
+                                    <field name="rent_area" string="总面积（㎡）"/>
                                 </group>
                                 <group>
                                     <field name="rent_amount"/>
-                                </group>
-                                <group>
                                     <field name="rent_amount_year"/>
                                 </group>
                             </group>
@@ -95,16 +107,72 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="租金方案">
+                            <button name="action_refresh_rental_plan" type="object" string="点击刷新"
+                                    invisible="context.get('contract_read_only')"/>
+                            <field name="rental_plan_ids"/>
+                        </page>
+                        <page string="每期金额明细">
+                            <group col="6">
+                                <group col="1" colspan="1" invisible="context.get('contract_read_only')">
+                                    <button name="action_refresh_all_money" type="object" string="点击刷新"/>
+                                </group>
+                                <group col="1" colspan="5">
+                                    <field name="warn_msg" string="" readonly="1"/>
+                                </group>
+                            </group>
+                            <sheet readonly="1">
+                                <group>
+                                    <group string="todo" invisible="1">
+                                        <group string="租金（优惠后）">
+                                            <group string="首期租金">
+                                            </group>
+                                            <group string="押金">
+                                            </group>
+
+                                        </group>
+                                        <group string="物业费">
+
+                                        </group>
+                                    </group>
+                                    <field name="rental_details" readonly="not edit_on_hist_page">
+                                        <tree string=""
+                                              decoration-danger="(rental_amount != rental_receivable) or edited"
+                                              decoration-success="rental_received &gt; 0 and rental_received == rental_receivable"
+                                              decoration-warning="rental_received != 0 and rental_received != rental_receivable"
+                                              readonly="not parent.edit_on_hist_page">
+                                            <field name="edited" column_invisible="True"/>
+                                            <field name="property_id"/>
+                                            <field name="rental_period_no"/>
+                                            <field name="period_date_from"/>
+                                            <field name="period_date_to"/>
+                                            <field name="date_payment"/>
+                                            <field name="rental_amount" digits="[12, 2]" sum="合计租金：根据资产面积、租金方案自动计算"/>
+                                            <field name="rental_receivable" digits="[12, 2]"
+                                                   sum="合计应收：请谨慎调整，系统自动记录调整历史"/>
+                                            <field name="rental_received" digits="[12, 2]"
+                                                   sum="合计实收：每期租金收款后，请回填，以保证业务数据一致性"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </sheet>
+                        </page>
                         <page string="停车位">
                             <group>
                                 <field name="parking_space_count"/>
                             </group>
                             <field name="parking_space_ids"/>
                         </page>
-                        <page string="租金方案">
-                            <button name="action_refresh_rental_plan" type="object" string="点击刷新"
-                                    invisible="context.get('contract_read_only')"/>
-                            <field name="rental_plan_ids"/>
+                        <page string="注册地址">
+                            <group col="2">
+                                <group>
+                                    <field name="registration_addr_count"/>
+                                </group>
+                                <group>
+                                    <field name="registration_addr_sum"/>
+                                </group>
+                            </group>
+                            <field name="registration_addr"/>
                         </page>
                         <page string="物业费方案" id="page_management_fee_plan" invisible="1">
                             <button name="action_refresh_management_fee_plan" type="object" string="点击刷新"
@@ -176,36 +244,64 @@
                                     <group col="1">
                                         <group string="租金账户" col="1">
                                             <field name="rent_account" placeholder="请选择"/>
-                                            <group invisible="rent_account == False">
-                                                <field name="rent_account_bank_name" string="银行名称"/>
-                                                <field name="rent_account_bank_branch_name" string="分行名称"/>
-                                                <field name="rent_account_bank_account_name" string="账户名称"/>
-                                                <field name="rent_account_bank_account_id" string="账号"/>
+                                            <group invisible="rent_account == False" col="2">
+                                                <group>
+                                                    <field name="rent_account_bank_name" string="银行名称"/>
+                                                    <field name="rent_account_bank_branch_name" string="分行名称"/>
+                                                </group>
+                                                <group>
+                                                    <field name="rent_account_bank_account_name" string="账户名称"/>
+                                                    <field name="rent_account_bank_account_id" string="账号"/>
+                                                </group>
                                             </group>
                                         </group>
                                     </group>
                                     <group col="1">
                                         <group string="物业费账户" col="1">
                                             <field name="property_management_fee_account" placeholder="请选择"/>
-                                            <group invisible="property_management_fee_account == False">
-                                                <field name="property_management_fee_account_bank_name" string="银行名称"/>
-                                                <field name="property_management_fee_account_bank_branch_name"
-                                                       string="分行名称"/>
-                                                <field name="property_management_fee_account_bank_account_name"
-                                                       string="账户名称"/>
-                                                <field name="property_management_fee_account_bank_account_id"
-                                                       string="账号"/>
+                                            <group invisible="property_management_fee_account == False" col="2">
+                                                <group>
+                                                    <field name="property_management_fee_account_bank_name"
+                                                           string="银行名称"/>
+                                                    <field name="property_management_fee_account_bank_branch_name"
+                                                           string="分行名称"/>
+                                                </group>
+                                                <group>
+                                                    <field name="property_management_fee_account_bank_account_name"
+                                                           string="账户名称"/>
+                                                    <field name="property_management_fee_account_bank_account_id"
+                                                           string="账号"/>
+                                                </group>
                                             </group>
                                         </group>
                                     </group>
                                     <group col="1">
                                         <group string="停车费账户" col="1">
                                             <field name="parking_fee_account" placeholder="请选择"/>
-                                            <group invisible="parking_fee_account == False">
-                                                <field name="parking_fee_account_bank_name" string="银行名称"/>
-                                                <field name="parking_fee_account_bank_branch_name" string="分行名称"/>
-                                                <field name="parking_fee_account_bank_account_name" string="账户名称"/>
-                                                <field name="parking_fee_account_bank_account_id" string="账号"/>
+                                            <group invisible="parking_fee_account == False" col="2">
+                                                <group>
+                                                    <field name="parking_fee_account_bank_name" string="银行名称"/>
+                                                    <field name="parking_fee_account_bank_branch_name" string="分行名称"/>
+                                                </group>
+                                                <group>
+                                                    <field name="parking_fee_account_bank_account_name" string="账户名称"/>
+                                                    <field name="parking_fee_account_bank_account_id" string="账号"/>
+                                                </group>
+                                            </group>
+                                        </group>
+                                    </group>
+                                    <group col="1">
+                                        <group string="取暖费账户" col="1">
+                                            <field name="heat_bill_account" placeholder="请选择"/>
+                                            <group invisible="heat_bill_account == False" col="2">
+                                                <group>
+                                                    <field name="heat_bill_account_bank_name" string="银行名称"/>
+                                                    <field name="heat_bill_account_bank_branch_name" string="分行名称"/>
+                                                </group>
+                                                <group>
+                                                    <field name="heat_bill_account_bank_account_name" string="账户名称"/>
+                                                    <field name="heat_bill_account_bank_account_id" string="账号"/>
+                                                </group>
                                             </group>
                                         </group>
                                     </group>
@@ -214,33 +310,45 @@
                                     <group col="1">
                                         <group string="押金账户" col="1">
                                             <field name="pledge_account" placeholder="请选择"/>
-                                            <group invisible="pledge_account == False">
-                                                <field name="pledge_account_bank_name" string="银行名称"/>
-                                                <field name="pledge_account_bank_branch_name" string="分行名称"/>
-                                                <field name="pledge_account_bank_account_name" string="账户名称"/>
-                                                <field name="pledge_account_bank_account_id" string="账号"/>
+                                            <group invisible="pledge_account == False" col="2">
+                                                <group>
+                                                    <field name="pledge_account_bank_name" string="银行名称"/>
+                                                    <field name="pledge_account_bank_branch_name" string="分行名称"/>
+                                                </group>
+                                                <group>
+                                                    <field name="pledge_account_bank_account_name" string="账户名称"/>
+                                                    <field name="pledge_account_bank_account_id" string="账号"/>
+                                                </group>
                                             </group>
                                         </group>
                                     </group>
                                     <group col="1">
                                         <group string="电费账户" col="1">
                                             <field name="electricity_account" placeholder="请选择"/>
-                                            <group invisible="electricity_account == False">
-                                                <field name="electricity_account_bank_name" string="银行名称"/>
-                                                <field name="electricity_account_bank_branch_name" string="分行名称"/>
-                                                <field name="electricity_account_bank_account_name" string="账户名称"/>
-                                                <field name="electricity_account_bank_account_id" string="账号"/>
+                                            <group invisible="electricity_account == False" col="2">
+                                                <group>
+                                                    <field name="electricity_account_bank_name" string="银行名称"/>
+                                                    <field name="electricity_account_bank_branch_name" string="分行名称"/>
+                                                </group>
+                                                <group>
+                                                    <field name="electricity_account_bank_account_name" string="账户名称"/>
+                                                    <field name="electricity_account_bank_account_id" string="账号"/>
+                                                </group>
                                             </group>
                                         </group>
                                     </group>
                                     <group col="1">
                                         <group string="水费账户" col="1">
                                             <field name="water_bill_account" placeholder="请选择"/>
-                                            <group invisible="water_bill_account == False">
-                                                <field name="water_bill_account_bank_name" string="银行名称"/>
-                                                <field name="water_bill_account_bank_branch_name" string="分行名称"/>
-                                                <field name="water_bill_account_bank_account_name" string="账户名称"/>
-                                                <field name="water_bill_account_bank_account_id" string="账号"/>
+                                            <group invisible="water_bill_account == False" col="2">
+                                                <group>
+                                                    <field name="water_bill_account_bank_name" string="银行名称"/>
+                                                    <field name="water_bill_account_bank_branch_name" string="分行名称"/>
+                                                </group>
+                                                <group>
+                                                    <field name="water_bill_account_bank_account_name" string="账户名称"/>
+                                                    <field name="water_bill_account_bank_account_id" string="账号"/>
+                                                </group>
                                             </group>
                                         </group>
                                     </group>
@@ -251,49 +359,6 @@
                             <group>
                                 <field name="attachment_ids" widget="many2many_binary" options="{'no_create': True}"/>
                             </group>
-                        </page>
-                        <page string="每期金额明细">
-                            <group col="6">
-                                <group col="1" colspan="1" invisible="context.get('contract_read_only')">
-                                    <button name="action_refresh_all_money" type="object" string="点击刷新"/>
-                                </group>
-                                <group col="1" colspan="5">
-                                    <field name="warn_msg" string="" readonly="1"/>
-                                </group>
-                            </group>
-                            <sheet readonly="1">
-                                <group>
-                                    <group string="todo" invisible="1">
-                                        <group string="租金（优惠后）">
-                                            <group string="首期租金">
-                                            </group>
-                                            <group string="押金">
-                                            </group>
-
-                                        </group>
-                                        <group string="物业费">
-
-                                        </group>
-                                    </group>
-                                    <field name="rental_details" readonly="not edit_on_hist_page">
-                                        <tree string=""
-                                              decoration-danger="(rental_amount != rental_receivable) or edited"
-                                              decoration-success="rental_received &gt; 0 and rental_received == rental_receivable"
-                                              decoration-warning="rental_received != 0 and rental_received != rental_receivable"
-                                              readonly="not parent.edit_on_hist_page">
-                                            <field name="edited" column_invisible="True"/>
-                                            <field name="property_id"/>
-                                            <field name="rental_period_no"/>
-                                            <field name="period_date_from"/>
-                                            <field name="period_date_to"/>
-                                            <field name="date_payment"/>
-                                            <field name="rental_amount" digits="[12, 2]" sum="合计租金：根据资产面积、租金方案自动计算"/>
-                                            <field name="rental_receivable" digits="[12, 2]" sum="合计应收：请谨慎调整，系统自动记录调整历史"/>
-                                            <field name="rental_received" digits="[12, 2]" sum="合计实收：每期租金收款后，请回填，以保证业务数据一致性"/>
-                                        </tree>
-                                    </field>
-                                </group>
-                            </sheet>
                         </page>
                     </notebook>
 
@@ -413,7 +478,7 @@
         <field name="arch" type="xml">
             <search string="合同检索">
                 <filter string="有效合同" name="state_valid" domain="[('state','!=', 'invalid')]"/>
-                <filter string="包含过期/失效合同" name="state_all" domain="[('state','in',['to_be_released', 'released', 'invalid'])]"/>
+                <filter string="过期/失效合同" name="state_all" domain="[('state','=', 'invalid')]"/>
                 <group expand='1' string='按资产分组'>
                     <filter string='按资产分组' name="property_ids" context="{'group_by': 'property_ids'}"/>
                     <filter string='按承租人组' name="renter_id" context="{'group_by': 'renter_id'}"/>

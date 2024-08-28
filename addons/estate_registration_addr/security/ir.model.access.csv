@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+estate_registration_addr_read,estate.registration.addr.read,model_estate_registration_addr,base.group_user,1,0,0,0
+estate_registration_addr_manager,estate.registration.addr.manager,model_estate_registration_addr,group_estate_registration_addr_manager,1,1,1,1

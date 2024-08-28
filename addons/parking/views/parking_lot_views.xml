@@ -16,7 +16,7 @@
         <field name="name">parking.lot.tree</field>
         <field name="model">parking.lot</field>
         <field name="arch" type="xml">
-            <tree string="parking_lot_tree">
+            <tree string="parking_lot_tree" editable="bottom">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="park_id"/>

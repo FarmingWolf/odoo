@@ -16,7 +16,7 @@
         <field name="name">park.tree</field>
         <field name="model">park</field>
         <field name="arch" type="xml">
-            <tree string="park_tree">
+            <tree string="park_tree" editable="bottom">
                 <field name="name"/>
                 <field name="parking_lot_cnt" sum="总计停车场数量"/>
                 <field name="parking_space_cnt" sum="总计停车位数量"/>

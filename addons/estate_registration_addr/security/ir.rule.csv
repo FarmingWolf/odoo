@@ -1,0 +1,2 @@
+id,name,model_id:id,domain_force
+estate_registration_addr_rule,Restrict Estate Registration Addr by Company,model_estate_registration_addr,"[('company_id','=',user.company_id.id)]"

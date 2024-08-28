@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="estate_registration_addr_action" model="ir.actions.act_window">
+        <field name="name">注册地址管理</field>
+        <field name="res_model">estate.registration.addr</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                园区注册地址管理。
+            </p>
+        </field>
+    </record>
+
+    <record id="estate_registration_addr_view_tree" model="ir.ui.view">
+        <field name="name">estate.registration.addr.tree</field>
+        <field name="model">estate.registration.addr</field>
+        <field name="arch" type="xml">
+            <tree string="estate_registration_addr_tree" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="price" digits="[12, 2]" sum="总金额（元）"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="estate_registration_addr_view_form" model="ir.ui.view">
+        <field name="name">estate.registration.addr.form</field>
+        <field name="model">estate.registration.addr</field>
+        <field name="arch" type="xml">
+            <form string="estate_registration_addr_form">
+                <group>
+                    <group>
+                        <field name="name"/>
+                        <field name="price" digits="[12, 2]"/>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- 菜单项 -->
+    <menuitem id="menu_estate_registration_addr" groups="group_estate_registration_addr_manager" name="注册地址管理"
+              action="estate_registration_addr_action"/>
+</odoo>

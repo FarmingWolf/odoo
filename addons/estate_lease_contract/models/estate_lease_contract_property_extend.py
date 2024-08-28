@@ -581,6 +581,14 @@ class EstateLeaseContractPropertyExtend(models.Model):
                     vals['set_rent_plan_on_this_page'] = False
 
                     _logger.info(f"write vals 再做成={vals}")
+            else:
+                # 如果不是在本页设置固定金额模式，那也可能时在本页修改了租金方案，就要把修改后的租金方案写回关系表
+                if 'rent_plan_id' in vals:
+                    rel_model = self.env['estate.lease.contract.rental.plan.rel']
+                    session_contract_id = request.session.get('session_contract_id')
+                    rel_model.search([('contract_id', '=', session_contract_id),
+                                      ('property_id', '=', record.id)]).write({'rental_plan_id': vals['rent_plan_id']})
+                    _logger.info(f"rent_plan_id 写进关系表 ={vals}")
 
         res = super().write(vals)
         _logger.info(f"write after vals={vals}")

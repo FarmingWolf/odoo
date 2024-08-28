@@ -234,10 +234,10 @@ def _prepare_rent_price_period_lst(property_id, rent_amount_monthly_val, rental_
                                    'from_n_month': period_percentage.billing_progress_info_month_from,
                                    'every_x_month': period_percentage.billing_progress_info_month_every,
                                    'up_percentage': period_percentage.billing_progress_info_up_percentage,
-                                   'rent_amount_adapt': round(base_rent_amount_monthly_val * (
-                                           1 + (period_percentage.billing_progress_info_up_percentage / 100)), 2),
-                                   'rent_price_adapt': round(base_rent_price * (
-                                           1 + (period_percentage.billing_progress_info_up_percentage / 100)), 2),
+                                   'rent_amount_adapt': base_rent_amount_monthly_val * (
+                                           1 + (period_percentage.billing_progress_info_up_percentage / 100)),
+                                   'rent_price_adapt': base_rent_price * (
+                                           1 + (period_percentage.billing_progress_info_up_percentage / 100)),
                                    'period_from': temp_date_s,
                                    'period_to': temp_date_e}
 
@@ -299,7 +299,8 @@ def _generate_details_from_rent_plan(record_self):
         if property_id.rent_amount_monthly_adjust:
             rent_amount_monthly_val = property_id.rent_amount_monthly_adjust
         else:
-            rent_amount_monthly_val = round(rental_plan.rent_price * property_id.rent_area * 365 / 12, 2)
+            rent_amount_monthly_val = rental_plan.rent_price * property_id.rent_area * 365 / 12
+        # ↑↑↑不能在这里四舍五入
 
         temp_deposit_amount += property_id.deposit_amount if property_id.deposit_amount else 0
 
@@ -571,6 +572,12 @@ class EstateLeaseContract(models.Model):
     water_bill_account_bank_account_name = fields.Char("水费账户银行账户名", related="water_bill_account.bank_account_name")
     water_bill_account_bank_account_id = fields.Char("水费账户银行账号", related="water_bill_account.bank_account_id")
 
+    heat_bill_account = fields.Many2one("estate.lease.contract.bank.account", string='取暖费收缴账户名')
+    heat_bill_account_bank_name = fields.Char("取暖费账户银行名称", related="heat_bill_account.bank_name")
+    heat_bill_account_bank_branch_name = fields.Char("取暖费账户分行名称", related="heat_bill_account.bank_branch_name")
+    heat_bill_account_bank_account_name = fields.Char("取暖费账户银行账户名", related="heat_bill_account.bank_account_name")
+    heat_bill_account_bank_account_id = fields.Char("取暖费账户银行账号", related="heat_bill_account.bank_account_id")
+
     parking_fee_account = fields.Many2one("estate.lease.contract.bank.account", string='停车费收缴账户名')
     parking_fee_account_bank_name = fields.Char("停车费账户银行名称", related="parking_fee_account.bank_name")
     parking_fee_account_bank_branch_name = fields.Char("停车费账户分行名称", related="parking_fee_account.bank_branch_name")
@@ -616,7 +623,8 @@ class EstateLeaseContract(models.Model):
     rent_count = fields.Integer(default=0, string="租赁标的数量", compute="_calc_rent_total_info", copy=False)
     building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", compute="_calc_rent_total_info", copy=False)
     rent_area = fields.Float(default=0.0, string="总计租面积（㎡）", compute="_calc_rent_total_info", copy=False)
-
+    brokerage_fee = fields.Float(default=0.0, string="中介费（元）", copy=False)
+    comments = fields.Html(string='合同备注')
     sequence = fields.Integer(compute='_compute_sorted_sequence', store=True, string='可在列表页面拖拽排序')
 
     @api.depends('property_ids')
@@ -766,11 +774,26 @@ class EstateLeaseContract(models.Model):
     garbage_removal_fee = fields.Float(default=0.0, string="垃圾清运费（元）", tracking=True, copy=False)
 
     description = fields.Text("详细信息", copy=False, tracking=True)
+    registration_addr = fields.Many2many(string="注册地址", comodel_name="estate.registration.addr",
+                                         copy=False, tracking=True)
+    registration_addr_count = fields.Integer(string="注册地址数量（个）", copy=False,
+                                             compute="_compute_registration_addr_count")
+    registration_addr_sum = fields.Integer(string="注册地址金额（元）", copy=False,
+                                           compute="_compute_registration_addr_count")
 
     attachment_ids = fields.Many2many('ir.attachment', string="附件管理", copy=False, tracking=True)
 
     rental_details = fields.One2many('estate.lease.contract.property.rental.detail', 'contract_id', store=True,
                                      compute='_compute_rental_details', string="租金明细", readonly=False, copy=False)
+
+    @api.depends("registration_addr")
+    def _compute_registration_addr_count(self):
+        for record in self:
+            record.registration_addr_count = 0
+            record.registration_addr_sum = 0
+            for addr in record.registration_addr:
+                record.registration_addr_count += 1
+                record.registration_addr_sum = record.registration_addr_sum + addr.price
 
     def _compute_edit_on_hist_page(self):
         """合同管理员希望在合同发布后，在查看界面也可以随时修改"""
@@ -1009,10 +1032,12 @@ class EstateLeaseContract(models.Model):
                                 # raise UserError("合同开始日期不能晚于计租开始日期！")
                     else:
                         if record.date_rent_start:
-                            # if record.date_rent_start < datetime.strptime(vals['date_start'], '%Y-%m-%d').date():
-                            #     vals['date_start'] = record.date_rent_start.strftime('%Y-%m-%d')
-                            if record.date_rent_start < vals['date_start']:
-                                vals['date_start'] = record.date_rent_start
+                            if isinstance(vals['date_start'], str):
+                                if record.date_rent_start < datetime.strptime(vals['date_start'], '%Y-%m-%d').date():
+                                    vals['date_start'] = record.date_rent_start.strftime('%Y-%m-%d')
+                            if isinstance(vals['date_start'], date):
+                                if record.date_rent_start < vals['date_start']:
+                                    vals['date_start'] = record.date_rent_start
                                 # raise UserError("合同开始日期不能晚于计租开始日期！")
 
             if 'date_rent_start' in vals:
@@ -1024,10 +1049,12 @@ class EstateLeaseContract(models.Model):
                                 # raise UserError("合同开始日期不能晚于计租开始日期！")
                     else:
                         if record.date_start:
-                            # if datetime.strptime(vals['date_rent_start'], '%Y-%m-%d').date() < record.date_start:
-                            #     record.date_start = datetime.strptime(vals['date_rent_start'], '%Y-%m-%d').date()
-                            if vals['date_rent_start'] < record.date_start:
-                                record.date_start = vals['date_rent_start']
+                            if isinstance(vals['date_rent_start'], str):
+                                if datetime.strptime(vals['date_rent_start'], '%Y-%m-%d').date() < record.date_start:
+                                    record.date_start = datetime.strptime(vals['date_rent_start'], '%Y-%m-%d').date()
+                            if isinstance(vals['date_rent_start'], date):
+                                if vals['date_rent_start'] < record.date_start:
+                                    record.date_start = vals['date_rent_start']
                                 # raise UserError("合同开始日期不能晚于计租开始日期！")
 
             if ('date_start' not in vals) and ('date_rent_start' not in vals):
