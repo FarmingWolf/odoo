@@ -482,9 +482,10 @@
                 <group expand='1' string='按资产分组'>
                     <filter string='按资产分组' name="property_ids" context="{'group_by': 'property_ids'}"/>
                     <filter string='按承租人组' name="renter_id" context="{'group_by': 'renter_id'}"/>
-                    <filter string='按甲方单位分组' name="party_a_unit_id" context="{'group_by': 'party_a_unit_id'}"/>
+                    <filter string='按合同主体分组' name="party_a_unit_id" context="{'group_by': 'party_a_unit_id'}"/>
                 </group>
                 <searchpanel>
+                    <field string='合同主体文件夹' name="party_a_unit_id" context="{'group_by': 'party_a_unit_id'}"/>
                     <field string='承租人合同文件夹' name="renter_id" context="{'group_by': 'renter_id'}"/>
                 </searchpanel>
             </search>

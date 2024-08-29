@@ -373,7 +373,8 @@ class EstateLeaseContract(models.Model):
                        default=lambda self: self._get_default_name())
     party_a_unit_id = fields.Many2one(comodel_name="estate.lease.contract.party.a.unit", string="甲方",
                                       default=lambda self: self._get_party_a_unit_id())
-    party_a_unit_invisible = fields.Boolean(store=False, default=lambda self: self._get_party_a_unit_invisible())
+    party_a_unit_invisible = fields.Boolean(default=lambda self: self._get_party_a_unit_invisible(),
+                                            compute="_get_party_a_unit_invisible")
     contract_no = fields.Char('合同编号', required=True, translate=True, copy=False,
                               default=lambda self: self._get_contract_no(False))
     # contract_amount = fields.Float("合同金额", default=0.0)
@@ -424,14 +425,22 @@ class EstateLeaseContract(models.Model):
     """
 
     def _get_party_a_unit_id(self):
-        return self.env['estate.lease.contract.party.a.unit'].search([], limit=1)
+        return self.env['estate.lease.contract.party.a.unit'].search([('company_id', '=',
+                                                                       self.env.user.company_id.id)], limit=1)
 
     def _get_party_a_unit_invisible(self):
-        result = self.env['estate.lease.contract.party.a.unit'].search([])
-        if result:
-            return False
+        result = self.env['estate.lease.contract.party.a.unit'].search([('company_id', '=',
+                                                                       self.env.user.company_id.id)])
+
+        if result and len(result) > 1:
+            res = False
         else:
-            return True
+            res = True
+
+        for record in self:
+            record.party_a_unit_invisible = res
+
+        return res
 
     def _set_context(self):
         # 把contract_read_only和session_contract_id写进session
