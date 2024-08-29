@@ -34,7 +34,9 @@ class EstateLeaseContractPropertyExtend(models.Model):
         request.session["menu_root"] = self.env.context.get('menu_root')
         _logger.info(f"资产管理模型：session[menu_root]=【{request.session.get('menu_root')}】")
         _logger.info(f"资产管理模型：session[contract_read_only]=【{request.session.get('contract_read_only')}】")
-        session_contract_id = request.session.get('session_contract_id')
+        session_contract_id = ""
+        if 'session_contract_id' in request.session:
+            session_contract_id = request.session.get('session_contract_id')
         _logger.info(f"资产管理模型：session_contract_id=[{session_contract_id}]")
 
         for record in self:
@@ -496,9 +498,10 @@ class EstateLeaseContractPropertyExtend(models.Model):
                                 each_property.state = "offer_received"
                                 state_change = True
 
-                            _logger.info(f"公司{each_property.company_id},合同{unreleased_contract.name}"
-                                         f"原状态={unreleased_contract.state},更新为to_be_released")
-                            unreleased_contract.write({'state': 'to_be_released'})
+                            if unreleased_contract.state != 'to_be_released':
+                                _logger.info(f"公司{each_property.company_id},合同{unreleased_contract.id}"
+                                             f"原状态={unreleased_contract.state},更新为to_be_released")
+                                unreleased_contract.write({'state': 'to_be_released'})
 
                     # 按日期，已经生效的合同
                     if (unreleased_contract.date_start and unreleased_contract.date_start <= current_date) and \
@@ -574,9 +577,13 @@ class EstateLeaseContractPropertyExtend(models.Model):
                     # 还要写到rental_plan_rel表
                     # 还要更新关系表estate_lease_contract_rental_plan_rel
                     rel_model = self.env['estate.lease.contract.rental.plan.rel']
-                    session_contract_id = request.session.get('session_contract_id')
-                    rel_model.search([('contract_id', '=', session_contract_id),
-                                      ('property_id', '=', record.id)]).write({'rental_plan_id': rental_plan.id})
+                    if 'session_contract_id' in request.session:
+                        session_contract_id = request.session.get('session_contract_id')
+                        rel_model.search([('contract_id', '=', session_contract_id),
+                                          ('property_id', '=', record.id)]).write({'rental_plan_id': rental_plan.id})
+                    else:
+                        _logger.info(f"session 中无key： session_contract_id ，可能来自cron的调用……")
+
                     # 既然已保存租金方案，则设置本页编辑开关关闭
                     vals['set_rent_plan_on_this_page'] = False
 
@@ -585,10 +592,13 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 # 如果不是在本页设置固定金额模式，那也可能时在本页修改了租金方案，就要把修改后的租金方案写回关系表
                 if 'rent_plan_id' in vals:
                     rel_model = self.env['estate.lease.contract.rental.plan.rel']
-                    session_contract_id = request.session.get('session_contract_id')
-                    rel_model.search([('contract_id', '=', session_contract_id),
-                                      ('property_id', '=', record.id)]).write({'rental_plan_id': vals['rent_plan_id']})
-                    _logger.info(f"rent_plan_id 写进关系表 ={vals}")
+                    if 'session_contract_id' in request.session:
+                        session_contract_id = request.session.get('session_contract_id')
+                        rel_model.search([('contract_id', '=', session_contract_id),
+                                          ('property_id', '=', record.id)]).write({'rental_plan_id': vals['rent_plan_id']})
+                        _logger.info(f"rent_plan_id 写进关系表 ={vals}")
+                    else:
+                        _logger.info(f"session 中无key： session_contract_id ，可能来自cron的调用……")
 
         res = super().write(vals)
         _logger.info(f"write after vals={vals}")
