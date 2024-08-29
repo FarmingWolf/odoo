@@ -76,9 +76,16 @@
                                     <field name="billing_method"/>
                                 </group>
                                 <group invisible="billing_method_fixed_price_invisible">
-                                    <field name="rent_price" digits="[12, 2]"/>
-                                    <field name="rent_amount_monthly_auto" digits="[12, 2]"/>
+                                    <field name="rent_price" readonly="1" digits="[12, 2]"/>
+                                    <field name="rent_amount_monthly_auto" readonly="1" digits="[12, 2]"/>
+                                    <field name="latest_annual_rent" readonly="1" digits="[12, 2]"/>
                                     <field name="rent_amount_monthly_adjust"
+                                           readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"
+                                           digits="[12, 2]"/>
+                                    <field name="rent_amount_yearly_adjust"
+                                           readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"
+                                           digits="[12, 2]"/>
+                                    <field name="rent_amount_yearly_adjust_4_view"
                                            readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"
                                            digits="[12, 2]"/>
                                 </group>
@@ -105,11 +112,17 @@
                                     <field name="payment_period"/>
                                     <field name="payment_date"/>
                                 </group>
-                                <group col="1"
-                                       invisible="billing_method_progress_invisible or billing_progress_method_period_invisible">
-                                    <field name="rent_price" string="起始单价（元/天/㎡）" digits="[12, 2]"/>
-                                    <field name="rent_amount_monthly_auto" digits="[12, 2]"/>
+                                <group col="1" invisible="billing_method_progress_invisible or billing_progress_method_period_invisible">
+                                    <field name="rent_price" string="起始单价（元/天/㎡）" readonly="1" digits="[12, 2]"/>
+                                    <field name="rent_amount_monthly_auto" digits="[12, 2]" readonly="1"/>
+                                    <field name="latest_annual_rent" readonly="1" digits="[12, 2]"/>
                                     <field name="rent_amount_monthly_adjust" digits="[12, 2]"/>
+                                    <field name="rent_amount_yearly_adjust"
+                                           readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"
+                                           digits="[12, 2]"/>
+                                    <field name="rent_amount_yearly_adjust_4_view"
+                                           readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"
+                                           digits="[12, 2]"/>
                                 </group>
                             </group>
                         </group>
@@ -154,7 +167,14 @@
                             <group string="固定单价" col="2" invisible="billing_progress_method_no_progress_invisible">
                                 <field name="rent_price" string="无递增固定单价（元/天/㎡）" digits="[12, 2]"/>
                                 <field name="rent_amount_monthly_auto" digits="[12, 2]"/>
+                                    <field name="latest_annual_rent" readonly="1" digits="[12, 2]"/>
                                 <field name="rent_amount_monthly_adjust" digits="[12, 2]"/>
+                                <field name="rent_amount_yearly_adjust"
+                                       readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"
+                                       digits="[12, 2]"/>
+                                <field name="rent_amount_yearly_adjust_4_view"
+                                       readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"
+                                       digits="[12, 2]"/>
                             </group>
                         </group>
 
@@ -163,7 +183,14 @@
                                 <group col="1">
                                     <field name="rent_price" string="保底单价（元/天/㎡）" digits="[12, 2]"/>
                                     <field name="rent_amount_monthly_auto" digits="[12, 2]"/>
+                                    <field name="latest_annual_rent" readonly="1" digits="[12, 2]"/>
                                     <field name="rent_amount_monthly_adjust" digits="[12, 2]"/>
+                                    <field name="rent_amount_yearly_adjust"
+                                           readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"
+                                           digits="[12, 2]"/>
+                                    <field name="rent_amount_yearly_adjust_4_view"
+                                           readonly="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"
+                                           digits="[12, 2]"/>
                                 </group>
                                 <group col="2">
                                     <group>

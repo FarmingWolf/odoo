@@ -287,6 +287,7 @@ def _generate_details_from_rent_plan(record_self):
 
     # 根据property去找rental_plan
     temp_rent_amount = 0.0
+    temp_rent_amount_year = 0.0
     temp_deposit_amount = 0.0
     for property_id in record_self.property_ids:
         if property_id.rent_plan_id:
@@ -349,11 +350,19 @@ def _generate_details_from_rent_plan(record_self):
             period_no += 1
 
         temp_rent_amount += rent_amount_monthly_val  # 这里还是显示基础月租
+        # 手调年租金仅显示
+        if property_id.rent_amount_yearly_adjust_4_view:
+            _logger.info(f"property_id.rent_amount_yearly_adjust={property_id.rent_amount_yearly_adjust}")
+            temp_rent_amount_year += property_id.rent_amount_yearly_adjust
+        else:
+            temp_rent_amount_year += rent_amount_monthly_val * 12
+
         _logger.info(f"{rental_plan.name}.rental_periods={rental_periods_details}")
-        _logger.debug(f"temp_rent_amount={temp_rent_amount}")
+        _logger.info(f"temp_rent_amount={temp_rent_amount}")
+        _logger.info(f"temp_rent_amount_year={temp_rent_amount_year}")
 
     record_self.rent_amount = temp_rent_amount
-    record_self.rent_amount_year = temp_rent_amount * 12
+    record_self.rent_amount_year = temp_rent_amount_year
     record_self.lease_deposit = temp_deposit_amount
 
     return rental_periods_details
@@ -691,8 +700,13 @@ class EstateLeaseContract(models.Model):
                         rent_area_total += rent_property.rent_area
                         rent_amount_total += rent_property.rent_amount_monthly_adjust if \
                             rent_property.rent_amount_monthly_adjust else rent_property.rent_amount_monthly_auto
-                        rent_amount_year_total += 12 * rent_property.rent_amount_monthly_adjust if \
-                            rent_property.rent_amount_monthly_adjust else rent_property.rent_amount_monthly_auto
+                        # 不管是recording 还是非recording，都要看这个property的手调年租金是不是仅显示用
+                        if not rent_property.rent_amount_yearly_adjust_4_view:
+                            rent_amount_year_total += 12 * rent_property.rent_amount_monthly_adjust if \
+                                rent_property.rent_amount_monthly_adjust else rent_property.rent_amount_monthly_auto
+                        else:
+                            rent_amount_year_total += rent_property.rent_amount_yearly_adjust
+
                         deposit_total += rent_property.deposit_amount
                 else:
                     for each_hist in record.contract_hist:
@@ -700,7 +714,12 @@ class EstateLeaseContract(models.Model):
                         building_area_total += each_hist.contract_property_building_area
                         rent_area_total += each_hist.contract_property_area
                         rent_amount_total += each_hist.contract_rent_amount_monthly
-                        rent_amount_year_total += 12 * each_hist.contract_rent_amount_monthly
+                        # 不管是recording 还是非recording，都要看这个property的手调年租金是不是仅显示用
+                        if not rent_property.rent_amount_yearly_adjust_4_view:
+                            rent_amount_year_total += 12 * each_hist.contract_rent_amount_monthly
+                        else:
+                            rent_amount_year_total += rent_property.rent_amount_yearly_adjust
+
                         deposit_total += each_hist.contract_deposit_amount
 
             record.rent_count = rent_cnt_total
@@ -1150,6 +1169,7 @@ class EstateLeaseContract(models.Model):
             "contract_no": f"{self.contract_no}-xz-01",
             "date_rent_start": self.date_rent_end + timedelta(days=1),
             "date_rent_end": self.date_rent_end + timedelta(days=1) + (self.date_rent_end - self.date_rent_start),
+            "latest_is_renew": True,
         }
         return self.copy(default)
 

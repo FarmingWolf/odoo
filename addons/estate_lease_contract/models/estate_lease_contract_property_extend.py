@@ -277,6 +277,18 @@ class EstateLeaseContractPropertyExtend(models.Model):
 
             record.latest_payment_method = _set_payment_method_str(record)
 
+    @api.onchange("rent_amount_yearly_adjust")
+    def _onchange_rent_amount_yearly_adjust(self):
+        if not self.rent_amount_yearly_adjust_4_view:
+            self.rent_amount_monthly_adjust = self.rent_amount_yearly_adjust / 12
+        self.latest_annual_rent = self.rent_amount_yearly_adjust
+
+    @api.onchange("rent_amount_monthly_adjust")
+    def _onchange_rent_amount_monthly_adjust(self):
+        if not self.rent_amount_yearly_adjust_4_view:
+            self.rent_amount_yearly_adjust = self.rent_amount_monthly_adjust * 12
+        self.latest_annual_rent = self.rent_amount_yearly_adjust
+
     @api.onchange("rent_plan_id")
     def _onchange_rent_plan_id(self):
         self._compute_billing_method_group_invisible()
@@ -369,9 +381,15 @@ class EstateLeaseContractPropertyExtend(models.Model):
     turnover_percentage_id = fields.Char(string='营业额抽成详情', readonly=True, compute="_get_rent_plan_info")
     payment_period = fields.Char(string="支付周期", readonly=True, compute="_get_rent_plan_info")
     rent_price = fields.Float(string="租金单价（元/天/㎡）", readonly=True, compute="_get_rent_plan_info")
-    rent_amount_monthly_auto = fields.Float(string="月租金（元/月）", readonly=True, compute="_get_rent_plan_info",
+    rent_amount_monthly_auto = fields.Float(string="月租金（元）", readonly=True, compute="_get_rent_plan_info",
                                             help="=租金单价（元/天/㎡）×计租面积（㎡）×365÷12")
-    rent_amount_monthly_adjust = fields.Float(string="手调月租金（元/月）", help="可手动调整此金额。若调整后不为0，则系统以此为准。")
+    rent_amount_monthly_adjust = fields.Float(string="手调月租金（元）", help="可手动调整此金额。若调整后不为0，则系统以此为准。")
+    rent_amount_yearly_adjust = fields.Float(string="手调年租金（元）", help="请通过点击后方单选框明确本字段用于系统计算或仅显示。",
+                                             default=lambda self: self.rent_amount_yearly_adjust * 12)
+    rent_amount_yearly_adjust_4_view = fields.Boolean(string="手调年租金仅用于页面显示", default=False,
+                                                      help="勾选则表示手调年租金仅用于页面显示而不参与系统自动计算；"
+                                                           "不勾选则表示手调年租金不仅用于系统自动计算租金，还用于页面显示。"
+                                                           "当合同约定月租金与年租金有明显较大差额时可勾选此项。")
     payment_date = fields.Char(string="租金支付日", readonly=True, compute="_get_rent_plan_info")
     compensation_method = fields.Char(string='补差方式', readonly=True, compute="_get_rent_plan_info")
     compensation_period = fields.Char(string='补差周期', readonly=True, compute="_get_rent_plan_info")
