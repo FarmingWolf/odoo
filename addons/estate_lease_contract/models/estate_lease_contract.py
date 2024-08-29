@@ -714,12 +714,7 @@ class EstateLeaseContract(models.Model):
                         building_area_total += each_hist.contract_property_building_area
                         rent_area_total += each_hist.contract_property_area
                         rent_amount_total += each_hist.contract_rent_amount_monthly
-                        # 不管是recording 还是非recording，都要看这个property的手调年租金是不是仅显示用
-                        if not rent_property.rent_amount_yearly_adjust_4_view:
-                            rent_amount_year_total += 12 * each_hist.contract_rent_amount_monthly
-                        else:
-                            rent_amount_year_total += rent_property.rent_amount_yearly_adjust
-
+                        rent_amount_year_total += each_hist.contract_rent_amount_year
                         deposit_total += each_hist.contract_deposit_amount
 
             record.rent_count = rent_cnt_total
@@ -1039,6 +1034,8 @@ class EstateLeaseContract(models.Model):
             for each_property in record.property_ids:
                 contract_rent_amount_monthly = each_property.rent_amount_monthly_adjust \
                     if each_property.rent_amount_monthly_adjust else each_property.rent_amount_monthly_auto
+                contract_rent_amount_yearly = each_property.rent_amount_yearly_adjust \
+                    if each_property.rent_amount_yearly_adjust_4_view else contract_rent_amount_monthly * 12
 
                 contract_rental_plan_rel.append({
                     "contract_id": record.id,
@@ -1052,7 +1049,7 @@ class EstateLeaseContract(models.Model):
                     "contract_deposit_months": each_property.deposit_months,
                     "contract_deposit_amount": each_property.deposit_amount,
                     "contract_rent_amount_monthly": contract_rent_amount_monthly,
-                    "contract_rent_amount_year": contract_rent_amount_monthly * 12,
+                    "contract_rent_amount_year": contract_rent_amount_yearly,
                     "contract_rent_payment_method": each_property.latest_payment_method,
                 })
                 # self.env.cr.execute("INSERT INTO estate_lease_contract_rental_plan_rel ("
