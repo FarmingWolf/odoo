@@ -660,6 +660,20 @@ class EstateLeaseContract(models.Model):
 
         return property_current_contract
 
+    # 检查该合同中分配的注册地址是否在其他合同中
+    def _check_registration_addr_in_contract(self, registration_addr_id, self_record):
+        property_current_contract = self.env['estate.lease.contract'].search(
+            [('registration_addr', '=', registration_addr_id), ('active', '=', True), ('terminated', '=', False),
+             ('state', 'in', ['released', 'to_be_released']),
+             '|', '&', ('date_rent_start', '>=', self_record.date_rent_start),
+             ('date_rent_start', '<=', self_record.date_rent_end),
+             '|', '&', ('date_rent_end', '>=', self_record.date_rent_start),
+             ('date_rent_end', '<=', self_record.date_rent_end),
+             '&', ('date_rent_start', '<=', self_record.date_rent_start),
+             ('date_rent_end', '>=', self_record.date_rent_end), ])
+
+        return property_current_contract
+
     @api.depends("property_ids")
     def _calc_rent_total_info(self):
         rent_cnt_total = 0
@@ -795,8 +809,28 @@ class EstateLeaseContract(models.Model):
     rental_details = fields.One2many('estate.lease.contract.property.rental.detail', 'contract_id', store=True,
                                      compute='_compute_rental_details', string="租金明细", readonly=False, copy=False)
 
+    @api.onchange("registration_addr")
+    def _check_registration_addr_duplicated(self):
+        for record in self:
+            if record.registration_addr:
+                valid_contract_list = []
+                for addr in record.registration_addr:
+                    current_contracts = self._check_registration_addr_in_contract(addr.id, record)
+                    for each_contract in current_contracts:
+                        if each_contract.id != record.id:
+                            if each_contract.state in ('released', 'to_be_released'):
+                                valid_contract_list.append(
+                                    f"注册地址：【 {addr.name}】合同：【{each_contract.name}】"
+                                    f"承租人：【 {each_contract.renter_id.name}】"
+                                    f"租赁期间：【{each_contract.date_rent_start}~{each_contract.date_rent_end}】")
+
+                if valid_contract_list:
+                    msg = '；'.join(valid_contract_list)
+                    raise UserError(_('注册地址已分配其他合同：{0}'.format(msg)))
+
     @api.depends("registration_addr")
     def _compute_registration_addr_count(self):
+        self._check_registration_addr_duplicated()
         for record in self:
             record.registration_addr_count = 0
             record.registration_addr_sum = 0

@@ -398,6 +398,8 @@
                 <field name="renter_company_id" column_invisible="1"/>
                 <field name="sales_person_id" groups="estate_lease_contract.contract_brokerage_fee_manage"/>
                 <field name="brokerage_fee" groups="estate_lease_contract.contract_brokerage_fee_manage" sum="中介费合计"/>
+                <field name="registration_addr" widget="many2many_tags" options="{'color_field': 'sequence'}"/>
+                <field name="registration_addr_sum" sum="注册地址金额总计（元）"/>
             </tree>
         </field>
     </record>
@@ -427,6 +429,8 @@
                 <field name="renter_company_id" column_invisible="1"/>
                 <field name="sales_person_id" groups="estate_lease_contract.contract_brokerage_fee_manage"/>
                 <field name="brokerage_fee" groups="estate_lease_contract.contract_brokerage_fee_manage" sum="中介费合计"/>
+                <field name="registration_addr" widget="many2many_tags" options="{'color_field': 'sequence'}"/>
+                <field name="registration_addr_sum" sum="注册地址金额总计（元）"/>
             </tree>
         </field>
     </record>
