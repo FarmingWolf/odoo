@@ -830,7 +830,6 @@ class EstateLeaseContract(models.Model):
 
     @api.depends("registration_addr")
     def _compute_registration_addr_count(self):
-        self._check_registration_addr_duplicated()
         for record in self:
             record.registration_addr_count = 0
             record.registration_addr_sum = 0
@@ -979,6 +978,9 @@ class EstateLeaseContract(models.Model):
             if record.date_rent_start and record.date_start and record.date_rent_start < record.date_start:
                 record.date_start = record.date_rent_start
                 # raise UserError("合同开始日期不能晚于计租开始日期！")
+
+            # 发布时最终做校验
+            self._check_registration_addr_duplicated()
 
             record.active = True
             # 根据合同生效日期判断state

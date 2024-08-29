@@ -172,7 +172,15 @@
                                     <field name="registration_addr_sum"/>
                                 </group>
                             </group>
-                            <field name="registration_addr"/>
+                            <field name="registration_addr" readonly="not edit_on_hist_page"
+                                   invisible="state != 'recording'"/>
+                            <field name="registration_addr" readonly="1" invisible="state == 'recording'">
+                                <tree string="">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="price" sum="总计金额（元）"/>
+                                </tree>
+                            </field>
                         </page>
                         <page string="物业费方案" id="page_management_fee_plan" invisible="1">
                             <button name="action_refresh_management_fee_plan" type="object" string="点击刷新"
