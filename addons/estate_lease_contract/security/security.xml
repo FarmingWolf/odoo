@@ -10,4 +10,8 @@
         <field name="category_id" ref="base.module_category_real_estate_brokerage"/>
         <field name="implied_ids" eval="[(4, ref('estate_lease_contract_group_user'))]"/>
     </record>
+    <record id="contract_brokerage_fee_manage" model="res.groups">
+        <field name="name">资产租赁合同中介费管理</field>
+        <field name="category_id" ref="base.module_category_real_estate_brokerage"/>
+    </record>
 </odoo>

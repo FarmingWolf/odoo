@@ -39,7 +39,7 @@
                             <field name="renter_id" string="乙方" readonly="not edit_on_hist_page"/>
                             <field name="renter_company_id" readonly="not edit_on_hist_page"/>
                             <field name="sales_person_id" readonly="not edit_on_hist_page"/>
-                            <field name="brokerage_fee" readonly="not edit_on_hist_page"/>
+                            <field name="brokerage_fee" readonly="not edit_on_hist_page" groups="estate_lease_contract.contract_brokerage_fee_manage"/>
                             <field name="opt_person_id" readonly="not edit_on_hist_page"/>
                             <field name="date_sign" readonly="not edit_on_hist_page"/>
                             <field name="date_start" readonly="not edit_on_hist_page"/>
@@ -395,7 +395,9 @@
                 <field name="state"/>
                 <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}"/>
                 <field name="renter_id"/>
-                <field name="renter_company_id"/>
+                <field name="renter_company_id" column_invisible="1"/>
+                <field name="sales_person_id" groups="estate_lease_contract.contract_brokerage_fee_manage"/>
+                <field name="brokerage_fee" groups="estate_lease_contract.contract_brokerage_fee_manage" sum="中介费合计"/>
             </tree>
         </field>
     </record>
@@ -422,7 +424,9 @@
                 <field name="state"/>
                 <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}"/>
                 <field name="renter_id"/>
-                <field name="renter_company_id"/>
+                <field name="renter_company_id" column_invisible="1"/>
+                <field name="sales_person_id" groups="estate_lease_contract.contract_brokerage_fee_manage"/>
+                <field name="brokerage_fee" groups="estate_lease_contract.contract_brokerage_fee_manage" sum="中介费合计"/>
             </tree>
         </field>
     </record>
@@ -479,14 +483,18 @@
             <search string="合同检索">
                 <filter string="有效合同" name="state_valid" domain="[('state','!=', 'invalid')]"/>
                 <filter string="过期/失效合同" name="state_all" domain="[('state','=', 'invalid')]"/>
+                <separator/>
+                <filter string="合同签订月份" name="date_sign_month" date="date_sign"/>
+                <separator/>
+                <field string='招商员' name="sales_person_id" context="{'group_by': 'sales_person_id'}" groups="estate_lease_contract.contract_brokerage_fee_manage"/>
                 <group expand='1' string='按资产分组'>
                     <filter string='按资产分组' name="property_ids" context="{'group_by': 'property_ids'}"/>
                     <filter string='按承租人组' name="renter_id" context="{'group_by': 'renter_id'}"/>
                     <filter string='按合同主体分组' name="party_a_unit_id" context="{'group_by': 'party_a_unit_id'}"/>
                 </group>
                 <searchpanel>
-                    <field string='合同主体文件夹' name="party_a_unit_id" context="{'group_by': 'party_a_unit_id'}"/>
-                    <field string='承租人合同文件夹' name="renter_id" context="{'group_by': 'renter_id'}"/>
+                    <field string='合同主体文件夹' name="party_a_unit_id" context="{'group_by': 'property_ids'}"/>
+                    <field string='承租人合同文件夹' name="renter_id" context="{'group_by': 'property_ids'}"/>
                 </searchpanel>
             </search>
         </field>

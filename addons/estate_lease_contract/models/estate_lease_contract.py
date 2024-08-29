@@ -615,7 +615,7 @@ class EstateLeaseContract(models.Model):
     invoicing_address = fields.Char('发票邮寄地址', translate=True, copy=True)
     invoicing_email = fields.Char('电子发票邮箱', translate=True, copy=True)
 
-    sales_person_id = fields.Many2one('res.users', string='招商员', index=True, default=lambda self: self.env.user,
+    sales_person_id = fields.Many2one('res.users', string='招商员（中介）', index=True, default=lambda self: self.env.user,
                                       domain="[('company_id', '=', company_id)]")
     opt_person_id = fields.Many2one('res.users', string='录入员', index=True, default=lambda self: self.env.user,
                                     domain="[('company_id', '=', company_id)]")
