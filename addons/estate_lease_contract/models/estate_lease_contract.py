@@ -834,7 +834,7 @@ class EstateLeaseContract(models.Model):
                         if each_contract.id != record.id:
                             if each_contract.state in ('released', 'to_be_released'):
                                 valid_contract_list.append(
-                                    f"注册地址：【 {addr.name}】合同：【{each_contract.name}】"
+                                    f"注册地址：【 {addr.name}】合同：【{each_contract.name}】【{each_contract.contract_no}】"
                                     f"承租人：【 {each_contract.renter_id.name}】"
                                     f"租赁期间：【{each_contract.date_rent_start}~{each_contract.date_rent_end}】")
 
@@ -851,24 +851,34 @@ class EstateLeaseContract(models.Model):
                 record.registration_addr_count += 1
                 record.registration_addr_sum = record.registration_addr_sum + addr.price
 
+    @api.depends("contract_no")
     def _compute_edit_on_hist_page(self):
+        editable = False
+        if 'contract_read_only' in self.env.context:
+            editable = self.env.context.get('contract_read_only')
+            _logger.info(f"self.env.context.get('contract_read_only')={editable}")
+
         """合同管理员希望在合同发布后，在查看界面也可以随时修改"""
         if self.env.user.has_group('estate_lease_contract.estate_lease_contract_group_manager'):
+            _logger.info(f"有estate_lease_contract_group_manager权限")
+            editable = True
+            # 还要看看是否已过期和失效合同
             for record in self:
+                _logger.info(f"合同状态record.state={record.state}")
                 if record.state != 'invalid':
-                    record.edit_on_hist_page = True
-                    return True
+                    editable = True
                 else:
-                    record.edit_on_hist_page = False
-                    return False
+                    editable = False
+            _logger.info(f"有estate_lease_contract_group_manager权限,so editable={editable}")
 
-        if self.env.context.get('contract_read_only'):
-            for record in self:
-                record.edit_on_hist_page = False
-                return False
+        self.edit_on_hist_page = editable
+        for record in self:
+            record.edit_on_hist_page = editable
 
-    edit_on_hist_page = fields.Boolean(string='历史页面可编辑', default=_compute_edit_on_hist_page,
-                                       compute=_compute_edit_on_hist_page, store=False)
+        return editable
+
+    edit_on_hist_page = fields.Boolean(string='历史页面可编辑', default=lambda self: self._compute_edit_on_hist_page(),
+                                       compute="_compute_edit_on_hist_page", store=False)
 
     @api.depends("property_ids", "rental_details")
     def _compute_rental_details(self):

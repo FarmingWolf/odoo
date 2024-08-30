@@ -142,6 +142,8 @@ class EstateLeaseContractRentalPlan(models.Model):
     def write(self, vals):
         _logger.info(f"vals={vals}")
         _logger.info(f'old period_percentage_id={self.period_percentage_id}')
+        # 修改方案之前，先判断该方案是否在已经发布的合同中
+        self._check_used_in_released_contract(vals)
 
         # 先检查是否按时间段递增的设置
         if self._check_is_period_percentage_4_update(vals):
@@ -184,3 +186,28 @@ class EstateLeaseContractRentalPlan(models.Model):
                         return True
 
         return False
+
+    # 已经发布的合同中用了此方案，那么就不让write了
+    def _check_used_in_released_contract(self, vals):
+        if len(vals) == 0:
+            return
+
+        if len(vals) == 1 and 'rent_targets' in vals:
+            return
+
+        for record in self:
+            msg_list = []
+            _logger.info(f'本方案id={record.id}')
+            domain = [('rental_plan_id', '=', record.id), ('rental_plan_id', '!=', False)]
+            contracts_rel = self.env['estate.lease.contract.rental.plan.rel'].search(domain)
+            for contract_rel in contracts_rel:
+                if contract_rel.contract_id.state in ('to_be_released', 'released'):
+                    msg_list.append(
+                        f"房屋：【 {contract_rel.property_id.name}】合同：【{contract_rel.contract_id.name}】"
+                        f"【{contract_rel.contract_id.contract_no}】"
+                        f"承租人：【 {contract_rel.contract_id.renter_id.name}】")
+
+            if msg_list:
+                msg = '；'.join(msg_list)
+                raise UserError(f'不能修改本租金方案【{record.name}】，因为该方案已在其他已发布的租赁合同使用：{msg}。'
+                                f'建议：新作一个租金方案；或者将已发布的合同取消发布后方可修改本租金方案。')

@@ -32,7 +32,7 @@
                     <group col="2">
                         <group>
                             <field name="default_context_contract_id" invisible="1"/>
-                            <field name="name" readonly="context.get('contract_read_only')"/>
+                            <field name="name" readonly="not edit_on_hist_page"/>
                             <field name="contract_type_id" readonly="not edit_on_hist_page"/>
                             <field name="party_a_unit_id" readonly="not edit_on_hist_page"
                                    invisible="party_a_unit_invisible"/>
