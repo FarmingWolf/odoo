@@ -39,7 +39,8 @@
                             <field name="renter_id" string="乙方" readonly="not edit_on_hist_page"/>
                             <field name="renter_company_id" readonly="not edit_on_hist_page"/>
                             <field name="sales_person_id" readonly="not edit_on_hist_page"/>
-                            <field name="brokerage_fee" readonly="not edit_on_hist_page" groups="estate_lease_contract.contract_brokerage_fee_manage"/>
+                            <field name="brokerage_fee" readonly="not edit_on_hist_page"
+                                   groups="estate_lease_contract.contract_brokerage_fee_manage"/>
                             <field name="opt_person_id" readonly="not edit_on_hist_page"/>
                             <field name="date_sign" readonly="not edit_on_hist_page"/>
                             <field name="date_start" readonly="not edit_on_hist_page"/>
@@ -443,6 +444,88 @@
         </field>
     </record>
 
+    <record model="ir.ui.view" id="view_estate_contract_kanban">
+        <field name="name">estate.lease.contract.kanban</field>
+        <field name="model">estate.lease.contract</field>
+        <field name="arch" type="xml">
+            <kanban class="o_event_kanban_view" sample="1" group_create="False" group_delete="False" group_edit="False">
+                <field name="default_context_contract_id" invisible="1"/>
+                <field name="party_a_unit_invisible" invisible="1"/>
+                <field name="sequence" invisible="1"/>
+                <field name="property_ids" widget="many2many_tags" string="租赁房屋" options="{'color_field': 'color'}"/>
+                <field name="party_a_unit_id" invisible="party_a_unit_invisible" string=""/>
+                <field name="date_sign"/>
+                <field name="date_start"/>
+                <field name="date_rent_start"/>
+                <field name="date_rent_end"/>
+                <field name="state"/>
+                <field name="rent_amount_year"/>
+                <field name="parking_space_count"/>
+                <field name="renter_id"/>
+                <field name="sales_person_id" groups="estate_lease_contract.contract_brokerage_fee_manage"/>
+                <field name="brokerage_fee" groups="estate_lease_contract.contract_brokerage_fee_manage" sum="中介费合计"/>
+                <field name="registration_addr_count"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="d-flex flex-column p-0 oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_content p-0 m-0 position-relative row d-flex flex-fill">
+                                <div class="col-4 text-bg-primary p-2 text-center d-flex flex-column justify-content-center">
+                                    <div t-esc="luxon.DateTime.fromISO(record.date_rent_start.raw_value).toFormat('yyyy-MMM-d')"/>
+                                    <div>
+                                        <i class="oi oi-arrow-right me-2 o_event_fontsize_09" title="至"/>
+                                    </div>
+                                    <div>
+                                        <t t-esc="luxon.DateTime.fromISO(record.date_rent_end.raw_value).toFormat('yyyy-MMM-d')"/>
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-cny me-2 o_event_fontsize_09" title="年租金"/>
+                                        <t t-esc="record.rent_amount_year.value" t-options="{'widget': 'float', 'precision': 0}"/>
+                                    </div>
+                                    <div>
+                                        <t t-if="record.parking_space_count != 0">
+                                            <i class="fa fa-car me-2 o_event_fontsize_09" title="车位"/>
+                                            <field name="parking_space_count"/>
+                                            <span>　</span>
+                                        </t>
+                                        <t t-if="record.registration_addr_count != 0">
+                                            <i class="fa fa-address-card-o me-2 o_event_fontsize_09" title="注册地址"/>
+                                            <field name="registration_addr_count"/>
+                                        </t>
+                                    </div>
+                                </div>
+                                <div class="col-8 py-2 px-3 d-flex flex-column justify-content-between pt-3">
+                                    <div>
+                                        <div class="o_kanban_record_title o_text_overflow"
+                                             t-att-title="record.name">
+                                            <field name="property_ids" widget="many2many_tags"/>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex ps-1">
+                                        <field class="fa fa-briefcase" name="party_a_unit_id" invisible="party_a_unit_invisible"/>
+                                    </div>
+                                    <div class="d-flex ps-1">
+                                        <field class="fa fa-briefcase" name="renter_id"/>
+                                    </div>
+                                    <div class="o_kanban_record_bottom">
+
+                                        <div class="oe_kanban_bottom_left">
+                                            <field name="brokerage_fee"
+                                                   groups="estate_lease_contract.contract_brokerage_fee_manage"/>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <field name="sales_person_id" widget="many2one_avatar_user"/>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <record id="estate_lease_contract_action" model="ir.actions.act_window">
         <field name="name">资产租赁合同列表（查看）</field>
         <field name="res_model">estate.lease.contract</field>
@@ -498,7 +581,8 @@
                 <separator/>
                 <filter string="合同签订月份" name="date_sign_month" date="date_sign"/>
                 <separator/>
-                <field string='招商员' name="sales_person_id" context="{'group_by': 'sales_person_id'}" groups="estate_lease_contract.contract_brokerage_fee_manage"/>
+                <field string='招商员' name="sales_person_id" context="{'group_by': 'sales_person_id'}"
+                       groups="estate_lease_contract.contract_brokerage_fee_manage"/>
                 <group expand='1' string='按资产分组'>
                     <filter string='按资产分组' name="property_ids" context="{'group_by': 'property_ids'}"/>
                     <filter string='按承租人组' name="renter_id" context="{'group_by': 'renter_id'}"/>
