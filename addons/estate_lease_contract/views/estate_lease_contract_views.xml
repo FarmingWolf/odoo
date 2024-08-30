@@ -479,7 +479,7 @@
                                     </div>
                                     <div>
                                         <i class="fa fa-cny me-2 o_event_fontsize_09" title="年租金"/>
-                                        <t t-esc="record.rent_amount_year.value" t-options="{'widget': 'float', 'precision': 0}"/>
+                                        <t t-esc="record.rent_amount_year.value"/>
                                     </div>
                                     <div>
                                         <t t-if="record.parking_space_count != 0">
@@ -513,7 +513,7 @@
                                                    groups="estate_lease_contract.contract_brokerage_fee_manage"/>
                                         </div>
                                         <div class="oe_kanban_bottom_right">
-                                            <field name="sales_person_id" widget="many2one_avatar_user"/>
+                                            <field name="sales_person_id" widget="many2one_avatar_user" readonly="1"/>
                                         </div>
                                     </div>
 
