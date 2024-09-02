@@ -35,6 +35,44 @@
             </tree>
         </field>
     </record>
+
+    <record id="real_estate_property_unsold_view_tree" model="ir.ui.view">
+        <field name="name">real.estate.property.unsold.view.tree</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <tree string="properties_tree" create="False" edit="False" delete="False" import="False" open_form_view="True"
+                  default_order="date_availability asc">
+                <field name="date_availability" column_invisible="1"/>
+                <field name="sequence" widget="handle"/>
+                <field name="name" string="资产名称"/>
+                <field name="state" />
+                <field name="out_of_rent_days"/>
+                <field name="last_rent_date_e"/>
+                <field name="rent_area" string="面积（㎡）"/>
+                <field name="property_type_id" string="资产类型"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="real_estate_unsold_action" model="ir.actions.act_window">
+        <field name="name">空置资产</field>
+        <field name="res_model">estate.property</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="views">[False, "tree"]</field>
+        <field name="view_id" ref="real_estate_property_unsold_view_tree"/>
+        <field name="context">{
+            'contract_read_only': True,
+            'menu_root': 'estate.property',}
+        </field>
+        <field name="domain">
+            [('active', '=', True), '|', ('state', '!=', 'sold'), ('state', '=', False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                恭喜！所有资产都在租中！一大波租金正在向您走来！
+            </p>
+        </field>
+    </record>
+
     <record id="491_real_estate_view_form" model="ir.ui.view">
         <field name="name">491.real.estate.property.form</field>
         <field name="model">estate.property</field>
@@ -240,6 +278,18 @@
                     </t>
                 </templates>
             </kanban>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_property_daily_status_update_manual_action" model="ir.actions.server">
+        <field name="name">资产出租状态手动更新</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="estate_lease_contract.model_estate_property"/>
+        <field name="binding_model_id" ref="estate_lease_contract.model_estate_property"/>
+        <field name="state">code</field>
+        <field name="code">
+env.context['is_from_page_click'] = True
+action = model.automatic_daily_calc_property_status()
         </field>
     </record>
 

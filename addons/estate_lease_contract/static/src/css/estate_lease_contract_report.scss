@@ -1,6 +1,7 @@
 @font-face {
     font-family: 'FZXBSJT';
-    src: url('../fonts/FZXBSJT.TTF') format('truetype');
+    src: url('/addons/estate_lease_contract/static/src/fonts/FZXBSJT.TTF') format('truetype');
+    font-weight: bold;
 }
 
 .my_header {
@@ -29,9 +30,27 @@
     width: 70%;
     padding-top: 50px;
 }
+.title {
+    font-family: 'FZXBSJT', sans-serif !important;
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+}
+.report_title {
+    font-family: 'FZXBSJT', sans-serif !important;
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+}
 
 h1.title {
-    font-family: 'FZXBSJT', sans-serif;
+    font-family: 'FZXBSJT', sans-serif !important;
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+}
+h1.report_title {
+    font-family: 'FZXBSJT', sans-serif !important;
     font-size: 40px;
     text-align: center;
     font-weight: bold;
@@ -156,9 +175,9 @@ h1.title {
     flex: 1 1 auto;
 }
 
-.page {
+.estate_report {
   direction: ltr;
-  width: 700px;
+  width: 610px;
   height: 1035px;
   margin: var(--page-margin);
   position: relative;
@@ -170,6 +189,54 @@ h1.title {
   background-color: rgba(255, 255, 255, 1);
 }
 
+.estate_report.report_title {
+    font-family: 'FZXBSJT', sans-serif !important;
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+}
+.estate_report.h1.report_title {
+    font-family: 'FZXBSJT', sans-serif !important;
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+}
+.estate_report.div.report_title {
+    font-family: 'FZXBSJT', sans-serif !important;
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+}
+.estate_report.div.h1.report_title {
+    font-family: 'FZXBSJT', sans-serif !important;
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+}
+.div.estate_report.div.h1.report_title {
+    font-family: 'FZXBSJT', sans-serif !important;
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+}
+.div.report_title {
+    font-family: 'FZXBSJT', sans-serif !important;
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+}
+.div.h1.report_title {
+    font-family: 'FZXBSJT', sans-serif !important;
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+}
+.div.div.h1.report_title {
+    font-family: 'FZXBSJT', sans-serif !important;
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+}
 .o_event_venue_id_cell {
     width: 33% !important;
 }

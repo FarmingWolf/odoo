@@ -51,8 +51,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
 
     def automatic_daily_calc_status(self):
         _logger.info("开始做成资产租赁状态每日数据")
-        self = self.with_user(SUPERUSER_ID)
-        self.env.cr.execute(f'SELECT DISTINCT company_id FROM estate_property')
+        if 'is_from_page_click' in self.env.context and self.env.context.get('is_from_page_click') is True:
+            self.env.cr.execute(f'SELECT DISTINCT company_id FROM estate_property WHERE company_id = '
+                                f'{self.env.user.company_id.id}')
+        else:
+            self = self.with_user(SUPERUSER_ID)
+            self.env.cr.execute(f'SELECT DISTINCT company_id FROM estate_property')
+
         property_companies = set(self.env.cr.fetchall())
 
         for company_id in property_companies:

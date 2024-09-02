@@ -472,8 +472,13 @@ class EstateLeaseContractPropertyExtend(models.Model):
     def automatic_daily_calc_property_status(self):
         _logger.info("开始计算资产状态")
         current_date = fields.Date.context_today(self)
-        self = self.with_user(SUPERUSER_ID)
-        self.env.cr.execute(f'SELECT DISTINCT company_id FROM estate_property')
+        if 'is_from_page_click' in self.env.context and self.env.context.get('is_from_page_click') is True:
+            self.env.cr.execute(f'SELECT DISTINCT company_id FROM estate_property WHERE company_id = '
+                                f'{self.env.user.company_id.id}')
+        else:
+            self = self.with_user(SUPERUSER_ID)
+            self.env.cr.execute(f'SELECT DISTINCT company_id FROM estate_property')
+
         property_companies = set(self.env.cr.fetchall())
         for company_id in property_companies:
             # 每日JOB从数据库里记录的最新一天开始往后按天计算
@@ -513,7 +518,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                          ('terminated', '=', False),
                          ('state', '!=', 'released')],
                         order='date_rent_end DESC', limit=1)
-                    # 只关注未发布的新合同
+                    # 关注未发布的新合同和手动更新结束日期后变为失效的合同
                     if unreleased_contract:
                         # 未来生效的合同
                         if unreleased_contract.date_start and unreleased_contract.date_start > current_date:
@@ -529,7 +534,8 @@ class EstateLeaseContractPropertyExtend(models.Model):
 
                         # 按日期，已经生效的合同
                         if (unreleased_contract.date_start and unreleased_contract.date_start <= current_date) and \
-                                (unreleased_contract.date_rent_end and unreleased_contract.date_rent_end >= current_date):
+                                (unreleased_contract.date_rent_end and
+                                 unreleased_contract.date_rent_end >= current_date):
                             # 如果合同处于已发布待生效状态，那么可以更新合同为生效状态，资产为已租状态
                             if unreleased_contract.state != 'recording':
                                 _logger.info(f"公司{each_property.company_id},合同{unreleased_contract.name}"
@@ -539,6 +545,18 @@ class EstateLeaseContractPropertyExtend(models.Model):
                                 if each_property.state != 'sold':
                                     each_property.state = "sold"
                                     state_change = True
+
+                        # 按日期，已经失效的合同（这里是手动特意修改成失效合同的）
+                        if unreleased_contract.date_rent_end and unreleased_contract.date_rent_end < current_date:
+                            if unreleased_contract.state != 'recording':
+                                if each_property.state not in ("canceled", "out_dated"):
+                                    each_property.state = "out_dated"
+                                    state_change = True
+
+                                if unreleased_contract.state != 'invalid':
+                                    _logger.info(f"公司{each_property.company_id},合同{unreleased_contract.id}"
+                                                 f"原状态={unreleased_contract.state},更新为invalid")
+                                    unreleased_contract.write({'state': 'invalid'})
                     else:
                         # 在以上已发布的合同，未发布的合同，都没有的情况下，看已终止的合同，且上述都没有的情况下，看1个就够改的了
                         terminated_contract = self.env['estate.lease.contract'].search(
@@ -616,7 +634,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 # 如果不是在本页设置固定金额模式，那也可能时在本页修改了租金方案，就要把修改后的租金方案写回关系表
                 if 'rent_plan_id' in vals:
                     rel_model = self.env['estate.lease.contract.rental.plan.rel']
-                    if 'session_contract_id' in request.session:
+                    if request and request.session and 'session_contract_id' in request.session:
                         session_contract_id = request.session.get('session_contract_id')
                         rel_model.search([('contract_id', '=', session_contract_id),
                                           ('property_id', '=', record.id)]).write({'rental_plan_id': vals['rent_plan_id']})

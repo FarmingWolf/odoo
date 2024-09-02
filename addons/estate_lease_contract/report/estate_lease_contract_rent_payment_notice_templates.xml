@@ -2,67 +2,70 @@
 <odoo>
     <template id="estate_lease_contract_rent_payment_notice_application">
         <style type="text/css">
-            @import '/estate_lease_contract/static/src/css/estate_lease_contract_report.scss';
+            @import '/addons/estate_lease_contract/static/src/css/estate_lease_contract_report.scss';
         </style>
         <t t-call="web.html_container">
-            <t t-call="web.internal_layout">
-                <t t-foreach="docs" t-as="rent">
-                    <div class="my_header">
-                        <img t-if="rent.contract_id.opt_person_id.company_id.logo_web"
-                             t-att-src="image_data_uri(rent.contract_id.opt_person_id.company_id.logo_web)"
-                             class="img" />
-                    </div>
-                    <!-- 设置主体内容 -->
-                    <div style="margin-top: 50px;">
-                        <h1 class='title'>
-                            房租缴费通知书
-                        </h1>
+            <t t-foreach="docs" t-as="rent">
+                <t t-call="web.internal_layout">
+                    <div class="estate_report">
+                        <div class="my_header">
+                            <img t-if="rent.contract_id.opt_person_id.company_id.logo_web"
+                                 t-att-src="image_data_uri(rent.contract_id.opt_person_id.company_id.logo_web)"
+                                 class="img" />
+                        </div>
+                        <!-- 设置主体内容 -->
+                        <div style="margin-top: 50px;">
+                            <h1 class='report_title'>
+                                房租缴费通知书
+                            </h1>
 
-                        <p class="greetings" >
-                            <span style="border-bottom: 1px solid #000;">尊敬的<span t-esc="rent.property_id.name"/> </span>租户：
-                        </p>
+                            <p class="greetings" >
+                                <span style="border-bottom: 1px solid #000;">尊敬的<span t-esc="rent.property_id.name"/> </span>租户：
+                            </p>
 
-                        <p class="report_paragraph">
-                            您好。
-                        </p>
+                            <p class="report_paragraph">
+                                您好。
+                            </p>
 
-                        <p class="report_paragraph">
-                            贵公司的已付的房屋租金
-                            <t t-if="rent.period_date_to_prev &gt; rent.report_print_date">将</t><t t-else="">已</t>
-                            于　<span t-esc="rent.period_date_to_prev.strftime('%Y年%m月%d日')" style="border-bottom: 1px solid #000;"/>　到期，
-                            根据贵公司同我公司签署的房屋租赁协议，贵公司需在　<span t-esc="rent.date_payment.strftime('%Y年%m月%d日')" style="border-bottom: 1px solid #000;"/>　
-                            前支付　<span style="border-bottom: 1px solid #000;"><span t-esc="rent.period_date_from.strftime('%Y年%m月%d日')"/>　至　<span t-esc="rent.period_date_to.strftime('%Y年%m月%d日')"/></span>
-                            的房屋租金及物业费。
-                        </p>
+                            <p class="report_paragraph">
+                                贵公司的已付的房屋租金
+                                <t t-if="rent.period_date_to_prev &gt; rent.report_print_date">将</t><t t-else="">已</t>
+                                于　<span t-esc="rent.period_date_to_prev.strftime('%Y年%m月%d日')" style="border-bottom: 1px solid #000;"/>　到期，
+                                根据贵公司同我公司签署的房屋租赁协议，贵公司需在　<span t-esc="rent.date_payment.strftime('%Y年%m月%d日')" style="border-bottom: 1px solid #000;"/>　
+                                前支付　<span style="border-bottom: 1px solid #000;"><span t-esc="rent.period_date_from.strftime('%Y年%m月%d日')"/>　至　<span t-esc="rent.period_date_to.strftime('%Y年%m月%d日')"/></span>
+                                的房屋租金及物业费。
+                            </p>
 
-                        <p class="report_paragraph">
-                            房屋租金总计：
-                            <span style="border-bottom: 1px solid #000;" t-esc="rent.rental_amount_zh"/>。(￥<span t-esc="round(rent.rental_amount, 2)"/>)
-                        </p>
-                        <p class="report_paragraph">
-                            如逾期缴纳，将按合同相关条款，产生滞纳金等相关费用。
-                        </p>
-                        <p class="report_paragraph">
-                            <br/>
-                        </p>
-                        <p class="report_paragraph">
-                            望您/贵公司接到通知后，尽快向我公司/我缴纳房屋租金及物业费用。并将付款凭证复印件交于我公司/我。
-                        </p>
-                        <p class="report_paragraph">
-                            甲方账户名：<span t-esc="rent.contract_id.rent_account_bank_account_name"/>
-                        </p>
-                        <p class="report_paragraph">
-                            开　户　行：<span t-esc="rent.contract_id.rent_account_bank_name"/><span t-esc="rent.contract_id.rent_account_bank_branch_name"/>
-                        </p>
-                        <p class="report_paragraph">
-                            账　　　号：　<span t-esc="rent.contract_id.rent_account_bank_account_id"/>
-                        </p>
+                            <p class="report_paragraph">
+                                房屋租金总计：
+                                <span style="border-bottom: 1px solid #000;" t-esc="rent.rental_amount_zh"/>。(￥<span t-esc="round(rent.rental_amount, 2)"/>)
+                            </p>
+                            <p class="report_paragraph">
+                                如逾期缴纳，将按合同相关条款，产生滞纳金等相关费用。
+                            </p>
+                            <p class="report_paragraph">
+                                <br/>
+                            </p>
+                            <p class="report_paragraph">
+                                望您/贵公司接到通知后，尽快向我公司/我缴纳房屋租金及物业费用。并将付款凭证复印件交于我公司/我。
+                            </p>
+                            <p class="report_paragraph">
+                                甲方账户名：<span t-esc="rent.contract_id.rent_account_bank_account_name"/>
+                            </p>
+                            <p class="report_paragraph">
+                                开　户　行：<span t-esc="rent.contract_id.rent_account_bank_name"/><span t-esc="rent.contract_id.rent_account_bank_branch_name"/>
+                            </p>
+                            <p class="report_paragraph">
+                                账　　　号：　<span t-esc="rent.contract_id.rent_account_bank_account_id"/>
+                            </p>
 
-                        <p class="report_paragraph">
-                            <br/>
-                        </p>
-                        <p class="applicant_p"><span t-esc="user.department_id.name"/></p>
-                        <p class="applicant_p"><span t-esc="rent.report_print_date.strftime('%Y年%m月%d日')"/></p>
+                            <p class="report_paragraph">
+                                <br/>
+                            </p>
+                            <p class="applicant_p"><span t-esc="user.department_id.name"/></p>
+                            <p class="applicant_p"><span t-esc="rent.report_print_date.strftime('%Y年%m月%d日')"/></p>
+                        </div>
+
                     </div>
                 </t>
             </t>

@@ -12,6 +12,17 @@ from ...utils.models.utils import Utils
 _logger = logging.getLogger(__name__)
 
 
+def _get_rental_received_2_date_from_rcd(record):
+    if record.rental_received and record.period_date_from and record.period_date_to and record.rental_amount:
+        days_period = (record.period_date_to - record.period_date_from + timedelta(days=1)).days
+        days_received = record.rental_received / record.rental_amount * days_period
+        record.rental_received_2_date = record.period_date_from + timedelta(days=days_received)
+        if record.rental_received_2_date > record.period_date_to:
+            if record.rental_received <= record.rental_amount:
+                record.rental_received_2_date = record.period_date_to
+        return record.rental_received_2_date
+
+
 class EstateLeaseContractPropertyRentalDetail(models.Model):
     _name = "estate.lease.contract.property.rental.detail"
     _description = "资产租赁合同租金明细"
@@ -44,6 +55,16 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     report_print_date = fields.Date("房租缴费通知书打印日", store=False, compute="_get_report_print_date")
+    rental_received_2_date = fields.Date(string="实收至", compute="_get_rental_received_2_date", readonly=True)
+
+    @api.depends("rental_received")
+    def _get_rental_received_2_date(self):
+        for record in self:
+            record.rental_received_2_date = _get_rental_received_2_date_from_rcd(record)
+
+    @api.onchange("rental_received")
+    def _onchange_rental_received(self):
+        self.rental_received_2_date = _get_rental_received_2_date_from_rcd(self)
 
     @api.depends("contract_id")
     def _get_report_print_date(self):
@@ -104,7 +125,10 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
                             vals['edited'] = True
                             break
                         else:
-                            raise UserError('本期租金、本期应收、本期开始结束日期、支付日期的调整，视为优惠。修改这些字段必须填写备注！')
+                            _logger.info(f"record.comment={record.comment}")
+                            if not record.comment:
+                                raise UserError('本期租金、本期应收、本期开始结束日期、支付日期的调整，'
+                                                '视为优惠。修改这些字段必须填写备注！')
 
         res = super().write(vals)
         return res

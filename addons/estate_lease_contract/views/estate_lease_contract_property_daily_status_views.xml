@@ -16,7 +16,10 @@
         <field name="model_id" ref="estate_lease_contract.model_estate_lease_contract_property_daily_status"/>
         <field name="binding_model_id" ref="estate_lease_contract.model_estate_lease_contract_property_daily_status"/>
         <field name="state">code</field>
-        <field name="code">model.automatic_daily_calc_status()</field>
+        <field name="code">
+env.context['is_from_page_click'] = True
+action = model.automatic_daily_calc_status()
+        </field>
     </record>
 
     <record id="estate_lease_contract_property_daily_status_view_tree" model="ir.ui.view">
@@ -46,7 +49,6 @@
         <field name="arch" type="xml">
             <form string="estate_lease_contract_property_daily_status_form" create="false" delete="false" edit="false">
                 <header groups="estate.estate_group_manager" >
-                    <button name="automatic_daily_calc_status" type="object" string="重新计算资产状态"/>
                     <group>
                         <field name="cal_date_s"/>
                     </group>
