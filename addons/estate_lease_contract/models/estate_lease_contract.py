@@ -368,6 +368,20 @@ def _generate_details_from_rent_plan(record_self):
     return rental_periods_details
 
 
+class Partner(models.Model):
+    _description = '直接输入名称创建partner'
+    _inherit = 'res.partner'
+
+    @api.model
+    def name_create(self, name):
+        """复写此方法为了能把company_id写库"""
+
+        partner_id, display_name = super().name_create(name)
+        self.env['res.partner'].search([('id', '=', partner_id)]).write({'company_id': self.env.user.company_id.id})
+
+        return id, display_name
+
+
 class EstateLeaseContract(models.Model):
     # def onchange(self, values, field_names, fields_spec):
     #     super().onchange(values, field_names, fields_spec)
@@ -817,7 +831,9 @@ class EstateLeaseContract(models.Model):
                                              compute="_compute_registration_addr_count")
     registration_addr_sum = fields.Integer(string="注册地址金额（元）", copy=False,
                                            compute="_compute_registration_addr_count")
-
+    contract_registration_addr_rel_id = fields.One2many(string="合同分配的注册地址", copy=False,
+                                                        comodel_name="estate.lease.contract.registration.addr.rel",
+                                                        inverse_name="contract_id")
     attachment_ids = fields.Many2many('ir.attachment', string="附件管理", copy=False, tracking=True)
 
     rental_details = fields.One2many('estate.lease.contract.property.rental.detail', 'contract_id', store=True,
@@ -1028,6 +1044,29 @@ class EstateLeaseContract(models.Model):
             if record.state in ['to_be_released', 'released']:
                 self.action_release_contract()
 
+    def _insert_contract_registration_addr_rel(self, records):
+        if records:
+            tgt_rcd = records
+        else:
+            tgt_rcd = self
+
+        contract_registration_addr_rel = []
+        for rcd in tgt_rcd:
+            for addr in rcd.registration_addr:
+                contract_registration_addr_rel.append({
+                    "name": [rcd.name, addr.name,
+                             addr.party_b_associated_company.name if addr.party_b_associated_company else ""],
+                    "price": addr.price,
+                    "sequence": addr.sequence,
+                    "contract_id": rcd.id,
+                    "registration_addr_id": addr.id,
+                    "party_b_associated_company_id":
+                        addr.party_b_associated_company.id if addr.party_b_associated_company else None,
+                    "company_id": self.env.user.company_id.id,
+                })
+        if contract_registration_addr_rel:
+            self.env['estate.lease.contract.registration.addr.rel'].create(contract_registration_addr_rel)
+
     def _insert_contract_property_rental_plan_rel(self, records):
         _logger.info(f"进入 _insert_contract_property_rental_plan_rel 方法")
         if records:
@@ -1084,6 +1123,7 @@ class EstateLeaseContract(models.Model):
         records = super().create(vals)
 
         self._insert_contract_property_rental_plan_rel(records)
+        self._insert_contract_registration_addr_rel(records)
 
         return records
 
@@ -1138,10 +1178,18 @@ class EstateLeaseContract(models.Model):
         for record in self:
             _logger.info(f"write2 record=个数：{len(record.rental_details)}-{record.rental_details}")
 
+        # 合同-资产-租金方案历史表
         self._delete_contract_property_rental_plan_rel()
         self._insert_contract_property_rental_plan_rel(None)
+        # 合同-注册地址历史表
+        self._delete_contract_registration_addr_rel()
+        self._insert_contract_registration_addr_rel(None)
 
         return res
+
+    def _delete_contract_registration_addr_rel(self):
+        for record in self:
+            self.env['estate.lease.contract.registration.addr.rel'].search([('contract_id', '=', record.id)]).unlink()
 
     def _delete_contract_property_rental_plan_rel(self):
 
@@ -1167,6 +1215,7 @@ class EstateLeaseContract(models.Model):
                 return
 
         self._delete_contract_property_rental_plan_rel()
+        self._delete_contract_registration_addr_rel()
         return super().unlink()
 
     # 手动续租

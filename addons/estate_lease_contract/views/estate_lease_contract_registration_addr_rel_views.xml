@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="estate_lease_contract_registration_addr_rel_action" model="ir.actions.act_window">
+        <field name="name">资产租赁合同注册地址分配（历史信息）</field>
+        <field name="res_model">estate.lease.contract.registration.addr.rel</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                合同发布后，合同-注册地址-分配公司的关联关系的历史信息。
+            </p>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_registration_addr_rel_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.registration.addr.rel.tree</field>
+        <field name="model">estate.lease.contract.registration.addr.rel</field>
+        <field name="arch" type="xml">
+            <tree string="estate_lease_contract_registration_addr_rel_tree">
+                <field name="sequence" widget="handle"/>
+                <field name="contract_id"/>
+                <field name="registration_addr_id"/>
+                <field name="party_b_associated_company_id"/>
+                <field name="price" digits="[12, 2]"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_registration_addr_rel_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.registration.addr.rel.form</field>
+        <field name="model">estate.lease.contract.registration.addr.rel</field>
+        <field name="arch" type="xml">
+            <form string="estate_lease_contract_registration_addr_rel_form" readonly="1">
+                <sheet>
+                    <group>
+                        <field name="contract_id"/>
+                        <field name="registration_addr_id"/>
+                        <field name="party_b_associated_company_id"/>
+                        <field name="price" digits="[12, 2]"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

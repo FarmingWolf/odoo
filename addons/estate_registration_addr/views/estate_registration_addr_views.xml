@@ -17,8 +17,10 @@
         <field name="arch" type="xml">
             <tree string="estate_registration_addr_tree" editable="bottom">
                 <field name="sequence" widget="handle"/>
+                <field name="company_id" column_invisible="1"/>
                 <field name="name"/>
                 <field name="price" digits="[12, 2]" sum="总金额（元）"/>
+                <field name="party_b_associated_company" readonly="1"/>
             </tree>
         </field>
     </record>
@@ -30,10 +32,10 @@
         <field name="arch" type="xml">
             <form string="estate_registration_addr_form">
                 <group>
-                    <group>
-                        <field name="name"/>
-                        <field name="price" digits="[12, 2]"/>
-                    </group>
+                    <field name="company_id" invisible="1"/>
+                    <field name="name"/>
+                    <field name="price" digits="[12, 2]"/>
+                    <field name="party_b_associated_company" readonly="1"/>
                 </group>
             </form>
         </field>

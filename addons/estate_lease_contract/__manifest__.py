@@ -45,6 +45,7 @@
         'views/estate_lease_contract_property_management_fee_plan_views.xml',
         'views/estate_lease_contract_rental_plan_views.xml',
         'views/estate_lease_contract_rental_plan_rel_views.xml',
+        'views/estate_lease_contract_registration_addr_rel_views.xml',
         'views/estate_lease_contract_views.xml',
         'views/estate_lease_contract_property_daily_status_views.xml',
         'views/estate_lease_contract_menus.xml',

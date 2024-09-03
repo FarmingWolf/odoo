@@ -17,6 +17,8 @@ class EstateRegistrationAddr(models.Model):
     name = fields.Char('注册地址', required=True)
     price = fields.Float('价格（元）')
     sequence = fields.Integer("排序", default=1)
+    party_b_associated_company = fields.Many2one('res.partner', string='关联公司', copy=False,
+                                                 domain="[('company_id', '=', company_id)]")
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     _sql_constraints = [

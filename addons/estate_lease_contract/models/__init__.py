@@ -15,5 +15,6 @@ from . import estate_lease_contract_rental_period_percentage
 from . import estate_lease_contract_property_management_fee_plan
 from . import estate_lease_contract_rental_plan
 from . import estate_lease_contract_rental_plan_rel
+from . import estate_lease_contract_registration_addr_rel
 from . import estate_lease_contract
 from . import estate_lease_contract_property_daily_status
