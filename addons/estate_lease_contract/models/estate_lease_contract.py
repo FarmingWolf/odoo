@@ -647,7 +647,8 @@ class EstateLeaseContract(models.Model):
                                 domain="[('company_id', '=', company_id)]")
     renter_company_id = fields.Many2one('res.partner', string='经营公司', index=True, copy=True, tracking=True,
                                         domain="[('company_id', '=', company_id)]")
-
+    renter_contact_name = fields.Char(string="承租联系人", compute="_compute_renter_contact_info")
+    renter_contact_tel = fields.Char(string="联系方式", compute="_compute_renter_contact_info")
     property_ids = fields.Many2many('estate.property', 'contract_property_rel', 'contract_id', 'property_id',
                                     string='租赁标的', copy=True, tracking=True,
                                     domain="[('company_id', '=', company_id)]")
@@ -658,6 +659,19 @@ class EstateLeaseContract(models.Model):
     brokerage_fee = fields.Float(default=0.0, string="中介费（元）", copy=False)
     comments = fields.Html(string='合同备注')
     sequence = fields.Integer(compute='_compute_sorted_sequence', store=True, string='可在列表页面拖拽排序')
+
+    @api.depends('renter_id')
+    def _compute_renter_contact_info(self):
+        for record in self:
+            # 查找partner的child_ids中is_company=False的记录，这通常代表个人联系人
+            contact = record.renter_id.child_ids.filtered(lambda r: not r.is_company)
+            if contact:
+                record.renter_contact_name = contact[0].name
+                record.renter_contact_tel = contact[0].phone if contact[0].phone else contact[0].mobile
+            else:
+                record.renter_contact_name = record.renter_id.name
+                record.renter_contact_tel = record.renter_id.phone \
+                    if record.renter_id.phone else record.renter_id.mobile
 
     @api.depends('property_ids')
     def _compute_sorted_sequence(self):

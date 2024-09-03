@@ -110,7 +110,8 @@ class EstateLeaseContractRentalPlan(models.Model):
             if len(method) == 2:
                 methods_by_period_ids.append(method[1])
 
-        domain = [('company_id', '=', self.env.user.company_id.id), ('id', 'in', methods_by_period_ids)]
+        domain = [('id', 'in', methods_by_period_ids)]
+        _logger.info(f"domain={domain}")
         record_sorted = self.env['estate.lease.contract.rental.period.percentage'].\
             search(domain, order='billing_progress_info_month_from ASC')
 

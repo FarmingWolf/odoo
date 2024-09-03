@@ -421,6 +421,26 @@
         </field>
     </record>
 
+    <record id="estate_lease_contract_party_b_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.party.b.tree</field>
+        <field name="model">estate.lease.contract</field>
+        <field name="arch" type="xml">
+            <tree string="入驻企业花名册"
+                  decoration-success="date_rent_end &gt;= context_today()"
+                  decoration-muted="date_rent_end &lt; context_today()"
+                  create="False" delete="False" edit="False" import="False" open_form_view="True" default_order="renter_id">
+                <field name="default_context_contract_id" column_invisible="1"/>
+                <field name="party_a_unit_invisible" column_invisible="1"/>
+                <field name="date_rent_end" column_invisible="1"/>
+                <field name="sequence" widget="handle"/>
+                <field name="renter_id" string="入驻企业/个人"/>
+                <field name="renter_contact_name"/>
+                <field name="renter_contact_tel"/>
+                <field name="renter_company_id" column_invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
     <record id="estate_lease_contract_view_inactive_tree" model="ir.ui.view">
         <field name="name">estate.lease.contract.tree</field>
         <field name="model">estate.lease.contract</field>
@@ -553,6 +573,31 @@
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 还没有合同信息。
+            </p>
+            <p>
+                说明合同还没录入，或者录入了也没发布。
+            </p>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_party_b_action" model="ir.actions.act_window">
+        <field name="name">入驻企业花名册</field>
+        <field name="res_model">estate.lease.contract</field>
+        <field name="view_mode">tree,form</field>
+        <field name="views">[False, "tree"]</field>
+        <field name="view_id" ref="estate_lease_contract_party_b_view_tree"/>
+        <field name="context">{
+            'search_default_state_valid': True,
+            'search_default_active': True,
+            'contract_read_only': True,
+            'menu_root': 'estate.lease.contract',
+            'from_menu_click_tree': True,
+            }
+        </field>
+        <field name="domain">[('active', '=', True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                还没有企业入驻。
             </p>
             <p>
                 说明合同还没录入，或者录入了也没发布。
