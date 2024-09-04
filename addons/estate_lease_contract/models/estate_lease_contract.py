@@ -372,14 +372,118 @@ class Partner(models.Model):
     _description = '直接输入名称创建partner'
     _inherit = 'res.partner'
 
+    contract_party_b_id = fields.One2many(comodel_name="estate.lease.contract", inverse_name="renter_id",
+                                          string="乙方单位/个人", copy=False)
+    contract_party_b_contact_name = fields.Char(string="联系人", compute="_compute_party_b_contact_info")
+    contract_party_b_contact_tel = fields.Char(string="联系方式", compute="_compute_party_b_contact_info")
+    party_b_properties = fields.Text(string="租赁信息", compute="_compute_party_b_properties")
+    contracts_valid = fields.Boolean(string="合同有效", compute="_compute_contracts_valid", store=True)
+
+    @api.depends("contract_party_b_id", "contract_party_b_contact_name", "party_b_properties")
+    def _compute_contracts_valid(self):
+        for record in self:
+            for contract in record.contract_party_b_id:
+                if not contract.terminated and contract.date_rent_end >= fields.Date.today():
+                    record.contracts_valid = True
+                    break
+            record.contracts_valid = False
+
+    def _compute_party_b_properties(self):
+        for record in self:
+            property_info = []
+            for contract in record.contract_party_b_id:
+                for property_id in contract.property_ids:
+                    property_info.append((property_id.name,
+                                          contract.date_rent_start.strftime('%Y-%m-%d') + '-' +
+                                          contract.date_rent_end.strftime('%Y-%m-%d')))
+            if property_info:
+                record.party_b_properties = str(sorted(property_info,
+                                                       key=lambda property_i: property_i[1],
+                                                       reverse=True)).lstrip('[').rstrip(']')
+            else:
+                record.party_b_properties = False
+
+    def _compute_party_b_contact_info(self):
+        for record in self:
+            contact = record.child_ids.filtered(lambda r: not r.is_company)
+            if contact:
+                record.contract_party_b_contact_name = contact[0].name
+                record.contract_party_b_contact_tel = contact[0].phone if contact[0].phone else contact[0].mobile
+            else:
+                record.contract_party_b_contact_name = record.name
+                record.contract_party_b_contact_tel = record.phone if record.phone else record.mobile
+
     @api.model
     def name_create(self, name):
         """复写此方法为了能把company_id写库"""
 
         partner_id, display_name = super().name_create(name)
+        _logger.debug(f"self.env.user.company_id={self.env.user.company_id}")
         self.env['res.partner'].search([('id', '=', partner_id)]).write({'company_id': self.env.user.company_id.id})
 
         return id, display_name
+
+    def automatic_set_party_a_status(self):
+        # 更新本公司下的花名册
+        _logger.debug(f"self.env.user.company_id={self.env.user.company_id}")
+        partners = self.env['res.partner'].search([('company_id', '=', self.env.user.company_id.id)])
+        _logger.info(f"准备更新partners={partners}")
+        need_commit = False
+        set_2_true = []
+        set_2_false = []
+        for partner in partners:
+            _logger.debug(f"partner={partner}；partner.contract_party_b_id={partner.contract_party_b_id}")
+            for contract in partner.contract_party_b_id:
+                _logger.debug(f"contract={contract};terminated={contract.terminated};"
+                              f"date_rent_end={contract.date_rent_end};today={fields.Date.today()}")
+                if not contract.terminated and contract.date_rent_end >= fields.Date.today():
+                    if not partner.contracts_valid:
+                        _logger.debug(f"partner.contracts_valid={partner.contracts_valid}改为True")
+                        # partner.contracts_valid = True
+                        # partner.write({'contracts_valid': True})
+                        set_2_true.append(partner.id)
+                    break
+            if partner.contracts_valid:
+                _logger.debug(f"partner.contracts_valid={partner.contracts_valid}改为False")
+                # partner.contracts_valid = False
+                # partner.write({'contracts_valid': False})
+                set_2_false.append(partner.id)
+
+        if set_2_true:
+            _logger.debug(f"更新为true：{set_2_true}")
+            if len(set_2_true) == 1:
+                self.env.cr.execute(f"UPDATE res_partner SET contracts_valid = true WHERE id = {set_2_true[0]}")
+            else:
+                self.env.cr.execute(f"UPDATE res_partner SET contracts_valid = true WHERE id in {tuple(set_2_true)}")
+            need_commit = True
+
+        if set_2_false:
+            _logger.debug(f"更新为false：{set_2_false}")
+            if len(set_2_false) == 1:
+                self.env.cr.execute(f"UPDATE res_partner SET contracts_valid = false WHERE id = {set_2_false[0]}")
+            else:
+                self.env.cr.execute(f"UPDATE res_partner SET contracts_valid = false WHERE id in {tuple(set_2_false)}")
+            need_commit = True
+
+        if need_commit:
+            self.env.cr.commit()
+
+        action = {
+            "name": "入驻花名册",
+            "type": "ir.actions.act_window",
+            "view_mode": "tree",
+            "res_model": "res.partner",
+            "views": [
+                (self.env.ref('estate_lease_contract.estate_lease_contract_party_b_view_tree').id, 'tree'),
+                (False, 'form')],
+            "context": {
+                'search_default_contracts_valid': True,
+                'menu_root': 'estate.lease.contract',
+                'from_menu_click_tree': True,
+            },
+            "domain": [('company_id', 'in', self.env.user.company_ids.ids)],
+        }
+        return action
 
 
 class EstateLeaseContract(models.Model):
@@ -453,7 +557,7 @@ class EstateLeaseContract(models.Model):
 
     def _get_party_a_unit_invisible(self):
         result = self.env['estate.lease.contract.party.a.unit'].search([('company_id', '=',
-                                                                       self.env.user.company_id.id)])
+                                                                         self.env.user.company_id.id)])
 
         if result and len(result) > 1:
             res = False
@@ -645,7 +749,7 @@ class EstateLeaseContract(models.Model):
 
     renter_id = fields.Many2one('res.partner', string='承租人', index=True, copy=True, tracking=True,
                                 domain="[('company_id', '=', company_id)]")
-    renter_company_id = fields.Many2one('res.partner', string='经营公司', index=True, copy=True, tracking=True,
+    renter_company_id = fields.Many2one('res.partner', string='在地经营公司', index=True, copy=True, tracking=True,
                                         domain="[('company_id', '=', company_id)]")
     renter_contact_name = fields.Char(string="承租联系人", compute="_compute_renter_contact_info")
     renter_contact_tel = fields.Char(string="联系方式", compute="_compute_renter_contact_info")

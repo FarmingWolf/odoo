@@ -175,7 +175,8 @@
                             </group>
                             <field name="registration_addr" readonly="not edit_on_hist_page"
                                    invisible="state != 'recording'">
-                                <tree string="设置" create="1" delete="1" edit="1" import="0" editable="bottom" multi_edit="1">
+                                <tree string="设置" create="1" delete="1" edit="1" import="0" editable="bottom"
+                                      multi_edit="1">
                                     <field name="company_id" column_invisible="1"/>
                                     <field name="sequence" widget="handle"/>
                                     <field name="name"/>
@@ -183,7 +184,8 @@
                                     <field name="price" digits="[12, 2]" sum="总金额（元）"/>
                                 </tree>
                             </field>
-                            <field name="contract_registration_addr_rel_id" readonly="1" invisible="state == 'recording'">
+                            <field name="contract_registration_addr_rel_id" readonly="1"
+                                   invisible="state == 'recording'">
                                 <tree string="查看">
                                     <field name="registration_addr_id"/>
                                     <field name="party_b_associated_company_id"/>
@@ -423,20 +425,16 @@
 
     <record id="estate_lease_contract_party_b_view_tree" model="ir.ui.view">
         <field name="name">estate.lease.contract.party.b.tree</field>
-        <field name="model">estate.lease.contract</field>
+        <field name="model">res.partner</field>
         <field name="arch" type="xml">
-            <tree string="入驻企业花名册"
-                  decoration-success="date_rent_end &gt;= context_today()"
-                  decoration-muted="date_rent_end &lt; context_today()"
-                  create="False" delete="False" edit="False" import="False" open_form_view="True" default_order="renter_id">
-                <field name="default_context_contract_id" column_invisible="1"/>
-                <field name="party_a_unit_invisible" column_invisible="1"/>
-                <field name="date_rent_end" column_invisible="1"/>
-                <field name="sequence" widget="handle"/>
-                <field name="renter_id" string="入驻企业/个人"/>
-                <field name="renter_contact_name"/>
-                <field name="renter_contact_tel"/>
-                <field name="renter_company_id" column_invisible="1"/>
+            <tree string="入驻企业花名册" create="false" delete="false" edit="false" import="false" default_order="name">
+                <field name="name"/>
+                <field name="phone"/>
+                <field name="mobile"/>
+                <field name="contract_party_b_contact_name"/>
+                <field name="contract_party_b_contact_tel"/>
+                <field name="is_company"/>
+                <field name="party_b_properties"/>
             </tree>
         </field>
     </record>
@@ -529,7 +527,8 @@
                                         </div>
                                     </div>
                                     <div class="d-flex ps-1">
-                                        <field class="fa fa-briefcase" name="party_a_unit_id" invisible="party_a_unit_invisible"/>
+                                        <field class="fa fa-briefcase" name="party_a_unit_id"
+                                               invisible="party_a_unit_invisible"/>
                                     </div>
                                     <div class="d-flex ps-1">
                                         <field class="fa fa-briefcase" name="renter_id"/>
@@ -582,19 +581,19 @@
 
     <record id="estate_lease_contract_party_b_action" model="ir.actions.act_window">
         <field name="name">入驻企业花名册</field>
-        <field name="res_model">estate.lease.contract</field>
+        <field name="res_model">res.partner</field>
         <field name="view_mode">tree,form</field>
         <field name="views">[False, "tree"]</field>
         <field name="view_id" ref="estate_lease_contract_party_b_view_tree"/>
         <field name="context">{
-            'search_default_state_valid': True,
-            'search_default_active': True,
-            'contract_read_only': True,
+            'search_default_contracts_valid': True,
             'menu_root': 'estate.lease.contract',
             'from_menu_click_tree': True,
             }
         </field>
-        <field name="domain">[('active', '=', True)]</field>
+        <field name="domain">
+            [('company_id', 'in', allowed_company_ids)]
+        </field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 还没有企业入驻。
@@ -602,6 +601,17 @@
             <p>
                 说明合同还没录入，或者录入了也没发布。
             </p>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_party_b_view_search" model="ir.ui.view">
+        <field name="name">estate.lease.contract.party.b.view.search</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search string="入驻花名册检索">
+                <filter string="合同有效" name="contracts_valid" domain="[('contracts_valid','=', True)]"/>
+                <filter string="合同失效" name="contracts_invalid" domain="[('contracts_valid','=', False)]"/>
+            </search>
         </field>
     </record>
 
@@ -646,6 +656,18 @@
                     <field string='承租人合同文件夹' name="renter_id" context="{'group_by': 'property_ids'}"/>
                 </searchpanel>
             </search>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_party_a_status_action" model="ir.actions.server">
+        <field name="name">入驻花名册</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="binding_model_id" ref="model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code">
+env.context['is_from_page_click'] = True
+action = model.automatic_set_party_a_status()
         </field>
     </record>
 
