@@ -138,9 +138,9 @@
                                     </group>
                                     <field name="rental_details" readonly="not edit_on_hist_page">
                                         <tree string=""
-                                              decoration-danger="(rental_amount != rental_receivable) or edited"
-                                              decoration-success="rental_received &gt; 0 and rental_received == rental_receivable"
-                                              decoration-warning="rental_received != 0 and rental_received != rental_receivable"
+                                              decoration-danger="(rental_amount - rental_receivable &gt;= 0.01) or edited"
+                                              decoration-success="rental_received &gt; 0 and rental_receivable - rental_received &gt;= 0.01"
+                                              decoration-warning="rental_received != 0 and rental_receivable - rental_received &gt;= 0.01"
                                               readonly="not parent.edit_on_hist_page">
                                             <field name="edited" column_invisible="True"/>
                                             <field name="property_id"/>
