@@ -121,12 +121,18 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
                 if old_val != new_val:  # 本期租金、本期应收、本期开始结束日期、支付日期的调整，视为优惠，必须填写备注
                     if field_name in ['rental_amount', 'rental_receivable', 'date_payment',
                                       'period_date_from', 'period_date_to']:
-                        if 'comment' in vals and vals['comment']:
-                            vals['edited'] = True
-                            break
+                        vals['edited'] = True
+                        if 'comment' in vals:
+                            if vals['comment']:
+                                break
+                            else:
+                                raise UserError('本期租金、本期应收、本期开始结束日期、支付日期的调整，'
+                                                '视为优惠。修改这些字段必须填写备注！')
                         else:
                             _logger.info(f"record.comment={record.comment}")
-                            if not record.comment:
+                            if record.comment:  # 姑且认为已经有了comment就不用再写了 todo
+                                break
+                            else:
                                 raise UserError('本期租金、本期应收、本期开始结束日期、支付日期的调整，'
                                                 '视为优惠。修改这些字段必须填写备注！')
 

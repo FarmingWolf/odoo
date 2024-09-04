@@ -138,9 +138,11 @@
                                     </group>
                                     <field name="rental_details" readonly="not edit_on_hist_page">
                                         <tree string=""
-                                              decoration-danger="(rental_amount - rental_receivable &gt;= 0.01) or edited"
-                                              decoration-success="rental_received &gt; 0 and rental_receivable - rental_received &gt;= 0.01"
-                                              decoration-warning="rental_received != 0 and rental_receivable - rental_received &gt;= 0.01"
+                                              decoration-info="edited and (rental_received &lt; 0.01) and (date_payment &gt;= (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d'))"
+                                              decoration-muted="rental_amount &lt; 0.01 and rental_receivable &lt; 0.01"
+                                              decoration-danger="((date_payment &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')) and rental_received &lt; 0.01 and rental_amount &gt;= 0.01 and rental_receivable &gt; 0.01) or (rental_received &gt;= 0.01 and rental_receivable - rental_received &gt;= 0.01)"
+                                              decoration-warning="(rental_amount - rental_receivable &gt;= 0.01) or (rental_receivable - rental_amount &gt;= 0.01)"
+                                              decoration-success="rental_received &gt; 0 and (rental_received == rental_receivable or rental_received - rental_receivable &gt;= 0 or rental_receivable - rental_received &lt; 0.01)"
                                               readonly="not parent.edit_on_hist_page">
                                             <field name="edited" column_invisible="True"/>
                                             <field name="property_id"/>

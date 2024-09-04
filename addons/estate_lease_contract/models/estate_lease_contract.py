@@ -6,6 +6,7 @@ import random
 from typing import Dict, List
 
 from odoo.http import request
+from odoo.tools.safe_eval import time
 from odoo.tools.translate import _
 
 from dateutil.utils import today
@@ -433,20 +434,18 @@ class Partner(models.Model):
         set_2_false = []
         for partner in partners:
             _logger.debug(f"partner={partner}；partner.contract_party_b_id={partner.contract_party_b_id}")
+            partner_contract_valid_cnt = 0
             for contract in partner.contract_party_b_id:
                 _logger.debug(f"contract={contract};terminated={contract.terminated};"
                               f"date_rent_end={contract.date_rent_end};today={fields.Date.today()}")
                 if not contract.terminated and contract.date_rent_end >= fields.Date.today():
+                    partner_contract_valid_cnt += 1
                     if not partner.contracts_valid:
                         _logger.debug(f"partner.contracts_valid={partner.contracts_valid}改为True")
-                        # partner.contracts_valid = True
-                        # partner.write({'contracts_valid': True})
                         set_2_true.append(partner.id)
                     break
-            if partner.contracts_valid:
+            if partner_contract_valid_cnt == 0 and partner.contracts_valid:
                 _logger.debug(f"partner.contracts_valid={partner.contracts_valid}改为False")
-                # partner.contracts_valid = False
-                # partner.write({'contracts_valid': False})
                 set_2_false.append(partner.id)
 
         if set_2_true:

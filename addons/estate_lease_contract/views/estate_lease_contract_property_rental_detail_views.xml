@@ -22,9 +22,11 @@
             <tree string="estate_lease_contract_property_rental_detail_view_tree"
                   create="context.get('contract_read_only')" delete="context.get('contract_read_only')"
                   edit="context.get('contract_read_only')"
-                  decoration-danger="(rental_amount - rental_receivable &gt;= 0.01) or edited"
-                  decoration-success="rental_received &gt; 0 and rental_receivable - rental_received &gt;= 0.01"
-                  decoration-warning="rental_received != 0 and rental_receivable - rental_received &gt;= 0.01">
+                  decoration-info="edited and (rental_received &lt; 0.01) and (date_payment &gt;= (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d'))"
+                  decoration-muted="rental_amount &lt; 0.01 and rental_receivable &lt; 0.01"
+                  decoration-danger="((date_payment &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')) and rental_received &lt; 0.01 and rental_amount &gt;= 0.01 and rental_receivable &gt; 0.01) or (rental_received &gt;= 0.01 and rental_receivable - rental_received &gt;= 0.01)"
+                  decoration-warning="(rental_amount - rental_receivable &gt;= 0.01) or (rental_receivable - rental_amount &gt;= 0.01)"
+                  decoration-success="rental_received &gt; 0 and (rental_received == rental_receivable or rental_received - rental_receivable &gt;= 0 or rental_receivable - rental_received &lt; 0.01)">
                 <field name="edited" column_invisible="1"/>
                 <field name="contract_id" column_invisible="1"/>
                 <field name="property_id"/>
@@ -95,7 +97,7 @@
                     </group>
                     <button name="action_print_payment_notice" type="object" class="btn btn-primary"
                             icon="fa-file-pdf-o"
-                            string="缴费通知单" title="点击打印缴费通知单" />
+                            string="缴费通知单" title="点击打印缴费通知单"/>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids"/>
@@ -113,9 +115,11 @@
             <tree string="租金催缴明细"
                   create="False" delete="False"
                   edit="context.get('contract_read_only')"
-                  decoration-danger="(rental_amount - rental_receivable &gt;= 0.01) or edited"
-                  decoration-success="rental_received &gt; 0 and rental_receivable - rental_received &gt;= 0.01"
-                  decoration-warning="rental_received != 0 and rental_receivable - rental_received &gt;= 0.01">
+                  decoration-info="edited and (rental_received &lt; 0.01) and (date_payment &gt;= (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d'))"
+                  decoration-muted="rental_amount &lt; 0.01 and rental_receivable &lt; 0.01"
+                  decoration-danger="((date_payment &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')) and rental_received &lt; 0.01 and rental_amount &gt;= 0.01 and rental_receivable &gt; 0.01) or (rental_received &gt;= 0.01 and rental_receivable - rental_received &gt;= 0.01)"
+                  decoration-warning="(rental_amount - rental_receivable &gt;= 0.01) or (rental_receivable - rental_amount &gt;= 0.01)"
+                  decoration-success="rental_received &gt; 0 and (rental_received == rental_receivable or rental_received - rental_receivable &gt;= 0 or rental_receivable - rental_received &lt; 0.01)">
                 <field name="edited" column_invisible="True"/>
                 <field name="property_id"/>
                 <field name="renter_id"/>
@@ -162,11 +166,14 @@
             <search string="租金检索">
                 <filter string="支付月份" name="date_payment_month" date="date_payment"/>
                 <separator/>
-                <filter string="截至本日" name="date_payment_2_today" domain="[('date_payment', '&lt;=', context_today())]"/>
+                <filter string="截至本日" name="date_payment_2_today"
+                        domain="[('date_payment', '&lt;=', context_today())]"/>
                 <separator/>
-                <filter string="截至本月" name="date_payment_2_this_month" domain="[('date_payment', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="截至本月" name="date_payment_2_this_month"
+                        domain="[('date_payment', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
                 <separator/>
-                <filter string="截至本年" name="date_payment_2_this_year" domain="[('date_payment', '&lt;', (context_today() + relativedelta(years=1, month=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="截至本年" name="date_payment_2_this_year"
+                        domain="[('date_payment', '&lt;', (context_today() + relativedelta(years=1, month=1, day=1)).strftime('%Y-%m-%d'))]"/>
                 <searchpanel>
                     <field string='承租人文件夹' name="renter_id" context="{'group_by': 'property_id'}"/>
                 </searchpanel>
