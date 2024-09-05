@@ -1012,6 +1012,7 @@ class EstateLeaseContract(models.Model):
 
     edit_on_hist_page = fields.Boolean(string='历史页面可编辑', default=lambda self: self._compute_edit_on_hist_page(),
                                        compute="_compute_edit_on_hist_page", store=False)
+    parent_id = fields.Integer(string="续租前合同ID")
 
     @api.depends("property_ids", "rental_details")
     def _compute_rental_details(self):
@@ -1154,6 +1155,10 @@ class EstateLeaseContract(models.Model):
         for record in self:
             record.active = False
             record.state = 'recording'
+
+            # 跳转至form录入界面
+            action = self._goto_recording_form(record.id)
+            return action
 
     @api.constrains('property_ids')
     def _check_update(self):
@@ -1342,7 +1347,7 @@ class EstateLeaseContract(models.Model):
             "contract_no": f"{self.contract_no}-xz-01",
             "date_rent_start": self.date_rent_end + timedelta(days=1),
             "date_rent_end": self.date_rent_end + timedelta(days=1) + (self.date_rent_end - self.date_rent_start),
-            "latest_is_renew": True,
+            "parent_id": self.id,
         }
         return self.copy(default)
 
@@ -1491,3 +1496,18 @@ class EstateLeaseContract(models.Model):
             return super()._search(['|', ('id', 'in', ids_origin), ('id', 'in', ids_added)], *args, **kwargs)
         else:
             return super()._search(domain, *args, **kwargs)
+
+    def _goto_recording_form(self, self_id):
+        title = "资产租赁合同（取消发布，重新录入）"
+        # 设置上下文
+        context = {
+            'search_default_active': False,
+            'contract_read_only': False,
+            'menu_root': 'estate.lease.contract'
+        }
+        # 设置域
+        domain = [('id', '=', self_id), ('active', '=', False)]
+
+        # 跳转到新记录的表单视图
+        return self._action_view_record(self_id, title, context, domain)
+
