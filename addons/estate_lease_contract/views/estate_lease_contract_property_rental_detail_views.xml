@@ -120,7 +120,8 @@
                   decoration-danger="((date_payment &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')) and rental_received &lt; 0.01 and rental_amount &gt;= 0.01 and rental_receivable &gt; 0.01) or (rental_received &gt;= 0.01 and rental_receivable - rental_received &gt;= 0.01)"
                   decoration-warning="(rental_amount - rental_receivable &gt;= 0.01) or (rental_receivable - rental_amount &gt;= 0.01)"
                   decoration-success="rental_received &gt; 0 and (rental_received == rental_receivable or rental_received - rental_receivable &gt;= 0 or rental_receivable - rental_received &lt; 0.01)">
-                <field name="edited" column_invisible="True"/>
+                <field name="edited" column_invisible="1"/>
+                <field name="contract_state" column_invisible="1"/>
                 <field name="property_id"/>
                 <field name="renter_id"/>
                 <field name="renter_id_phone"/>
@@ -145,12 +146,10 @@
         <field name="view_mode">tree,form,kanban</field>
         <field name="context">{
             'search_default_date_payment_2_this_month': True,
+            'search_default_is_rental_arrears': True,
             }
         </field>
-        <field name="domain">[
-            ('active', '=', True),
-            ('rental_arrears', '!=', 0),
-            ]
+        <field name="domain">[('active', '=', True), ('contract_state', '=', 'released')]
         </field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -174,6 +173,9 @@
                 <separator/>
                 <filter string="截至本年" name="date_payment_2_this_year"
                         domain="[('date_payment', '&lt;', (context_today() + relativedelta(years=1, month=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="有欠缴" name="is_rental_arrears" domain="[('rental_arrears', '&gt;=', 0.01)]"/>
+                <filter string="无欠缴" name="no_rental_arrears" domain="[('rental_arrears', '&lt;', 0.01)]"/>
                 <searchpanel>
                     <field string='承租人文件夹' name="renter_id" context="{'group_by': 'property_id'}"/>
                 </searchpanel>

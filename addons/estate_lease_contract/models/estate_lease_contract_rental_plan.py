@@ -32,7 +32,7 @@ class EstateLeaseContractRentalPlan(models.Model):
 
     name = fields.Char('资产租赁合同租金方案', required=True, copy=False, default="租金方案名-请重命名")
     rent_targets = fields.One2many("estate.property", "rent_plan_id", string='对应标的')
-    business_method_id = fields.Selection(string="经营性质",
+    business_method_id = fields.Selection(string="经营性质", default="direct_sale",
                                           selection=[('direct_sale', '直营'), ('franchisee', '加盟'),
                                                      ('agent', '代理'), ('direct_and_agent', '直营+代理'),
                                                      ('direct_and_franchisee', '直营+加盟')], )
@@ -40,12 +40,12 @@ class EstateLeaseContractRentalPlan(models.Model):
     business_type_id = fields.Many2one("estate.lease.contract.rental.business.type", string="经营业态")
     main_category = fields.Many2one("estate.lease.contract.rental.main.category", string="主品类")
 
-    billing_method = fields.Selection(string='计费方式', required=True,
+    billing_method = fields.Selection(string='计费方式', required=True, default="by_progress",
                                       selection=[('by_fixed_price', '固定金额'), ('by_percentage', '纯抽成'),
                                                  ('by_progress', '按递增率'),
                                                  ('by_fixed_price_percentage_higher', '保底抽成两者取高')], )
 
-    billing_progress_method_id = fields.Selection(string='递进方式',
+    billing_progress_method_id = fields.Selection(string='递进方式', default="by_period",
                                                   selection=[('by_period', '按时间段'), ('by_turnover', '按营业额'),
                                                              ('no_progress', '无递增')], )
 
@@ -58,12 +58,12 @@ class EstateLeaseContractRentalPlan(models.Model):
                                               'rental_plan_percentage_rel', 'rental_plan_id', 'turnover_percentage_id',
                                               string='营业额抽成详情')
 
-    payment_period = fields.Selection(string="支付周期", required=True,
+    payment_period = fields.Selection(string="支付周期", required=True, default="6",
                                       selection=[('1', '月付'), ('2', '双月付'), ('3', '季付'),
                                                  ('4', '四个月付'), ('6', '半年付'), ('12', '年付')], )
     rent_price = fields.Float(default=0.0, string="租金单价（元/天/㎡）")
 
-    payment_date = fields.Selection(string="租金支付日", required=True,
+    payment_date = fields.Selection(string="租金支付日", required=True, default="period_start_15_bef_this",
                                     selection=[
                                         ('period_start_30_bef_this', '租期开始日的30日前付本期费用'),
                                         ('period_start_15_bef_this', '租期开始日的15日前付本期费用'),
