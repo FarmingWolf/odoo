@@ -66,10 +66,11 @@ class EventEvent(models.Model):
 
     def _ir_attachment_domain(self):
         # 只有新建阶段，有可能打开”添加行“附件列表，这时只看自己的
-        domain = [('company_id', '=', self.env.user.company_id.id), ('create_uid', '=', self.env.user.id)]
-        if not self.stage_id_sequence or self.stage_id_sequence == 0:
-            _logger.info(f"event_attachment_ids_domain={domain}")
-            return domain
+        for record in self:
+            domain = [('company_id', '=', self.env.user.company_id.id), ('create_uid', '=', self.env.user.id)]
+            if not record.stage_id_sequence or record.stage_id_sequence == 0:
+                _logger.info(f"event_attachment_ids_domain={domain}")
+                return domain
 
         # 其他阶段，在form的附件列表中，不用添加create_uid作为约束条件
         domain = [('company_id', '=', self.env.user.company_id.id)]
