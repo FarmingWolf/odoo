@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
 from datetime import timedelta
+from math import ceil, floor
 from typing import Dict, List
 
 from odoo.exceptions import UserError
@@ -149,3 +150,90 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
 
     def action_print_payment_notice(self):
         return self.env.ref('estate_lease_contract.action_print_payment_notice').report_action(self)
+
+    def action_round(self):
+        for record in self:
+            round_method = self.env.context.get('round_method')
+            method_msg = self.env.context.get('method_msg')
+            amount_bef = record.rental_amount
+            receivable_bef = record.rental_receivable
+            if round_method:
+                if round_method == "up2ten":
+                    amount_aft = ceil(record.rental_amount / 10) * 10
+                    receivable_aft = ceil(record.rental_receivable / 10) * 10
+                elif round_method == "round2ten":
+                    amount_aft = round(record.rental_amount / 10) * 10
+                    receivable_aft = round(record.rental_receivable / 10) * 10
+                elif round_method == "down2ten":
+                    amount_aft = floor(record.rental_amount / 10) * 10
+                    receivable_aft = floor(record.rental_receivable / 10) * 10
+                elif round_method == "up2one":
+                    amount_aft = ceil(record.rental_amount)
+                    receivable_aft = ceil(record.rental_receivable)
+                elif round_method == "round2one":
+                    amount_aft = round(record.rental_amount)
+                    receivable_aft = round(record.rental_receivable)
+                elif round_method == "down2one":
+                    amount_aft = floor(record.rental_amount)
+                    receivable_aft = floor(record.rental_receivable)
+                elif round_method == "up2hundred":
+                    amount_aft = ceil(record.rental_amount / 100) * 100
+                    receivable_aft = ceil(record.rental_receivable / 100) * 100
+                elif round_method == "round2hundred":
+                    amount_aft = round(record.rental_amount / 100) * 100
+                    receivable_aft = round(record.rental_receivable / 100) * 100
+                elif round_method == "down2hundred":
+                    amount_aft = floor(record.rental_amount / 100) * 100
+                    receivable_aft = floor(record.rental_receivable / 100) * 100
+                else:
+                    _logger.error("原则上不会出现这样的错误。")
+                    amount_aft = "未知修改"
+                    receivable_aft = "未知修改"
+
+                msg = f"{fields.Date.context_today(record)}{method_msg}," \
+                      f"本期租金[{amount_bef}]→[{amount_aft}];" \
+                      f"本期应收[{receivable_bef}]→[{receivable_aft}]。"
+                record.comment = msg if not record.comment else msg + record.comment
+                record.rental_amount = amount_aft
+                record.rental_receivable = receivable_aft
+                record.edited = True
+
+            else:
+                _logger.error("原则上也不会出现这样的错误。")
+
+    @api.onchange("period_date_from")
+    def _onchange_period_date_from(self):
+        origin_val = self._origin.period_date_from if self._origin else "原始值请手动记录"
+        msg = f"{fields.Date.context_today(self)}修改租期开始日[{origin_val}]→[{self.period_date_from}]。"
+        self.comment = msg if not self.comment else msg + self.comment
+
+    @api.onchange("period_date_to")
+    def _onchange_period_date_to(self):
+        origin_val = self._origin.period_date_to if self._origin else "原始值请手动记录"
+        msg = f"{fields.Date.context_today(self)}修改租期结束日[{origin_val}]→[{self.period_date_to}]。"
+        self.comment = msg if not self.comment else msg + self.comment
+
+    @api.onchange("date_payment")
+    def _onchange_date_payment(self):
+        origin_val = self._origin.date_payment if self._origin else "原始值请手动记录"
+        msg = f"{fields.Date.context_today(self)}修改支付日期[{origin_val}]→[{self.date_payment}]。"
+        self.comment = msg if not self.comment else msg + self.comment
+
+    @api.onchange("rental_amount")
+    def _onchange_rental_amount(self):
+        origin_val = self._origin.rental_amount if self._origin else "原始值请手动记录"
+        msg = f"{fields.Date.context_today(self)}修改本期租金[{origin_val}]→[{self.rental_amount}]。"
+        self.comment = msg if not self.comment else msg + self.comment
+
+    @api.onchange("rental_receivable")
+    def _onchange_rental_receivable(self):
+        origin_val = self._origin.rental_receivable if self._origin else "原始值请手动记录"
+        msg = f"{fields.Date.context_today(self)}修改本期应收[{origin_val}]→[{self.rental_receivable}]。"
+        self.comment = msg if not self.comment else msg + self.comment
+
+    @api.onchange("rental_received")
+    def _onchange_rental_received(self):
+        origin_val = self._origin.rental_received if self._origin else "原始值请手动记录"
+        msg = f"{fields.Date.context_today(self)}修改本期实收[{origin_val}]→[{self.rental_received}]。"
+        self.comment = msg if not self.comment else msg + self.comment
+        

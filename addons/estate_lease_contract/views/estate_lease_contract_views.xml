@@ -153,6 +153,15 @@
                                             <field name="rental_amount" digits="[12, 2]" sum="合计租金：根据资产面积、租金方案自动计算"/>
                                             <field name="rental_receivable" digits="[12, 2]"
                                                    sum="合计应收：请谨慎调整，系统自动记录调整历史"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'up2hundred', 'method_msg': '上取整至百位'}" title="上取整至百位" icon="fa-angle-double-up" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'round2hundred', 'method_msg': '四舍五入至百位'}" title="四舍五入至百位" icon="fa-angle-double-left" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'down2hundred', 'method_msg': '下取整至百位'}" title="下取整至百位" icon="fa-angle-double-down" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'up2ten', 'method_msg': '上取整至十位'}" title="上取整至十位" icon="fa-chevron-up" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'round2ten', 'method_msg': '四舍五入至十位'}" title="四舍五入至十位" icon="fa-chevron-left" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'down2ten', 'method_msg': '下取整至十位'}" title="下取整至十位" icon="fa-chevron-down" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'up2one', 'method_msg': '上取整至个位'}" title="上取整至个位" icon="fa-arrow-up" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'round2one', 'method_msg': '四舍五入至个位'}" title="四舍五入至个位" icon="fa-arrow-left" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'down2one', 'method_msg': '下取整至个位'}" title="下取整至个位" icon="fa-arrow-down" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
                                             <field name="rental_received" digits="[12, 2]"
                                                    sum="合计实收：每期租金收款后，请回填，以保证业务数据一致性"/>
                                         </tree>
