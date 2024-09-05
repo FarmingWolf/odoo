@@ -47,6 +47,7 @@
                 <button type="object" name="action_round" context="{'round_method': 'round2one', 'method_msg': '四舍五入至个位'}" title="四舍五入至个位" icon="fa-arrow-left" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
                 <button type="object" name="action_round" context="{'round_method': 'down2one', 'method_msg': '下取整至个位'}" title="下取整至个位" icon="fa-arrow-down" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
                 <field name="rental_received" digits="[12, 2]" sum="总计实收"/>
+                <button type="object" name="action_confirm_received" title="点击确认本期租金已收齐（等于本期应收）" icon="fa-thumbs-o-up" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
                 <field name="rental_arrears" digits="[12, 2]" sum="总计欠缴"/>
                 <field name="description"/>
             </tree>
@@ -151,6 +152,7 @@
                 <button type="object" name="action_round" context="{'round_method': 'round2one', 'method_msg': '四舍五入至个位'}" title="四舍五入至个位" icon="fa-arrow-left" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
                 <button type="object" name="action_round" context="{'round_method': 'down2one', 'method_msg': '下取整至个位'}" title="下取整至个位" icon="fa-arrow-down" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
                 <field name="rental_received" digits="[12, 2]" sum="总计实收"/>
+                <button type="object" name="action_confirm_received" title="点击确认本期租金已收齐（等于本期应收）" icon="fa-thumbs-o-up" groups="estate_lease_contract.estate_lease_contract_group_manager"/>
                 <field name="rental_arrears" digits="[12, 2]" sum="总计欠缴"/>
             </tree>
         </field>

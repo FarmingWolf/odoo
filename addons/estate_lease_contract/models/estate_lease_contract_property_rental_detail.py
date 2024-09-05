@@ -236,4 +236,12 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
         origin_val = self._origin.rental_received if self._origin else "原始值请手动记录"
         msg = f"{fields.Date.context_today(self)}修改本期实收[{origin_val}]→[{self.rental_received}]。"
         self.comment = msg if not self.comment else msg + self.comment
-        
+
+    def action_confirm_received(self):
+        for record in self:
+            received_bef = record.rental_received
+            received_aft = record.rental_receivable
+            msg = f"{fields.Date.context_today(self)}本期租金收齐[{received_bef}]→[{received_aft}]。"
+            record.comment = msg if not record.comment else msg + record.comment
+            record.rental_received = received_aft
+            record.edited = True
