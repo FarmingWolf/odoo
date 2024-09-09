@@ -14,11 +14,20 @@ import requests
 import win32file
 import tkinter as tk
 from tkinter import ttk
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
+
+# class LogHandler(FileSystemEventHandler):
+#     def on_modified(self, event):
+#         # 当文件被修改时，打印出通知
+#         print(f"Hey, {event.src_path} has been modified!")
+
 
 action_type = "zip"
 # action_type = "unzip" attention!!!
 
-# pyinstaller -F startup.py -i 491logo.png --noconsole todo
+# pyinstaller -F startup.py -i 491logo.png --noconsole todo 这个noconsole可能是个问题
 
 tmp_fn = "estate_management.x_pptx"
 out_zip_fld = "../em/"
@@ -76,7 +85,6 @@ progress_label.pack(pady=10)
 stop_event = threading.Event()
 unzip_event_success = threading.Event()
 
-global em_web_server_process
 em_server_conf_file = '../debian/odoo.conf'
 conf_config = {}
 
@@ -111,6 +119,22 @@ def init_param():
     # 读取conf文件
     global conf_config
     conf_config = read_conf_file()
+
+    # # 创建一个事件处理器实例
+    # event_handler = LogHandler()
+    # # 创建一个观察者实例
+    # observer = Observer()
+    # # 调用 `schedule` 方法来设置观察者监视指定路径
+    # observer.schedule(event_handler, path='.', recursive=False)  # 只监视当前目录下的文件
+    # # 启动观察者
+    # observer.start()
+    # try:
+    #     while True:
+    #         time.sleep(1)  # 防止CPU空转
+    # except KeyboardInterrupt:
+    #     observer.stop()  # 如果收到键盘中断信号，则停止观察者
+    # # 加入这一行是为了确保观察者线程能够优雅地退出
+    # observer.join()
 
 
 def walk_and_delete_folder(del_tgt_folder):
@@ -224,7 +248,7 @@ def unzip_customer_file_with_progress(in_root, in_label, in_bar):
                     while True:
                         if stop_event.is_set():  # 检查是否应该停止
                             break
-                        chunk = source.read(1024 * 1024)  # 每次读取3MB的数据
+                        chunk = source.read(1024 * 1024)  # 每次读取1MB的数据
                         if not chunk:
                             break
                         target.write(chunk)
@@ -352,7 +376,6 @@ def unzip_files(in_root, in_label, in_bar):
         in_label.config(text=f"已完成部署，开始启动服务……")
         in_root.update_idletasks()
         unzip_event_success.set()
-        # start_web_server_button.config(state=tk.NORMAL)
         start_web_server(in_root, in_label, in_bar)
         return True
     except RuntimeError as e:
@@ -392,17 +415,14 @@ def start_em_server(in_root, in_label, in_bar):
                 f"wechat,contacts,estate_dashboard"
     command.extend(['-u', em_addons])
 
-    _logger.info("启动服务执行中……")
-    update_log_and_progress(in_root, in_label, in_bar)
-
+    _logger.debug(f"command={command}")
     try:
         process = subprocess.Popen(command)
-        global em_web_server_process
-        em_web_server_process = process
+        _logger.info("启动服务执行中……")
         start_event.set()
         process.wait()
     except Exception as e:
-        _logger.info(f"启动错误:{e}")
+        _logger.info(f"启动错误:{e}{e.with_traceback}")
         sys.exit(1)
 
 
@@ -416,8 +436,10 @@ def update_log_and_progress(in_root, in_label, in_bar):
     pattern = r'\(\d+/\d+\)'
     pattern_end = r'\d+ modules loaded in \d+\.\d+s'
     while in_bar['value'] < 100:
-        time.sleep(0.1)
+        time.sleep(1)
         in_bar['value'] += 1
+
+        _logger.debug(conf_config['logfile'])
         for line in tail(conf_config['logfile'], 10):
             _logger.debug(line)
             if "INFO postgres odoo.modules.loading load_module_graph" in line:
@@ -450,7 +472,7 @@ def is_server_started(in_root, in_label, in_bar, retry_times=None):
     # 一次0.3秒，300次最多90秒
     loop_cnt = 0
     max_loop = 300
-    while not start_event.is_set():
+    while start_event.is_set():
         loop_cnt += 1
         _logger.debug(f"loop_cnt={loop_cnt}")
         in_label.config(text=f"资产管理平台启动中，请稍候……")
@@ -467,6 +489,7 @@ def is_server_started(in_root, in_label, in_bar, retry_times=None):
             if response.status_code == 200:
                 _logger.info("服务器启动完毕")
                 in_label.config(text=f"资产管理平台启动完毕……")
+                in_bar['value'] = 100
                 in_root.update_idletasks()
                 webbrowser.open_new_tab(url)
                 return True
@@ -495,10 +518,15 @@ def rem_py_files():
 
 def start_web_server(in_root, in_label, in_bar):
     # 启动服务
-    thread_start_em_server = threading.Thread(target=start_em_server, name="ThreadStartEMServer",
-                                              args=(root, progress_label, progress_bar))
-    thread_start_em_server.daemon = True
-    thread_start_em_server.start()
+    # thread_start_em_server = threading.Thread(target=start_em_server, name="ThreadStartEMServer",
+    #                                           args=(root, progress_label, progress_bar))
+    # thread_start_em_server.daemon = True
+    # thread_start_em_server.start()
+    start_em_server(root, progress_label, progress_bar)
+
+    # 如果不是多线程，顺序执行下来可以不用if
+    # while not start_event.is_set():
+    update_log_and_progress(in_root, in_label, in_bar)
 
     # 判断服务器启动结果:重试一次60s，三次为限
     server_started = is_server_started(in_root, in_label, in_bar)
