@@ -84,6 +84,7 @@ progress_label.pack(pady=10)
 # 创建一个停止标志
 stop_event = threading.Event()
 unzip_event_success = threading.Event()
+server_start_success = threading.Event()
 
 em_server_conf_file = '../debian/odoo.conf'
 conf_config = {}
@@ -376,7 +377,6 @@ def unzip_files(in_root, in_label, in_bar):
         in_label.config(text=f"已完成部署，开始启动服务……")
         in_root.update_idletasks()
         unzip_event_success.set()
-        start_web_server(in_root, in_label, in_bar)
         return True
     except RuntimeError as e:
         _logger.info(f"部署时发生错误: {e.with_traceback}")
@@ -433,6 +433,9 @@ def tail(file_path, n=10):
 
 
 def update_log_and_progress(in_root, in_label, in_bar):
+    while not start_event.is_set():
+        time.sleep(1)
+
     pattern = r'\(\d+/\d+\)'
     pattern_end = r'\d+ modules loaded in \d+\.\d+s'
     while in_bar['value'] < 100:
@@ -440,6 +443,16 @@ def update_log_and_progress(in_root, in_label, in_bar):
         in_bar['value'] += 1
 
         _logger.debug(conf_config['logfile'])
+        lines_read = tail(conf_config['logfile'], 10)
+        # 初始化时log为空
+        time_waited = 1
+        while not lines_read:
+            time_waited += 1
+            if time_waited > 100:
+                break
+            time.sleep(1)
+            lines_read = tail(conf_config['logfile'], 10)
+
         for line in tail(conf_config['logfile'], 10):
             _logger.debug(line)
             if "INFO postgres odoo.modules.loading load_module_graph" in line:
@@ -454,13 +467,35 @@ def update_log_and_progress(in_root, in_label, in_bar):
             if end_matches:
                 in_bar['value'] = 100
                 in_root.update_idletasks()
+                server_start_success.set()
+
+    # 根据实际情况看，一般不超过100s
+    if server_start_success.is_set():
+        server_started = True
+    else:
+        server_started = is_server_started(in_root, in_label, in_bar)
+
+    if server_started:
+        _logger.info(f"服务器启动成功！请打开浏览器访问:http://localhost:8069")
+
+        in_label.config(text="资产管理平台运行中，请勿关闭此窗口！")
+        in_bar['value'] = 100
+        in_root.update_idletasks()
+        time.sleep(60)
+        rem_py_files()
+    else:
+        _logger.info("服务器启动失败……")
+        in_label.config(text="服务器启动失败……请关闭窗口，重新启动！")
+        in_root.update_idletasks()
+        # 删除文件
+        delete_files()
 
 
 def is_server_started(in_root, in_label, in_bar, retry_times=None):
     url = "http://localhost:8069"
 
-    _logger.info("开始启动服务器……")
-    in_label.config(text=f"开始启动资产管理平台……")
+    _logger.info("服务器状态判断")
+    in_label.config(text=f"资产管理平台启动状态判断……")
     if retry_times:
         if retry_times > 3:
             return False
@@ -469,40 +504,28 @@ def is_server_started(in_root, in_label, in_bar, retry_times=None):
     else:
         retry_times = 1
 
-    # 一次0.3秒，300次最多90秒
-    loop_cnt = 0
-    max_loop = 300
-    while start_event.is_set():
-        loop_cnt += 1
-        _logger.debug(f"loop_cnt={loop_cnt}")
-        in_label.config(text=f"资产管理平台启动中，请稍候……")
-        in_bar['value'] = loop_cnt / max_loop * 100
-        time.sleep(0.3)
-        in_root.update_idletasks()
-        if loop_cnt > max_loop:
-            in_label.config(text=f"资产管理平台启动失败，请关闭窗口重新启动!")
-            in_root.update_idletasks()
-            return False
+    in_bar['value'] = retry_times / 3 * 100
+    in_root.update_idletasks()
 
-        try:
-            response = requests.get(url)
-            if response.status_code == 200:
-                _logger.info("服务器启动完毕")
-                in_label.config(text=f"资产管理平台启动完毕……")
-                in_bar['value'] = 100
-                in_root.update_idletasks()
-                webbrowser.open_new_tab(url)
-                return True
-            else:
-                _logger.info(f"服务器启动失败 status code={response.status_code}。自动再尝试……")
-                time.sleep(5)
-                is_server_started(in_root, in_label, in_bar, retry_times)
-                return False
-        except requests.ConnectionError as e:
-            _logger.info(f"服务器连接失败。{e.with_traceback}")
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            _logger.info("服务器启动完毕")
+            in_label.config(text=f"资产管理平台启动完毕……")
+            in_bar['value'] = 100
+            in_root.update_idletasks()
+            webbrowser.open_new_tab(url)
+            return True
+        else:
+            _logger.info(f"服务器启动失败 status code={response.status_code}。自动再尝试……")
             time.sleep(5)
             is_server_started(in_root, in_label, in_bar, retry_times)
             return False
+    except requests.ConnectionError as e:
+        _logger.info(f"服务器连接失败。{e.with_traceback}")
+        time.sleep(5)
+        is_server_started(in_root, in_label, in_bar, retry_times)
+        return False
 
 
 def rem_py_files():
@@ -517,34 +540,12 @@ def rem_py_files():
 
 
 def start_web_server(in_root, in_label, in_bar):
-    # 启动服务
-    # thread_start_em_server = threading.Thread(target=start_em_server, name="ThreadStartEMServer",
-    #                                           args=(root, progress_label, progress_bar))
-    # thread_start_em_server.daemon = True
-    # thread_start_em_server.start()
-    start_em_server(root, progress_label, progress_bar)
+    # 启动服务，还没解压完成就等待
+    while not unzip_event_success.is_set():
+        time.sleep(1)
 
-    # 如果不是多线程，顺序执行下来可以不用if
-    # while not start_event.is_set():
-    update_log_and_progress(in_root, in_label, in_bar)
-
-    # 判断服务器启动结果:重试一次60s，三次为限
-    server_started = is_server_started(in_root, in_label, in_bar)
-    if not server_started:
-        _logger.info("服务器启动失败……")
-        in_label.config(text="服务器启动失败……请关闭窗口，重新启动！")
-        in_root.update_idletasks()  # 更新GUI，确保进度条立即反映变化
-        # 删除文件
-        delete_files()
-
-    if server_started:
-        _logger.info(f"服务器启动成功！请打开浏览器访问:http://localhost:8069")
-
-        in_label.config(text="资产管理平台运行中，请勿关闭此窗口！")
-        in_root.minsize(0, 0)
-        time.sleep(60)
-        rem_py_files()
-        # thread_start_em_server.join()
+    # 解压完成，就启动，内部另起子线程来启动server
+    start_em_server(in_root, in_label, in_bar)
 
 
 def main():
@@ -576,6 +577,18 @@ def main():
                                         args=(root, progress_label, progress_bar))
         thread_unzip.daemon = True
         thread_unzip.start()
+
+        # 另起线程启动服务
+        thread_start_webserver = threading.Thread(target=start_web_server, name="ThreadStartWebServer",
+                                                  args=(root, progress_label, progress_bar))
+        thread_start_webserver.daemon = True
+        thread_start_webserver.start()
+
+        # 另起线程观察服务启动状态
+        thread_log_progress = threading.Thread(target=update_log_and_progress, name="ThreadLogProcess",
+                                               args=(root, progress_label, progress_bar))
+        thread_log_progress.daemon = True
+        thread_log_progress.start()
 
     elif action_type == "zip":
         thread_zip_tgt = threading.Thread(target=zip_tgt_files, name="ThreadZipTgtFiles",
