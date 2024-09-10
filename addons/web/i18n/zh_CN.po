@@ -4669,8 +4669,8 @@ msgstr "伊斯兰教徒"
 #. odoo-javascript
 #: code:addons/web/static/src/webclient/user_menu/user_menu_items.js:0
 #, python-format
-msgid "My Odoo.com account"
-msgstr "Odoo.com账户"
+msgid "My 491Tech account"
+msgstr "491科技账户"
 
 #. module: web
 #. odoo-javascript
