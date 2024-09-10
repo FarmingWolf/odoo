@@ -134,6 +134,6 @@ Dialog.defaultProps = {
     header: true,
     size: "lg",
     technical: true,
-    title: "Odoo",
+    title: "491Tech",
     withBodyPadding: true,
 };
