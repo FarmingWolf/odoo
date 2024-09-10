@@ -26,7 +26,7 @@ var Dialog = Widget.extend({
     /**
      * @param {Widget} parent
      * @param {Object} [options]
-     * @param {string} [options.title=Odoo]
+     * @param {string} [options.title=491Tech]
      * @param {string} [options.subtitle]
      * @param {string} [options.size=large] - 'extra-large', 'large', 'medium'
      *        or 'small'
@@ -72,7 +72,7 @@ var Dialog = Widget.extend({
             this._opened = this.opened(this.on_attach_callback);
         }
         options = Object.assign({
-            title: _t('Odoo'), subtitle: '',
+            title: _t('491Tech'), subtitle: '',
             size: 'large',
             fullscreen: false,
             dialogClass: '',
