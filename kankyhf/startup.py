@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import logging
 import os
 import re
@@ -10,10 +11,14 @@ import webbrowser
 import zipfile
 from collections import deque
 
+import psutil
 import requests
 import win32file
 import tkinter as tk
 from tkinter import ttk
+from datetime import datetime
+
+from dateutil.relativedelta import relativedelta
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -26,8 +31,13 @@ from watchdog.events import FileSystemEventHandler
 
 action_type = "zip"
 # action_type = "unzip" attention!!!
+"""
 
-# pyinstaller -F startup.py -i 491logo.png --noconsole todo 这个noconsole可能是个问题
+pyinstaller -F startup.py -i ./img/491logo.png --noconsole
+xcopy /d /y .\dist\startup.exe .\
+
+
+"""
 
 tmp_fn = "estate_management.x_pptx"
 out_zip_fld = "../em/"
@@ -88,6 +98,10 @@ server_start_success = threading.Event()
 
 em_server_conf_file = '../debian/odoo.conf'
 conf_config = {}
+icon_file = tk.PhotoImage(file='./img/491logo.png')
+url = "http://localhost:8069"
+browser_opened_event = threading.Event()
+web_server_process = None
 
 
 def read_conf_file():
@@ -117,6 +131,7 @@ def init_param():
     if action_type == 'unzip':
         root.title("资产管理服务平台启动进度提示——491Tech")
 
+    root.iconphoto(True, icon_file)
     # 读取conf文件
     global conf_config
     conf_config = read_conf_file()
@@ -365,7 +380,7 @@ def unzip_files(in_root, in_label, in_bar):
                     zip_ref.extract(zip_info, tgt_file_pt)
                     if filename.endswith(py_f_subfix):
                         new_fn = (tgt_file_pt + zip_info.filename).replace(py_f_subfix, ".py")
-                        _logger.debug(f"生成文件：{new_fn}")
+                        # _logger.debug(f"生成文件：{new_fn}")
                         os.renames(tgt_file_pt + zip_info.filename, new_fn)
                     file_extracted += 1
 
@@ -417,10 +432,11 @@ def start_em_server(in_root, in_label, in_bar):
 
     _logger.debug(f"command={command}")
     try:
-        process = subprocess.Popen(command)
+        global web_server_process
+        web_server_process = subprocess.Popen(command, creationflags=subprocess.CREATE_NO_WINDOW)
         _logger.info("启动服务执行中……")
         start_event.set()
-        process.wait()
+        web_server_process.wait()
     except Exception as e:
         _logger.info(f"启动错误:{e}{e.with_traceback}")
         sys.exit(1)
@@ -437,37 +453,88 @@ def update_log_and_progress(in_root, in_label, in_bar):
         time.sleep(1)
 
     pattern = r'\(\d+/\d+\)'
-    pattern_end = r'\d+ modules loaded in \d+\.\d+s'
+    pattern_end = r'\d{3} modules loaded in \d+\.\d+s'
+    pattern_time = r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}'
+    in_label.config(text="资产管理平台启动中……")
+    in_bar['value'] = 0
+    in_root.update_idletasks()
+    _logger.debug(f"日志文件：{conf_config['logfile']}")
     while in_bar['value'] < 100:
         time.sleep(1)
         in_bar['value'] += 1
-
-        _logger.debug(conf_config['logfile'])
+        in_root.update_idletasks()
         lines_read = tail(conf_config['logfile'], 10)
+        _logger.debug(f"lines_read={lines_read}")
         # 初始化时log为空
         time_waited = 1
+        max_wait = 100
         while not lines_read:
             time_waited += 1
-            if time_waited > 100:
+            if time_waited > max_wait:
                 break
             time.sleep(1)
             lines_read = tail(conf_config['logfile'], 10)
 
-        for line in tail(conf_config['logfile'], 10):
-            _logger.debug(line)
-            if "INFO postgres odoo.modules.loading load_module_graph" in line:
-                if "Loading module" in line:
+        # 万一日志文件的输出有问题，也不能无限等待下去
+        times_wait = 0
+        latest_time_read = ""
+        while not server_start_success.is_set():
+            times_wait += 1
+            in_bar['value'] = times_wait if times_wait > in_bar['value'] else in_bar['value']
+            in_root.update_idletasks()
+            time.sleep(1)
+            if times_wait > max_wait:
+                break
+
+            lines_read = tail(conf_config['logfile'], 10)
+            latest_time_read_in_these_lines = ""
+            these_lines_all_error = True
+            for line in lines_read:
+                _logger.debug(f"一行日志line={line}")
+                line = line.strip()
+                if not line:
+                    _logger.debug(f"not line={line}")
+                    continue
+                # 取出年月日时分秒
+                log_time_match = re.findall(pattern_time, line)
+                _logger.debug(f"log_time_match={log_time_match}；latest_time_read={latest_time_read}")
+                if log_time_match:
+                    these_lines_all_error = False
+                    log_time = log_time_match[0]
+                    if log_time > latest_time_read_in_these_lines:
+                        latest_time_read_in_these_lines = log_time
+                    if log_time > latest_time_read:
+                        latest_time_read = log_time
+                    # 如果日志时间比刚才读出的时间还小，说明log文件尚未更新又都出来了
+                    if log_time < latest_time_read:
+                        time.sleep(5)
+                        break
+                else:
+                    continue
+
+                # tgt_time = datetime.now() - relativedelta(hours=8, minutes=10)
+                # _logger.debug(f"log_time{log_time}与tgt_time{tgt_time}比较")
+                # if log_time < tgt_time.strftime("%Y-%m-%d %H:%M:%S"):
+                #     _logger.debug(f"再等一圈")
+                #     time.sleep(1)
+                #     break
+
+                if "INFO postgres odoo.modules.loading load_module_graph" in line and "Loading module" in line:
                     matches = re.findall(pattern, line)
                     if matches:
+                        _logger.info(f"启动进度：{matches}")
                         number_s = re.findall(r'\d+', matches[0])
-                        tmp_v = number_s[0] / number_s[1] * 100
+                        tmp_v = int(number_s[0]) / int(number_s[1]) * 100
                         in_bar['value'] = tmp_v if tmp_v > in_bar['value'] else in_bar['value']
                         in_root.update_idletasks()
-            end_matches = re.findall(pattern_end, line)
-            if end_matches:
-                in_bar['value'] = 100
-                in_root.update_idletasks()
-                server_start_success.set()
+                end_matches = re.findall(pattern_end, line)
+                if end_matches or "Registry loaded in " in line or 'Bus.loop listen imbus on db' in line:
+                    _logger.info(f"启动进度直达最后：{end_matches}或者'Registry loaded in'或者'Bus.loop listen imbus on db'")
+                    # 保险起见，还是得看is_server_started
+                    if is_server_started(in_root, in_label, in_bar):
+                        in_bar['value'] = 100
+                        in_root.update_idletasks()
+                        server_start_success.set()
 
     # 根据实际情况看，一般不超过100s
     if server_start_success.is_set():
@@ -476,13 +543,18 @@ def update_log_and_progress(in_root, in_label, in_bar):
         server_started = is_server_started(in_root, in_label, in_bar)
 
     if server_started:
-        _logger.info(f"服务器启动成功！请打开浏览器访问:http://localhost:8069")
+        _logger.info(f"服务器启动成功！请打开浏览器访问:{url}")
 
         in_label.config(text="资产管理平台运行中，请勿关闭此窗口！")
         in_bar['value'] = 100
         in_root.update_idletasks()
+        if not browser_opened_event.is_set():
+            webbrowser.open_new_tab(url)
+            browser_opened_event.set()
         time.sleep(60)
         rem_py_files()
+        stop_server_button.config(state=tk.NORMAL)
+        in_root.update_idletasks()
     else:
         _logger.info("服务器启动失败……")
         in_label.config(text="服务器启动失败……请关闭窗口，重新启动！")
@@ -492,7 +564,6 @@ def update_log_and_progress(in_root, in_label, in_bar):
 
 
 def is_server_started(in_root, in_label, in_bar, retry_times=None):
-    url = "http://localhost:8069"
 
     _logger.info("服务器状态判断")
     in_label.config(text=f"资产管理平台启动状态判断……")
@@ -514,7 +585,11 @@ def is_server_started(in_root, in_label, in_bar, retry_times=None):
             in_label.config(text=f"资产管理平台启动完毕……")
             in_bar['value'] = 100
             in_root.update_idletasks()
-            webbrowser.open_new_tab(url)
+            stop_server_button.config(state=tk.NORMAL)
+            in_root.update_idletasks()
+            if not browser_opened_event.is_set():
+                webbrowser.open_new_tab(url)
+                browser_opened_event.set()
             return True
         else:
             _logger.info(f"服务器启动失败 status code={response.status_code}。自动再尝试……")
@@ -549,61 +624,81 @@ def start_web_server(in_root, in_label, in_bar):
 
 
 def main():
-    progress_bar['value'] = 0
-    progress_label.config(text="开始处理...")
-    root.update_idletasks()  # 更新GUI，确保进度条立即反映变化
-    start_distribute_button.config(state=tk.DISABLED)
-    if zip_all_addons:
-
-        progress_label.config(text=f"即将处理模块{len(zip_tgt_folders)}个")
+    try:
+        progress_bar['value'] = 0
+        progress_label.config(text="开始处理...")
         root.update_idletasks()  # 更新GUI，确保进度条立即反映变化
-        for root_fld, dirs, files in os.walk(tgt_file_pt):
-            if root_fld == tgt_file_pt:
-                for each_dir in dirs:
-                    if os.path.basename(each_dir) not in zip_tgt_folders:
-                        zip_tgt_folders.append(os.path.basename(each_dir))
-                        progress_label.config(text=f"即将处理模块{len(zip_tgt_folders)}个")
-                        root.update_idletasks()  # 更新GUI，确保进度条立即反映变化
-            else:
-                break
+        start_distribute_button.config(state=tk.DISABLED)
+        if zip_all_addons:
 
-    _logger.debug(f"zip_tgt_folders{len(zip_tgt_folders)}个={zip_tgt_folders}")
+            progress_label.config(text=f"即将处理模块{len(zip_tgt_folders)}个")
+            root.update_idletasks()  # 更新GUI，确保进度条立即反映变化
+            for root_fld, dirs, files in os.walk(tgt_file_pt):
+                if root_fld == tgt_file_pt:
+                    for each_dir in dirs:
+                        if os.path.basename(each_dir) not in zip_tgt_folders:
+                            zip_tgt_folders.append(os.path.basename(each_dir))
+                            progress_label.config(text=f"即将处理模块{len(zip_tgt_folders)}个")
+                            root.update_idletasks()  # 更新GUI，确保进度条立即反映变化
+                else:
+                    break
 
-    if action_type == "unzip":
-        # 先解压缩，部署
-        # if not unzip_files(root, progress_label, progress_bar):
-        #     return False
-        thread_unzip = threading.Thread(target=unzip_files, name="ThreadUnzipTgtFiles",
-                                        args=(root, progress_label, progress_bar))
-        thread_unzip.daemon = True
-        thread_unzip.start()
+        _logger.debug(f"zip_tgt_folders{len(zip_tgt_folders)}个={zip_tgt_folders}")
 
-        # 另起线程启动服务
-        thread_start_webserver = threading.Thread(target=start_web_server, name="ThreadStartWebServer",
-                                                  args=(root, progress_label, progress_bar))
-        thread_start_webserver.daemon = True
-        thread_start_webserver.start()
+        if action_type == "unzip":
+            # 先解压缩，部署
+            # if not unzip_files(root, progress_label, progress_bar):
+            #     return False
+            thread_unzip = threading.Thread(target=unzip_files, name="ThreadUnzipTgtFiles",
+                                            args=(root, progress_label, progress_bar))
+            thread_unzip.daemon = True
+            thread_unzip.start()
 
-        # 另起线程观察服务启动状态
-        thread_log_progress = threading.Thread(target=update_log_and_progress, name="ThreadLogProcess",
-                                               args=(root, progress_label, progress_bar))
-        thread_log_progress.daemon = True
-        thread_log_progress.start()
+            # 另起线程启动服务
+            thread_start_webserver = threading.Thread(target=start_web_server, name="ThreadStartWebServer",
+                                                      args=(root, progress_label, progress_bar))
+            thread_start_webserver.daemon = True
+            thread_start_webserver.start()
 
-    elif action_type == "zip":
-        thread_zip_tgt = threading.Thread(target=zip_tgt_files, name="ThreadZipTgtFiles",
-                                          args=(root, progress_label, progress_bar))
-        thread_zip_tgt.daemon = True
-        thread_zip_tgt.start()
+            # 另起线程观察服务启动状态
+            thread_log_progress = threading.Thread(target=update_log_and_progress, name="ThreadLogProcess",
+                                                   args=(root, progress_label, progress_bar))
+            thread_log_progress.daemon = True
+            thread_log_progress.start()
 
-    else:
-        _logger.info(f"action_type={action_type}，Nothing done.")
+        elif action_type == "zip":
+            thread_zip_tgt = threading.Thread(target=zip_tgt_files, name="ThreadZipTgtFiles",
+                                              args=(root, progress_label, progress_bar))
+            thread_zip_tgt.daemon = True
+            thread_zip_tgt.start()
+
+        else:
+            _logger.info(f"action_type={action_type}，Nothing done.")
+
+    except Exception as e:
+        _logger.info(f"main启动错误:{e}{e.with_traceback}")
+        sys.exit(1)
 
 
 def close_window():
-    # 设置标志位以便工作线程检查并退出
-    stop_event.set()
-    root.after(100, root.destroy)  # 给线程一些时间来检查标志位
+    try:
+        stop_web_server()
+        # 设置标志位以便工作线程检查并退出
+        stop_event.set()
+        root.after(100, root.destroy)  # 给线程一些时间来检查标志位
+    except Exception as e:
+        _logger.info(f"停止服务发生未知错误: {e}{e.with_traceback}")
+        sys.exit(1)
+
+
+def stop_web_server():
+    global web_server_process
+    if web_server_process:
+        process = psutil.Process(web_server_process.pid)
+        for child in process.children(recursive=True):  # 先杀死子进程
+            child.kill()
+        process.kill()
+        web_server_process = None  # 最后杀死父进程
 
 
 container = tk.Frame(root)
@@ -611,9 +706,9 @@ container.pack(expand=True, fill='both')
 # 创建一个按钮启动处理过程
 start_distribute_button = tk.Button(container, text="开始/启动", command=main, width=10)
 start_distribute_button.pack(side=tk.LEFT, padx=(230, 5))
-# start_web_server_button = tk.Button(container, text="2.启动服务", command=start_web_server, width=10)
-# start_web_server_button.pack(side=tk.LEFT, padx=50)
-# start_web_server_button.config(state=tk.DISABLED)
+stop_server_button = tk.Button(container, text="停止服务", command=stop_web_server, width=10)
+stop_server_button.pack(side=tk.LEFT, padx=50)
+stop_server_button.config(state=tk.DISABLED)
 close_button = tk.Button(container, text="取消/关闭", command=close_window, width=10)
 close_button.pack(side=tk.LEFT, padx=50)
 
