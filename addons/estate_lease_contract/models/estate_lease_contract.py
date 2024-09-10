@@ -422,7 +422,7 @@ class Partner(models.Model):
         _logger.debug(f"self.env.user.company_id={self.env.user.company_id}")
         self.env['res.partner'].search([('id', '=', partner_id)]).write({'company_id': self.env.user.company_id.id})
 
-        return id, display_name
+        return partner_id, display_name
 
     def automatic_set_party_a_status(self):
         # 更新本公司下的花名册

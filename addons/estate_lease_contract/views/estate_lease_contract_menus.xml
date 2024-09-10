@@ -10,11 +10,11 @@
             <menuitem id="estate_lease_contract_menu_setting_tag" action="estate_lease_contract_action_tag"/>
             <menuitem id="estate_lease_contract_menu_setting_rental_business_type" action="estate_lease_contract_rental_business_type_action"/>
             <menuitem id="estate_lease_contract_menu_setting_rental_main_category" action="estate_lease_contract_rental_main_category_action"/>
-            <menuitem id="estate_lease_contract_menu_setting_rental_turnover_percentage" action="estate_lease_contract_rental_turnover_percentage_action"/>
+<!--            <menuitem id="estate_lease_contract_menu_setting_rental_turnover_percentage" action="estate_lease_contract_rental_turnover_percentage_action"/>-->
             <menuitem id="estate_lease_contract_menu_setting_rental_period_percentage" action="estate_lease_contract_rental_period_percentage_action"/>
             <menuitem id="estate_lease_contract_menu_setting_rental_plan" action="estate_lease_contract_rental_plan_action"/>
-            <menuitem id="estate_lease_contract_menu_setting_property_management_fee_plan" action="estate_lease_contract_property_management_fee_plan_action"/>
-            <menuitem id="estate_lease_contract_menu_setting_contract_incentives" action="estate_lease_contract_incentives_action"/>
+<!--            <menuitem id="estate_lease_contract_menu_setting_property_management_fee_plan" action="estate_lease_contract_property_management_fee_plan_action"/>-->
+<!--            <menuitem id="estate_lease_contract_menu_setting_contract_incentives" action="estate_lease_contract_incentives_action"/>-->
             <menuitem id="estate_lease_contract_menu_setting_party_a_unit" action="estate_lease_contract_party_a_unit_action"/>
             <menuitem id="estate_lease_contract_menu_setting_contract_accounts" action="estate_lease_contract_bank_account_action"/>
         </menuitem>
