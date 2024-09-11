@@ -1144,17 +1144,29 @@ class EstateLeaseContract(models.Model):
             # 根据合同生效日期判断state
             if record.date_start <= date.today():
                 record.state = 'released'
+                for each_property in record.property_ids:
+                    if each_property.state != "sold":
+                        each_property.state = "sold"
             else:
                 record.state = 'to_be_released'
+                for each_property in record.property_ids:
+                    if each_property.state != "offer_accepted":
+                        each_property.state = "offer_accepted"
 
             if record.date_rent_end < date.today():
                 record.state = 'invalid'
+                for each_property in record.property_ids:
+                    if each_property.state != "out_dated":
+                        each_property.state = "out_dated"
 
     # 取消发布合同
     def action_cancel_release_contract(self):
         for record in self:
             record.active = False
             record.state = 'recording'
+            for each_property in record.property_ids:
+                if each_property.state != "offer_received":
+                    each_property.state = "offer_received"
 
             # 跳转至form录入界面
             action = self._goto_recording_form(record.id)
