@@ -270,8 +270,18 @@
                         <div class="oe_kanban_global_click">
                             <div class="o_kanban_card">
                                 <div class="o_kanban_record_title">
-                                    <field name="name"/><br/>
-                                    <field name="state"/>
+                                    <field name="name"/>
+                                    <br/>
+                                    <div class="o_kanban_record_bottom">
+                                        <div class="oe_kanban_bottom_left">
+                                            <field name="rent_area"/>
+                                            <span>㎡</span>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <field name="state" widget="badge" decoration-success="state == 'sold'"
+                                                   decoration-warning="state == 'canceled'"/>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
