@@ -10,12 +10,14 @@ import time
 import webbrowser
 import zipfile
 from collections import deque
+from tkinter.font import Font
 
 import psutil
 import requests
 import win32file
 import tkinter as tk
 from tkinter import ttk
+from tkinter import PhotoImage
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
@@ -125,12 +127,27 @@ def read_conf_file():
     return config
 
 
+def set_button_bg(in_action_type):
+    if in_action_type == 'zip':
+        bg_color = "#bee9ee"
+        start_distribute_button.config(text="制作文件")
+    else:
+        bg_color = "#c6c6c6"
+
+    button_font = Font(family='宋体', size=10, weight='bold')
+    start_distribute_button.config(bg=bg_color, fg="black", font=button_font)
+    stop_server_button.config(bg=bg_color, fg="black", font=button_font)
+    close_button.config(bg=bg_color, fg="black", font=button_font)
+
+
 def init_param():
     if action_type == 'zip':
         root.title("资产管理服务平台产品发布进度提示——491Tech")
+
     if action_type == 'unzip':
         root.title("资产管理服务平台启动进度提示——491Tech")
 
+    set_button_bg(action_type)
     root.iconphoto(True, icon_file)
     # 读取conf文件
     global conf_config
