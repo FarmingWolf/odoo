@@ -508,26 +508,24 @@
                         <div t-attf-class="d-flex flex-column p-0 oe_kanban_card oe_kanban_global_click">
                             <div class="o_kanban_content p-0 m-0 position-relative row d-flex flex-fill">
                                 <div class="col-4 text-bg-primary p-2 text-center d-flex flex-column justify-content-center">
-                                    <div t-esc="luxon.DateTime.fromISO(record.date_rent_start.raw_value).toFormat('yyyy-MMM-d')"/>
+                                    <div t-esc="luxon.DateTime.fromISO(record.date_rent_start.raw_value).toFormat('yyyy-MMM-d')" title="计租开始日期"/>
                                     <div>
                                         <i class="oi oi-arrow-right me-2 o_event_fontsize_09" title="至"/>
                                     </div>
+                                    <div t-esc="luxon.DateTime.fromISO(record.date_rent_end.raw_value).toFormat('yyyy-MMM-d')" title="计租结束日期"/>
                                     <div>
-                                        <t t-esc="luxon.DateTime.fromISO(record.date_rent_end.raw_value).toFormat('yyyy-MMM-d')"/>
-                                    </div>
-                                    <div>
-                                        <i class="fa fa-cny me-2 o_event_fontsize_09" title="年租金"/>
+                                        <i class="fa fa-cny me-2 o_event_fontsize_09" title="年租金(元)"/>
                                         <t t-esc="record.rent_amount_year.value"/>
                                     </div>
                                     <div>
                                         <t t-if="record.parking_space_count != 0">
-                                            <i class="fa fa-car me-2 o_event_fontsize_09" title="车位"/>
-                                            <field name="parking_space_count"/>
+                                            <i class="fa fa-car me-2 o_event_fontsize_09" title="车位（个）"/>
+                                            <field name="parking_space_count" help="车位（个）"/>
                                             <span>　</span>
                                         </t>
                                         <t t-if="record.registration_addr_count != 0">
-                                            <i class="fa fa-address-card-o me-2 o_event_fontsize_09" title="注册地址"/>
-                                            <field name="registration_addr_count"/>
+                                            <i class="fa fa-address-card-o me-2 o_event_fontsize_09" title="注册地址（个）"/>
+                                            <field name="registration_addr_count" help="注册地址（个）"/>
                                         </t>
                                     </div>
                                 </div>
@@ -548,6 +546,7 @@
                                     <div class="o_kanban_record_bottom">
 
                                         <div class="oe_kanban_bottom_left">
+                                            <i class="fa fa-money" title="中介费（元）" groups="estate_lease_contract.contract_brokerage_fee_manage" />
                                             <field name="brokerage_fee"
                                                    groups="estate_lease_contract.contract_brokerage_fee_manage"/>
                                         </div>
