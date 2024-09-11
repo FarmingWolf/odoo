@@ -149,8 +149,11 @@
                                             <field name="rental_period_no"/>
                                             <field name="period_date_from"/>
                                             <field name="period_date_to"/>
+                                            <field name="period_days" sum="总计天数"/>
                                             <field name="date_payment"/>
                                             <field name="rental_amount" digits="[12, 2]" sum="合计租金：根据资产面积、租金方案自动计算"/>
+                                            <field name="incentive_amount" digits="[12, 2]" sum="总计优惠"/>
+                                            <field name="incentive_days" digits="[12, 0]" sum="总计优惠天数"/>
                                             <field name="rental_receivable" digits="[12, 2]"
                                                    sum="合计应收：请谨慎调整，系统自动记录调整历史"/>
                                             <button type="object" name="action_round" context="{'round_method': 'up2hundred', 'method_msg': '上取整至百位'}" title="上取整至百位" icon="fa-angle-double-up" groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
@@ -165,6 +168,9 @@
                                             <field name="rental_received" digits="[12, 2]"
                                                    sum="合计实收：每期租金收款后，请回填，以保证业务数据一致性"/>
                                             <button type="object" name="action_confirm_received" title="点击确认本期租金已收齐（等于本期应收）" icon="fa-thumbs-o-up" groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
+                                            <field name="days_received" digits="[12, 0]" sum="总计实收天数"/>
+                                            <field name="rental_arrears" digits="[12, 2]" sum="总计欠缴金额"/>
+                                            <field name="days_arrears" digits="[12, 0]" sum="总计欠缴天数"/>
                                         </tree>
                                     </field>
                                 </group>

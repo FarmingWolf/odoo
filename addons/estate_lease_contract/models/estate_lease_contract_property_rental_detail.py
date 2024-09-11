@@ -14,10 +14,13 @@ _logger = logging.getLogger(__name__)
 
 
 def _get_rental_received_2_date_from_rcd(record):
-    if record.rental_received and record.period_date_from and record.period_date_to and record.rental_amount:
-        days_period = (record.period_date_to - record.period_date_from + timedelta(days=1)).days
-        days_received = record.rental_received / record.rental_amount * days_period
-        record.rental_received_2_date = record.period_date_from + timedelta(days=days_received)
+    if record.rental_received and record.period_date_from and record.period_date_to and record.rental_receivable:
+
+        if record.rental_receivable > 0:
+            record.days_received = record.rental_received / record.rental_receivable * record.days_receivable
+
+        record.days_arrears = record.days_receivable - record.days_received
+        record.rental_received_2_date = record.period_date_from + timedelta(days=record.days_received)
         if record.rental_received_2_date > record.period_date_to:
             if record.rental_received <= record.rental_amount:
                 record.rental_received_2_date = record.period_date_to
@@ -33,8 +36,8 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     contract_id = fields.Many2one('estate.lease.contract', string="合同")
     contract_state = fields.Selection(string="合同状态", related="contract_id.state")
     property_id = fields.Many2one('estate.property', string="租赁标的")
-    rental_amount = fields.Float(default=0.0, string="本期租金(元)", tracking=True)
-    rental_amount_zh = fields.Char(string="本期租金(元)大写", compute="_cal_rental_amount_zh", store=True)
+    rental_amount = fields.Float(default=0.0, string="本期租金(元)", readonly=True)
+    rental_amount_zh = fields.Char(string="本期租金(元)大写", compute="_cal_rental_amount_zh", store=True, readonly=True)
     rental_receivable = fields.Float(default=0.0, string="本期应收(元)", compute="_get_default_rental_receivable",
                                      readonly=False, store=True, tracking=True)
     rental_received = fields.Float(default=0.0, string="本期实收(元)", tracking=True)
@@ -59,14 +62,45 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     report_print_date = fields.Date("房租缴费通知书打印日", store=False, compute="_get_report_print_date")
     rental_received_2_date = fields.Date(string="实收至", compute="_get_rental_received_2_date", readonly=True)
 
+    period_days = fields.Integer(string="本期天数", compute="_get_period_days", readonly=True)
+    incentive_days = fields.Float(string="优惠天数", default=0)
+    incentive_amount = fields.Float(string="优惠金额(元)", default=0)
+    days_receivable = fields.Float(string="应收天数", compute="_get_days_receivable", readonly=True)
+    days_received = fields.Float(string="实收天数", compute="_get_days_received", readonly=True)
+    days_arrears = fields.Float(string="欠缴天数", compute="_get_days_received", readonly=True)
+
+    @api.onchange("period_days")
+    def _onchange_period_days(self):
+        # 不能直接修改优惠日期，因为可能把已经修改的优惠金额改成整期租金，如果已经存在修改的优惠金额，那么应该根据金额来反算优惠天数
+        # if self.incentive_days > self.period_days:
+        #     self.incentive_days = self.period_days
+        self._onchange_incentive_amount()
+        self._onchange_rental_receivable()
+        self._onchange_rental_received()
+
+    @api.depends("incentive_days", "period_days")
+    def _get_days_receivable(self):
+        for record in self:
+            record.days_receivable = record.period_days - record.incentive_days
+
+    @api.depends("incentive_days", "period_days", "rental_received", "incentive_amount")
+    def _get_days_received(self):
+        for record in self:
+            record.days_received = 0
+            if record.rental_receivable != 0:
+                record.days_received = record.rental_received / record.rental_receivable * record.days_receivable
+
+            record.days_arrears = record.days_receivable - record.days_received
+
+    @api.depends("period_date_from", "period_date_to")
+    def _get_period_days(self):
+        for record in self:
+            record.period_days = (record.period_date_to - record.period_date_from + timedelta(days=1)).days
+
     @api.depends("rental_received")
     def _get_rental_received_2_date(self):
         for record in self:
             record.rental_received_2_date = _get_rental_received_2_date_from_rcd(record)
-
-    @api.onchange("rental_received")
-    def _onchange_rental_received(self):
-        self.rental_received_2_date = _get_rental_received_2_date_from_rcd(self)
 
     @api.depends("contract_id")
     def _get_report_print_date(self):
@@ -91,16 +125,15 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
         for record in self:
             record.rental_amount_zh = Utils.arabic_to_chinese(round(record.rental_amount, 2))
 
-    @api.depends("rental_amount", "rental_received")
+    @api.depends("rental_receivable", "rental_received", "incentive_amount", "incentive_days")
     def _compute_rental_arrears(self):
         for record in self:
-            record.rental_arrears = record.rental_amount - record.rental_received
+            record.rental_arrears = record.rental_receivable - record.rental_received
 
-    @api.depends("rental_amount")
+    @api.depends("rental_amount", "incentive_amount", "incentive_days")
     def _get_default_rental_receivable(self):
         for record in self:
-            if not record.rental_receivable:
-                record.rental_receivable = record.rental_amount
+            record.rental_receivable = record.rental_amount - record.incentive_amount
 
     @api.depends("period_date_from")
     def _get_default_date_end(self):
@@ -120,9 +153,10 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
             old_record_values = old_values[i]
             for field_name, new_val in vals.items():
                 old_val = old_record_values[field_name]
-                if old_val != new_val:  # 本期租金、本期应收、本期开始结束日期、支付日期的调整，视为优惠，必须填写备注
+                # 本期租金、本期应收、本期开始结束日期、支付日期、本期优惠天数和本期优惠金额的调整，视为优惠，必须填写备注
+                if old_val != new_val:
                     if field_name in ['rental_amount', 'rental_receivable', 'date_payment',
-                                      'period_date_from', 'period_date_to']:
+                                      'period_date_from', 'period_date_to', 'incentive_days', 'incentive_amount']:
                         vals['edited'] = True
                         if 'comment' in vals:
                             if vals['comment']:
@@ -135,7 +169,7 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
                             if record.comment:  # 姑且认为已经有了comment就不用再写了 todo
                                 break
                             else:
-                                raise UserError('本期租金、本期应收、本期开始结束日期、支付日期的调整，'
+                                raise UserError('本期租金、本期应收、本期开始结束日期、支付日期、本期优惠天数、本期优惠金额的调整，'
                                                 '视为优惠。修改这些字段必须填写备注！')
 
         res = super().write(vals)
@@ -155,47 +189,47 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
         for record in self:
             round_method = self.env.context.get('round_method')
             method_msg = self.env.context.get('method_msg')
-            amount_bef = record.rental_amount
+            # amount_bef = record.rental_amount
             receivable_bef = record.rental_receivable
             if round_method:
                 if round_method == "up2ten":
-                    amount_aft = ceil(record.rental_amount / 10) * 10
+                    # amount_aft = ceil(record.rental_amount / 10) * 10
                     receivable_aft = ceil(record.rental_receivable / 10) * 10
                 elif round_method == "round2ten":
-                    amount_aft = round(record.rental_amount / 10) * 10
+                    # amount_aft = round(record.rental_amount / 10) * 10
                     receivable_aft = round(record.rental_receivable / 10) * 10
                 elif round_method == "down2ten":
-                    amount_aft = floor(record.rental_amount / 10) * 10
+                    # amount_aft = floor(record.rental_amount / 10) * 10
                     receivable_aft = floor(record.rental_receivable / 10) * 10
                 elif round_method == "up2one":
-                    amount_aft = ceil(record.rental_amount)
+                    # amount_aft = ceil(record.rental_amount)
                     receivable_aft = ceil(record.rental_receivable)
                 elif round_method == "round2one":
-                    amount_aft = round(record.rental_amount)
+                    # amount_aft = round(record.rental_amount)
                     receivable_aft = round(record.rental_receivable)
                 elif round_method == "down2one":
-                    amount_aft = floor(record.rental_amount)
+                    # amount_aft = floor(record.rental_amount)
                     receivable_aft = floor(record.rental_receivable)
                 elif round_method == "up2hundred":
-                    amount_aft = ceil(record.rental_amount / 100) * 100
+                    # amount_aft = ceil(record.rental_amount / 100) * 100
                     receivable_aft = ceil(record.rental_receivable / 100) * 100
                 elif round_method == "round2hundred":
-                    amount_aft = round(record.rental_amount / 100) * 100
+                    # amount_aft = round(record.rental_amount / 100) * 100
                     receivable_aft = round(record.rental_receivable / 100) * 100
                 elif round_method == "down2hundred":
-                    amount_aft = floor(record.rental_amount / 100) * 100
+                    # amount_aft = floor(record.rental_amount / 100) * 100
                     receivable_aft = floor(record.rental_receivable / 100) * 100
                 else:
                     _logger.error("原则上不会出现这样的错误。")
-                    amount_aft = "未知修改"
+                    # amount_aft = "未知修改"
                     receivable_aft = "未知修改"
 
                 msg = f"{fields.Date.context_today(record)}{method_msg}," \
-                      f"本期租金[{amount_bef}]→[{amount_aft}];" \
-                      f"本期应收[{receivable_bef}]→[{receivable_aft}]。"
+                      f"本期应收[{round(receivable_bef, 2)}]→[{round(receivable_aft, 2)}]。"
                 record.comment = msg if not record.comment else msg + record.comment
-                record.rental_amount = amount_aft
+                # record.rental_amount = amount_aft
                 record.rental_receivable = receivable_aft
+                self._onchange_rental_receivable()
                 record.edited = True
 
             else:
@@ -204,44 +238,94 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     @api.onchange("period_date_from")
     def _onchange_period_date_from(self):
         origin_val = self._origin.period_date_from if self._origin else "原始值请手动记录"
-        msg = f"{fields.Date.context_today(self)}修改租期开始日[{origin_val}]→[{self.period_date_from}]。"
-        self.comment = msg if not self.comment else msg + self.comment
+        if origin_val != self.period_date_from:
+            msg = f"{fields.Date.context_today(self)}修改租期开始日[{origin_val}]→[{self.period_date_from}]。"
+            self.comment = msg if not self.comment else msg + self.comment
 
     @api.onchange("period_date_to")
     def _onchange_period_date_to(self):
         origin_val = self._origin.period_date_to if self._origin else "原始值请手动记录"
-        msg = f"{fields.Date.context_today(self)}修改租期结束日[{origin_val}]→[{self.period_date_to}]。"
-        self.comment = msg if not self.comment else msg + self.comment
+        if origin_val != self.period_date_to:
+            msg = f"{fields.Date.context_today(self)}修改租期结束日[{origin_val}]→[{self.period_date_to}]。"
+            self.comment = msg if not self.comment else msg + self.comment
 
     @api.onchange("date_payment")
     def _onchange_date_payment(self):
         origin_val = self._origin.date_payment if self._origin else "原始值请手动记录"
-        msg = f"{fields.Date.context_today(self)}修改支付日期[{origin_val}]→[{self.date_payment}]。"
-        self.comment = msg if not self.comment else msg + self.comment
+        if origin_val != self.date_payment:
+            msg = f"{fields.Date.context_today(self)}修改支付日期[{origin_val}]→[{self.date_payment}]。"
+            self.comment = msg if not self.comment else msg + self.comment
 
     @api.onchange("rental_amount")
     def _onchange_rental_amount(self):
         origin_val = self._origin.rental_amount if self._origin else "原始值请手动记录"
-        msg = f"{fields.Date.context_today(self)}修改本期租金[{origin_val}]→[{self.rental_amount}]。"
-        self.comment = msg if not self.comment else msg + self.comment
+        if origin_val != self.rental_amount:
+            msg = f"{fields.Date.context_today(self)}" \
+                  f"修改本期租金[{round(origin_val, 2)}]→[{round(self.rental_amount, 2)}]。"
+            self.comment = msg if not self.comment else msg + self.comment
 
     @api.onchange("rental_receivable")
     def _onchange_rental_receivable(self):
+        self.incentive_amount = self.rental_amount - self.rental_receivable
         origin_val = self._origin.rental_receivable if self._origin else "原始值请手动记录"
-        msg = f"{fields.Date.context_today(self)}修改本期应收[{origin_val}]→[{self.rental_receivable}]。"
-        self.comment = msg if not self.comment else msg + self.comment
+        if origin_val != self.rental_receivable:
+            msg = f"{fields.Date.context_today(self)}" \
+                  f"修改本期应收[{round(origin_val, 2)}]→[{round(self.rental_receivable, 2)}]。"
+            self.comment = msg if not self.comment else msg + self.comment
 
     @api.onchange("rental_received")
     def _onchange_rental_received(self):
         origin_val = self._origin.rental_received if self._origin else "原始值请手动记录"
-        msg = f"{fields.Date.context_today(self)}修改本期实收[{origin_val}]→[{self.rental_received}]。"
-        self.comment = msg if not self.comment else msg + self.comment
+        if origin_val != self.rental_received:
+            msg = f"{fields.Date.context_today(self)}" \
+                  f"修改本期实收[{round(origin_val, 2)}]→[{round(self.rental_received, 2)}]。"
+            self.comment = msg if not self.comment else msg + self.comment
+
+        self.rental_received_2_date = _get_rental_received_2_date_from_rcd(self)
+        if self.rental_receivable > 0:
+            self.days_received = self.rental_received / self.rental_receivable * self.days_receivable
+
+    @api.onchange("incentive_days")
+    def _onchange_incentive_days(self):
+        if self.incentive_days > self.period_days:
+            self.incentive_days = self.period_days
+
+        self.days_receivable = self.period_days - self.incentive_days
+        if self.period_days > 0:
+            self.incentive_amount = self.incentive_days / self.period_days * self.rental_amount
+        if self.rental_receivable != 0:
+            self.days_received = self.rental_received / self.rental_receivable * self.days_receivable
+        self.days_arrears = self.days_receivable - self.days_received
+
+        origin_val = self._origin.incentive_days if self._origin else "原始值请手动记录"
+        if origin_val != self.incentive_days:
+            msg = f"{fields.Date.context_today(self)}" \
+                  f"修改本期优惠天数[{round(origin_val, 0)}]→[{round(self.incentive_days, 0)}]。"
+            self.comment = msg if not self.comment else msg + self.comment
+
+    @api.onchange("incentive_amount")
+    def _onchange_incentive_amount(self):
+        if self.incentive_amount > self.rental_amount:
+            self.incentive_amount = self.rental_amount
+
+        if self.rental_amount != 0:
+            self.incentive_days = self.incentive_amount / self.rental_amount * self.period_days
+        self.days_receivable = self.period_days - self.incentive_days
+        if self.rental_receivable != 0:
+            self.days_received = self.rental_received / self.rental_receivable * self.days_receivable
+        self.days_arrears = self.days_receivable - self.days_received
+
+        origin_val = self._origin.incentive_amount if self._origin else "原始值请手动记录"
+        if origin_val != self.incentive_amount:
+            msg = f"{fields.Date.context_today(self)}" \
+                  f"修改本期优惠金额[{round(origin_val, 2)}]→[{round(self.incentive_amount, 2)}]。"
+            self.comment = msg if not self.comment else msg + self.comment
 
     def action_confirm_received(self):
         for record in self:
             received_bef = record.rental_received
             received_aft = record.rental_receivable
-            msg = f"{fields.Date.context_today(self)}本期租金收齐[{received_bef}]→[{received_aft}]。"
+            msg = f"{fields.Date.context_today(self)}本期租金收齐[{round(received_bef, 2)}]→[{round(received_aft, 2)}]。"
             record.comment = msg if not record.comment else msg + record.comment
             record.rental_received = received_aft
             record.edited = True

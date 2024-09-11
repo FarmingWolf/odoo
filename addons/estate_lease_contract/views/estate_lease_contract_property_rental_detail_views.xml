@@ -34,9 +34,13 @@
                 <field name="rental_period_no"/>
                 <field name="period_date_from"/>
                 <field name="period_date_to"/>
+                <field name="period_days" sum="总计天数"/>
                 <field name="date_payment"/>
                 <field name="rental_amount" digits="[12, 2]" sum="总计租金"/>
+                <field name="incentive_amount" digits="[12, 2]" sum="总计优惠"/>
+                <field name="incentive_days" digits="[12, 0]" sum="总计优惠天数"/>
                 <field name="rental_receivable" digits="[12, 2]" sum="总计应收"/>
+                <field name="days_receivable" digits="[12, 0]" sum="总计应收天数"/>
                 <button type="object" name="action_round" context="{'round_method': 'up2hundred', 'method_msg': '上取整至百位'}" title="上取整至百位" icon="fa-angle-double-up" groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
                 <button type="object" name="action_round" context="{'round_method': 'round2hundred', 'method_msg': '四舍五入至百位'}" title="四舍五入至百位" icon="fa-angle-double-left" groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
                 <button type="object" name="action_round" context="{'round_method': 'down2hundred', 'method_msg': '下取整至百位'}" title="下取整至百位" icon="fa-angle-double-down" groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
@@ -49,7 +53,9 @@
                 <field name="rental_received" digits="[12, 2]" sum="总计实收"/>
                 <button type="object" name="action_confirm_received" title="点击确认本期租金已收齐（等于本期应收）" icon="fa-thumbs-o-up" groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
                 <field name="rental_received_2_date"/>
-                <field name="rental_arrears" digits="[12, 2]" sum="总计欠缴"/>
+                <field name="days_received" digits="[12, 0]" sum="总计实收天数"/>
+                <field name="rental_arrears" digits="[12, 2]" sum="总计欠缴金额"/>
+                <field name="days_arrears" digits="[12, 0]" sum="总计欠缴天数"/>
                 <field name="description"/>
             </tree>
         </field>
@@ -81,9 +87,16 @@
                         <field name="period_date_from" string="开始与结束日期" widget="daterange"
                                options="{'end_date_field': 'period_date_to'}"/>
                         <field name="period_date_to" invisible="1"/>
-                        <field name="date_payment"/>
                     </group>
 
+                    <group col="2">
+                        <group>
+                            <field name="date_payment"/>
+                        </group>
+                        <group>
+                            <field name="period_days"/>
+                        </group>
+                    </group>
                     <group col="2">
                         <group>
                             <field name="rental_amount" digits="[12, 2]"/>
@@ -94,14 +107,43 @@
                     </group>
                     <group col="2">
                         <group>
-                            <field name="rental_receivable" digits="[12, 2]"/>
-                            <field name="rental_arrears" digits="[12, 2]" readonly="1"/>
-                            <field name="description"/>
+                            <field name="incentive_amount" digits="[12, 2]"/>
                         </group>
                         <group>
-                            <field name="rental_received" digits="[12, 2]"/>
-                            <field name="rental_received_2_date"/>
+                            <field name="incentive_days" digits="[12, 0]"/>
                         </group>
+                    </group>
+                    <group col="2">
+                        <group>
+                            <field name="rental_receivable" digits="[12, 2]"/>
+                        </group>
+                        <group>
+                            <field name="days_receivable" digits="[12, 0]"/>
+                        </group>
+                    </group>
+                    <group col="2">
+                        <group>
+                            <field name="rental_received" digits="[12, 2]"/>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="days_received" digits="[12, 0]"/>
+                            </group>
+                            <group>
+                                <field name="rental_received_2_date"/>
+                            </group>
+                        </group>
+                    </group>
+                    <group col="2">
+                        <group>
+                            <field name="rental_arrears" digits="[12, 2]" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="days_arrears" digits="[12, 0]"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description"/>
                     </group>
                     <group>
                         <field name="comment" placeholder="若修改本页内容，请填写备注！如：优惠政策描述等"/>
@@ -140,9 +182,13 @@
                 <field name="rental_period_no"/>
                 <field name="period_date_from"/>
                 <field name="period_date_to"/>
+                <field name="period_days" sum="总计天数"/>
                 <field name="date_payment"/>
                 <field name="rental_amount" digits="[12, 2]" sum="总计租金"/>
+                <field name="incentive_amount" digits="[12, 2]" sum="总计优惠"/>
+                <field name="incentive_days" digits="[12, 0]" sum="优惠天数"/>
                 <field name="rental_receivable" digits="[12, 2]" sum="总计应收"/>
+                <field name="days_receivable" digits="[12, 0]" sum="总计应收天数"/>
                 <button type="object" name="action_round" context="{'round_method': 'up2hundred', 'method_msg': '上取整至百位'}" title="上取整至百位" icon="fa-angle-double-up" groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
                 <button type="object" name="action_round" context="{'round_method': 'round2hundred', 'method_msg': '四舍五入至百位'}" title="四舍五入至百位" icon="fa-angle-double-left" groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
                 <button type="object" name="action_round" context="{'round_method': 'down2hundred', 'method_msg': '下取整至百位'}" title="下取整至百位" icon="fa-angle-double-down" groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
@@ -155,7 +201,9 @@
                 <field name="rental_received" digits="[12, 2]" sum="总计实收"/>
                 <button type="object" name="action_confirm_received" title="点击确认本期租金已收齐（等于本期应收）" icon="fa-thumbs-o-up" groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
                 <field name="rental_received_2_date"/>
-                <field name="rental_arrears" digits="[12, 2]" sum="总计欠缴"/>
+                <field name="days_received" digits="[12, 0]" sum="总计实收天数"/>
+                <field name="rental_arrears" digits="[12, 2]" sum="总计欠缴金额"/>
+                <field name="days_arrears" digits="[12, 0]" sum="总计欠缴天数"/>
             </tree>
         </field>
     </record>
