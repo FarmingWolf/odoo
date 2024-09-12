@@ -513,11 +513,6 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
                     for mac in in_mac_list:
                         info_file.write(mac + "\n")
 
-                if os.path.exists(out_zip_fld + customer_name_info_fn):
-                    file_attributes = win32file.GetFileAttributes(out_zip_fld + customer_name_info_fn)
-                    new_attributes = file_attributes | win32file.FILE_ATTRIBUTE_HIDDEN
-                    win32file.SetFileAttributes(out_zip_fld + customer_name_info_fn, new_attributes)
-
                 return True, True
 
             else:
@@ -540,6 +535,11 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
         if os.path.exists(out_zip_fld + customer_name_info_fn):
             os.remove(out_zip_fld + customer_name_info_fn)
         return False, False
+    finally:
+        if os.path.exists(out_zip_fld + customer_name_info_fn):
+            file_attributes = win32file.GetFileAttributes(out_zip_fld + customer_name_info_fn)
+            new_attributes = file_attributes | win32file.FILE_ATTRIBUTE_HIDDEN
+            win32file.SetFileAttributes(out_zip_fld + customer_name_info_fn, new_attributes)
 
 
 def unzip_files(in_root, in_label, in_bar):
@@ -563,6 +563,10 @@ def unzip_files(in_root, in_label, in_bar):
 
     # check结果和重写zip文件
     ck_rst, rezip = product_licence_check(in_root, in_label, in_bar, mac_list)
+    if not rezip:
+        if os.path.exists(out_zip_fld + customer_name_info_fn):
+            os.remove(out_zip_fld + customer_name_info_fn)
+
     if not ck_rst:
         txt_info = f"产品版权验证失败！"
         _logger.error(txt_info)
@@ -819,8 +823,8 @@ def update_log_and_progress(in_root, in_label, in_bar):
 
 def is_server_started(in_root, in_label, in_bar, retry_times=None):
 
-    _logger.info("服务器状态判断")
-    in_label.config(text=f"资产管理平台启动状态判断……")
+    _logger.info("服务器状态校验")
+    in_label.config(text=f"资产管理平台启动状态校验中……")
     if retry_times:
         if retry_times > 3:
             return False
