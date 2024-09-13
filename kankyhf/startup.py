@@ -115,6 +115,7 @@ progress_label.grid(row=2, column=1, columnspan=7, padx=(20, 0), pady=20)
 stop_event = threading.Event()
 unzip_event_success = threading.Event()
 unzip_event_failed = threading.Event()
+input_p_code_recheck = threading.Event()
 server_start_success = threading.Event()
 
 em_server_conf_file = '../debian/odoo.conf'
@@ -123,6 +124,7 @@ icon_file = tk.PhotoImage(file='./img/491logo.png')
 url = "http://localhost:8069"
 browser_opened_event = threading.Event()
 web_server_process = None
+main_process = 0
 
 
 def get_mac_address():
@@ -370,7 +372,6 @@ def unzip_customer_file_with_progress(in_root, in_label, in_bar, in_mac_lst):
                     in_label.config(text=txt_info)
                     in_root.update_idletasks()
                     unzip_event_failed.set()
-                    unzip_event_failed.set()
                     return False
 
                 if member.endswith(customer_name_info_fn):
@@ -428,7 +429,7 @@ def unzip_customer_file_with_progress(in_root, in_label, in_bar, in_mac_lst):
 def rezip_customer_file(in_root, in_label, in_bar):
     # 把添加了mac地址的文件加密压回去
     try:
-        tmp_z_fn = datetime.today().strftime("%Y%m%d%H%M%S")
+        tmp_z_fn = "../" + datetime.today().strftime("%Y%m%d%H%M%S")
         in_label.config(text="程序正在执行……")
         in_root.update_idletasks()
         add_file_2_zip_with_password(out_zip_fld + customer_name_info_fn, customer_name_info_fn, tmp_z_fn, zip_pwd, 'w')
@@ -444,12 +445,16 @@ def rezip_customer_file(in_root, in_label, in_bar):
         traceback.print_exc()
         in_label.config(text="rezip时发生错误，请关闭窗口，关闭杀毒软件后，重新启动！")
         in_root.update_idletasks()
+        if os.path.exists(tmp_z_fn):
+            os.remove(tmp_z_fn)
         return False
     except Exception as ex:
         _logger.info(f"rezip发生未知错误: {ex}{ex.with_traceback}")
         traceback.print_exc()
         in_label.config(text="rezip时发生未知错误，请关闭窗口，关闭杀毒软件后，重新启动！")
         in_root.update_idletasks()
+        if os.path.exists(tmp_z_fn):
+            os.remove(tmp_z_fn)
         return False
 
 
@@ -511,6 +516,7 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
                     in_label.config(text=txt_info)
                     in_root.update_idletasks()
                     unzip_event_failed.set()
+                    input_p_code_recheck.set()
                     return False, False
 
                 # 产品编码正确，将本机mac地址加进customer_name_info_fn
@@ -889,19 +895,24 @@ def rem_py_files():
 
 def start_web_server(in_root, in_label, in_bar):
     # 启动服务，还没解压完成就等待
+    _logger.info(f"等待解压完成……")
     while not unzip_event_success.is_set():
+        _logger.debug(f"在解压中等待还是在等待中消亡……这是个问题")
         time.sleep(1)
-        # 明确的解压错误
-        if unzip_event_failed.is_set():
+        # 明确的解压错误，同时不是要求重新输入产品编码再校验
+        if unzip_event_failed.is_set() and not input_p_code_recheck.is_set():
             _logger.info(f"启动错误:初始化文件错误！")
             sys.exit(1)
 
+    _logger.info(f"开始启动服务……")
     # 解压完成，就启动，内部另起子线程来启动server
     start_em_server(in_root, in_label, in_bar)
     return True
 
 
 def main():
+    global main_process
+    main_process += 1
     try:
         progress_bar['value'] = 0
         progress_label.config(text="开始处理...")
@@ -924,25 +935,24 @@ def main():
         _logger.debug(f"zip_tgt_folders{len(zip_tgt_folders)}个={zip_tgt_folders}")
 
         if action_type == "unzip":
+            # 当检查产品编码出错，要求输入产品编码时，要避免主线程中的逻辑重复
             # 先解压缩，部署
-            # if not unzip_files(root, progress_label, progress_bar):
-            #     return False
             thread_unzip = threading.Thread(target=unzip_files, name="ThreadUnzipTgtFiles",
                                             args=(root, progress_label, progress_bar))
             thread_unzip.daemon = True
             thread_unzip.start()
+            if main_process == 1:
+                # 另起线程启动服务
+                thread_start_webserver = threading.Thread(target=start_web_server, name="ThreadStartWebServer",
+                                                          args=(root, progress_label, progress_bar))
+                thread_start_webserver.daemon = True
+                thread_start_webserver.start()
 
-            # 另起线程启动服务
-            thread_start_webserver = threading.Thread(target=start_web_server, name="ThreadStartWebServer",
-                                                      args=(root, progress_label, progress_bar))
-            thread_start_webserver.daemon = True
-            thread_start_webserver.start()
-
-            # 另起线程观察服务启动状态
-            thread_log_progress = threading.Thread(target=update_log_and_progress, name="ThreadLogProcess",
-                                                   args=(root, progress_label, progress_bar))
-            thread_log_progress.daemon = True
-            thread_log_progress.start()
+                # 另起线程观察服务启动状态
+                thread_log_progress = threading.Thread(target=update_log_and_progress, name="ThreadLogProcess",
+                                                       args=(root, progress_label, progress_bar))
+                thread_log_progress.daemon = True
+                thread_log_progress.start()
 
         elif action_type == "zip":
             thread_zip_tgt = threading.Thread(target=zip_tgt_files, name="ThreadZipTgtFiles",
