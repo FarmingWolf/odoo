@@ -157,19 +157,25 @@ def get_mac_address():
         return []
 
 
-def add_file_2_zip_with_password(input_filename, name_in_zip, output_filename, password, in_zip_type):
+def add_file_2_zip_with_password(input_filename, name_in_zip, tmp_z_fn, password, in_zip_type, output_filename=None):
     """
     使用pyzipper库将文件压缩为带密码的ZIP文件。
     :param input_filename: 要压缩的文件的路径
     :param name_in_zip: ZIP文件中的文件名
-    :param output_filename: 输出的ZIP文件的路径
+    :param tmp_z_fn: 临时文件名，最终替换为output_filename
     :param password: ZIP文件的解压密码
     :param in_zip_type: w/a
+    :param output_filename: 最终输出的ZIP文件的路径
     """
     # 使用AES加密压缩文件
-    with AESZipFile(output_filename, in_zip_type, compression=zipfile.ZIP_DEFLATED, encryption=WZ_AES) as zf:
+    with AESZipFile(tmp_z_fn, in_zip_type, compression=zipfile.ZIP_DEFLATED, encryption=WZ_AES) as zf:
         zf.setpassword(password.encode())  # 设置密码，需要转换为bytes
         zf.write(input_filename, arcname=name_in_zip)  # 将文件添加到ZIP中
+
+    if output_filename:
+        if os.path.exists(output_filename):
+            os.remove(output_filename)
+        os.rename(tmp_z_fn, output_filename)
 
 
 def read_conf_file():
@@ -422,17 +428,16 @@ def unzip_customer_file_with_progress(in_root, in_label, in_bar, in_mac_lst):
 def rezip_customer_file(in_root, in_label, in_bar):
     # 把添加了mac地址的文件加密压回去
     try:
+        tmp_z_fn = datetime.today().strftime("%Y%m%d%H%M%S")
         in_label.config(text="程序正在执行……")
         in_root.update_idletasks()
-        add_file_2_zip_with_password(out_zip_fld + customer_name_info_fn,
-                                     customer_name_info_fn, file_2_customer, zip_pwd, 'w')
+        add_file_2_zip_with_password(out_zip_fld + customer_name_info_fn, customer_name_info_fn, tmp_z_fn, zip_pwd, 'w')
         if os.path.exists(out_zip_fld + customer_name_info_fn):
             os.remove(out_zip_fld + customer_name_info_fn)
 
         in_label.config(text="准备部署服务器资源……")
         in_root.update_idletasks()
-        add_file_2_zip_with_password(in_zip_file,
-                                     tmp_fn, file_2_customer, zip_pwd, 'a')
+        add_file_2_zip_with_password(in_zip_file, tmp_fn, tmp_z_fn, zip_pwd, 'a', file_2_customer)
         return True
     except RuntimeError as e:
         _logger.info(f"rezip时发生错误: {e}{e.with_traceback}")
@@ -496,7 +501,7 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
                 return False, False
 
             if not mac_lst_in_f:
-                if entry_var.get() != product_code:
+                if not check_product_code(entry_var.get(), product_code):
 
                     entry_product_code.config(state=tk.NORMAL)
                     txt_info = f"该版本是北京四九一科技有限公司为{customer_name_in_f}开发的专业版产品！\n" \
@@ -530,10 +535,17 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
     except Exception as ex:
         _logger.error(f"版权验证中发生未知错误{ex}{ex.with_traceback}")
         traceback.print_exc()
+        txt_info = f"软件基础文件包发生未知错误，请关闭后重试！"
+        _logger.error(txt_info)
+        in_label.config(text=txt_info)
+        in_root.update_idletasks()
         unzip_event_failed.set()
 
         if os.path.exists(out_zip_fld + customer_name_info_fn):
             os.remove(out_zip_fld + customer_name_info_fn)
+        if os.path.exists(out_zip_file):
+            os.remove(out_zip_file)
+
         return False, False
     finally:
         if os.path.exists(out_zip_fld + customer_name_info_fn):
@@ -566,6 +578,8 @@ def unzip_files(in_root, in_label, in_bar):
     if not rezip:
         if os.path.exists(out_zip_fld + customer_name_info_fn):
             os.remove(out_zip_fld + customer_name_info_fn)
+        if os.path.exists(out_zip_file):
+            os.remove(out_zip_file)
 
     if not ck_rst:
         txt_info = f"产品版权验证失败！"
@@ -576,7 +590,7 @@ def unzip_files(in_root, in_label, in_bar):
         return False
 
     if not unzip_customer_file_with_progress(in_root, in_label, in_bar, mac_list):
-        txt_info = f"基础文件 {file_2_customer} 解压出错，请联系管理员确认：start.log"
+        txt_info = f"基础文件 {file_2_customer} 解压出错，请关闭杀毒软件后重试！"
         _logger.error(txt_info)
         in_label.config(text=txt_info)
         in_root.update_idletasks()
@@ -584,7 +598,7 @@ def unzip_files(in_root, in_label, in_bar):
         return False
 
     if not os.path.exists(in_zip_file):
-        txt_info = f"解压后文件 {in_zip_file} 丢失，请联系管理员确认：start.log"
+        txt_info = f"解压后文件 {in_zip_file} 丢失，请关闭杀毒软件后重试！"
         _logger.error(txt_info)
         in_label.config(text=txt_info)
         in_root.update_idletasks()
@@ -967,8 +981,15 @@ def stop_web_server():
         web_server_process = None  # 最后杀死父进程
 
 
-def check_product_code():
-    pass
+def check_product_code(code_input, p_code):
+    today_str = datetime.today().strftime("%Y%m%d")
+    month_day = int(today_str[4:8])
+    tmp_code = month_day + 3014
+    p_code_today = str(p_code) + "-" + str(tmp_code)
+    if code_input == p_code_today:
+        return True
+    else:
+        return False
 
 
 start_distribute_button = tk.Button(root, text="开始/启动", command=main, width=10, height=3, font=my_font)
