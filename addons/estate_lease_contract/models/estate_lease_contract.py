@@ -1133,7 +1133,8 @@ class EstateLeaseContract(models.Model):
                 c_received += rental_detail.rental_received if rental_detail.rental_received else 0.0
                 c_remain += rental_detail.rental_arrears if rental_detail.rental_arrears else 0.0
                 # 当有多条租赁标的时，这里只取最后一条
-                if rental_detail.date_payment <= fields.Date.today() <= rental_detail.period_date_to:
+                date_s = rental_detail.date_payment if rental_detail.date_payment else rental_detail.period_date_from
+                if date_s <= fields.Date.today() <= rental_detail.period_date_to:
                     c_d_start_issue = rental_detail.period_date_from
                     c_d_end_issue = rental_detail.period_date_to
                     c_d_payment_issue = rental_detail.date_payment
