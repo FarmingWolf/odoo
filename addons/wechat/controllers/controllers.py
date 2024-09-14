@@ -38,3 +38,21 @@ class WechatHandle(http.Controller):
         except Exception as e:
             _logger.error(e)
             return e
+
+    @http.route('/wechat/qr-code', type='http', auth='public', website=True)
+    def get_qr_code(self, **kw):
+        # 这个方法应该返回一个包含二维码的响应
+        # 你可以使用微信提供的API来生成二维码并返回
+        # 这里仅作示例，你需要根据实际情况实现
+        return request.render('wechat.qr_code', {})
+
+    @http.route('/wechat/callback', type='http', auth='public', website=True)
+    def wechat_callback(self, **kw):
+        _logger.info("entering wechat/callback")
+        # 这个方法用于处理微信回调
+        # 从回调中获取code，然后通过code换取access_token和openid
+        # 最终根据openid找到对应的Odoo用户并登录
+        code = kw.get('code')
+        # 实现获取access_token和openid的逻辑
+        # 并使用这些信息登录Odoo用户
+        return request.redirect("/web")

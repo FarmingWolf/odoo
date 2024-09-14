@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="wechat.login" name="Login with WeChat" inherit_id="web.login">
+        <xpath expr="//form[hasclass('oe_login_form')]" position="inside">
+            <div id="container_div" style="display:none;">
+                <div id="wechat_qr_code_container" class="o_wechat_qrcode_container">
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>
