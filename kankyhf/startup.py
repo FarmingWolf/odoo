@@ -990,6 +990,9 @@ def stop_web_server():
         process.kill()
         web_server_process = None  # 最后杀死父进程
 
+    progress_label.config(text="资产租赁管理平台服务已停止，请关闭此窗口!")
+    root.update_idletasks()
+
 
 def check_product_code(code_input, p_code):
     today_str = datetime.today().strftime("%Y%m%d")

@@ -1084,6 +1084,77 @@ class EstateLeaseContract(models.Model):
     # 因租金明细修改后的警告提示信息
     warn_msg = fields.Text(string="提示", default="", store=False, compute="_compute_warn_msg")
 
+    # 合同总计收缴状况统计
+    contract_amount = fields.Float(string="合同总额（元）", compute="_compute_contract_amount", readonly=True, store=False)
+    contract_concessions = fields.Float(string="合同总优惠（元）", readonly=True, store=False,
+                                        compute="_compute_contract_amount")
+    contract_receivable = fields.Float(string="合同总应收（元）", readonly=True, store=False,
+                                       compute="_compute_contract_amount")
+    contract_received = fields.Float(string="合同总实收（元）", readonly=True, store=False,
+                                     compute="_compute_contract_amount")
+    contract_remain = fields.Float(string="剩余总应收（元）", readonly=True, store=False,
+                                   compute="_compute_contract_amount")
+    contract_d_start_issue = fields.Date(string="本期开始日", readonly=True, store=False,
+                                         compute="_compute_contract_amount")
+    contract_d_end_issue = fields.Date(string="本期结束日", readonly=True, store=False,
+                                       compute="_compute_contract_amount")
+    contract_d_payment_issue = fields.Date(string="本期支付日", readonly=True, store=False,
+                                           compute="_compute_contract_amount")
+    contract_receivable_issue = fields.Float(string="本期应收（元）", readonly=True, store=False,
+                                             compute="_compute_contract_amount")
+    contract_received_issue = fields.Float(string="本期实收（元）", readonly=True, store=False,
+                                           compute="_compute_contract_amount")
+    contract_received_2_d_issue = fields.Date(string="实收至", readonly=True, store=False,
+                                              compute="_compute_contract_amount")
+    contract_arrears_issue = fields.Float(string="本期欠缴（元）", readonly=True, store=False,
+                                          compute="_compute_contract_amount")
+
+    @api.depends("rental_details")
+    def _compute_contract_amount(self):
+        _logger.debug("开始计算合同收款状况")
+        for record in self:
+            c_amount = 0.0
+            c_concessions = 0.0
+            c_receivable = 0.0
+            c_received = 0.0
+            c_remain = 0.0
+            c_d_start_issue = None
+            c_d_end_issue = None
+            c_d_payment_issue = None
+            c_receivable_issue = 0.0
+            c_received_issue = 0.0
+            c_received_2_d_issue = None
+            c_arrears_issue = 0.0
+            for rental_detail in record.rental_details:
+                _logger.debug("按合同租金明细统计")
+                c_amount += rental_detail.rental_amount if rental_detail.rental_amount else 0.0
+                c_concessions += rental_detail.incentive_amount if rental_detail.incentive_amount else 0.0
+                c_receivable += rental_detail.rental_receivable if rental_detail.rental_receivable else 0.0
+                c_received += rental_detail.rental_received if rental_detail.rental_received else 0.0
+                c_remain += rental_detail.rental_arrears if rental_detail.rental_arrears else 0.0
+                # 当有多条租赁标的时，这里只取最后一条
+                if rental_detail.date_payment <= fields.Date.today() <= rental_detail.period_date_to:
+                    c_d_start_issue = rental_detail.period_date_from
+                    c_d_end_issue = rental_detail.period_date_to
+                    c_d_payment_issue = rental_detail.date_payment
+                    c_receivable_issue = rental_detail.rental_receivable
+                    c_received_issue = rental_detail.rental_received
+                    c_received_2_d_issue = rental_detail.rental_received_2_date
+                    c_arrears_issue = rental_detail.rental_arrears
+
+            record.contract_amount = c_amount
+            record.contract_concessions = c_concessions
+            record.contract_receivable = c_receivable
+            record.contract_received = c_received
+            record.contract_remain = c_remain
+            record.contract_d_start_issue = c_d_start_issue
+            record.contract_d_end_issue = c_d_end_issue
+            record.contract_d_payment_issue = c_d_payment_issue
+            record.contract_receivable_issue = c_receivable_issue
+            record.contract_received_issue = c_received_issue
+            record.contract_received_2_d_issue = c_received_2_d_issue
+            record.contract_arrears_issue = c_arrears_issue
+
     @api.depends("rental_details", "property_ids")
     def _compute_warn_msg(self):
         for record in self:

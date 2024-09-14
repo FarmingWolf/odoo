@@ -5,6 +5,7 @@
         <xpath expr="//form[hasclass('oe_login_form')]" position="inside">
             <div id="container_div" style="display:none;">
                 <div id="wechat_qr_code_container" class="o_wechat_qrcode_container">
+                    微信登陆二维码
                 </div>
             </div>
         </xpath>

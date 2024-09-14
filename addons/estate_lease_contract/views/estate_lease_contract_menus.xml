@@ -18,10 +18,9 @@
             <menuitem id="estate_lease_contract_menu_setting_party_a_unit" action="estate_lease_contract_party_a_unit_action"/>
             <menuitem id="estate_lease_contract_menu_setting_contract_accounts" action="estate_lease_contract_bank_account_action"/>
         </menuitem>
-        <menuitem id="estate_lease_contract_menu_rental" name="租金明细" sequence="40" action="estate_lease_contract_property_rental_detail_action">
-        </menuitem>
-        <menuitem id="estate_lease_contract_menu_rental_reminder" name="租金催缴" sequence="50" action="estate_lease_contract_property_rental_detail_reminder_action">
-        </menuitem>
+        <menuitem id="estate_lease_contract_menu_rental" name="租金明细" sequence="40" action="estate_lease_contract_property_rental_detail_action"/>
+        <menuitem id="estate_lease_contract_menu_rental_reminder" name="租金催缴" sequence="50" action="estate_lease_contract_property_rental_detail_reminder_action"/>
+        <menuitem id="estate_lease_contract_credit_menu" name="合同收款概况" sequence="50" action="estate_lease_contract_credit_action"/>
         <menuitem id="estate_lease_contract_menu_party_b" name="入驻企业花名册" sequence="60" action="estate_lease_contract_party_a_status_action"/>
     </menuitem>
 </odoo>

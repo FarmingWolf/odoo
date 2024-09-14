@@ -441,6 +441,67 @@
         </field>
     </record>
 
+    <record id="estate_lease_contract_credit_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.tree</field>
+        <field name="model">estate.lease.contract</field>
+        <field name="arch" type="xml">
+            <tree string="contracts_tree"
+                  decoration-success="contract_arrears_issue &lt; 0.01"
+                  decoration-danger="contract_arrears_issue &gt;= 0.01 and contract_d_start_issue &lt;= (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')"
+                  decoration-warning="contract_arrears_issue &gt;= 0.01 and contract_d_start_issue &gt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')"
+                  create="False" delete="False" edit="False" import="False" open_form_view="False">
+
+                <field name="default_context_contract_id" column_invisible="1"/>
+                <field name="party_a_unit_invisible" column_invisible="1"/>
+                <field name="sequence" widget="handle"/>
+                <field name="property_ids" widget="many2many_tags" string="租赁房屋" options="{'color_field': 'color'}"/>
+                <field name="party_a_unit_id" invisible="party_a_unit_invisible" string=""/>
+                <field name="date_rent_start"/>
+                <field name="date_rent_end"/>
+                <field name="renter_id"/>
+                <field name="contract_amount" digits="[12, 2]" sum="合计总租金（元）"/>
+                <field name="contract_concessions" digits="[12, 2]" sum="合计总优惠（元）"/>
+                <field name="contract_receivable" digits="[12, 2]" sum="合计总应收（元）"/>
+                <field name="contract_received" digits="[12, 2]" sum="合计总实收（元）"/>
+                <field name="contract_remain" digits="[12, 2]" sum="剩余总应收（元）"/>
+                <field name="contract_d_start_issue"/>
+                <field name="contract_d_end_issue"/>
+                <field name="contract_d_payment_issue"/>
+                <field name="contract_receivable_issue" digits="[12, 2]"/>
+                <field name="contract_received_issue" digits="[12, 2]"/>
+                <field name="contract_arrears_issue" digits="[12, 2]"/>
+                <field name="contract_received_2_d_issue"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_credit_action" model="ir.actions.act_window">
+        <field name="name">合同收款概况</field>
+        <field name="res_model">estate.lease.contract</field>
+        <field name="view_mode">tree,form</field>
+        <field name="views">[False, "tree"]</field>
+        <field name="view_id" ref="estate_lease_contract_credit_view_tree"/>
+        <field name="context">{
+            'search_default_state_valid': True,
+            'search_default_group_by_property_ids': True,
+            'search_default_active': True,
+            'contract_read_only': True,
+            'menu_root': 'estate.lease.contract',
+            'from_menu_click_tree': True,
+            }
+        </field>
+        <field name="domain">[('active', '=', True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                还没有合同信息。
+            </p>
+            <p>
+                说明合同还没录入，或者录入了也没发布。
+            </p>
+        </field>
+    </record>
+
     <record id="estate_lease_contract_party_b_view_tree" model="ir.ui.view">
         <field name="name">estate.lease.contract.party.b.tree</field>
         <field name="model">res.partner</field>
