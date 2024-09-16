@@ -816,13 +816,13 @@ class EstateLeaseContract(models.Model):
 
     @api.depends("property_ids")
     def _calc_rent_total_info(self):
-        rent_cnt_total = 0
-        building_area_total = 0
-        rent_area_total = 0
-        rent_amount_total = 0
-        rent_amount_year_total = 0
-        deposit_total = 0
         for record in self:
+            rent_cnt_total = 0
+            building_area_total = 0
+            rent_area_total = 0
+            rent_amount_total = 0
+            rent_amount_year_total = 0
+            deposit_total = 0
             if record.property_ids:
                 if record.state == "recording":
                     for rent_property in record.property_ids:
