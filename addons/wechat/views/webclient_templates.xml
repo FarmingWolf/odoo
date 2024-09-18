@@ -3,11 +3,18 @@
 
     <template id="wechat.login" name="Login with WeChat" inherit_id="web.login">
         <xpath expr="//form[hasclass('oe_login_form')]" position="inside">
-            <div id="container_div" style="display:none;">
-                <div id="wechat_qr_code_container" class="o_wechat_qrcode_container">
-                    微信登陆二维码
+            <t t-if="wx_login_msg">
+                <div id="msg_div">
+                    <span t-esc="wx_login_msg"/>
                 </div>
-            </div>
+            </t>
+            <t t-if="not wx_login_msg">
+                <div id="container_div">
+                    <div id="wechat_qr_code_container" class="o_wechat_qrcode_container">
+                        微信登陆二维码
+                    </div>
+                </div>
+            </t>
         </xpath>
     </template>
 

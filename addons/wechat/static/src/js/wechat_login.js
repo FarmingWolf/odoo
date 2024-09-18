@@ -8,14 +8,15 @@ export async function wechatLogin() {
     if (session.connectionState === undefined) {
         try {
             return new WxLogin({
-                self_redirect: true,
+                self_redirect: false,
                 id: "wechat_qr_code_container",
                 appid: "wx2dadd8272b906e46",
                 scope: "snsapi_login",
                 redirect_uri: window.location.origin + "/wechat/callback",
                 state: "STATE",
                 style: "black",
-                href: ""
+                href: "",
+                fast_login: ""
             });
         } catch (error) {
             console.error("Error fetching QR code:", error);

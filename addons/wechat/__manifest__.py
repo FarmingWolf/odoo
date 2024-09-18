@@ -13,12 +13,13 @@
     'author': "北京491科技",
     'website': "https://www.491tech.com/",
     'category': 'Wechat/Wechat',
-    'version': '0.1',
+    'version': '1.0',
     'application': True,
     'installable': True,
     'depends': ['base', 'web'],
 
     'data': [
+        'security/ir.model.access.csv',
         'views/webclient_templates.xml',
     ],
     'assets': {
