@@ -276,6 +276,11 @@
                                         <div class="oe_kanban_bottom_left">
                                             <field name="rent_area"/>
                                             <span>㎡</span>
+                                            <div invisible="out_of_rent_days &lt;= 0 or state == 'sold'">
+                                                <span>空置</span>
+                                                <field name="out_of_rent_days"/>
+                                                <span>天</span>
+                                            </div>
                                         </div>
                                         <div class="oe_kanban_bottom_right">
                                             <field name="state" widget="badge" decoration-success="state == 'sold'"
