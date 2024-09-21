@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <!-- sms.ali VIEWS -->
+        <record id="sms_ali_view_tree" model="ir.ui.view">
+            <field name="name">sms.ali.view.tree</field>
+            <field name="model">sms.ali</field>
+            <field name="arch" type="xml">
+                <tree string="短信模板">
+                    <field name="tgt_partner_id"/>
+                    <field name="tgt_mobile"/>
+                    <field name="sms_send_period_descript"/>
+                    <field name="sms_sign_name"/>
+                    <field name="sms_template_name"/>
+                    <field name="sms_template_code"/>
+                    <field name="sms_template_content"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="sms_ali_view_form" model="ir.ui.view">
+            <field name="name">sms.ali.view.form</field>
+            <field name="model">sms.ali</field>
+            <field name="arch" type="xml">
+                <form string="短信模板">
+                    <sheet>
+                        <group cols="2">
+                            <group>
+                                <field name="tgt_partner_id"/>
+                                <field name="sms_sign_name"/>
+                                <field name="sms_template_code"/>
+                                <field name="sms_send_period" widget="selection" required="1"/>
+                                <field name="sms_send_period_descript"/>
+                            </group>
+                            <group>
+                                <field name="tgt_mobile"/>
+                                <field name="sms_template_name"/>
+                                <label for="sms_send_time_h"/>
+                                <div class="o_row">
+                                    <field name="sms_send_time_h"/>
+                                    <span>:</span>
+                                    <field name="sms_send_time_m" nolabel="1"/>
+                                </div>
+
+                                <field name="sms_send_period_weekday" widget="selection" required="1" invisible="sms_send_period != 'weekly'"/>
+                                <field name="sms_send_period_monthday" invisible="sms_send_period != 'monthly'"/>
+                            </group>
+                        </group>
+                        <group col="2">
+                            <field name="sms_template_content"/>
+                            <field name="sms_template_params"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="sms_ali_action" model="ir.actions.act_window">
+            <field name="name">短信模板</field>
+            <field name="res_model">sms.ali</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sms_ali_read,access.sms.ali.read,model_sms_ali,base.group_user,1,0,0,0
+access_sms_ali_manage,access.sms.ali.manage,model_sms_ali,base.group_system,1,1,1,1
+access_sms_ali_hist_read,access.sms.ali.hist.read,model_sms_ali_hist,base.group_user,1,0,0,0
+access_sms_ali_hist_manage,access.sms.ali.hist.manage,model_sms_ali_hist,base.group_system,1,1,1,1

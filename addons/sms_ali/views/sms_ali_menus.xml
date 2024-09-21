@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="sms_ali_menu_root" groups="sms_ali_group_user" name="短信发送管理">
+        <menuitem id="sms_ali_menu_root_action" name="短信发送管理" action="sms_ali_action"/>
+        <menuitem id="sms_ali_hist_menu_action" name="短信发送记录" action="sms_ali_hist_action"/>
+    </menuitem>
+</odoo>

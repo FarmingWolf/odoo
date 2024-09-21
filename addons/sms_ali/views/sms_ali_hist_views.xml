@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <!-- sms.ali VIEWS -->
+        <record id="sms_ali_hist_view_tree" model="ir.ui.view">
+            <field name="name">sms.ali.view.tree</field>
+            <field name="model">sms.ali.hist</field>
+            <field name="arch" type="xml">
+                <tree string="短信记录" create="false" delete="false" edit="false">
+                    <field name="tgt_partner_id"/>
+                    <field name="tgt_mobile"/>
+                    <field name="date_send_no_tz"/>
+                    <field name="date_sent_no_tz"/>
+                    <field name="sent_result"/>
+                    <field name="text_content"/>
+                    <field name="sms_size"/>
+                    <field name="err_code"/>
+                    <field name="err_msg"/>
+                    <field name="biz_id"/>
+                    <field name="out_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="sms_ali_hist_view_form" model="ir.ui.view">
+            <field name="name">sms.ali.hist.view.form</field>
+            <field name="model">sms.ali.hist</field>
+            <field name="arch" type="xml">
+                <form string="短信记录" create="false" delete="false" edit="false">
+                    <sheet>
+                        <group cols="2">
+                            <group>
+                                <field name="sms_ali_id"/>
+                                <field name="date_send_no_tz"/>
+                                <field name="sms_size"/>
+                            </group>
+                            <group>
+                                <field name="tgt_mobile"/>
+                                <field name="date_sent_no_tz"/>
+                                <field name="sent_result"/>
+                            </group>
+                        </group>
+                        <group col="2">
+                            <field name="sent_content_params"/>
+                            <field name="text_content"/>
+                        </group>
+                        <group cols="2">
+                            <group>
+                                <field name="err_code"/>
+                                <field name="err_msg"/>
+                            </group>
+                            <group>
+                                <field name="biz_id"/>
+                                <field name="out_id"/>
+                            </group>>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="sms_ali_hist_action" model="ir.actions.act_window">
+            <field name="name">发送记录</field>
+            <field name="res_model">sms.ali.hist</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+    </data>
+</odoo>

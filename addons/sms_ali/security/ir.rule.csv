@@ -1,0 +1,3 @@
+id,name,model_id:id,domain_force
+sms_ali_rule,Restrict SMS Ali by Company,model_sms_ali,"[('company_id','=',user.company_id.id)]"
+sms_ali_hist_rule,Restrict SMS Ali history by Company,model_sms_ali_hist,"[('company_id','=',user.company_id.id)]"
