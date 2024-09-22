@@ -125,11 +125,15 @@ def send_sms_ali_batch(args: dict, process_type,):
         args["err_msg"] = bat_err_msg
         args["biz_id"] = bat_biz_id
 
+        # 走到这一步没出sys错误的话，就说明阿里云已经把sms发送给了运营商那边
+        args["date_sent"] = fields.datetime.now()
         _logger.info(f'phone:{args["phone_numbers"]},发送【{args["template_param"]}】，bat_biz_id={bat_biz_id}，'
+                     f'bat_code={bat_code}'
                      f'错误信息: {bat_err_msg}')
 
         if not UtilClient.equal_string(bat_code, 'OK'):
             _logger.error(f'phone:{args["phone_numbers"]},发送【{args["template_param"]}】，bat_biz_id={bat_biz_id}，'
+                          f'bat_code={bat_code}'
                           f'错误信息: {bat_err_msg}')
             # 不着急返回return args
 
@@ -148,6 +152,7 @@ def send_sms_ali_batch(args: dict, process_type,):
             )
             query_resp = client.query_send_details(query_req)
             dtos = query_resp.body.sms_send_detail_dtos.sms_send_detail_dto
+            _logger.info(f"SMS查询结果dtos={dtos}")
             # 打印结果
             for dto in dtos:
 
@@ -229,7 +234,8 @@ class SmsAliHist(models.Model):
             record.date_sent_no_tz = str(record.date_sent) if record.date_sent else False
 
     def auto_get_send_tgt(self):
-        send_tgt = self.env['sms.ali.hist'].sudo().search([('date_sent', '=', False)], order="sms_template_code")
+        send_tgt = self.env['sms.ali.hist'].sudo().search([('date_sent', '=', False)],
+                                                          order="sms_template_code, tgt_mobile")
         _logger.info(f"send_tgt ids={send_tgt.ids}")
         if send_tgt:
             tgt_cnt = len(send_tgt)
@@ -252,7 +258,8 @@ class SmsAliHist(models.Model):
                         if il == tgt_cnt - 1:
                             i_e = il + 1
                         else:
-                            if send_tgt[il + 1].sms_template_code != send_tgt[il].sms_template_code:
+                            if send_tgt[il + 1].sms_template_code != send_tgt[il].sms_template_code \
+                                    or send_tgt[il + 1].tgt_mobile == send_tgt[il].tgt_mobile:
                                 i_e = il + 1
 
                     if i_e - i_s > 0:
@@ -279,6 +286,10 @@ class SmsAliHist(models.Model):
         err_code = args["err_code"]
         err_msg = args["err_msg"]
         biz_id = args["biz_id"]
+        date_sent = False
+        if "date_sent" in args:
+            date_sent = args["date_sent"]
+
         _logger.info(f"process_type={process_type}")
         if process_type == "batch":
             phone_err_code = args["phone_err_code"]
@@ -289,14 +300,18 @@ class SmsAliHist(models.Model):
             send_tgt.biz_id = biz_id
             send_tgt.err_code = err_code
             send_tgt.err_msg = err_msg
+            send_tgt.date_sent = date_sent if date_sent else False
+            send_tgt.sent_result = err_code
 
         else:
             i_cnt = len(ids)
             for i in range(i_cnt):
                 send_tgt = self.env['sms.ali.hist'].sudo().search([('id', '=', ids[i])])
                 send_tgt.biz_id = biz_id
-                send_tgt.err_code = phone_err_code[i]
-                send_tgt.err_msg = phone_err_msg[i]
+                send_tgt.err_code = phone_err_code[i] if phone_err_code else False
+                send_tgt.err_msg = phone_err_msg[i] if phone_err_msg else False
+                send_tgt.date_sent = date_sent if date_sent else False
+                send_tgt.sent_result = err_code
 
     def receive_sms_report(self, bk_sms_report):
         for bk_data in bk_sms_report:
@@ -307,7 +322,7 @@ class SmsAliHist(models.Model):
             err_code = bk_data["err_code"]
             err_msg = bk_data["err_msg"]
             sms_size = bk_data["sms_size"]
-            out_id = bk_data["out_id"]
+            # out_id = bk_data["out_id"]
 
             record = self.env['sms.ali.hist'].sudo().search([('tgt_mobile', '=', tgt_mobile), ('biz_id', '=', biz_id)])
             _logger.info(f"更新tgt_mobile{tgt_mobile},biz_id={biz_id},对象{len(record)}条")
@@ -316,5 +331,5 @@ class SmsAliHist(models.Model):
             record.err_code = err_code
             record.err_msg = err_msg
             record.sms_size = sms_size
-            record.out_id = out_id
+            # record.out_id = out_id
 

@@ -67,7 +67,7 @@ class SmsAli(models.Model):
     sms_send_period = fields.Selection(string="发送周期", default="daily",
                                        selection=[('daily', '每天'), ('weekly', '每周'), ('monthly', '每月'),
                                                   ('depends_on', '按实际合同情况')], )
-    sms_send_period_weekday = fields.Selection(string="每周", default=1,
+    sms_send_period_weekday = fields.Selection(string="每周", default='1',
                                                selection=[('1', '一'), ('2', '二'), ('3', '三'), ('4', '四'), ('5', '五'),
                                                           ('6', '六'), ('7', '日')])
     sms_send_period_monthday = fields.Integer(string="每月", default=1)
@@ -146,23 +146,24 @@ class SmsAli(models.Model):
             hist_sms_template_code = rule.sms_template_code
             hist_date_send = send_date
             if rule.sms_template_name == "资产出租率汇报":
-                json_data = EstateDashboardService.get_statistics_svc(company_id=rule.company_id.id, env=self.env)
+                json_data = EstateDashboardService.get_statistics_svc(company_id=rule.company_id.id,
+                                                                      env=self.env(su=True))
                 hist_sent_content_params = {
                     "park_n": rule.company_id.name,
                     "p_cnt": json_data['estate_property_quantity'],
-                    "area_cnt": json_data['estate_property_area_quantity'],
+                    "area_cnt": round(json_data['estate_property_area_quantity'], 2),
                     "on_rent_p": json_data['estate_property_lease_quantity'],
-                    "ratio_p": json_data['ratio_property_quantity'] * 100,
-                    "on_rent_area": json_data['estate_property_area_lease_quantity'],
-                    "ratio_area": json_data['ratio_property_area_quantity'] * 100,
+                    "ratio_p": round(json_data['ratio_property_quantity'] * 100, 2),
+                    "on_rent_area": round(json_data['estate_property_area_lease_quantity'], 2),
+                    "ratio_area": round(json_data['ratio_property_area_quantity'] * 100, 2),
                 }
                 hist_text_content = f"截至今日{rule.company_id.name}" \
                                     f"总房间数{json_data['estate_property_quantity']}，" \
-                                    f"总面积{json_data['estate_property_area_quantity']}㎡，" \
+                                    f"总面积{round(json_data['estate_property_area_quantity'], 2)}㎡，" \
                                     f"在租房间数{json_data['estate_property_lease_quantity']}" \
-                                    f"占比{json_data['ratio_property_quantity'] * 100}%，" \
-                                    f"在租面积{json_data['estate_property_area_lease_quantity']}㎡" \
-                                    f"占比${json_data['ratio_property_area_quantity'] * 100}%。"
+                                    f"占比{round(json_data['ratio_property_quantity'] * 100, 2)}%，" \
+                                    f"在租面积{round(json_data['estate_property_area_lease_quantity'], 2)}㎡" \
+                                    f"占比{round(json_data['ratio_property_area_quantity'] * 100, 2)}%。"
                 hist_company_id = rule.company_id.id
                 self.env['sms.ali.hist'].sudo().create({
                     "sms_ali_id": hist_sms_ali_id,
