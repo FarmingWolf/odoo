@@ -2,9 +2,9 @@
 <odoo>
     <menuitem id="estate_lease_contract_menu_root" groups="estate_lease_contract_group_user" name="资产租赁合同">
         <menuitem id="estate_ease_contract_first_level_menu_list" name="合同列表" sequence="20">
+            <menuitem id="estate_lease_contract_menu_action" action="estate_lease_contract_action" sequence="23"/>
             <menuitem id="estate_lease_contract_menu_action_recording" groups="estate_lease_contract_group_manager"
-                      action="estate_lease_contract_action_recording" sequence="21"/>
-            <menuitem id="estate_lease_contract_menu_action" action="estate_lease_contract_action" sequence="25"/>
+                      action="estate_lease_contract_action_recording" sequence="24"/>
         </menuitem>
         <menuitem id="estate_lease_contract_menu_settings" groups="estate_lease_contract_group_manager" name="合同基础设置" sequence="30">
             <menuitem id="estate_lease_contract_menu_setting_tag" action="estate_lease_contract_action_tag"/>
