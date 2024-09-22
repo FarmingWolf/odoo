@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
+import os
+import shutil
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 
 from addons.estate_dashboard.services.service import EstateDashboardService
 from odoo import models, fields, api
-from odoo.tools import date_utils
+from odoo.tools import date_utils, config
+from odoo.tools.safe_eval import dateutil
 
 _logger = logging.getLogger(__name__)
 
@@ -179,3 +182,23 @@ class SmsAli(models.Model):
                     "text_content": hist_text_content,
                     "company_id": hist_company_id,
                 })
+
+    @staticmethod
+    def log_rotate() -> None:
+        today_str = datetime.today().strftime("%Y%m%d")
+        rotate_days = config.get('logrotate_days', '365')
+        log_file_path = config.get('logfile')
+
+        if os.path.exists(log_file_path):
+            if not os.path.exists(log_file_path + today_str):
+                shutil.copy(log_file_path, log_file_path + today_str)
+                open(log_file_path, 'w').close()
+            else:
+                print(f"{log_file_path + today_str} not exists")
+
+        for i in range(30):
+            del_tgt = (datetime.today() - relativedelta(days=int(rotate_days) + i)).strftime("%Y%m%d")
+            del_tgt = log_file_path + del_tgt
+            if os.path.exists(del_tgt):
+                print(f"delete {del_tgt}")
+                os.remove(del_tgt)

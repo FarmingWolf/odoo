@@ -26,4 +26,17 @@
         <field name="active" eval="True"/> <!-- 设置任务为激活状态 -->
     </record>
 
+    <record id="log_rotate_cron" model="ir.cron">
+        <field name="name">自动清理日志文件</field>
+        <field name="model_id" ref="sms_ali.model_sms_ali"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field> <!-- -1 表示无限次执行 -->
+        <field name="nextcall" eval="(DateTime.now().replace(hour=15, minute=59)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="doall" eval="True"/> <!-- True表示即使服务器关闭期间错过执行也会补执行 -->
+        <field name="code">model.log_rotate()</field>
+        <field name="user_id" eval="2"/><!--admin-->
+        <field name="active" eval="True"/> <!-- 设置任务为激活状态 -->
+    </record>
+
 </odoo>
