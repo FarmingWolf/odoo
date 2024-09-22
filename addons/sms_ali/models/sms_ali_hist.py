@@ -300,8 +300,10 @@ class SmsAliHist(models.Model):
             send_tgt.biz_id = biz_id
             send_tgt.err_code = err_code
             send_tgt.err_msg = err_msg
-            send_tgt.date_sent = date_sent if date_sent else False
             send_tgt.sent_result = err_code
+            if date_sent:
+                send_tgt.date_sent = date_sent
+                send_tgt.sms_ali_id.latest_sent_time = date_sent
 
         else:
             i_cnt = len(ids)
@@ -310,8 +312,10 @@ class SmsAliHist(models.Model):
                 send_tgt.biz_id = biz_id
                 send_tgt.err_code = phone_err_code[i] if phone_err_code else False
                 send_tgt.err_msg = phone_err_msg[i] if phone_err_msg else False
-                send_tgt.date_sent = date_sent if date_sent else False
                 send_tgt.sent_result = err_code
+                if date_sent:
+                    send_tgt.date_sent = date_sent
+                    send_tgt.sms_ali_id.latest_sent_time = date_sent
 
     def receive_sms_report(self, bk_sms_report):
         for bk_data in bk_sms_report:
@@ -332,4 +336,8 @@ class SmsAliHist(models.Model):
             record.err_msg = err_msg
             record.sms_size = sms_size
             # record.out_id = out_id
+            # 同时，也要把发送日期回写到模板的latest_sent_time
+            for each_rcd in record:
+                each_rcd.sms_ali_id.latest_sent_time = sent_date
+
 
