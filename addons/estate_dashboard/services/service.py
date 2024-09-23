@@ -61,4 +61,5 @@ class EstateDashboardService:
                 '在租面积(㎡)': round(estate_property_area_lease_quantity, 2),
                 '空置面积(㎡)': round(estate_property_area_quantity - estate_property_area_lease_quantity, 2),
             },
+            'latest_property_detail': latest_property_detail,
         }

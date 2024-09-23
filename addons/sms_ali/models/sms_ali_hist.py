@@ -90,7 +90,7 @@ def create_client() -> Dysmsapi20170525Client:
     return Dysmsapi20170525Client(config)
 
 
-def send_sms_ali_batch(args: dict, process_type,):
+def send_sms_ali_batch(self, args: dict, process_type,):
 
     _logger.info(f"发送短信process_type={process_type}, args={args}")
     if not args or not args["id"]:
@@ -126,15 +126,17 @@ def send_sms_ali_batch(args: dict, process_type,):
         args["biz_id"] = bat_biz_id
 
         # 走到这一步没出sys错误的话，就说明阿里云已经把sms发送给了运营商那边
-        args["date_sent"] = fields.datetime.now()
+        args["date_sent"] = fields.Datetime.context_timestamp(self, fields.datetime.now()).replace(tzinfo=None)
         _logger.info(f'phone:{args["phone_numbers"]},发送【{args["template_param"]}】，bat_biz_id={bat_biz_id}，'
                      f'bat_code={bat_code}'
-                     f'错误信息: {bat_err_msg}')
+                     f'错误信息: {bat_err_msg}'
+                     f'args["date_sent"]={args["date_sent"]}')
 
         if not UtilClient.equal_string(bat_code, 'OK'):
             _logger.error(f'phone:{args["phone_numbers"]},发送【{args["template_param"]}】，bat_biz_id={bat_biz_id}，'
                           f'bat_code={bat_code}'
-                          f'错误信息: {bat_err_msg}')
+                          f'错误信息: {bat_err_msg}'
+                          f'args["date_sent"]={args["date_sent"]}')
             # 不着急返回return args
 
         # 2. 等待 10 秒后查询结果
@@ -146,7 +148,7 @@ def send_sms_ali_batch(args: dict, process_type,):
             query_req = dysmsapi_20170525_models.QuerySendDetailsRequest(
                 phone_number=UtilClient.assert_as_string(phone_num),
                 biz_id=bat_biz_id,
-                send_date=fields.datetime.today().strftime('%Y%m%d'),
+                send_date=fields.Datetime.context_timestamp(self, fields.datetime.now()).strftime('%Y%m%d'),
                 page_size=10,
                 current_page=1
             )
@@ -242,7 +244,7 @@ class SmsAliHist(models.Model):
             _logger.info(f"tgt_cnt={tgt_cnt}")
             if tgt_cnt == 1:
                 send_tgt_param = set_single_param(self, send_tgt)
-                ret_args = send_sms_ali_batch(send_tgt_param, "single")
+                ret_args = send_sms_ali_batch(self, send_tgt_param, "single")
                 self.write_sent_result(ret_args)
             else:
                 # 批量发送必须同一模板，每次最多100条
@@ -267,9 +269,9 @@ class SmsAliHist(models.Model):
                         send_bat_param = set_batch_param(self, send_tgt[i_s: i_e])
                         if send_bat_param and send_bat_param["id"] and len(send_bat_param["id"]) == 1:
                             send_bat_param = set_bat_2_single_param(send_bat_param)
-                            ret_args = send_sms_ali_batch(send_bat_param, "single")
+                            ret_args = send_sms_ali_batch(self, send_bat_param, "single")
                         else:
-                            ret_args = send_sms_ali_batch(send_bat_param, "batch")
+                            ret_args = send_sms_ali_batch(self, send_bat_param, "batch")
                         i_s = i_e
                         self.write_sent_result(ret_args)
 

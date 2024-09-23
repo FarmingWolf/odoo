@@ -15,21 +15,22 @@ from odoo.tools.safe_eval import dateutil
 _logger = logging.getLogger(__name__)
 
 
-def _compute_date_send(rule):
+def _compute_date_send(self, rule):
     date_send = datetime.today()
+    context_today = fields.Date.context_today(self)
 
     if rule.sms_send_period == "daily":
         pass
     elif rule.sms_send_period == "weekly":
-        weekday = datetime.today().weekday() + 1
-        date_send = datetime.today() + timedelta(days=(int(rule.sms_send_period_weekday) - weekday + 7) % 7)
+        weekday = context_today.weekday() + 1
+        date_send = context_today + timedelta(days=(int(rule.sms_send_period_weekday) - weekday + 7) % 7)
 
     elif rule.sms_send_period == "monthly":
-        monthday = datetime.today().day
+        monthday = context_today.day
         if monthday <= rule.sms_send_period_monthday:
-            date_send = datetime.today() + relativedelta(day=rule.sms_send_period_monthday)
+            date_send = context_today + relativedelta(day=rule.sms_send_period_monthday)
         else:
-            date_send = datetime.today() + relativedelta(months=1, day=rule.sms_send_period_monthday)
+            date_send = context_today + relativedelta(months=1, day=rule.sms_send_period_monthday)
     elif rule.sms_send_period == "depends_on":
         pass
     else:
@@ -41,18 +42,95 @@ def _compute_date_send(rule):
     return date_send
 
 
-def _need_create_sms_rcd(rule):
-    rcd_send_date = _compute_date_send(rule)
+def _need_create_sms_rcd(self, rule):
+    rcd_send_date = _compute_date_send(self, rule)
     if not rule.latest_sent_time:
         return True, rcd_send_date
     else:
+        _logger.info(f"latest_sent_time={rule.latest_sent_time}"
+                     f"{'<' if rule.latest_sent_time < rcd_send_date else '>='}"
+                     f"{rcd_send_date}")
         if rule.latest_sent_time < rcd_send_date:
-            if rcd_send_date.date == datetime.today():
+            _logger.info(f"rcd_send_date.date={rcd_send_date.date()}"
+                         f"{'==' if rcd_send_date.date() == fields.Date.context_today(self) else '!='}"
+                         f"fields.Date.context_today(self)={fields.Date.context_today(self)}")
+            if rcd_send_date.date() == fields.Date.context_today(self):
                 return True, rcd_send_date
             else:
                 return False, rcd_send_date
         else:
             return False, rcd_send_date
+
+
+def _set_template_property_rent_ratio_common(json_data):
+    hist_sent_content_params = {
+        "park_n": json_data['company_name'],
+        "p_cnt": json_data['estate_property_quantity'],
+        "area_cnt": round(json_data['estate_property_area_quantity'], 2),
+        "on_rent_p": json_data['estate_property_lease_quantity'],
+        "ratio_p": round(json_data['ratio_property_quantity'] * 100, 2),
+        "on_rent_area": round(json_data['estate_property_area_lease_quantity'], 2),
+        "ratio_area": round(json_data['ratio_property_area_quantity'] * 100, 2),
+    }
+    hist_text_content = f"截至今日{json_data['company_name']}" \
+                        f"总房间数{json_data['estate_property_quantity']}，" \
+                        f"总面积{round(json_data['estate_property_area_quantity'], 2)}㎡，" \
+                        f"在租房间数{json_data['estate_property_lease_quantity']}" \
+                        f"占比{round(json_data['ratio_property_quantity'] * 100, 2)}%，" \
+                        f"在租面积{round(json_data['estate_property_area_lease_quantity'], 2)}㎡" \
+                        f"占比{round(json_data['ratio_property_area_quantity'] * 100, 2)}%。"
+    return hist_sent_content_params, hist_text_content
+
+
+def _set_template_property_rent_ratio_491(json_data):
+    room_cnt = 0
+    area_cnt = 0
+    not_rent = 0
+    not_rent_area = 0
+    woods_pieces = 0
+    woods_area = 0
+    woods_not_rent_pieces = 0
+    woods_not_rent_area = 0
+
+    for record in json_data['latest_property_detail']:
+        if not record.property_id.property_type_id or record.property_id.property_type_id in \
+                ("办公空间", "标准厂房", "居住空间", "住宅空间", "商业空间", "工业空间", "零售店铺", "高棚仓库", "修理车间",
+                 "餐饮大厅", "共享办公", "员工宿舍", "会议大厅", "会展大厅"):
+            room_cnt += 1
+            area_cnt += record.property_rent_area
+            if not record.property_state or record.property_state not in ('sold', '已租'):
+                not_rent += 1
+                not_rent_area += record.property_rent_area
+
+        elif record.property_id.property_type_id in ("林地空间", "土地空间", "生地空间", "停车库", "停车场", "足球场"):
+            woods_pieces += 1
+            woods_area += record.property_rent_area
+            if record.property_state != "sold":
+                woods_not_rent_pieces += 1
+                woods_not_rent_area += record.property_rent_area
+        else:
+            _logger.error(f"record.property_id={record.property_id},"
+                          f"property_type_id={record.property_id.property_type_id}未被统计")
+
+    wood_info = "无空置" if woods_not_rent_pieces == 0 else f"空置{woods_not_rent_pieces}块，空置面积{woods_not_rent_area}㎡"
+
+    ratio_out_area = not_rent_area / area_cnt if area_cnt != 0 else 0
+
+    hist_sent_content_params = {
+        "room_cnt": room_cnt,
+        "area_cnt": round(area_cnt, 2),
+        "not_rent": not_rent,
+        "not_rent_area": round(not_rent_area, 2),
+        "ratio_out_area": round(ratio_out_area * 100, 2),
+        "woods_pieces": woods_pieces,
+        "woods_area": round(woods_area, 2),
+        "wood_info": wood_info,
+    }
+
+    hist_text_content = f"截至今日491空间房间总数{room_cnt}，总面积{round(area_cnt, 2)}㎡，空置{not_rent}间，" \
+                        f"空置面积{round(not_rent_area, 2)}㎡，空置率{round(ratio_out_area * 100, 2)}%；" \
+                        f"此外，林地{woods_pieces}块，面积{round(woods_area, 2)}㎡，{wood_info}。"
+    return hist_sent_content_params, hist_text_content
 
 
 class SmsAli(models.Model):
@@ -78,7 +156,7 @@ class SmsAli(models.Model):
     sms_send_time_m = fields.Integer(string="发送时间（分）", default=0)
     sms_send_time_hhmm = fields.Char(string="发送时间(时分)", compute="_get_sms_send_time_hhmm", readonly=True)
     sms_send_period_descript = fields.Char(string="周期描述", compute="_get_sms_send_period_descript", readonly=True)
-    latest_sent_time = fields.Datetime(string="最近发送时间", readonly=True)  # 由短信发送程序更新回写
+    latest_sent_time = fields.Datetime(string="最近发送时间", readonly=True, copy=False)  # 由短信发送程序更新回写
     active = fields.Boolean(string="有效", default=True)
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
@@ -127,10 +205,10 @@ class SmsAli(models.Model):
             self.sms_send_time_m = 59
 
     def create_sms_rcd_by_rules(self):
-        sms_rules = self.env['sms.ali'].sudo().search([], order="company_id, tgt_partner_id")
+        sms_rules = self.env['sms.ali'].sudo().search([('active', '=', True)], order="company_id, tgt_partner_id")
         for rule in sms_rules:
             # 先看本条是否要做成短信数据
-            need_create, send_date = _need_create_sms_rcd(rule)
+            need_create, send_date = _need_create_sms_rcd(self, rule)
             if not need_create:
                 _logger.info(f"【跳过】id={rule.id},发送周期：{rule.sms_send_period_descript},send_date={send_date}")
                 continue
@@ -147,41 +225,32 @@ class SmsAli(models.Model):
             hist_sms_sign_name = rule.sms_sign_name
             hist_sms_template_name = rule.sms_template_name
             hist_sms_template_code = rule.sms_template_code
+            hist_company_id = rule.company_id.id
             hist_date_send = send_date
-            if rule.sms_template_name == "资产出租率汇报":
+            if "资产出租率汇报" in rule.sms_template_name:
                 json_data = EstateDashboardService.get_statistics_svc(company_id=rule.company_id.id,
                                                                       env=self.env(su=True))
-                hist_sent_content_params = {
-                    "park_n": rule.company_id.name,
-                    "p_cnt": json_data['estate_property_quantity'],
-                    "area_cnt": round(json_data['estate_property_area_quantity'], 2),
-                    "on_rent_p": json_data['estate_property_lease_quantity'],
-                    "ratio_p": round(json_data['ratio_property_quantity'] * 100, 2),
-                    "on_rent_area": round(json_data['estate_property_area_lease_quantity'], 2),
-                    "ratio_area": round(json_data['ratio_property_area_quantity'] * 100, 2),
-                }
-                hist_text_content = f"截至今日{rule.company_id.name}" \
-                                    f"总房间数{json_data['estate_property_quantity']}，" \
-                                    f"总面积{round(json_data['estate_property_area_quantity'], 2)}㎡，" \
-                                    f"在租房间数{json_data['estate_property_lease_quantity']}" \
-                                    f"占比{round(json_data['ratio_property_quantity'] * 100, 2)}%，" \
-                                    f"在租面积{round(json_data['estate_property_area_lease_quantity'], 2)}㎡" \
-                                    f"占比{round(json_data['ratio_property_area_quantity'] * 100, 2)}%。"
-                hist_company_id = rule.company_id.id
-                self.env['sms.ali.hist'].sudo().create({
-                    "sms_ali_id": hist_sms_ali_id,
-                    "tgt_partner_id": hist_tgt_partner_id,
-                    "tgt_mobile": hist_tgt_mobile,
-                    "sms_sign_name": hist_sms_sign_name,
-                    "sms_template_name": hist_sms_template_name,
-                    "sms_template_code": hist_sms_template_code,
-                    "date_send": hist_date_send,
-                    "date_sent": None,
-                    "sent_result": None,
-                    "sent_content_params": str(hist_sent_content_params),
-                    "text_content": hist_text_content,
-                    "company_id": hist_company_id,
-                })
+                if '491' in rule.sms_template_name:
+                    hist_sent_content_params, hist_text_content = _set_template_property_rent_ratio_491(json_data)
+                else:
+                    json_data["company_name"] = rule.company_id.name
+                    hist_sent_content_params, hist_text_content = _set_template_property_rent_ratio_common(json_data)
+
+            # 写入hist
+            self.env['sms.ali.hist'].sudo().create({
+                "sms_ali_id": hist_sms_ali_id,
+                "tgt_partner_id": hist_tgt_partner_id,
+                "tgt_mobile": hist_tgt_mobile,
+                "sms_sign_name": hist_sms_sign_name,
+                "sms_template_name": hist_sms_template_name,
+                "sms_template_code": hist_sms_template_code,
+                "date_send": hist_date_send,
+                "date_sent": None,
+                "sent_result": None,
+                "sent_content_params": str(hist_sent_content_params),
+                "text_content": hist_text_content,
+                "company_id": hist_company_id,
+            })
 
     @staticmethod
     def log_rotate() -> None:
