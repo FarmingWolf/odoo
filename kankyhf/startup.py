@@ -60,6 +60,7 @@ zip_tgt_folders = [
     'contacts',
     'estate_dashboard',
     'estate_account',
+    'sms_ali',
 ]
 
 zip_all_addons = True
