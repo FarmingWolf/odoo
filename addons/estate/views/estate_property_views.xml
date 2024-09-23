@@ -25,7 +25,7 @@
                 <field name="latest_contact_person"/>
                 <field name="state" />
                 <field name="property_type_id" string="资产类型"/>
-                <field name="rent_area" string="面积（㎡）"/>
+                <field name="rent_area" string="面积（㎡）" sum="总面积（㎡）"/>
                 <field name="expected_price" string="期待价格（元/天/㎡）"/>
                 <field name="selling_price" string="实际价格（元/天/㎡）"/>
                 <field name="building_no"/>
@@ -48,7 +48,7 @@
                 <field name="state" />
                 <field name="out_of_rent_days"/>
                 <field name="last_rent_date_e"/>
-                <field name="rent_area" string="面积（㎡）"/>
+                <field name="rent_area" string="面积（㎡）" sum="总面积（㎡）"/>
                 <field name="property_type_id" string="资产类型"/>
             </tree>
         </field>
@@ -250,10 +250,15 @@
             <search string="资产检索">
                 <filter name="active" string="数据可用" domain="[('active','=','true')]" />
                 <separator/>
+                <filter name="sold" string="已租" domain="[('state','=','sold')]"/>
+                <filter name="unsold" string="未租" domain="[('state','!=','sold')]"/>
+                <field name="property_type_id" string="资产类型" operator="like"/>
+                <separator/>
                 <field name="rent_area" string="面积>=" filter_domain="[('rent_area', '>=', self)]"/>
                 <separator/>
                 <group expand='1' string='按资产状态'>
-                    <filter string='状态' name="state" context="{'group_by': 'state'}"/>
+                    <filter string='资产状态' name="state" context="{'group_by': 'state'}"/>
+                    <filter string='资产类型' name="property_type_id" context="{'group_by': 'property_type_id'}"/>
                 </group>
             </search>
         </field>
