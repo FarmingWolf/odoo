@@ -18,6 +18,7 @@
         <field name="arch" type="xml">
             <tree string="property_type_tree">
                 <field name="name" string="资产类型"/>
+                <field name="count_ratio_as_room"/>
                 <field name="property_ids"/>
 <!--                <field name="property_count" string="资产条数"/>-->
             </tree>
@@ -38,7 +39,10 @@
             <form string="RealEstatePropertyType" create="True" edit="True" duplicate="False" delete="False">
 
                 <sheet>
-                    <field name="name" class="o_estate_property_form_title_large_font" default_focus="True"/>
+                    <group class="o_estate_property_form_title_large_font" >
+                        <field name="name" default_focus="True"/>
+                        <field name="count_ratio_as_room"/>
+                    </group>
                     <button name="%(estate.action_toggle_show_offer)d" icon="fa-users" type="action"
                             class="oe_stat_button" invisible="offer_count==0" title="显示报价">
 <!--                            class="oe_stat_button" invisible="offer_count==0" title="显示报价">-->

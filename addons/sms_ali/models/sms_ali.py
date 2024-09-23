@@ -16,21 +16,20 @@ _logger = logging.getLogger(__name__)
 
 
 def _compute_date_send(self, rule):
-    date_send = datetime.today()
-    context_today = fields.Date.context_today(self)
+    date_send = fields.Datetime.context_timestamp(self, fields.datetime.now()).replace(tzinfo=None)
 
     if rule.sms_send_period == "daily":
         pass
     elif rule.sms_send_period == "weekly":
-        weekday = context_today.weekday() + 1
-        date_send = context_today + timedelta(days=(int(rule.sms_send_period_weekday) - weekday + 7) % 7)
+        weekday = date_send.weekday() + 1
+        date_send = date_send + timedelta(days=(int(rule.sms_send_period_weekday) - weekday + 7) % 7)
 
     elif rule.sms_send_period == "monthly":
-        monthday = context_today.day
+        monthday = date_send.day
         if monthday <= rule.sms_send_period_monthday:
-            date_send = context_today + relativedelta(day=rule.sms_send_period_monthday)
+            date_send = date_send + relativedelta(day=rule.sms_send_period_monthday)
         else:
-            date_send = context_today + relativedelta(months=1, day=rule.sms_send_period_monthday)
+            date_send = date_send + relativedelta(months=1, day=rule.sms_send_period_monthday)
     elif rule.sms_send_period == "depends_on":
         pass
     else:
@@ -93,24 +92,19 @@ def _set_template_property_rent_ratio_491(json_data):
     woods_not_rent_area = 0
 
     for record in json_data['latest_property_detail']:
-        if not record.property_id.property_type_id or record.property_id.property_type_id in \
-                ("办公空间", "标准厂房", "居住空间", "住宅空间", "商业空间", "工业空间", "零售店铺", "高棚仓库", "修理车间",
-                 "餐饮大厅", "共享办公", "员工宿舍", "会议大厅", "会展大厅"):
+        if (not record.property_id.property_type_id) or record.property_id.property_type_id.count_ratio_as_room:
             room_cnt += 1
             area_cnt += record.property_rent_area
-            if not record.property_state or record.property_state not in ('sold', '已租'):
+            if (not record.property_state) or record.property_state not in ('sold', '已租'):
                 not_rent += 1
                 not_rent_area += record.property_rent_area
 
-        elif record.property_id.property_type_id in ("林地空间", "土地空间", "生地空间", "停车库", "停车场", "足球场"):
+        else:
             woods_pieces += 1
             woods_area += record.property_rent_area
-            if record.property_state != "sold":
+            if (not record.property_state) or record.property_state not in ('sold', '已租'):
                 woods_not_rent_pieces += 1
                 woods_not_rent_area += record.property_rent_area
-        else:
-            _logger.error(f"record.property_id={record.property_id},"
-                          f"property_type_id={record.property_id.property_type_id}未被统计")
 
     wood_info = "无空置" if woods_not_rent_pieces == 0 else f"空置{woods_not_rent_pieces}块，空置面积{woods_not_rent_area}㎡"
 

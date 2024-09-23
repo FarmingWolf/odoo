@@ -15,6 +15,8 @@ class EstatePropertyType(models.Model):
     property_count = fields.Integer(compute="_compute_property_count", default=0)
     sequence = fields.Integer('Sequence', default=1, help="排序")
 
+    count_ratio_as_room = fields.Boolean(string="计入房间出租率", default=True)
+
     offer_ids = fields.One2many('estate.property.offer', 'property_type_id', string="报价")
     offer_count = fields.Integer(compute="_compute_offer_count", default=0)
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
