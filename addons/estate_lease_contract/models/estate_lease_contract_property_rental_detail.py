@@ -95,7 +95,10 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     @api.depends("period_date_from", "period_date_to")
     def _get_period_days(self):
         for record in self:
-            record.period_days = (record.period_date_to - record.period_date_from + timedelta(days=1)).days
+            if record.period_date_to and record.period_date_from:
+                record.period_days = (record.period_date_to - record.period_date_from + timedelta(days=1)).days
+            else:
+                record.period_days = 0
 
     @api.depends("rental_received")
     def _get_rental_received_2_date(self):
@@ -261,7 +264,8 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
         origin_val = self._origin.rental_amount if self._origin else "原始值请手动记录"
         if origin_val != self.rental_amount:
             msg = f"{fields.Date.context_today(self)}" \
-                  f"修改本期租金[{round(origin_val, 2)}]→[{round(self.rental_amount, 2)}]。"
+                  f"修改本期租金[{round(origin_val, 2) if isinstance(origin_val, float) else origin_val}]" \
+                  f"→[{round(self.rental_amount, 2)}]。"
             self.comment = msg if not self.comment else msg + self.comment
 
     @api.onchange("rental_receivable")
@@ -270,7 +274,8 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
         origin_val = self._origin.rental_receivable if self._origin else "原始值请手动记录"
         if origin_val != self.rental_receivable:
             msg = f"{fields.Date.context_today(self)}" \
-                  f"修改本期应收[{round(origin_val, 2)}]→[{round(self.rental_receivable, 2)}]。"
+                  f"修改本期应收[{round(origin_val, 2) if isinstance(origin_val, float) else origin_val}]→" \
+                  f"[{round(self.rental_receivable, 2)}]。"
             self.comment = msg if not self.comment else msg + self.comment
 
     @api.onchange("rental_received")
@@ -278,7 +283,8 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
         origin_val = self._origin.rental_received if self._origin else "原始值请手动记录"
         if origin_val != self.rental_received:
             msg = f"{fields.Date.context_today(self)}" \
-                  f"修改本期实收[{round(origin_val, 2)}]→[{round(self.rental_received, 2)}]。"
+                  f"修改本期实收[{round(origin_val, 2) if isinstance(origin_val, float) else origin_val}]→" \
+                  f"[{round(self.rental_received, 2)}]。"
             self.comment = msg if not self.comment else msg + self.comment
 
         self.rental_received_2_date = _get_rental_received_2_date_from_rcd(self)
@@ -300,7 +306,8 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
         origin_val = self._origin.incentive_days if self._origin else "原始值请手动记录"
         if origin_val != self.incentive_days:
             msg = f"{fields.Date.context_today(self)}" \
-                  f"修改本期优惠天数[{round(origin_val, 0)}]→[{round(self.incentive_days, 0)}]。"
+                  f"修改本期优惠天数[{round(origin_val, 0) if isinstance(origin_val, float) else origin_val}]→" \
+                  f"[{round(self.incentive_days, 0)}]。"
             self.comment = msg if not self.comment else msg + self.comment
 
     @api.onchange("incentive_amount")
@@ -318,7 +325,8 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
         origin_val = self._origin.incentive_amount if self._origin else "原始值请手动记录"
         if origin_val != self.incentive_amount:
             msg = f"{fields.Date.context_today(self)}" \
-                  f"修改本期优惠金额[{round(origin_val, 2)}]→[{round(self.incentive_amount, 2)}]。"
+                  f"修改本期优惠金额[{round(origin_val, 2) if isinstance(origin_val, float) else origin_val}]→" \
+                  f"[{round(self.incentive_amount, 2)}]。"
             self.comment = msg if not self.comment else msg + self.comment
 
     def action_confirm_received(self):
