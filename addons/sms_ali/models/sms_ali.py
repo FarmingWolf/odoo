@@ -31,10 +31,11 @@ def _compute_date_send(self, rule):
         else:
             date_send = date_send + relativedelta(months=1, day=rule.sms_send_period_monthday)
     elif rule.sms_send_period == "depends_on":
-        pass
+        # todo 应该根据合同实际情况计算短信发送日
+        date_send = fields.datetime.now().replace(year=1900)
     else:
         _logger.error("目前没有这种情况")
-        pass
+        date_send = fields.datetime.now().replace(year=1900)
 
     date_send = date_send.replace(hour=rule.sms_send_time_h, minute=rule.sms_send_time_m, second=0, microsecond=0)
     _logger.info(f"date_send={date_send}")
@@ -230,21 +231,22 @@ class SmsAli(models.Model):
                     json_data["company_name"] = rule.company_id.name
                     hist_sent_content_params, hist_text_content = _set_template_property_rent_ratio_common(json_data)
 
-            # 写入hist
-            self.env['sms.ali.hist'].sudo().create({
-                "sms_ali_id": hist_sms_ali_id,
-                "tgt_partner_id": hist_tgt_partner_id,
-                "tgt_mobile": hist_tgt_mobile,
-                "sms_sign_name": hist_sms_sign_name,
-                "sms_template_name": hist_sms_template_name,
-                "sms_template_code": hist_sms_template_code,
-                "date_send": hist_date_send,
-                "date_sent": None,
-                "sent_result": None,
-                "sent_content_params": str(hist_sent_content_params),
-                "text_content": hist_text_content,
-                "company_id": hist_company_id,
-            })
+                # todo 目前只有这一个模板，其他模板先不发短信
+                # 写入hist
+                self.env['sms.ali.hist'].sudo().create({
+                    "sms_ali_id": hist_sms_ali_id,
+                    "tgt_partner_id": hist_tgt_partner_id,
+                    "tgt_mobile": hist_tgt_mobile,
+                    "sms_sign_name": hist_sms_sign_name,
+                    "sms_template_name": hist_sms_template_name,
+                    "sms_template_code": hist_sms_template_code,
+                    "date_send": hist_date_send,
+                    "date_sent": None,
+                    "sent_result": None,
+                    "sent_content_params": str(hist_sent_content_params),
+                    "text_content": hist_text_content,
+                    "company_id": hist_company_id,
+                })
 
     @staticmethod
     def log_rotate() -> None:
