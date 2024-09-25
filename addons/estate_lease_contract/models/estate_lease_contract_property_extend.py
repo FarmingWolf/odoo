@@ -41,7 +41,8 @@ class EstateLeaseContractPropertyExtend(models.Model):
 
         for record in self:
             # 如果不是只读查看模式，即编辑模式的时候，合同尚未激活
-            _logger.info(f"租赁标的-contract_read_only=[{request.session.get('contract_read_only')}]")
+            _logger.info(f"租赁标的={record.id}-{record.name}公司{record.company_id.id};"
+                         f"contract_read_only=[{request.session.get('contract_read_only')}]")
             if not request.session.get('contract_read_only'):
                 active_flg = False
             else:
@@ -56,14 +57,17 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 contract_rcd = self.env['estate.lease.contract'].search([('id', '=', session_contract_id),
                                                                          ('active', '=', active_flg)], limit=1)
                 for rcd in contract_rcd:
-                    _logger.info(f"设置本资产的合同相关信息：{rcd.name},id:{rcd.id}")
-                    record.current_contract_no = rcd.contract_no
-                    record.current_contract_nm = rcd.name
-                    record.latest_rent_date_s = rcd.date_rent_start
-                    record.latest_rent_date_e = rcd.date_rent_end
-                    record.latest_rent_days = rcd.days_rent_total
-                    record.latest_contact_person = rcd.renter_id.name
-                    record.latest_contact_person_tel = rcd.renter_id.phone
+                    if record in rcd.property_ids:
+                        _logger.info(f"设置本资产的合同相关信息：{rcd.name},id:{rcd.id}")
+                        record.current_contract_no = rcd.contract_no
+                        record.current_contract_nm = rcd.name
+                        record.latest_rent_date_s = rcd.date_rent_start
+                        record.latest_rent_date_e = rcd.date_rent_end
+                        record.latest_rent_days = rcd.days_rent_total
+                        record.latest_contact_person = rcd.renter_id.name
+                        record.latest_contact_person_tel = rcd.renter_id.phone
+                    else:
+                        _logger.info(f"本资产与session中的合同无关：{rcd.name},id:{rcd.id},property_ids:{rcd.property_ids}")
 
                 # 如果session_contract_id存在，从contract_property_rental_plan_rel中查找
                 rel_model = self.env['estate.lease.contract.rental.plan.rel']

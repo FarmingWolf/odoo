@@ -491,7 +491,7 @@ class EstateLeaseContract(models.Model):
 
     _name = "estate.lease.contract"
     _description = "资产租赁合同管理模型"
-    _order = "property_ids ASC, sequence ASC, renter_id ASC, date_rent_end DESC"
+    _order = "sequence ASC, renter_id ASC, date_rent_end DESC"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _mail_post_access = 'read'
 
