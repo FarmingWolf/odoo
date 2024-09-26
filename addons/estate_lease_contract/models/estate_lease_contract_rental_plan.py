@@ -60,7 +60,9 @@ class EstateLeaseContractRentalPlan(models.Model):
 
     payment_period = fields.Selection(string="支付周期", required=True, default="6",
                                       selection=[('1', '月付'), ('2', '双月付'), ('3', '季付'),
-                                                 ('4', '四个月付'), ('6', '半年付'), ('12', '年付')], )
+                                                 ('4', '四个月付'), ('5', '五个月付'), ('6', '半年付'), ('7', '七个月付'),
+                                                 ('8', '八个月付'), ('9', '九个月付'), ('10', '十个月付'),
+                                                 ('11', '十一个月付'), ('12', '年付')], )
     rent_price = fields.Float(default=0.0, string="租金单价（元/天/㎡）")
 
     payment_date = fields.Selection(string="租金支付日", required=True, default="period_start_15_bef_this",

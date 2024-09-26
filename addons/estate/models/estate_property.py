@@ -312,11 +312,11 @@ class EstateProperty(models.Model):
                 return label
         return "Unknown State[{0}]".format(state_value)
 
-    @api.model
-    def ondelete(self):
+    @api.ondelete(at_uninstall=False)
+    def _unlink_if_new_canceled(self):
         for record in self:
             if record.state not in ("new", "canceled"):
                 state_label = self._get_state_label(record.state)
                 raise UserError(_('[{0}]该条资产状态为【{1}】，不可被删除!'.format(record.name, state_label)))
 
-        return super().unlink()
+        # return super().unlink()

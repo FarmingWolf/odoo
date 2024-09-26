@@ -126,13 +126,13 @@ class EstateLeaseContractPropertyExtend(models.Model):
     set_rent_plan_main_category = fields.Many2one("estate.lease.contract.rental.main.category", string="主品类",
                                                   store=False)
     set_rent_plan_billing_method = fields.Selection(string='计费方式', store=False,
-                                                    selection=[('by_fixed_price', '固定金额'), ('by_percentage', '纯抽成'),
-                                                               ('by_progress', '按递增率'),
-                                                               ('by_fixed_price_percentage_higher', '保底抽成两者取高')],
+                                                    selection=[('by_fixed_price', '固定金额'), ('by_progress', '按递增率')],
                                                     default='by_fixed_price')
-    set_rent_plan_payment_period = fields.Selection(string="支付周期", default='3', store=False,
+    set_rent_plan_payment_period = fields.Selection(string="支付周期", default='6', store=False,
                                                     selection=[('1', '月付'), ('2', '双月付'), ('3', '季付'),
-                                                               ('4', '四个月付'), ('6', '半年付'), ('12', '年付')])
+                                                               ('4', '四个月付'), ('5', '五个月付'), ('6', '半年付'),
+                                                               ('7', '七个月付'), ('8', '八个月付'), ('9', '九个月付'),
+                                                               ('10', '十个月付'), ('11', '十一个月付'), ('12', '年付')], )
 
     set_rent_plan_payment_date = fields.Selection(string="租金支付日", default='period_start_15_bef_this', store=False,
                                                   selection=[
@@ -606,18 +606,22 @@ class EstateLeaseContractPropertyExtend(models.Model):
                                           f"unreleased_contract.date_rent_start={unreleased_contract.date_rent_start},"
                                           f"unreleased_contract.date_rent_end={unreleased_contract.date_rent_end}")
 
-                    if i == 0:
-                        # 在以上已发布的合同，未发布的合同，都没有的情况下，看已终止的合同，且上述都没有的情况下，看1个就够改的了
-                        terminated_contract = self.env['estate.lease.contract'].search(
-                            [('property_ids', 'in', each_property.id),
-                             ('active', '=', True),
-                             ('terminated', '=', True)],
-                            order='date_rent_end DESC', limit=1)
-                        if terminated_contract:
-                            # 如果合同已终止，资产状态就不能sold
-                            if each_property.state == "sold":
-                                each_property.state = 'out_dated'
-                                state_change = True
+                if i == 0:
+                    # 在以上已发布的合同，未发布的合同，都没有的情况下，看已终止的合同，且上述都没有的情况下，看1个就够改的了
+                    terminated_contract = self.env['estate.lease.contract'].search(
+                        [('property_ids', 'in', each_property.id),
+                         ('active', '=', True),
+                         ('terminated', '=', True)],
+                        order='date_rent_end DESC', limit=1)
+                    if terminated_contract:
+                        # 如果合同已终止，资产状态就不能sold
+                        if each_property.state == "sold":
+                            each_property.state = 'out_dated'
+                            state_change = True
+                    else:
+                        # 如果上边都没找到一条合同数据，那么可能合同被删除了，也要取消资产的已租状态
+                        if each_property.state in ("sold", 'offer_received', 'offer_accepted'):
+                            each_property.state = 'canceled'
 
                 _logger.info(f"公司{each_property.company_id},资产{each_property.name}状态={each_property.state},"
                              f"{'【不】' if not state_change else ''}需要更新")

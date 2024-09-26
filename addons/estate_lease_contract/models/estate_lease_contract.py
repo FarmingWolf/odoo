@@ -1215,21 +1215,21 @@ class EstateLeaseContract(models.Model):
             record.active = True
             # 根据合同生效日期判断state
             if record.date_start <= date.today():
-                record.state = 'released'
                 for each_property in record.property_ids:
                     if each_property.state != "sold":
                         each_property.state = "sold"
+                record.state = 'released'
             else:
-                record.state = 'to_be_released'
                 for each_property in record.property_ids:
                     if each_property.state != "offer_accepted":
                         each_property.state = "offer_accepted"
+                record.state = 'to_be_released'
 
             if record.date_rent_end < date.today():
-                record.state = 'invalid'
                 for each_property in record.property_ids:
                     if each_property.state != "out_dated":
                         each_property.state = "out_dated"
+                record.state = 'invalid'
 
     # 取消发布合同
     def action_cancel_release_contract(self):
@@ -1412,17 +1412,15 @@ class EstateLeaseContract(models.Model):
             # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['property_id'])
             # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['rental_plan_id'])
 
-    @api.model
-    def ondelete(self):
-
+    @api.ondelete(at_uninstall=False)
+    def _unlink_if_not_needed(self):
+        _logger.info(f"开始删除……")
         for record in self:
+            _logger.info(f"contract id={record.id},state={record.state},active={record.active}")
             if record.state != 'recording':
                 raise UserError(_(f'本合同目前所处状态：{record.state}，不能删除'))
-                return
 
-        self._delete_contract_property_rental_plan_rel()
-        self._delete_contract_registration_addr_rel()
-        return super().unlink()
+            self.compute_property_state(record.property_ids)
 
     # 手动续租
     def action_contract_renewal(self):
@@ -1594,4 +1592,147 @@ class EstateLeaseContract(models.Model):
 
         # 跳转到新记录的表单视图
         return self._action_view_record(self_id, title, context, domain)
+
+    def compute_property_state(self, property_ids):
+        # 更新该合同下的每个资产状态
+        for each_property in property_ids:
+            contracts = self.env['estate.lease.contract'].search([('property_ids', 'in', each_property.id)],
+                                                                 order="date_rent_end ASC")
+            if not contracts:
+                if each_property.state != 'canceled':
+                    each_property.state = 'canceled'
+                break
+
+            # 由于数据从旧到新排列，且已发布的资产租赁数据不会有时间段重合
+            for contract in contracts:
+                # 先看覆盖当天日期的时间段，最优先判断
+                if contract.date_start <= fields.Date.context_today(self) <= contract.date_rent_end:
+                    # 合同开始，但是租期未开始
+                    if contract.date_start <= fields.Date.context_today(self) < contract.date_rent_start:
+                        # 合同已发布且未终止
+                        if contract.active and not contract.terminated:
+                            if contract.state in ('to_be_released', 'released'):
+                                if each_property.state != "offer_accepted":
+                                    each_property.state = "offer_accepted"
+                            elif contract.state == "recording":
+                                if each_property.state != "offer_received":
+                                    each_property.state = "offer_received"
+                            elif contract.state == "invalid":
+                                if each_property.state != "canceled":
+                                    each_property.state = "canceled"
+                            else:
+                                _logger.error(f"新定义的合同状态{contract.state}，需增加逻辑")
+                                pass
+                        elif contract.active and contract.terminated:
+                            if each_property.state != "canceled":
+                                each_property.state = "canceled"
+                        elif (not contract.active) and (not contract.terminated):
+                            if each_property.state != "offer_received":
+                                each_property.state = "offer_received"
+                        elif (not contract.active) and contract.terminated:
+                            if each_property.state != "canceled":
+                                each_property.state = "canceled"
+                        else:
+                            _logger.error(f"理论上不存在该情况：contract.active={contract.active};"
+                                          f"contract.terminated={contract.terminated}")
+                            pass
+                    # 当前日期在租期内
+                    else:
+                        # 合同已发布且未终止
+                        if contract.active and not contract.terminated:
+                            if contract.state in ('to_be_released', 'released'):
+                                if each_property.state != "sold":
+                                    each_property.state = "sold"
+                            elif contract.state == "recording":
+                                if each_property.state != "offer_received":
+                                    each_property.state = "offer_received"
+                            elif contract.state == "invalid":
+                                if each_property.state != "canceled":
+                                    each_property.state = "canceled"
+                            else:
+                                _logger.error(f"新定义的合同状态{contract.state}，需增加逻辑")
+                                pass
+                        elif contract.active and contract.terminated:
+                            if each_property.state != "canceled":
+                                each_property.state = "canceled"
+                        elif (not contract.active) and (not contract.terminated):
+                            if each_property.state != "offer_received":
+                                each_property.state = "offer_received"
+                        elif (not contract.active) and contract.terminated:
+                            if each_property.state != "canceled":
+                                each_property.state = "canceled"
+                        else:
+                            _logger.error(f"理论上不存在该情况：contract.active={contract.active};"
+                                          f"contract.terminated={contract.terminated}")
+                            pass
+                    # 当前最新状态最优先，所以有了就退出
+                    break
+                # 看未来数据
+                elif fields.Date.context_today(self) < contract.date_start:
+                    # 合同已发布且未终止
+                    if contract.active and not contract.terminated:
+                        if contract.state == 'to_be_released':
+                            if each_property.state != "offer_accepted":
+                                each_property.state = "offer_accepted"
+                        elif contract.state == 'released':  # 理论上不存在这种情况
+                            if each_property.state != "offer_accepted":
+                                each_property.state = "offer_accepted"
+                        elif contract.state == "recording":
+                            if each_property.state != "offer_received":
+                                each_property.state = "offer_received"
+                        elif contract.state == "invalid":
+                            if each_property.state != "canceled":
+                                each_property.state = "canceled"
+                        else:
+                            _logger.error(f"新定义的合同状态{contract.state}，需增加逻辑")
+                            pass
+                    elif contract.active and contract.terminated:
+                        if each_property.state != "canceled":
+                            each_property.state = "canceled"
+                    elif (not contract.active) and (not contract.terminated):
+                        if each_property.state != "offer_received":
+                            each_property.state = "offer_received"
+                    elif (not contract.active) and contract.terminated:
+                        if each_property.state != "canceled":
+                            each_property.state = "canceled"
+                    else:
+                        _logger.error(f"理论上不存在该情况：contract.active={contract.active};"
+                                      f"contract.terminated={contract.terminated}")
+                        pass
+                    # 已看到未来数据，不用再看接下来的未来数据
+                    break
+
+                # 看过去的数据
+                elif fields.Date.context_today(self) > contract.date_rent_end:
+                    # 合同已发布且未终止
+                    if contract.active and not contract.terminated:
+                        if contract.state in ('to_be_released', 'released'):
+                            if each_property.state != "out_dated":
+                                each_property.state = "out_dated"
+                        elif contract.state == "recording":
+                            if each_property.state != "offer_received":
+                                each_property.state = "offer_received"
+                        elif contract.state == "invalid":
+                            if each_property.state != "out_dated":
+                                each_property.state = "out_dated"
+                        else:
+                            _logger.error(f"新定义的合同状态{contract.state}，需增加逻辑")
+                            pass
+                    elif contract.active and contract.terminated:
+                        if each_property.state != "canceled":
+                            each_property.state = "canceled"
+                    elif (not contract.active) and (not contract.terminated):
+                        if each_property.state != "offer_received":
+                            each_property.state = "offer_received"
+                    elif (not contract.active) and contract.terminated:
+                        if each_property.state != "out_dated":
+                            each_property.state = "out_dated"
+                    else:
+                        _logger.error(f"理论上不存在该情况：contract.active={contract.active};"
+                                      f"contract.terminated={contract.terminated}")
+                        pass
+                    # 这里不能break，因为后边可能还有数据
+
+
+
 
