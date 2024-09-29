@@ -973,7 +973,7 @@ class EstateLeaseContract(models.Model):
 
             for rcd in res:
                 if (not rcd.property_id) or (not rcd.image_1920) or \
-                        (not record.property_ids) or (res.property_id not in record.property_ids):
+                        (not record.property_ids) or (rcd.property_id not in record.property_ids):
                     rcd.unlink()
                 else:
                     tgt_ids.append(rcd.id)
