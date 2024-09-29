@@ -14,3 +14,4 @@ lease_contract_rental_plan_rel_account_rule,Restrict Lease Contract Rental Plan 
 lease_contract_registration_addr_rel_account_rule,Restrict Lease Contract Registration Addr Rel by Company,model_estate_lease_contract_registration_addr_rel,"[('company_id','=',user.company_id.id)]"
 lease_contract_rental_turnover_percentage_account_rule,Restrict Lease Contract Rental Turnover Percentage by Company,model_estate_lease_contract_rental_turnover_percentage,"[('company_id','=',user.company_id.id)]"
 lease_contract_tag_account_rule,Restrict Lease Contract Rental Tag by Company,model_estate_lease_contract_tag,"[('company_id','=',user.company_id.id)]"
+lease_contract_property_ini_state_rule,Restrict Lease Contract Property Ini State by Company,model_estate_lease_contract_property_ini_state,"[('company_id','=',user.company_id.id)]"

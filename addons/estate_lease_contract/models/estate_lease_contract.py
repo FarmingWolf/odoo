@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import io
 import logging
+import zipfile
 from datetime import timedelta, datetime, date
 import random
+from io import BytesIO
 from typing import Dict, List
 
 from odoo.http import request
@@ -956,6 +959,37 @@ class EstateLeaseContract(models.Model):
     rental_details = fields.One2many('estate.lease.contract.property.rental.detail', 'contract_id', store=True,
                                      compute='_compute_rental_details', string="租金明细", readonly=False, copy=False)
 
+    property_ini_img_ids = fields.One2many(comodel_name='estate.lease.contract.property.ini.state',
+                                           inverse_name='contract_id', string="资产初始状态图",
+                                           compute="_compute_property_ini_img_ids")
+    property_ini_img_ids_readonly = fields.Boolean(string="资产初始状态图只读", default=True, store=False,
+                                                   compute="_compute_property_ini_img_ids_readonly")
+
+    @api.depends("property_ids")
+    def _compute_property_ini_img_ids(self):
+        for record in self:
+            tgt_ids = []
+            res = self.env['estate.lease.contract.property.ini.state'].search([('contract_id', '=', record.id)])
+
+            for rcd in res:
+                if (not rcd.property_id) or (not rcd.image_1920) or \
+                        (not record.property_ids) or (res.property_id not in record.property_ids):
+                    rcd.unlink()
+                else:
+                    tgt_ids.append(rcd.id)
+            if tgt_ids:
+                record.property_ini_img_ids = self.env['estate.lease.contract.property.ini.state'].browse(tgt_ids)
+            else:
+                record.property_ini_img_ids = False
+
+    @api.depends("property_ids")
+    def _compute_property_ini_img_ids_readonly(self):
+        for record in self:
+            if record.property_ids:
+                record.property_ini_img_ids_readonly = False
+            else:
+                record.property_ini_img_ids_readonly = True
+
     @api.onchange("registration_addr")
     def _check_registration_addr_duplicated(self):
         for record in self:
@@ -1031,6 +1065,7 @@ class EstateLeaseContract(models.Model):
         self._compute_property_rental_detail_ids()
         self._compute_rental_details()
         self._compute_warn_msg()
+        self._compute_property_ini_img_ids()
 
     # 刷新租金方案
     def action_refresh_rental_plan(self):
@@ -1733,6 +1768,10 @@ class EstateLeaseContract(models.Model):
                         pass
                     # 这里不能break，因为后边可能还有数据
 
-
-
-
+    def download_all_images(self):
+        action = {
+            "type": "ir.actions.act_url",
+            "url": "/estate_lease_contract/download/all_images/" + str(self.id),
+            "target": "self",
+        }
+        return action

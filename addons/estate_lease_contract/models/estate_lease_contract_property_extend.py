@@ -759,3 +759,18 @@ class EstateLeaseContractPropertyExtend(models.Model):
         _logger.info(f"write 2 db rental_plan={rental_plan}")
         res = self.env['estate.lease.contract.rental.plan'].create(rental_plan)
         return res
+
+    def add_property_ini_img(self):
+        action = {
+            "name": "资产初始状态图",
+            "type": "ir.actions.act_window",
+            "view_mode": "tree",
+            "res_model": "estate.lease.contract.property.ini.state",
+            "views": [
+                (self.env.ref('estate_lease_contract.estate_lease_contract_property_ini_state_view_tree').id, 'tree')],
+            "target": "new",
+            "context": self.env.context,
+            "domain": [('contract_id', '=', self.env.context['CONTRACT_ID']),
+                       ('property_id', '=', self.env.context['PROPERTY_ID'])],
+        }
+        return action

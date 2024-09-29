@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="estate_lease_contract_property_ini_state_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.ini.state.tree</field>
+        <field name="model">estate.lease.contract.property.ini.state</field>
+        <field name="arch" type="xml">
+            <tree string="estate_lease_contract_property_ini_state_view_tree" create="True" edit="True" delete="True" editable="bottom">
+                <field name="contract_id" column_invisible="context.get('contract_invisible', True)"/>
+                <field name="property_id" readonly="1"/>
+                <field name="image_1920" widget="image" class="oe_avatar"
+                       options="{'preview_image': 'image_512'}"/>
+                <field name="write_date" string="上传时间" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_property_ini_state_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.ini.state.form</field>
+        <field name="model">estate.lease.contract.property.ini.state</field>
+        <field name="arch" type="xml">
+            <form string="estate_lease_contract_property_ini_state_form">
+                <sheet>
+                    <group cols="2">
+                        <group>
+                            <field name="contract_id" invisible="1" column_invisible="context.get('contract_invisible', True)"/>
+                            <field name="property_id" nolabel="1" column_invisible="context.get('contract_invisible', True)"/>
+                        </group>
+                        <group>
+                            <field name="image_1920" widget="image" class="oe_avatar"
+                                   options="{'preview_image': 'image_512'}" nolabel="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>
