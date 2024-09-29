@@ -89,8 +89,9 @@ class EstateProperty(models.Model):
     def _default_sequence(self):
         return (self.search([], order="sequence", limit=1).sequence or 0) + 1
 
-    sequence = fields.Integer(string='序号', default=_default_sequence, help="可在列表页面拖拽排序")
-
+    sequence = fields.Integer(string='序号', default=_default_sequence, help="可在列表页面拖拽排序",
+                              compute="_compute_sequence", store=True, readonly=False)
+    order_by_name = fields.Boolean(string="以名称排序", default=True, help="勾选则以名称为排序基准，不勾选则以序号为排序基准")
     total_area = fields.Float(compute="_compute_total_area", string="总使用面积（㎡）", readonly=True, copy=False)
 
     current_contract_id = fields.Char(string='当前合同', compute="_compute_latest_info", readonly=True, copy=False,
@@ -117,6 +118,20 @@ class EstateProperty(models.Model):
     latest_free_days = fields.Date(string="免租期", copy=False)
     more_info_invisible = fields.Boolean(string="更多信息", copy=False, default=False, store=False)
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+
+    @api.depends("name", 'order_by_name')
+    def _compute_sequence(self):
+        for record in self:
+
+            record.sequence = record.sequence
+
+            all_rcds = self.env['estate.property'].search([('company_id', '=', self.company_id.id)], order="name ASC")
+            i = 0
+            for rcd in all_rcds:
+                if rcd.order_by_name and rcd.sequence != i:
+                    _logger.info(f"重新排序property rcd{rcd.id}.sequence={rcd.sequence}→{i}")
+                    rcd.sequence = i
+                i += 1
 
     @api.depends("_id")
     def _get_context(self):

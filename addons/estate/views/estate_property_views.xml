@@ -101,8 +101,13 @@
                             <field name="company_id" invisible="1"/>
                             <field name="name" default_focus="True"/>
                         </group>
-                        <group>
-                            <field name="sequence"/>
+                        <group col="2">
+                            <group>
+                                <field name="sequence" readonly="order_by_name"/>
+                            </group>
+                            <group>
+                                <field name="order_by_name"/>
+                            </group>
                         </group>
                     </group>
                     <group>

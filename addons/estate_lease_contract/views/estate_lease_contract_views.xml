@@ -48,21 +48,30 @@
                             <field name="rent_amount"/>
                             <field name="rent_amount_year"/>
                         </group>
-                        <group>
-                            <field name="contract_no" readonly="not edit_on_hist_page"/>
-                            <field name="date_rent_start" readonly="not edit_on_hist_page"/>
-                            <field name="date_rent_end" readonly="not edit_on_hist_page"/>
-                            <field name="days_rent_total" readonly="1"/>
-                            <field name="days_free" readonly="not edit_on_hist_page"
-                                   help="目前仅用于记录合同中约定的免租期天数，系统暂不据此计算租金"/>
-                            <field name="date_decorate_start" readonly="not edit_on_hist_page"/>
-                            <field name="date_decorate_end" readonly="not edit_on_hist_page"/>
-                            <field name="days_decorate" readonly="1"/>
-                            <field name="opening_date" readonly="not edit_on_hist_page"/>
-                            <field name="rent_amount_first_period" readonly="not edit_on_hist_page"/>
-                            <field name="rent_first_payment_date" readonly="not edit_on_hist_page"/>
-                            <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}"
-                                   readonly="not edit_on_hist_page"/>
+                        <group col="1">
+                            <group col="2">
+                                <field name="contract_no" readonly="not edit_on_hist_page"/>
+                                <field name="date_rent_start" readonly="not edit_on_hist_page"/>
+                                <field name="date_rent_end" readonly="not edit_on_hist_page"/>
+                                <field name="days_rent_total" readonly="1"/>
+                                <field name="days_free" readonly="not edit_on_hist_page"
+                                       help="目前仅用于记录合同中约定的免租期天数，系统暂不据此计算租金"/>
+                                <field name="date_decorate_start" readonly="not edit_on_hist_page"/>
+                                <field name="date_decorate_end" readonly="not edit_on_hist_page"/>
+                                <field name="days_decorate" readonly="1"/>
+                                <field name="opening_date" readonly="not edit_on_hist_page"/>
+                                <field name="rent_amount_first_period" readonly="not edit_on_hist_page"/>
+                                <field name="rent_first_payment_date" readonly="not edit_on_hist_page"/>
+                            </group>
+                            <group col="4">
+                                <group colspan="3">
+                                    <field name="tag_ids" widget="many2many_tags" string="标签" options="{'color_field': 'color'}"
+                                           readonly="not edit_on_hist_page"/>
+                                </group>
+                                <group col="1">
+                                    <field name="order_by_name"/>
+                                </group>
+                            </group>
                         </group>
                     </group>
                     <group>

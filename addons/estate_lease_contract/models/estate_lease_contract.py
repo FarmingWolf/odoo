@@ -765,6 +765,8 @@ class EstateLeaseContract(models.Model):
     brokerage_fee = fields.Float(default=0.0, string="中介费（元）", copy=False)
     comments = fields.Html(string='合同备注')
     sequence = fields.Integer(compute='_compute_sorted_sequence', store=True, string='可在列表页面拖拽排序')
+    order_by_name = fields.Boolean(string="以名称排序", default=True,
+                                   help="勾选则以名称为排序基准，不勾选则以列表中拖拽顺序为排序基准")
 
     @api.depends('renter_id')
     def _compute_renter_contact_info(self):
@@ -779,15 +781,28 @@ class EstateLeaseContract(models.Model):
                 record.renter_contact_tel = record.renter_id.phone \
                     if record.renter_id.phone else record.renter_id.mobile
 
-    @api.depends('property_ids')
+    @api.depends('property_ids', 'name', 'order_by_name')
     def _compute_sorted_sequence(self):
         for record in self:
-            if record.property_ids:
-                # 获取所有关联 model_b 记录的 sequence 字段中的最小值
-                min_sequence = min(estate_property.sequence for estate_property in record.property_ids)
-                record.sequence = min_sequence
-            else:
-                record.sequence = 0
+            record.sequence = record.sequence
+            if record.order_by_name:
+                if record.property_ids:
+                    # 获取所有关联 model_b 记录的 sequence 字段中的最小值
+                    min_sequence = min(estate_property.sequence for estate_property in record.property_ids)
+                    if record.sequence != min_sequence:
+                        record.sequence = min_sequence
+                else:
+                    record.sequence = 0
+
+            all_rcds = self.env['estate.lease.contract'].search([('company_id', '=', self.company_id.id),
+                                                                 ('active', 'in', [True, False])])
+            _logger.info(f"排序self.company_id.id={self.company_id.id}contract集合all_rcds={all_rcds}")
+            for rcd in all_rcds:
+                if rcd.order_by_name and rcd.property_ids:
+                    min_sequence = min(each_property.sequence for each_property in rcd.property_ids)
+                    if rcd.sequence != min_sequence:
+                        _logger.info(f"重新排序contract rcd{rcd.id}.sequence={rcd.sequence}→{min_sequence}")
+                        rcd.sequence = min_sequence
 
     # 检查该合同的资产是否在其他合同中，且与其计租期重叠
     def _check_property_in_contract(self, rent_property, self_record):
@@ -1419,12 +1434,16 @@ class EstateLeaseContract(models.Model):
         for record in self:
             _logger.info(f"write2 record=个数：{len(record.rental_details)}-{record.rental_details}")
 
-        # 合同-资产-租金方案历史表
-        self._delete_contract_property_rental_plan_rel()
-        self._insert_contract_property_rental_plan_rel(None)
-        # 合同-注册地址历史表
-        self._delete_contract_registration_addr_rel()
-        self._insert_contract_registration_addr_rel(None)
+        # 避免手调sequence时，大量日志输出
+        if "sequence" in vals and len(vals) == 1:
+            _logger.info(f"不更新合同-资产-租金方案历史表、不更新合同-注册地址历史表")
+        else:
+            # 合同-资产-租金方案历史表
+            self._delete_contract_property_rental_plan_rel()
+            self._insert_contract_property_rental_plan_rel(None)
+            # 合同-注册地址历史表
+            self._delete_contract_registration_addr_rel()
+            self._insert_contract_registration_addr_rel(None)
 
         return res
 
@@ -1436,16 +1455,6 @@ class EstateLeaseContract(models.Model):
 
         for record in self:
             self.env['estate.lease.contract.rental.plan.rel'].search([('contract_id', '=', record.id)]).unlink()
-            # self.env['estate.lease.contract.rental.plan.rel'].flush_model(['contract_id'])
-            # self.env['estate.lease.contract.rental.plan.rel'].flush_model(['property_id'])
-            # self.env['estate.lease.contract.rental.plan.rel'].flush_model(['rental_plan_id'])
-            #
-            # self.env.cr.execute("DELETE FROM estate_lease_contract_rental_plan_rel "
-            #                     "WHERE contract_id=%s", [record.id])
-            #
-            # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['contract_id'])
-            # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['property_id'])
-            # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['rental_plan_id'])
 
     @api.ondelete(at_uninstall=False)
     def _unlink_if_not_needed(self):
