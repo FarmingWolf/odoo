@@ -202,7 +202,7 @@ class SmsAliHist(models.Model):
     _description = 'SMS sending history by aliyun'
     _order = 'id DESC'
 
-    sms_ali_id = fields.Many2one(string="模板对象", comodel_name="sms.ali")
+    sms_ali_id = fields.Many2one(string="模板对象", comodel_name="sms.ali", ondelete="cascade")
 
     tgt_partner_id = fields.Many2one(string="短信对象", comodel_name="res.partner", related="sms_ali_id.tgt_partner_id",
                                      readonly=True)
@@ -210,6 +210,8 @@ class SmsAliHist(models.Model):
     sms_sign_name = fields.Char(string="短信签名", related="sms_ali_id.sms_sign_name", readonly=True)
     sms_template_name = fields.Char(string="模板名称", related="sms_ali_id.sms_template_name", readonly=True)
     sms_template_code = fields.Char(string="模板编码", related="sms_ali_id.sms_template_code", readonly=True, store=True)
+
+    payment_detail_id = fields.Many2one(string="欠缴明细", comodel_name="estate.lease.contract.property.rental.detail")
 
     date_send = fields.Datetime(string="计划发送时间")
     date_send_no_tz = fields.Char(string="计划发送", compute="_get_date_send_no_tz", readonly=True)

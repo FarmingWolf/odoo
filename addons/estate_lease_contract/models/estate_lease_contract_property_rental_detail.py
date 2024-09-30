@@ -60,7 +60,7 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     report_print_date = fields.Date("房租缴费通知书打印日", store=False, compute="_get_report_print_date")
-    rental_received_2_date = fields.Date(string="实收至", compute="_get_rental_received_2_date", readonly=True)
+    rental_received_2_date = fields.Date(string="实收至", compute="_get_rental_received_2_date", readonly=True, store=True)
 
     period_days = fields.Integer(string="本期天数", compute="_get_period_days", readonly=True)
     incentive_days = fields.Float(string="优惠天数", default=0)

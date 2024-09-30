@@ -31,8 +31,7 @@ def _compute_date_send(self, rule):
         else:
             date_send = date_send + relativedelta(months=1, day=rule.sms_send_period_monthday)
     elif rule.sms_send_period == "depends_on":
-        # todo 应该根据合同实际情况计算短信发送日
-        date_send = fields.datetime.now().replace(year=1900)
+        date_send = fields.datetime.now().replace(year=2000)
     else:
         _logger.error("目前没有这种情况")
         date_send = fields.datetime.now().replace(year=1900)
@@ -59,6 +58,9 @@ def _need_create_sms_rcd(self, rule):
             else:
                 return False, rcd_send_date
         else:
+            if rule.sms_send_period == "depends_on":
+                _logger.info(f"making sms depends_on contract")
+                return True, rcd_send_date
             return False, rcd_send_date
 
 
@@ -126,6 +128,43 @@ def _set_template_property_rent_ratio_491(json_data):
                         f"空置面积{round(not_rent_area, 2)}㎡，空置率{round(ratio_out_area * 100, 2)}%；" \
                         f"此外，林地{woods_pieces}块，面积{round(woods_area, 2)}㎡，{wood_info}。"
     return hist_sent_content_params, hist_text_content
+
+
+def _set_template_arrears_alert(detail, date_today):
+    # ${name1}租户${name2}电话${phone}第${num}期${date1}至${date2}房租支付日${date3}
+    # 应缴${money1}元已实缴${money2}元至${date4}欠缴${money3}元
+
+    # name1-其他（如名称、账号、地址等）；name2-个人姓名；phone-电话号码；num-其他（如名称、账号、地址等）；date1-时间；date2-时间；
+    # date3-时间；money1-金额；money2-金额；date4-时间；money3-金额；
+    phone = ""
+    if detail.renter_id:
+        phone = detail.renter_id.phone or detail.renter_id.mobile
+        if not phone:
+            contacts = detail.renter_id.child_ids.filtered(lambda r: not r.is_company)
+            for contact in contacts:
+                phone = contact.phone or contact.mobile
+                if phone:
+                    break
+
+    hist_params = {
+        "name1": detail.property_id.name,
+        "name2": detail.renter_id.name if detail.renter_id else "",
+        "phone": phone if phone else "",
+        "num": detail.rental_period_no,
+        "date1": detail.period_date_from.strftime("%Y%m%d"),
+        "date2": detail.period_date_to.strftime("%Y%m%d"),
+        "date3": detail.date_payment.strftime("%Y%m%d"),
+        "money1": round(detail.rental_receivable, 2),
+        "money2": round(detail.rental_received, 2),
+        "date4": detail.rental_received_2_date.strftime("%Y%m%d") if detail.rental_received_2_date else
+        date_today.strftime("%Y%m%d"),
+        "money3": round(detail.rental_arrears, 2),
+    }
+    hist_content = f"{hist_params['name1']}租户{hist_params['name2']}电话{hist_params['phone']}第{hist_params['num']}期" \
+                   f"{hist_params['date1']}至{hist_params['date2']}房租支付日{hist_params['date3']}" \
+                   f"应缴{hist_params['money1']}元已实缴{hist_params['money2']}元至{hist_params['date4']}" \
+                   f"欠缴{hist_params['money3']}元"
+    return hist_params, hist_content
 
 
 class SmsAli(models.Model):
@@ -205,12 +244,12 @@ class SmsAli(models.Model):
             # 先看本条是否要做成短信数据
             need_create, send_date = _need_create_sms_rcd(self, rule)
             if not need_create:
-                _logger.info(f"【跳过】id={rule.id},发送周期：{rule.sms_send_period_descript},send_date={send_date}")
+                _logger.info(f"【跳过规则】id={rule.id},发送周期：{rule.sms_send_period_descript},send_date={send_date}")
                 continue
-
-            res = self.env['sms.ali.hist'].sudo().search([('sms_ali_id', '=', rule.id), ('date_send', '=', send_date)])
+            hist_domain = [('sms_ali_id', '=', rule.id), ('date_send', '=', send_date)]
+            res = self.env['sms.ali.hist'].sudo().search(hist_domain)
             if res:
-                _logger.info(f"【跳过】id={rule.id},mobile={rule.tgt_mobile}，{rule.sms_template_name}"
+                _logger.info(f"【跳过规则】id={rule.id},mobile={rule.tgt_mobile}，{rule.sms_template_name}"
                              f"发送周期：{rule.sms_send_period_descript},发送时间：{send_date}已存在")
                 continue
 
@@ -222,31 +261,77 @@ class SmsAli(models.Model):
             hist_sms_template_code = rule.sms_template_code
             hist_company_id = rule.company_id.id
             hist_date_send = send_date
-            if "资产出租率汇报" in rule.sms_template_name:
-                json_data = EstateDashboardService.get_statistics_svc(company_id=rule.company_id.id,
-                                                                      env=self.env(su=True))
-                if '491' in rule.sms_template_name:
-                    hist_sent_content_params, hist_text_content = _set_template_property_rent_ratio_491(json_data)
-                else:
-                    json_data["company_name"] = rule.company_id.name
-                    hist_sent_content_params, hist_text_content = _set_template_property_rent_ratio_common(json_data)
 
-                # todo 目前只有这一个模板，其他模板先不发短信
-                # 写入hist
-                self.env['sms.ali.hist'].sudo().create({
-                    "sms_ali_id": hist_sms_ali_id,
-                    "tgt_partner_id": hist_tgt_partner_id,
-                    "tgt_mobile": hist_tgt_mobile,
-                    "sms_sign_name": hist_sms_sign_name,
-                    "sms_template_name": hist_sms_template_name,
-                    "sms_template_code": hist_sms_template_code,
-                    "date_send": hist_date_send,
-                    "date_sent": None,
-                    "sent_result": None,
-                    "sent_content_params": str(hist_sent_content_params),
-                    "text_content": hist_text_content,
-                    "company_id": hist_company_id,
-                })
+            if rule.sms_send_period == "depends_on":
+                # 根据合同实际情况逐条生成发送短信
+                hist_date_send = fields.Datetime.context_timestamp(
+                    self, fields.datetime.now()).replace(tzinfo=None, hour=rule.sms_send_time_h,
+                                                         minute=rule.sms_send_time_m, second=0, microsecond=0)
+                domain_payment_detail = [('company_id', '=', hist_company_id), ('active', '=', True),
+                                         ('rental_arrears', '>=', 0.01), ('date_payment', '<=', hist_date_send.date())]
+                arrears = self.env['estate.lease.contract.property.rental.detail'].sudo().search(
+                    domain_payment_detail, order="date_payment ASC")
+                for detail in arrears:
+                    if (not detail.contract_id) or (not detail.contract_id.active) or detail.contract_id.terminated or \
+                            (detail.contract_id.state != 'released'):
+                        _logger.info(f"跳过company_id{hist_company_id}的payment_detail{detail.id}"
+                                     f"detail.contract_id={detail.contract_id}")
+                        continue
+                    else:
+                        # 租金催缴提醒-内部
+                        if rule.sms_template_code == 'SMS_473450261':
+                            hist_sent_params, hist_sent_content = _set_template_arrears_alert(detail, hist_date_send)
+                            arrears_hist_domain = [('sms_ali_id', '=', rule.id), ('date_send', '=', hist_date_send),
+                                                   ('payment_detail_id', '=', detail.id)]
+                            if self.env['sms.ali.hist'].sudo().search_count(arrears_hist_domain) > 0:
+                                continue
+
+                            self.env['sms.ali.hist'].sudo().create({
+                                'payment_detail_id': detail.id,
+                                "sms_ali_id": hist_sms_ali_id,
+                                "tgt_partner_id": hist_tgt_partner_id,
+                                "tgt_mobile": hist_tgt_mobile,
+                                "sms_sign_name": hist_sms_sign_name,
+                                "sms_template_name": hist_sms_template_name,
+                                "sms_template_code": hist_sms_template_code,
+                                "date_send": hist_date_send,
+                                "date_sent": None,
+                                "sent_result": None,
+                                "sent_content_params": str(hist_sent_params),
+                                "text_content": hist_sent_content,
+                                "company_id": hist_company_id,
+                            })
+
+            elif rule.sms_send_period in ('daily', 'weekly', 'monthly'):
+                if "资产出租率汇报" in rule.sms_template_name:
+                    json_ret = EstateDashboardService.get_statistics_svc(company_id=hist_company_id,
+                                                                         env=self.env(su=True))
+                    if '491' in rule.sms_template_name:
+                        hist_sent_content_params, hist_text_content = _set_template_property_rent_ratio_491(json_ret)
+                    else:
+                        json_ret["company_name"] = rule.company_id.name
+                        hist_sent_content_params, hist_text_content = _set_template_property_rent_ratio_common(json_ret)
+
+                    # 写入hist
+                    self.env['sms.ali.hist'].sudo().create({
+                        "sms_ali_id": hist_sms_ali_id,
+                        "tgt_partner_id": hist_tgt_partner_id,
+                        "tgt_mobile": hist_tgt_mobile,
+                        "sms_sign_name": hist_sms_sign_name,
+                        "sms_template_name": hist_sms_template_name,
+                        "sms_template_code": hist_sms_template_code,
+                        "date_send": hist_date_send,
+                        "date_sent": None,
+                        "sent_result": None,
+                        "sent_content_params": str(hist_sent_content_params),
+                        "text_content": hist_text_content,
+                        "company_id": hist_company_id,
+                    })
+                else:
+                    # todo 目前只有这一个模板，其他模板先不发短信
+                    _logger.error(f"改模板暂时没处理短信逻辑：rule.sms_template_name={rule.sms_template_name}")
+            else:
+                _logger.error(f"出现了新情况：rule.sms_send_period={rule.sms_send_period}")
 
     @staticmethod
     def log_rotate() -> None:

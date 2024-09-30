@@ -766,7 +766,7 @@ class EstateLeaseContract(models.Model):
     comments = fields.Html(string='合同备注')
     sequence = fields.Integer(compute='_compute_sorted_sequence', store=True, string='可在列表页面拖拽排序')
     order_by_name = fields.Boolean(string="以名称排序", default=True,
-                                   help="勾选则以名称为排序基准，不勾选则以列表中拖拽顺序为排序基准")
+                                   help="勾选则以租赁标的名称为排序基准，不勾选则以合同列表中的拖拽顺序为排序基准")
 
     @api.depends('renter_id')
     def _compute_renter_contact_info(self):
