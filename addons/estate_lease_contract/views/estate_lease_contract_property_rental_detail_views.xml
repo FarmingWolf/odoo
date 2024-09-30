@@ -246,6 +246,8 @@
                 <separator/>
                 <filter string="有欠缴" name="is_rental_arrears" domain="[('rental_arrears', '&gt;=', 0.01)]"/>
                 <filter string="无欠缴" name="no_rental_arrears" domain="[('rental_arrears', '&lt;', 0.01)]"/>
+                <separator/>
+                <field string='租赁标的名称' name="property_id"/>
                 <searchpanel>
                     <field string='承租人文件夹' name="renter_id" context="{'group_by': 'property_id'}"/>
                 </searchpanel>
