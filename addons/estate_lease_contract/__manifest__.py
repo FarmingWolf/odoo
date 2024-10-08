@@ -56,6 +56,7 @@
         'views/estate_lease_contract_property_ini_state_views.xml',
         'views/estate_lease_contract_bank_account_views.xml',
         'views/estate_lease_contract_party_a_unit_views.xml',
+        'views/estate_lease_contract_party_b_res_partner_views.xml',
         'views/estate_lease_contract_incentives_views.xml',
         'views/estate_lease_contract_property_rental_detail_views.xml',
         'views/estate_lease_contract_property_views.xml',
