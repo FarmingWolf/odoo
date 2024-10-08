@@ -35,8 +35,14 @@ class EstateDashboard extends Component {
             // companies: session.allowed_companies || [],
             // defaultStatistics: { isReady: false, data: {} },
             // items: registry.category("estate_dashboard").getAll(),**/
+            configurationSet: browser.localStorage.getItem("ConfigurationSet") || "no",
             allDataLoadedCnt: 0,
             allDataLoaded: false,
+            displayed_ini:
+                ['estate_conventional_quantity', 'estate_conventional_area_quantity',
+                    'estate_conventional_lease_quantity', 'estate_conventional_area_lease_quantity',
+                    'ratio_conventional_quantity', 'ratio_conventional_area_quantity',
+                    'pie_chart_ratio_conventional_quantity', 'pie_chart_ratio_conventional_area_quantity'],
         });
         // 使用 userService 获取当前用户的信息
         const { user_companies } = session;
@@ -135,6 +141,7 @@ class EstateDashboard extends Component {
 
     updateConfiguration(newDisabledItems) {
         this.state.disabledItems = newDisabledItems;
+        this.state.configurationSet = "yes";
     }
 
 
@@ -147,9 +154,14 @@ class ConfigurationDialog extends Component {
 
     setup() {
         this.items = useState(this.props.items.map((item) => {
+            const ini_display_items = ['estate_conventional_quantity', 'estate_conventional_area_quantity',
+                'estate_conventional_lease_quantity', 'estate_conventional_area_lease_quantity',
+                'ratio_conventional_quantity', 'ratio_conventional_area_quantity',
+                'pie_chart_ratio_conventional_quantity', 'pie_chart_ratio_conventional_area_quantity']
             return {
                 ...item,
-                enabled: !this.props.disabledItems.includes(item.id),
+                enabled: (browser.localStorage.getItem("ConfigurationSet") === "yes" && !this.props.disabledItems.includes(item.id)) ||
+                    (browser.localStorage.getItem("ConfigurationSet") !== "yes" && ini_display_items.includes(item.id)),
             }
         }));
     }
@@ -164,6 +176,10 @@ class ConfigurationDialog extends Component {
             (item) => !item.enabled
         ).map((item) => item.id)
 
+        browser.localStorage.setItem(
+            "ConfigurationSet",
+            "yes",
+        );
         browser.localStorage.setItem(
             "disabledDashboardItems",
             newDisabledItems,
