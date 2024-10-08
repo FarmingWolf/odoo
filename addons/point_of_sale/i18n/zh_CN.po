@@ -6784,7 +6784,7 @@ msgstr "税金显示"
 #: code:addons/point_of_sale/static/src/app/screens/partner_list/partner_editor/partner_editor.xml:0
 #, python-format
 msgid "Tax ID"
-msgstr "税项ID"
+msgstr "企业统一信用代码"
 
 #. module: point_of_sale
 #: model_terms:ir.ui.view,arch_db:point_of_sale.report_saledetails

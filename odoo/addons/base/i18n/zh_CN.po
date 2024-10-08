@@ -34180,7 +34180,7 @@ msgid ""
 "The Tax Identification Number. Values here will be validated based on the "
 "country format. You can use '/' to indicate that the partner is not subject "
 "to tax."
-msgstr "税务识别码。此处的值将根据国家格式进行验证。您可以使用\"/\"表示合作伙伴无需纳税。"
+msgstr "税务识别码，即企业统一信用代码。此处的值将根据国家格式进行验证。您可以使用\"/\"表示合作伙伴无需纳税。"
 
 #. module: base
 #: model:ir.model.constraint,message:base.constraint_res_lang_url_code_uniq

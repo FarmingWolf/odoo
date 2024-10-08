@@ -382,6 +382,7 @@ class Partner(models.Model):
     contract_party_b_contact_tel = fields.Char(string="联系方式", compute="_compute_party_b_contact_info")
     party_b_properties = fields.Text(string="租赁信息", compute="_compute_party_b_properties")
     contracts_valid = fields.Boolean(string="合同有效", compute="_compute_contracts_valid", store=True)
+    registered_capital = fields.Float(string="注册资金（万元）")
 
     @api.depends("contract_party_b_id", "contract_party_b_contact_name", "party_b_properties")
     def _compute_contracts_valid(self):
@@ -471,15 +472,15 @@ class Partner(models.Model):
             self.env.cr.commit()
 
         action = {
-            "name": "入驻花名册",
+            "name": "入驻企业花名册",
             "type": "ir.actions.act_window",
             "view_mode": "tree",
-            "res_model": "res.partner",
+            "res_model": "estate.lease.contract",
             "views": [
                 (self.env.ref('estate_lease_contract.estate_lease_contract_party_b_view_tree').id, 'tree'),
                 (False, 'form')],
             "context": {
-                'search_default_contracts_valid': True,
+                'search_default_state_valid': True,
                 'menu_root': 'estate.lease.contract',
                 'from_menu_click_tree': True,
             },
@@ -753,7 +754,7 @@ class EstateLeaseContract(models.Model):
                                 domain="[('company_id', '=', company_id)]")
     renter_company_id = fields.Many2one('res.partner', string='在地经营公司', index=True, copy=True, tracking=True,
                                         domain="[('company_id', '=', company_id)]")
-    renter_contact_name = fields.Char(string="承租联系人", compute="_compute_renter_contact_info")
+    renter_contact_name = fields.Char(string="承租方负责人", compute="_compute_renter_contact_info")
     renter_contact_tel = fields.Char(string="联系方式", compute="_compute_renter_contact_info")
     property_ids = fields.Many2many('estate.property', 'contract_property_rel', 'contract_id', 'property_id',
                                     string='租赁标的', copy=True, tracking=True,
@@ -767,6 +768,9 @@ class EstateLeaseContract(models.Model):
     sequence = fields.Integer(compute='_compute_sorted_sequence', store=True, string='可在列表页面拖拽排序')
     order_by_name = fields.Boolean(string="以名称排序", default=True,
                                    help="勾选则以租赁标的名称为排序基准，不勾选则以合同列表中的拖拽顺序为排序基准")
+    vat = fields.Char("企业统一信用代码", related="renter_id.vat")
+    registered_capital = fields.Float(string="注册资金（万元）", related="renter_id.registered_capital")
+    industry_id = fields.Many2one('res.partner.industry', string='行业类型', related="renter_id.industry_id")
 
     @api.depends('renter_id')
     def _compute_renter_contact_info(self):
@@ -774,8 +778,18 @@ class EstateLeaseContract(models.Model):
             # 查找partner的child_ids中is_company=False的记录，这通常代表个人联系人
             contact = record.renter_id.child_ids.filtered(lambda r: not r.is_company)
             if contact:
-                record.renter_contact_name = contact[0].name
-                record.renter_contact_tel = contact[0].phone if contact[0].phone else contact[0].mobile
+                for each_c in contact:
+                    check_str = str(each_c.name) + str(each_c.title.name) + str(each_c.function) + str(each_c.comment)
+                    _logger.info(f"承租方负责人check_str=[{check_str}]")
+                    if '责' in check_str:
+                        record.renter_contact_name = each_c.name
+                        record.renter_contact_tel = each_c.phone if each_c.phone else each_c.mobile
+                        break
+
+                if not record.renter_contact_name:
+                    record.renter_contact_name = contact[0].name
+                    record.renter_contact_tel = contact[0].phone if contact[0].phone else contact[0].mobile
+
             else:
                 record.renter_contact_name = record.renter_id.name
                 record.renter_contact_tel = record.renter_id.phone \

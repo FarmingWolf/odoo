@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="estate_lease_contract_party_b_action" model="ir.actions.act_window">
+        <field name="name">入驻企业花名册</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree,form</field>
+        <field name="views">[False, "tree"]</field>
+        <field name="view_id" ref="estate_lease_contract_party_b_view_tree"/>
+        <field name="context">{
+            'search_default_contracts_valid': True,
+            'menu_root': 'estate.lease.contract',
+            'from_menu_click_tree': True,
+            }
+        </field>
+        <field name="domain">
+            [('company_id', 'in', allowed_company_ids)]
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                还没有企业入驻。
+            </p>
+            <p>
+                说明合同还没录入，或者录入了也没发布。
+            </p>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_party_b_view_search" model="ir.ui.view">
+        <field name="name">estate.lease.contract.party.b.view.search</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search string="入驻花名册检索">
+                <filter string="合同有效" name="contracts_valid" domain="[('contracts_valid','=', True)]"/>
+                <filter string="合同失效" name="contracts_invalid" domain="[('contracts_valid','=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_party_b_res_partner_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.party.b.res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="attributes">
+                <attribute name="string">企业统一信用代码</attribute>
+                <attribute name="invisible">not is_company</attribute>
+            </xpath>
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="industry_id" invisible="not is_company" options="{'no_create': True}" string="行业类型"/>
+                <field name="registered_capital" invisible="not is_company"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

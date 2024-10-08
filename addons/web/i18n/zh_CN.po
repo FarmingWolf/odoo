@@ -6960,7 +6960,7 @@ msgstr "金牛座"
 #: model_terms:ir.ui.view,arch_db:web.external_layout_standard
 #: model_terms:ir.ui.view,arch_db:web.external_layout_striped
 msgid "Tax ID"
-msgstr "税项ID"
+msgstr "企业统一信用代码"
 
 #. module: web
 #. odoo-javascript
@@ -6997,7 +6997,7 @@ msgid ""
 "The Tax Identification Number. Values here will be validated based on the "
 "country format. You can use '/' to indicate that the partner is not subject "
 "to tax."
-msgstr "税务识别号。此处的值将根据国家格式进行验证。可以使用“/”表示合作伙伴无需纳税。"
+msgstr "税务识别号，即企业统一信用代码。此处的值将根据国家格式进行验证。可以使用“/”表示合作伙伴无需纳税。"
 
 #. module: web
 #. odoo-python
