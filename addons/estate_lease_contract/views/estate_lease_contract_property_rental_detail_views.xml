@@ -134,6 +134,20 @@
                             </group>
                         </group>
                     </group>
+                    <group>
+                        <field name="rental_detail_sub_ids">
+                            <tree string="分次缴费明细" create="1" delete="1" edit="1" import="0" editable="bottom">
+                                <field name="date_received"/>
+                                <field name="rental_received" digits="[12, 2]"/>
+                                <field name="rental_received_sum" digits="[12, 2]"/>
+                                <field name="rental_arrears" digits="[12, 2]"/>
+                                <field name="days_received" digits="[12, 0]"/>
+                                <field name="days_received_sum" digits="[12, 0]"/>
+                                <field name="days_arrears" digits="[12, 0]"/>
+                                <field name="rental_received_2_date"/>
+                            </tree>
+                        </field>
+                    </group>
                     <group col="2">
                         <group>
                             <field name="rental_arrears" digits="[12, 2]" readonly="1"/>

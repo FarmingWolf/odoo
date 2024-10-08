@@ -3,6 +3,7 @@
 
 from . import estate_lease_contract_property_ini_state
 from . import estate_lease_contract_party_a_unit
+from . import estate_lease_contract_property_rental_detail_sub
 from . import estate_lease_contract_property_rental_detail
 from . import estate_lease_contract_incentives
 from . import estate_lease_contract_property

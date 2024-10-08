@@ -40,7 +40,10 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     rental_amount_zh = fields.Char(string="本期租金(元)大写", compute="_cal_rental_amount_zh", store=True, readonly=True)
     rental_receivable = fields.Float(default=0.0, string="本期应收(元)", compute="_get_default_rental_receivable",
                                      readonly=False, store=True, tracking=True)
-    rental_received = fields.Float(default=0.0, string="本期实收(元)", tracking=True)
+    rental_receivable_zh = fields.Char(string="本期应收(元)大写", compute="_cal_rental_amount_zh", readonly=True)
+    rental_received = fields.Float(default=0.0, string="本期实收(元)", tracking=True, store=True,
+                                   compute="_compute_rental_detail_sub_ids")
+    rental_received_zh = fields.Char(string="本期实收(元)大写", compute="_cal_rental_amount_zh", readonly=True)
     rental_period_no = fields.Integer(default=0, string="期数", tracking=True)
     period_date_from = fields.Date(string="开始日期", default=lambda self: fields.Datetime.today(), tracking=True)
     period_date_to_prev = fields.Date(string="上期结束日期", compute="_get_period_date_to_prev",
@@ -53,7 +56,8 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     renter_id = fields.Many2one('res.partner', string="承租人", related='contract_id.renter_id', readonly=True, store=True)
     renter_id_phone = fields.Char(string="电话", related='contract_id.renter_id.phone', readonly=True)
     renter_id_mobile = fields.Char(string="手机", related='contract_id.renter_id.mobile', readonly=True)
-    rental_arrears = fields.Float(string="欠缴金额", compute='_compute_rental_arrears', readonly=True, store=True)
+    rental_arrears = fields.Float(string="欠缴金额（元）", compute='_compute_rental_arrears', readonly=True, store=True)
+    rental_arrears_zh = fields.Char(string="欠缴金额(元)大写", compute="_cal_rental_amount_zh", readonly=True)
     edited = fields.Boolean(string="有无优惠", readonly=True)
     edited_display = fields.Char(string="有优惠", compute="_get_display_edited", store=False)
     comment = fields.Text(string="修改备注")
@@ -68,6 +72,26 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     days_receivable = fields.Float(string="应收天数", compute="_get_days_receivable", readonly=True)
     days_received = fields.Float(string="实收天数", compute="_get_days_received", readonly=True)
     days_arrears = fields.Float(string="欠缴天数", compute="_get_days_received", readonly=True)
+
+    rental_detail_sub_ids = fields.One2many(comodel_name="estate.lease.contract.property.rental.detail.sub",
+                                            inverse_name="rental_detail_id", string="分次缴费明细")
+
+    @api.onchange("rental_detail_sub_ids")
+    def _onchange_rental_detail_sub_ids(self):
+        received_subtotal = 0
+        for rcd in self.rental_detail_sub_ids:
+            received_subtotal += rcd.rental_received
+        if self.rental_received != received_subtotal:
+            self.rental_received = received_subtotal
+
+    @api.depends("rental_detail_sub_ids")
+    def _compute_rental_detail_sub_ids(self):
+        received_subtotal = 0
+        for record in self:
+            for rcd in record.rental_detail_sub_ids:
+                received_subtotal += rcd.rental_received
+            if record.rental_received != received_subtotal:
+                record.rental_received = received_subtotal
 
     @api.onchange("period_days")
     def _onchange_period_days(self):
@@ -127,6 +151,9 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     def _cal_rental_amount_zh(self):
         for record in self:
             record.rental_amount_zh = Utils.arabic_to_chinese(round(record.rental_amount, 2))
+            record.rental_receivable_zh = Utils.arabic_to_chinese(round(record.rental_receivable, 2))
+            record.rental_received_zh = Utils.arabic_to_chinese(round(record.rental_received, 2))
+            record.rental_arrears_zh = Utils.arabic_to_chinese(round(record.rental_arrears, 2))
 
     @api.depends("rental_receivable", "rental_received", "incentive_amount", "incentive_days")
     def _compute_rental_arrears(self):

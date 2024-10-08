@@ -37,15 +37,20 @@
                             </p>
 
                             <p class="report_paragraph">
-                                房屋租金总计：
-                                <span style="border-bottom: 1px solid #000;" t-esc="rent.rental_amount_zh"/>。(￥<span t-esc="round(rent.rental_amount, 2)"/>)
+                                本期房屋租金总计：
+                                <span style="border-bottom: 1px solid #000;" t-esc="rent.rental_amount_zh"/>。(￥<span t-esc="round(rent.rental_amount, 2)"/>)<br/>
+                                　　 本期应缴：
+                                <span style="border-bottom: 1px solid #000;" t-esc="rent.rental_receivable_zh"/>。(￥<span t-esc="round(rent.rental_receivable, 2)"/>)<br/>
+                                　　 本期已缴：
+                                <span style="border-bottom: 1px solid #000;" t-esc="rent.rental_received_zh"/>。(￥<span t-esc="round(rent.rental_received, 2)"/>)<br/>
+                                　　 本期欠缴：
+                                <span style="border-bottom: 1px solid #000;" t-esc="rent.rental_arrears_zh"/>。(￥<span t-esc="round(rent.rental_arrears, 2)"/>)<br/>
                             </p>
                             <p class="report_paragraph">
                                 如逾期缴纳，将按合同相关条款，产生滞纳金等相关费用。
-                            </p>
-                            <p class="report_paragraph">
                                 <br/>
                             </p>
+
                             <p class="report_paragraph">
                                 望您/贵公司接到通知后，尽快向我公司/我缴纳房屋租金及物业费用。并将付款凭证复印件交于我公司/我。
                             </p>
