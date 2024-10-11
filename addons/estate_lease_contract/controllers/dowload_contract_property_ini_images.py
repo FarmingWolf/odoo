@@ -1,14 +1,22 @@
 import base64
 import logging
 
-from addons.account.controllers.download_docs import _get_zip_headers
 from odoo import http
-from odoo.http import request
+from odoo.http import request, content_disposition
 from io import BytesIO
 import zipfile
 
 
 _logger = logging.getLogger(__name__)
+
+
+def _get_zip_headers(content, filename):
+    return [
+        ('Content-Type', 'zip'),
+        ('X-Content-Type-Options', 'nosniff'),
+        ('Content-Length', len(content)),
+        ('Content-Disposition', content_disposition(filename)),
+    ]
 
 
 class DownloadContractPropertyIniImagesController(http.Controller):

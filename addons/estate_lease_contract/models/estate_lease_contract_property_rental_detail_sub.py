@@ -24,12 +24,18 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
     rental_received = fields.Float(default=0.0, string="本次实收(元)", tracking=True)
 
     date_received = fields.Date(string="实收日期", default=lambda self: fields.Date.context_today(self), tracking=True)
-    rental_received_sum = fields.Float(default=0.0, string="累计实收(元)", readonly=True, compute="_compute_received")
-    days_received = fields.Float(string="实收天数", readonly=True, store=True, compute="_compute_received")
-    days_received_sum = fields.Float(string="累计实收天数", readonly=True, store=True, compute="_compute_received")
-    rental_arrears = fields.Float(string="欠缴金额", readonly=True, store=True, compute="_compute_received")
-    days_arrears = fields.Float(string="欠缴天数", readonly=True, store=True, compute="_compute_received")
-    rental_received_2_date = fields.Date(string="实收至", readonly=True, store=True, compute="_compute_received")
+    rental_received_sum = fields.Float(default=0.0, string="累计实收(元)", readonly=True, compute="_compute_received",
+                                       store=True, compute_sudo=True)
+    days_received = fields.Float(string="实收天数", readonly=True, store=True, compute="_compute_received",
+                                 compute_sudo=True)
+    days_received_sum = fields.Float(string="累计实收天数", readonly=True, store=True, compute="_compute_received",
+                                     compute_sudo=True)
+    rental_arrears = fields.Float(string="欠缴金额", readonly=True, store=True, compute="_compute_received",
+                                  compute_sudo=True)
+    days_arrears = fields.Float(string="欠缴天数", readonly=True, store=True, compute="_compute_received",
+                                compute_sudo=True)
+    rental_received_2_date = fields.Date(string="实收至", readonly=True, store=True, compute="_compute_received",
+                                         compute_sudo=True)
 
     @api.depends("rental_received", "date_received")
     def _compute_received(self):
