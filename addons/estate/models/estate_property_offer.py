@@ -13,27 +13,56 @@ class EstatePropertyOffer(models.Model):
     _name = "estate.property.offer"
     _description = "报价"
     _order = "price desc"
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    price = fields.Float('报价', required=True)
+    price = fields.Float('报价（元/天/㎡）', required=True, tracking=True)
+    rental_monthly = fields.Float('月租（元）', help="=单价×面积×365÷12", tracking=True)
+    rental_yearly = fields.Float('年租（元）', help="=单价×面积×365", tracking=True)
     status = fields.Selection(
         string='报价状态',
-        selection=[('accepted', '已接受'), ('refused', '已拒绝')],
-        help="点击下拉框处理报价状态",
-        copy=False
+        selection=[('bargaining', '商谈中'), ('accepted', '已接受'), ('refused', '已拒绝')],
+        copy=False, tracking=True
     )
-    partner_id = fields.Many2one('res.partner', string='报价人', index=True, required=True,
+    partner_id = fields.Many2one('res.partner', string='报价人', index=True, required=True, tracking=True,
                                  domain="[('company_id', '=', company_id)]")
     property_id = fields.Many2one('estate.property', string='报价资产', index=True, required=True, readonly=True,
                                   domain="[('company_id', '=', company_id)]")
     property_type_id = fields.Many2one(related="property_id.property_type_id")
+    rent_area = fields.Float(related="property_id.rent_area", string="面积")
 
-    validity = fields.Integer(default=0, string="报价有效期天数")
+    validity = fields.Integer(default=0, string="报价有效期天数", tracking=True)
     date_deadline = fields.Date(compute="_compute_date_deadline", inverse="_inverse_validity", string="报价有效期至")
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+
+    comments = fields.Html(string="洽谈内容", tracking=True)
 
     _sql_constraints = [
         ('price', 'CHECK(price > 0)', '报价必须大于零')
     ]
+
+    @api.onchange('price')
+    def _onchange_price(self):
+        if self.rental_yearly != self.price * self.rent_area * 365:
+            self.rental_yearly = self.price * self.rent_area * 365
+
+        if self.rental_monthly != self.rental_yearly / 12:
+            self.rental_monthly = self.rental_yearly / 12
+
+    @api.onchange('rental_monthly')
+    def _onchange_rental_monthly(self):
+        if self.rental_yearly != self.rental_monthly * 12:
+            self.rental_yearly = self.rental_monthly * 12
+
+        if self.price != self.rental_yearly / 365 / self.rent_area:
+            self.price = self.rental_yearly / 365 / self.rent_area
+
+    @api.onchange('rental_yearly')
+    def _onchange_rental_yearly(self):
+        if self.rental_monthly != self.rental_yearly / 12:
+            self.rental_monthly = self.rental_yearly / 12
+
+        if self.price != self.rental_yearly / 365 / self.rent_area:
+            self.price = self.rental_yearly / 365 / self.rent_area
 
     @api.depends("validity")
     def _compute_date_deadline(self):
@@ -87,7 +116,7 @@ class EstatePropertyOffer(models.Model):
 
         # 如果找到报价且最高价高于新的offer_price，则抛出错误
         if highest_offer and vals_list.get('price', 0) <= highest_offer.price:
-            raise ValidationError(_("新报价必须高于已接受的最高报价:[{0}]".format(highest_offer.price)))
+            raise ValidationError(_("新报价必须高于已接受的最高报价:[{0}]".format(round(highest_offer.price, 2))))
 
         # 如果检查通过，则正常创建报价
         new_offer = super(EstatePropertyOffer, self).create(vals_list)

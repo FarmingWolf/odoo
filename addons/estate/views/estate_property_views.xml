@@ -226,24 +226,32 @@
                         </group>
                     </sheet>
                     <notebook>
-                        <page string="报价信息-暂时不显示" invisible="1">
+                        <page string="招商洽谈" groups="estate.estate_group_business">
                             <field name="offer_ids" readonly="state in ('sold', 'canceled')">
                                 <tree decoration-success="status=='accepted'"
                                       decoration-danger="status=='refused'">
-                                    <field name="price" string="报价"/>
+                                    <field name="create_date" string="日期"/>
+                                    <field name="price" digits="[12, 2]" />
+                                    <field name="rental_monthly" digits="[12, 2]" />
+                                    <field name="rental_yearly" digits="[12, 2]" />
                                     <field name="partner_id" string="报价人"/>
                                     <field name="date_deadline"/>
                                     <button name="action_accept" states="draft" type="object" string="接受"
                                             icon="fa-check" invisible="status in ('accepted', 'refused')"/>
                                     <button name="action_refuse" states="draft" type="object" string="拒绝"
                                             icon="fa-check" invisible="status in ('accepted', 'refused')"/>
-                                    <field name="status" string="状态"/>
+                                    <field name="status"/>
                                     <field name="validity"/>
                                 </tree>
                             </field>
                         </page>
                     </notebook>
                 </sheet>
+                <div class="oe_chatter" groups="estate.estate_group_tutorial_research">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>

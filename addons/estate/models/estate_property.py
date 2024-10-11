@@ -48,33 +48,34 @@ class EstateProperty(models.Model):
 
     _name = "estate.property"
     _description = "资产模型"
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char('资产名称', required=True, translate=True)
+    name = fields.Char('资产名称', required=True, translate=True, tracking=True)
     property_type_id = fields.Many2one("estate.property.type", string="资产类型")
     tag_ids = fields.Many2many("estate.property.tag", string="标签")
     sales_person_id = fields.Many2one('res.users', string='销售员', index=True,
                                       default=lambda self: self.env.user,
                                       domain="[('company_id', '=', company_id)]")
-    buyer_id = fields.Many2one('res.partner', string='购买人', index=True,
+    buyer_id = fields.Many2one('res.partner', string='购买人', index=True, tracking=True,
                                domain="[('company_id', '=', company_id)]")
-    offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价")
+    offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价", tracking=True)
     building_no = fields.Char(string='楼号')
     floor = fields.Char(default=1, string='楼层')
     room_no = fields.Char(string='房间号')
     description = fields.Text("详细信息")
     postcode = fields.Char()
-    date_availability = fields.Date(copy=False, string="可租日期")
-    expected_price = fields.Float(string="期望价格（元/天/㎡）", default=0.0)
-    announced_price = fields.Float(string="报价（元/天/㎡）", default=0.0)
-    selling_price = fields.Float(string="实际价格（元/天/㎡）", copy=False, default=0.0)
+    date_availability = fields.Date(copy=False, string="可租日期", tracking=True)
+    expected_price = fields.Float(string="期望价格（元/天/㎡）", default=0.0, tracking=True)
+    announced_price = fields.Float(string="报价（元/天/㎡）", default=0.0, tracking=True)
+    selling_price = fields.Float(string="实际价格（元/天/㎡）", copy=False, default=0.0, tracking=True)
     bedrooms = fields.Integer(default=0)
-    building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", help="实用面积+花园面积")
-    living_area = fields.Float(default=0.0, string="使用面积（㎡）")
-    unit_building_area = fields.Float(default=0.0, string="套内建筑面积（㎡）")
-    unit_living_area = fields.Float(default=0.0, string="套内使用面积（㎡）")
-    share_area = fields.Float(default=0.0, string="公摊面积（㎡）")
-    actual_living_area = fields.Float(default=0.0, string="实际使用面积（㎡）")
-    rent_area = fields.Float(default=100, string="计租面积（㎡）", help="租赁合同用面积")
+    building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", help="实用面积+花园面积", tracking=True)
+    living_area = fields.Float(default=0.0, string="使用面积（㎡）", tracking=True)
+    unit_building_area = fields.Float(default=0.0, string="套内建筑面积（㎡）", tracking=True)
+    unit_living_area = fields.Float(default=0.0, string="套内使用面积（㎡）", tracking=True)
+    share_area = fields.Float(default=0.0, string="公摊面积（㎡）", tracking=True)
+    actual_living_area = fields.Float(default=0.0, string="实际使用面积（㎡）", tracking=True)
+    rent_area = fields.Float(default=100, string="计租面积（㎡）", help="租赁合同用面积", tracking=True)
     facades = fields.Integer(default=0)
     garage = fields.Boolean(default=False)
     garden = fields.Boolean(default=False)

@@ -3,10 +3,10 @@
 
 {
     'name': "资产管理",
-    'depends': ['base', 'web'],
+    'depends': ['base', 'web', 'mail'],
     'summary': '资产租赁、合同管理等等',
     'category': 'Real Estate/Brokerage',
-    'website': 'https://www.odoo.com/app/realestate',
+    'website': 'https://www.491tech.com/',
     'installable': True,
     'application': True,
     'auto_install': False,

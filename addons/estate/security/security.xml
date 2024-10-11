@@ -23,6 +23,12 @@
         <field name="implied_ids" eval="[(4, ref('estate.estate_group_user'))]"/>
     </record>
 
+    <record id="estate_group_business" model="res.groups">
+        <field name="name">招商洽谈</field>
+        <field name="category_id" ref="base.module_category_real_estate_brokerage"/>
+        <field name="implied_ids" eval="[(4, ref('estate.estate_group_user'))]"/>
+    </record>
+
     <record id="estate_property_read_rule" model="ir.rule">
         <field name="name">不动产数据读取权限</field>
         <field name="model_id" ref="model_estate_property"/>
