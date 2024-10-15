@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import datetime
 import logging
 import os
@@ -19,20 +20,9 @@ import requests
 import win32file
 import tkinter as tk
 from tkinter import ttk, simpledialog, font
-from tkinter import PhotoImage
-from datetime import datetime
+from datetime import datetime, timedelta
 from pyzipper import AESZipFile, WZ_AES
-
-from dateutil.relativedelta import relativedelta
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-
-
-# class LogHandler(FileSystemEventHandler):
-#     def on_modified(self, event):
-#         # 当文件被修改时，打印出通知
-#         print(f"Hey, {event.src_path} has been modified!")
-
+from utils import Tooltip, check_trial_period, start_countdown_trial_period, add_file_2_zip_with_password
 
 action_type = "zip"
 # action_type = "unzip" attention!!!
@@ -69,6 +59,11 @@ customer_dis_name = "中广艺伍零"
 customer_name = "E50"
 # 初始化时，仅客户名写入此文件，第一次运行时，客户mac地址写入此文件，压缩包里必须有此文件，如无则判错
 customer_name_info_fn = "c_info_2_ck"
+
+# 初始化时，试用期天数*24*60计算值写入此文件，运行时，剩余时间写入此文件，压缩包里必须有此文件，如无则判错
+days_limit_info_fn = "c_info_3_ck"
+# countdown一次时间
+time_check_period = 10
 out_zip_fld = "../em/"
 in_zip_file = out_zip_fld + tmp_fn
 tgt_file_pt = "../addons/"
@@ -99,9 +94,26 @@ _logger.addHandler(fh)
 # 进度条
 root = tk.Tk()
 root.geometry("900x400")
+root.wm_attributes('-disabled', False)  # 禁用最大化功能
+root.resizable(width=False, height=False)  # 允许调整窗口大小
 my_font = font.Font(size=16, weight='bold')
 customer_info_label = tk.Label(root, text="", font=my_font)
-customer_info_label.grid(row=0, column=0, columnspan=7, sticky=tk.W, padx=(20, 0), pady=(20, 0))
+customer_info_label.grid(row=0, column=0, columnspan=6, sticky=tk.W, padx=(20, 0), pady=(20, 0))
+
+# 试用天数
+days_limit_label = tk.Label(root, text="试用天数：", font=my_font)
+if action_type == "zip":
+    days_limit_label.grid(row=0, column=7, sticky=tk.E, pady=(20, 0))
+
+days_limit = tk.IntVar()
+
+if action_type == "zip":
+    entry_days_limit = tk.Entry(root, width=8, textvariable=days_limit, font=my_font)
+    entry_days_limit.grid(row=0, column=8, sticky=tk.W, pady=(20, 0))
+else:
+    entry_days_limit = tk.Entry(root, width=8, textvariable=days_limit, font=my_font, state="disabled")
+
+tool_tip = Tooltip(entry_days_limit, '0表示无限制')
 
 # 创建一个进度条
 progress_bar = ttk.Progressbar(root, orient="horizontal", length=600, mode="determinate")
@@ -109,8 +121,7 @@ progress_bar.grid(row=1, column=1, columnspan=7, padx=(150, 0), pady=(70, 20))
 
 # 创建一个标签用于显示进度文本
 progress_label = tk.Label(root, text="", font=my_font)
-progress_label.grid(row=2, column=1, columnspan=7, padx=(20, 0), pady=20)
-
+progress_label.grid(row=2, column=1, columnspan=9, padx=(20, 0), pady=20)
 
 # 创建一个停止标志
 stop_event = threading.Event()
@@ -118,6 +129,7 @@ unzip_event_success = threading.Event()
 unzip_event_failed = threading.Event()
 input_p_code_recheck = threading.Event()
 server_start_success = threading.Event()
+check_countdown_failed = threading.Event()
 
 em_server_conf_file = '../debian/odoo.conf'
 conf_config = {}
@@ -158,27 +170,6 @@ def get_mac_address():
         _logger.error(f"发生未知错误：{ex}{ex.with_traceback}")
         traceback.print_exc()
         return []
-
-
-def add_file_2_zip_with_password(input_filename, name_in_zip, tmp_z_fn, password, in_zip_type, output_filename=None):
-    """
-    使用pyzipper库将文件压缩为带密码的ZIP文件。
-    :param input_filename: 要压缩的文件的路径
-    :param name_in_zip: ZIP文件中的文件名
-    :param tmp_z_fn: 临时文件名，最终替换为output_filename
-    :param password: ZIP文件的解压密码
-    :param in_zip_type: w/a
-    :param output_filename: 最终输出的ZIP文件的路径
-    """
-    # 使用AES加密压缩文件
-    with AESZipFile(tmp_z_fn, in_zip_type, compression=zipfile.ZIP_DEFLATED, encryption=WZ_AES) as zf:
-        zf.setpassword(password.encode())  # 设置密码，需要转换为bytes
-        zf.write(input_filename, arcname=name_in_zip)  # 将文件添加到ZIP中
-
-    if output_filename:
-        if os.path.exists(output_filename):
-            os.remove(output_filename)
-        os.rename(tmp_z_fn, output_filename)
 
 
 def read_conf_file():
@@ -255,6 +246,24 @@ def delete_files():
         # walk_and_delete_folder(tgt_file_pt + tgt_fld)
 
 
+def write_customer_info_2_file(in_fld, in_fn, in_f_content):
+    if os.path.exists(in_fld + in_fn):
+        os.remove(in_fld + in_fn)
+
+    with open(in_fld + in_fn, 'a', encoding='utf-8') as file:
+        if in_fn == customer_name_info_fn:
+            file.write(str(in_f_content) + "\n")
+
+        if in_fn == days_limit_info_fn:
+            # date_from
+            file.write((datetime.today() + timedelta(days=1)).strftime("%Y%m%d") + "\n")
+            # min_limit
+            min_limit = int(in_f_content) * 24 * 60
+            file.write(str(min_limit) + "\n")
+            # min_left
+            file.write(str(min_limit) + "\n")
+
+
 def zip_tgt_files(in_root, in_label, in_bar):
 
     try:
@@ -269,7 +278,6 @@ def zip_tgt_files(in_root, in_label, in_bar):
                 return
 
         # 创建ZIP文件对象
-        # with zipfile.ZipFile(out_zip_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
         with AESZipFile(out_zip_file, 'w', compression=zipfile.ZIP_DEFLATED, encryption=WZ_AES) as zipf:
             # 设置密码
             zipf.setpassword(zip_pwd.encode('utf-8'))
@@ -318,17 +326,17 @@ def zip_tgt_files(in_root, in_label, in_bar):
         in_root.update_idletasks()
 
         # 客户信息初始化文件
-        if os.path.exists(out_zip_fld + customer_name_info_fn):
-            os.remove(out_zip_fld + customer_name_info_fn)
+        write_customer_info_2_file(out_zip_fld, customer_name_info_fn, customer_dis_name)
 
-        with open(out_zip_fld + customer_name_info_fn, 'a', encoding='utf-8') as file:
-            file.write(customer_dis_name + "\n")
+        # 试用期天数写入文件
+        write_customer_info_2_file(out_zip_fld, days_limit_info_fn, days_limit.get())
 
         # 将上述文件压缩至zip
         with AESZipFile(file_2_customer, 'w', compression=zipfile.ZIP_DEFLATED, encryption=WZ_AES) as zip_f_2_c:
             zip_f_2_c.setpassword(zip_pwd.encode('utf-8'))
             zip_f_2_c.write(out_zip_file, tmp_fn)
             zip_f_2_c.write(out_zip_fld + customer_name_info_fn, customer_name_info_fn)
+            zip_f_2_c.write(out_zip_fld + days_limit_info_fn, days_limit_info_fn)
 
         _logger.info(f"压缩完成，ZIP文件保存在 {file_2_customer} 。")
         in_label.config(text=f"压缩完成，ZIP文件保存在 {file_2_customer} 。确认文件位置，关闭此窗口！")
@@ -347,6 +355,8 @@ def zip_tgt_files(in_root, in_label, in_bar):
             os.remove(out_zip_file)
         if os.path.exists(out_zip_fld + customer_name_info_fn):
             os.remove(out_zip_fld + customer_name_info_fn)
+        if os.path.exists(out_zip_fld + days_limit_info_fn):
+            os.remove(out_zip_fld + days_limit_info_fn)
 
 
 def unzip_customer_file_with_progress(in_root, in_label, in_bar, in_mac_lst):
@@ -356,7 +366,7 @@ def unzip_customer_file_with_progress(in_root, in_label, in_bar, in_mac_lst):
         with AESZipFile(file_2_customer, 'r', compression=zipfile.ZIP_DEFLATED, encryption=WZ_AES) as zip_ref:
             # 设置密码
             zip_ref.setpassword(zip_pwd.encode('utf-8'))
-            # 解压所有文件到目标目录，实际上就2个文件
+            # 解压所有文件到目标目录，实际上就3个文件
             for member in zip_ref.namelist():
                 if stop_event.is_set():  # 检查是否应该停止
                     txt_info = f"用户主动停止"
@@ -367,7 +377,8 @@ def unzip_customer_file_with_progress(in_root, in_label, in_bar, in_mac_lst):
                     return False
 
                 # 获取文件的完整路径
-                if not member.endswith(tmp_fn) and not member.endswith(customer_name_info_fn):
+                if (not member.endswith(tmp_fn)) and (not member.endswith(customer_name_info_fn)) \
+                        and (not member.endswith(days_limit_info_fn)):
                     txt_info = f"基础文件损坏，zip文件中的文件：{tmp_fn}并非资产管理平台用文件！"
                     _logger.error(txt_info)
                     in_label.config(text=txt_info)
@@ -375,7 +386,7 @@ def unzip_customer_file_with_progress(in_root, in_label, in_bar, in_mac_lst):
                     unzip_event_failed.set()
                     return False
 
-                if member.endswith(customer_name_info_fn):
+                if member.endswith(customer_name_info_fn) or member.endswith(days_limit_info_fn):
                     continue
 
                 # 获取文件信息
@@ -437,6 +448,10 @@ def rezip_customer_file(in_root, in_label, in_bar):
         if os.path.exists(out_zip_fld + customer_name_info_fn):
             os.remove(out_zip_fld + customer_name_info_fn)
 
+        add_file_2_zip_with_password(out_zip_fld + days_limit_info_fn, days_limit_info_fn, tmp_z_fn, zip_pwd, 'a')
+        if os.path.exists(out_zip_fld + days_limit_info_fn):
+            os.remove(out_zip_fld + days_limit_info_fn)
+
         in_label.config(text="准备部署服务器资源……")
         in_root.update_idletasks()
         add_file_2_zip_with_password(in_zip_file, tmp_fn, tmp_z_fn, zip_pwd, 'a', file_2_customer)
@@ -466,10 +481,19 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
                                  compression=zipfile.ZIP_DEFLATED, encryption=WZ_AES) as zip_ref:
             # 设置密码
             zip_ref.setpassword(zip_pwd.encode('utf-8'))
-            if customer_name_info_fn not in zip_ref.namelist():
-                txt_info = f"基础文件损坏，找不到：{customer_name_info_fn}，可能被人为删除。请联系管理员解决。"
+            if (customer_name_info_fn not in zip_ref.namelist()) or (days_limit_info_fn not in zip_ref.namelist()):
+                txt_info = f"基础文件损坏，找不到{customer_name_info_fn}/{days_limit_info_fn}，可能被人为删除。请联系管理员解决。"
                 _logger.error(txt_info)
                 in_label.config(text=txt_info)
+                in_root.update_idletasks()
+                unzip_event_failed.set()
+                return False, False
+
+            # 先检查试用期天数
+            trial_period, err_msg = check_trial_period(zip_ref, days_limit_info_fn, out_zip_fld)
+            if not trial_period:
+                _logger.error(err_msg)
+                in_label.config(text=err_msg)
                 in_root.update_idletasks()
                 unzip_event_failed.set()
                 return False, False
@@ -550,6 +574,8 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
 
         if os.path.exists(out_zip_fld + customer_name_info_fn):
             os.remove(out_zip_fld + customer_name_info_fn)
+        if os.path.exists(out_zip_fld + days_limit_info_fn):
+            os.remove(out_zip_fld + days_limit_info_fn)
         if os.path.exists(out_zip_file):
             os.remove(out_zip_file)
 
@@ -559,6 +585,10 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
             file_attributes = win32file.GetFileAttributes(out_zip_fld + customer_name_info_fn)
             new_attributes = file_attributes | win32file.FILE_ATTRIBUTE_HIDDEN
             win32file.SetFileAttributes(out_zip_fld + customer_name_info_fn, new_attributes)
+        if os.path.exists(out_zip_fld + days_limit_info_fn):
+            file_attributes = win32file.GetFileAttributes(out_zip_fld + days_limit_info_fn)
+            new_attributes = file_attributes | win32file.FILE_ATTRIBUTE_HIDDEN
+            win32file.SetFileAttributes(out_zip_fld + days_limit_info_fn, new_attributes)
 
 
 def unzip_files(in_root, in_label, in_bar):
@@ -585,6 +615,8 @@ def unzip_files(in_root, in_label, in_bar):
     if not rezip:
         if os.path.exists(out_zip_fld + customer_name_info_fn):
             os.remove(out_zip_fld + customer_name_info_fn)
+        if os.path.exists(out_zip_fld + days_limit_info_fn):
+            os.remove(out_zip_fld + days_limit_info_fn)
         if os.path.exists(out_zip_file):
             os.remove(out_zip_file)
 
@@ -911,6 +943,61 @@ def start_web_server(in_root, in_label, in_bar):
     return True
 
 
+def trial_period_countdown(in_root, in_label, in_bar):
+    _logger.info(f"等待解压完成后开始倒计时……")
+    while not unzip_event_success.is_set():
+        time.sleep(1)
+        # 明确的解压错误，同时不是要求重新输入产品编码再校验
+        if unzip_event_failed.is_set() and not input_p_code_recheck.is_set():
+            _logger.info(f"启动错误:初始化文件错误！")
+            sys.exit(1)
+
+    _logger.info(f"开始检查试用期限……")
+    # 解压完成，就另起子线程来倒计时试用期
+    in_args = {
+        "file_2_customer": file_2_customer,
+        "customer_name_info_fn": customer_name_info_fn,
+        "days_limit_info_fn": days_limit_info_fn,
+        "zip_pwd": zip_pwd,
+        "tmp_fn": tmp_fn,
+        "out_zip_fld": out_zip_fld,
+        "out_zip_file": out_zip_file,
+        "in_zip_file": in_zip_file,
+        "time_check_period": time_check_period,
+    }
+    loop_flg = True
+    try:
+        while loop_flg:
+            _logger.info(f"先睡{int(time_check_period * 60)}s")
+            time.sleep(time_check_period * 60)
+            countdown_res, countdown_msg, min_limit, min_left = start_countdown_trial_period(in_args)
+            _logger.info(f"试用期倒计时-{int(time_check_period)}，countdown_res={countdown_res},"
+                         f"countdown_msg={countdown_msg}"
+                         f"min_limit={min_limit}min_left={min_left}……")
+
+            if min_limit != 0:
+                days_limit_label.grid(row=0, column=7, sticky=tk.E, pady=(20, 0))
+                entry_days_limit.grid(row=0, column=8, sticky=tk.W, pady=(20, 0))
+                days_limit.set(round(min_left / 60 / 24, 0))
+                in_root.update_idletasks()
+
+            if not countdown_res:
+                loop_flg = False
+                check_countdown_failed.set()
+                stop_web_server()
+                in_label.config(text=countdown_msg)
+                in_root.update_idletasks()
+
+        return False
+
+    except Exception as e:
+        _logger.info(f"trial_period_countdown错误:{e}{e.with_traceback}")
+        check_countdown_failed.set()
+        traceback.print_exc()
+        stop_web_server()
+        sys.exit(1)
+
+
 def main():
     global main_process
     main_process += 1
@@ -936,6 +1023,10 @@ def main():
         _logger.debug(f"zip_tgt_folders{len(zip_tgt_folders)}个={zip_tgt_folders}")
 
         if action_type == "unzip":
+            # 先设置可用天数不可见
+            days_limit_label.grid_forget()
+            entry_days_limit.grid_forget()
+            root.update_idletasks()
             # 当检查产品编码出错，要求输入产品编码时，要避免主线程中的逻辑重复
             # 先解压缩，部署
             thread_unzip = threading.Thread(target=unzip_files, name="ThreadUnzipTgtFiles",
@@ -943,6 +1034,12 @@ def main():
             thread_unzip.daemon = True
             thread_unzip.start()
             if main_process == 1:
+                # 另起线程每10分钟更新一次试用期倒计时
+                thread_countdown = threading.Thread(target=trial_period_countdown, name="ThreadTrialPeriodCountdown",
+                                                    args=(root, progress_label, progress_bar))
+                thread_countdown.daemon = True
+                thread_countdown.start()
+
                 # 另起线程启动服务
                 thread_start_webserver = threading.Thread(target=start_web_server, name="ThreadStartWebServer",
                                                           args=(root, progress_label, progress_bar))
@@ -956,6 +1053,14 @@ def main():
                 thread_log_progress.start()
 
         elif action_type == "zip":
+            # 尝试将字符串转换为整数
+            try:
+                input_value = int(days_limit.get())
+                days_limit.set(input_value)  # 设置 IntVar 的值
+            except Exception:
+                # 如果转换失败，设置 IntVar 的值为 0
+                days_limit.set(0)
+
             thread_zip_tgt = threading.Thread(target=zip_tgt_files, name="ThreadZipTgtFiles",
                                               args=(root, progress_label, progress_bar))
             thread_zip_tgt.daemon = True
