@@ -265,6 +265,7 @@
                 <separator/>
                 <filter name="sold" string="已租" domain="[('state','=','sold')]"/>
                 <filter name="unsold" string="未租" domain="[('state','!=','sold')]"/>
+                <field name="name" string="资产名称" operator="like"/>
                 <field name="property_type_id" string="资产类型" operator="like"/>
                 <separator/>
                 <field name="rent_area" string="面积>=" filter_domain="[('rent_area', '>=', self)]"/>

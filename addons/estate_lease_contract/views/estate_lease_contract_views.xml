@@ -721,6 +721,7 @@
             <search string="合同检索">
                 <filter string="有效合同" name="state_valid" domain="[('state','!=', 'invalid')]"/>
                 <filter string="过期/失效合同" name="state_all" domain="[('state','=', 'invalid')]"/>
+                <field name="property_ids" string="资产名称" operator="like"/>
                 <separator/>
                 <filter string="合同签订月份" name="date_sign_month" date="date_sign"/>
                 <separator/>
