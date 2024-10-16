@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='expected_price']" position="replace">
                     <field name="default_rental_plan" column_invisible="1"/>
-                    <field name="rent_price" invisible="rent_price &lt; 0.01"/>
+                    <field name="rent_price" invisible="rent_price &lt; 0.01" avg="平均单价"/>
                     <field name="latest_monthly_rent" invisible="latest_monthly_rent &lt; 0.01"/>
                     <field name="latest_annual_rent" invisible="latest_annual_rent &lt; 0.01"/>
                 </xpath>
