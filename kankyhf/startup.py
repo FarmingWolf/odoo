@@ -978,7 +978,7 @@ def trial_period_countdown(in_root, in_label, in_bar):
             if min_limit != 0:
                 days_limit_label.grid(row=0, column=7, sticky=tk.E, pady=(20, 0))
                 entry_days_limit.grid(row=0, column=8, sticky=tk.W, pady=(20, 0))
-                days_limit.set(round(min_left / 60 / 24, 0))
+                days_limit.set(int(round(min_left / 60 / 24, 0)))
                 in_root.update_idletasks()
 
             if not countdown_res:
