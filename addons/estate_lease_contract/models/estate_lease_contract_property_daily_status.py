@@ -114,11 +114,10 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
 
                     # 查询该日期对应的有效合同
                     contract_domain = [('property_ids', '=', each_property.id), ('active', '=', True),
-                                       ('terminated', '=', False), ('state', '=', 'released'),
-                                       ('date_rent_start', '<=', record_status_date),
+                                       ('terminated', '=', False), ('state', 'in', ['to_be_released', 'released']),
                                        ('date_rent_end', '>=', record_status_date), ]
-                    property_contract = self.env['estate.lease.contract'].search(contract_domain, order='id DESC',
-                                                                                 limit=1)
+                    property_contract = self.env['estate.lease.contract'].search(contract_domain,
+                                                                                 order='date_rent_end DESC')
                     # 默认没有合同，则先设置每个字段为空
                     record_contract_id = None
                     record_contract_state = None
@@ -127,16 +126,23 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                     record_contract_date_rent_start = None
                     record_contract_date_rent_end = None
 
+                    # 合同有效时才设置其资产已租状态,业务上、理论上和逻辑上时间段不会重叠
                     for contract in property_contract:
-                        # 有合同时再设置其资产状态
-                        record_property_state = dict(
-                            each_property._fields['state'].selection).get(each_property.state)
-                        record_contract_id = contract
-                        record_contract_state = dict(contract._fields['state'].selection).get(contract.state)
-                        record_contract_date_sign = contract.date_sign
-                        record_contract_date_start = contract.date_start
-                        record_contract_date_rent_start = contract.date_rent_start
-                        record_contract_date_rent_end = contract.date_rent_end
+                        if (contract.property_state_by_date_sign and
+                            contract.date_sign <= record_status_date) or \
+                                (contract.property_state_by_date_start and
+                                 contract.date_start <= record_status_date) or \
+                                (contract.property_state_by_date_rent_start and
+                                 contract.date_rent_start <= record_status_date):
+
+                            record_property_state = dict(
+                                each_property._fields['state'].selection).get(each_property.state)
+                            record_contract_id = contract
+                            record_contract_state = dict(contract._fields['state'].selection).get(contract.state)
+                            record_contract_date_sign = contract.date_sign
+                            record_contract_date_start = contract.date_start
+                            record_contract_date_rent_start = contract.date_rent_start
+                            record_contract_date_rent_end = contract.date_rent_end
 
                     if record_contract_id:
                         record_contract_id_id = record_contract_id.id
