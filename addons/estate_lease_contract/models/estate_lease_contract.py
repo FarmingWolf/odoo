@@ -513,10 +513,12 @@ class EstateLeaseContract(models.Model):
     # contract_tax_out = fields.Float("不含税合同额", default=0.0)
 
     date_sign = fields.Date("合同签订日期", required=True, copy=False, default=fields.Date.context_today, tracking=True)
+    property_state_by_date_sign = fields.Boolean(string="资产出租状态依据", default=False)
     date_start = fields.Date("合同开始日期", required=True, copy=False, default=fields.Date.context_today, tracking=True)
-
+    property_state_by_date_start = fields.Boolean(string="资产出租状态依据", default=True)
     date_rent_start = fields.Date("计租开始日期", required=True, copy=False, tracking=True,
                                   default=fields.Date.context_today)
+    property_state_by_date_rent_start = fields.Boolean(string="资产出租状态依据", default=False)
     date_rent_end = fields.Date("计租结束日期", required=True, copy=False, tracking=True,
                                 default=lambda self: self._get_default_date_rent_end())
 
@@ -526,6 +528,69 @@ class EstateLeaseContract(models.Model):
     # *********在查看界面（也就是说只要合同发布），那么就应该显示历史数据，录入中的则显示关联master property和rental plan的信息*********
     contract_hist = fields.One2many('estate.lease.contract.rental.plan.rel', 'contract_id',
                                     string='合同-资产-租金方案历史信息', copy=False)
+
+    @api.onchange("date_sign")
+    def _onchange_date_sign(self):
+        if self.date_sign > self.date_start:
+            self.date_start = self.date_sign
+
+    @api.onchange("date_start")
+    def _onchange_date_start(self):
+        if self.date_start < self.date_sign:
+            self.date_sign = self.date_start
+        if self.date_start > self.date_rent_start:
+            self.date_rent_start = self.date_start
+
+    @api.onchange("date_rent_start")
+    def _onchange_date_rent_start(self):
+        if self.date_rent_start < self.date_start:
+            self.date_start = self.date_rent_start
+        if self.date_rent_start > self.date_rent_end:
+            self.date_rent_end = self.date_rent_start
+
+    @api.onchange("date_rent_end")
+    def _onchange_date_rent_end(self):
+        if self.date_rent_end < self.date_rent_start:
+            self.date_rent_start = self.date_rent_end
+
+    @api.onchange("property_state_by_date_sign")
+    def _onchange_property_state_by_date_sign(self):
+        if self.property_state_by_date_sign:
+            if self.property_state_by_date_start:
+                self.property_state_by_date_start = False
+            if self.property_state_by_date_rent_start:
+                self.property_state_by_date_rent_start = False
+        else:
+            if self.property_state_by_date_start and self.property_state_by_date_rent_start:
+                self.property_state_by_date_rent_start = False
+            if (not self.property_state_by_date_start) and (not self.property_state_by_date_rent_start):
+                self.property_state_by_date_start = True
+
+    @api.onchange("property_state_by_date_start")
+    def _onchange_property_state_by_date_start(self):
+        if self.property_state_by_date_start:
+            if self.property_state_by_date_sign:
+                self.property_state_by_date_sign = False
+            if self.property_state_by_date_rent_start:
+                self.property_state_by_date_rent_start = False
+        else:
+            if self.property_state_by_date_rent_start and self.property_state_by_date_sign:
+                self.property_state_by_date_sign = False
+            if (not self.property_state_by_date_rent_start) and (not self.property_state_by_date_sign):
+                self.property_state_by_date_rent_start = True
+
+    @api.onchange("property_state_by_date_rent_start")
+    def _onchange_property_state_by_date_rent_start(self):
+        if self.property_state_by_date_rent_start:
+            if self.property_state_by_date_sign:
+                self.property_state_by_date_sign = False
+            if self.property_state_by_date_start:
+                self.property_state_by_date_start = False
+        else:
+            if self.property_state_by_date_sign and self.property_state_by_date_start:
+                self.property_state_by_date_sign = False
+            if (not self.property_state_by_date_start) and (not self.property_state_by_date_sign):
+                self.property_state_by_date_start = True
 
     """ 这俩函数就是个废柴
     @api.onchange("contract_no")
@@ -602,7 +667,7 @@ class EstateLeaseContract(models.Model):
         for record in self:
             if record.date_rent_start and record.date_rent_end:
                 if record.date_rent_start > record.date_rent_end:
-                    raise exceptions.UserError("计租开始日期不能大于计租结束日期")
+                    raise exceptions.UserError("计租结束日期不能小于计租开始日期")
 
                 date_s = fields.Date.from_string(record.date_rent_start)
                 date_e = fields.Date.from_string(record.date_rent_end)
@@ -1278,16 +1343,28 @@ class EstateLeaseContract(models.Model):
 
             record.active = True
             # 根据合同生效日期判断state
+            depend_date = record.date_start
+            if record.property_state_by_date_sign:
+                depend_date = record.date_sign
+            if record.property_state_by_date_start:
+                depend_date = record.date_start
+            if record.property_state_by_date_rent_start:
+                depend_date = record.date_rent_start
+
+            # 合同状态
             if record.date_start <= date.today():
+                record.state = 'released'
+            else:
+                record.state = 'to_be_released'
+
+            if depend_date <= date.today():
                 for each_property in record.property_ids:
                     if each_property.state != "sold":
                         each_property.state = "sold"
-                record.state = 'released'
             else:
                 for each_property in record.property_ids:
                     if each_property.state != "offer_accepted":
                         each_property.state = "offer_accepted"
-                record.state = 'to_be_released'
 
             if record.date_rent_end < date.today():
                 for each_property in record.property_ids:
@@ -1685,8 +1762,13 @@ class EstateLeaseContract(models.Model):
                             if each_property.state != "canceled":
                                 each_property.state = "canceled"
                         elif (not contract.active) and (not contract.terminated):
-                            if each_property.state != "offer_received":
-                                each_property.state = "offer_received"
+                            # 目前资产状态判断依据只有这三个：date_sign、date_start、date_rent_start
+                            if contract.property_state_by_date_sign or contract.property_state_by_date_start:
+                                if each_property.state != "sold":
+                                    each_property.state = "sold"
+                            if contract.property_state_by_date_rent_start:
+                                if each_property.state != "offer_received":
+                                    each_property.state = "offer_received"
                         elif (not contract.active) and contract.terminated:
                             if each_property.state != "canceled":
                                 each_property.state = "canceled"
@@ -1725,14 +1807,47 @@ class EstateLeaseContract(models.Model):
                             pass
                     # 当前最新状态最优先，所以有了就退出
                     break
-                # 看未来数据
-                elif fields.Date.context_today(self) < contract.date_start:
+                # 看未来数据:已签约但是尚未开始合同
+                elif contract.date_sign <= fields.Date.context_today(self) < contract.date_start:
                     # 合同已发布且未终止
                     if contract.active and not contract.terminated:
-                        if contract.state == 'to_be_released':
-                            if each_property.state != "offer_accepted":
-                                each_property.state = "offer_accepted"
-                        elif contract.state == 'released':  # 理论上不存在这种情况
+                        if contract.state in ('released', 'to_be_released'):
+                            if contract.property_state_by_date_sign:
+                                if each_property.state != "sold":
+                                    each_property.state = "sold"
+                            if contract.property_state_by_date_start or contract.property_state_by_date_rent_start:
+                                if each_property.state != "offer_accepted":
+                                    each_property.state = "offer_accepted"
+                        elif contract.state == "recording":
+                            if each_property.state != "offer_received":
+                                each_property.state = "offer_received"
+                        elif contract.state == "invalid":
+                            if each_property.state != "canceled":
+                                each_property.state = "canceled"
+                        else:
+                            _logger.error(f"新定义的合同状态{contract.state}，需增加逻辑")
+                            pass
+                    elif contract.active and contract.terminated:
+                        if each_property.state != "canceled":
+                            each_property.state = "canceled"
+                    elif (not contract.active) and (not contract.terminated):
+                        if each_property.state != "offer_received":
+                            each_property.state = "offer_received"
+                    elif (not contract.active) and contract.terminated:
+                        if each_property.state != "canceled":
+                            each_property.state = "canceled"
+                    else:
+                        _logger.error(f"理论上不存在该情况：contract.active={contract.active};"
+                                      f"contract.terminated={contract.terminated}")
+                        pass
+                    # 已看到未来数据，不用再看接下来的未来数据
+                    break
+
+                # 理论上不应该存在当前日期在签约日期之前的情况
+                elif fields.Date.context_today(self) < contract.date_sign:
+                    # 合同已发布且未终止
+                    if contract.active and not contract.terminated:
+                        if contract.state in ('released', 'to_be_released'):
                             if each_property.state != "offer_accepted":
                                 each_property.state = "offer_accepted"
                         elif contract.state == "recording":

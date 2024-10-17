@@ -504,14 +504,22 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 for current_contract in current_contracts:
                     i += 1
                     # 因为合同计租开始终了日都是必填字段所以不必判空
-                    if current_date < current_contract.date_rent_start:
+                    depend_date = current_contract.date_rent_start
+                    if current_contract.property_state_by_date_sign:
+                        depend_date = current_contract.date_sign
+                    if current_contract.property_state_by_date_start:
+                        depend_date = current_contract.date_start
+                    if current_contract.property_state_by_date_rent_start:
+                        depend_date = current_contract.date_rent_sign
+
+                    if current_date < depend_date:
                         # 如果第一条就在当前日之后，那么后边也一定在当前日之后，所以不是最后一条的未开始不更新
                         # 如果当前日在开始日之前，而i小于len，那么说明后边还有
                         if i == len(current_contracts):
                             if each_property.state != "offer_accepted" and not now_in_period:
                                 each_property.state = "offer_accepted"
                                 state_change = True
-                    elif current_contract.date_rent_start <= current_date <= current_contract.date_rent_end:
+                    elif depend_date <= current_date <= current_contract.date_rent_end:
                         now_in_period = True  # 若当前日期正在期间内，那么这条合同状态最优先
                         if each_property.state != "sold":
                             each_property.state = "sold"
@@ -527,12 +535,14 @@ class EstateLeaseContractPropertyExtend(models.Model):
                         # 若有多条合同发布，前边过期，后边也一定过期，所以不是最后一条的过期合同不用更新资产状态
                         # 如果当前日在结束日日之后，而i小于len，那么说明后边还有
                         if i == len(current_contracts):
-                            if each_property.state != "out_dated":
+                            if each_property.state != "out_dated" and not now_in_period:
                                 each_property.state = "out_dated"
                                 state_change = True
                     else:
                         _logger.error(f"不可能出现这样的错误：current_contract id={current_contract.id},"
                                       f"current_date={current_date},"
+                                      f"current_contract.date_sign={current_contract.date_sign},"
+                                      f"current_contract.date_start={current_contract.date_start},"
                                       f"current_contract.date_rent_start={current_contract.date_rent_start},"
                                       f"current_contract.date_rent_end={current_contract.date_rent_end}")
 
@@ -549,12 +559,35 @@ class EstateLeaseContractPropertyExtend(models.Model):
                     for unreleased_contract in unreleased_contracts:
                         i += 1
                         # 未来生效的合同
-                        if current_date < unreleased_contract.date_start:
+                        if current_date < unreleased_contract.date_sign:
                             if unreleased_contract.state != 'recording':
                                 if each_property.state not in ("offer_received", "offer_accepted") and \
-                                        i == len(unreleased_contract) and not now_in_period:
+                                        i == len(unreleased_contracts) and not now_in_period:
                                     each_property.state = "offer_accepted"
                                     state_change = True
+
+                                if unreleased_contract.state != 'to_be_released':
+                                    _logger.info(f"公司{each_property.company_id},合同{unreleased_contract.id}"
+                                                 f"原状态={unreleased_contract.state},更新为to_be_released")
+                                    # unreleased_contract.write({'state': 'to_be_released'})
+                                    self.env.cr.execute(f"UPDATE estate_lease_contract SET state = 'to_be_released' "
+                                                        f"WHERE id = {unreleased_contract.id}")
+
+                        elif unreleased_contract.date_sign <= current_date < unreleased_contract.date_start:
+                            if unreleased_contract.state != 'recording':
+                                if unreleased_contract.property_state_by_date_sign:
+                                    if each_property.state != 'sold':
+                                        each_property.state = 'sold'
+                                        state_change = True
+                                        # 既然以签约日为判断基准，那么
+                                        now_in_period = True
+
+                                if unreleased_contract.property_state_by_date_start or \
+                                        unreleased_contract.property_state_by_date_rent_start:
+                                    if each_property.state not in ("offer_received", "offer_accepted") and \
+                                            i == len(unreleased_contracts) and not now_in_period:
+                                        each_property.state = "offer_accepted"
+                                        state_change = True
 
                                 if unreleased_contract.state != 'to_be_released':
                                     _logger.info(f"公司{each_property.company_id},合同{unreleased_contract.id}"
@@ -576,9 +609,16 @@ class EstateLeaseContractPropertyExtend(models.Model):
 
                                 # 当前在计租开始日之前
                                 if current_date < unreleased_contract.date_rent_start:
-                                    if each_property.state != "offer_accepted" and not now_in_period:
-                                        each_property.state = "offer_accepted"
-                                        state_change = True
+                                    if unreleased_contract.property_state_by_date_rent_start:
+                                        if each_property.state != "offer_accepted" and not now_in_period:
+                                            each_property.state = "offer_accepted"
+                                            state_change = True
+                                    if unreleased_contract.property_state_by_date_sign or \
+                                            unreleased_contract.property_state_by_date_start:
+                                        now_in_period = True
+                                        if each_property.state != 'sold':
+                                            each_property.state = "sold"
+                                            state_change = True
                                 elif unreleased_contract.date_rent_start <= current_date <= \
                                         unreleased_contract.date_rent_end:
                                     now_in_period = True
@@ -589,7 +629,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                         elif current_date > unreleased_contract.date_rent_end:
                             if unreleased_contract.state != 'recording':
                                 # 不是最后一条的过期合同不更新资产状态，如果i < len说明后边还有过期的，但后还有可能有当前日在期间内的
-                                if i == len(unreleased_contracts):
+                                if i == len(unreleased_contracts) and not now_in_period:
                                     if each_property.state not in ("canceled", "out_dated"):
                                         each_property.state = "out_dated"
                                         state_change = True
@@ -603,6 +643,8 @@ class EstateLeaseContractPropertyExtend(models.Model):
                         else:
                             _logger.error(f"不应该出现这样的错误：unreleased_contract id={unreleased_contract.id},"
                                           f"current_date={current_date},"
+                                          f"unreleased_contract.date_sign={unreleased_contract.date_sign},"
+                                          f"unreleased_contract.date_start={unreleased_contract.date_start},"
                                           f"unreleased_contract.date_rent_start={unreleased_contract.date_rent_start},"
                                           f"unreleased_contract.date_rent_end={unreleased_contract.date_rent_end}")
 

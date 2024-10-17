@@ -30,28 +30,55 @@
                 </header>
                 <sheet>
                     <group col="2">
-                        <group>
-                            <field name="default_context_contract_id" invisible="1"/>
-                            <field name="name" readonly="not edit_on_hist_page"/>
-                            <field name="contract_type_id" readonly="not edit_on_hist_page"/>
-                            <field name="party_a_unit_id" readonly="not edit_on_hist_page"
-                                   invisible="party_a_unit_invisible"/>
-                            <field name="renter_id" string="乙方" readonly="not edit_on_hist_page"/>
-                            <field name="renter_company_id" readonly="not edit_on_hist_page"/>
-                            <field name="sales_person_id" readonly="not edit_on_hist_page"/>
-                            <field name="brokerage_fee" readonly="not edit_on_hist_page"
-                                   groups="estate_lease_contract.contract_brokerage_fee_manage"/>
-                            <field name="opt_person_id" readonly="not edit_on_hist_page"/>
-                            <field name="date_sign" readonly="not edit_on_hist_page"/>
-                            <field name="date_start" readonly="not edit_on_hist_page"/>
-                            <field name="lease_deposit"/>
-                            <field name="rent_amount"/>
-                            <field name="rent_amount_year"/>
-                        </group>
                         <group col="1">
                             <group col="2">
+                                <field name="default_context_contract_id" invisible="1"/>
+                                <field name="name" readonly="not edit_on_hist_page"/>
+                                <field name="contract_type_id" readonly="not edit_on_hist_page"/>
+                                <field name="party_a_unit_id" readonly="not edit_on_hist_page"
+                                       invisible="party_a_unit_invisible"/>
+                                <field name="renter_id" string="乙方" readonly="not edit_on_hist_page"/>
+                                <field name="renter_company_id" readonly="not edit_on_hist_page"/>
+                                <field name="sales_person_id" readonly="not edit_on_hist_page"/>
+                                <field name="brokerage_fee" readonly="not edit_on_hist_page"
+                                       groups="estate_lease_contract.contract_brokerage_fee_manage"/>
+                                <field name="opt_person_id" readonly="not edit_on_hist_page"/>
+                            </group>
+                            <group col="2">
+                                <group>
+                                    <field name="date_sign" readonly="not edit_on_hist_page"/>
+                                </group>
+                                <group>
+                                    <field name="property_state_by_date_sign" readonly="not edit_on_hist_page" help="根据合同签订日期判断资产是否处于已租状态"/>
+                                </group>
+                            </group>
+                            <group col="2">
+                                <group>
+                                    <field name="date_start" readonly="not edit_on_hist_page"/>
+                                </group>
+                                <group>
+                                    <field name="property_state_by_date_start" readonly="not edit_on_hist_page" help="根据合同开始日期判断资产是否处于已租状态"/>
+                                </group>
+                            </group>
+                            <group col="2">
+                                <field name="lease_deposit"/>
+                                <field name="rent_amount"/>
+                                <field name="rent_amount_year"/>
+                            </group>
+                        </group>
+                        <group col="1">
+                            <group>
                                 <field name="contract_no" readonly="not edit_on_hist_page"/>
-                                <field name="date_rent_start" readonly="not edit_on_hist_page"/>
+                            </group>
+                            <group col="2">
+                                <group>
+                                    <field name="date_rent_start" readonly="not edit_on_hist_page"/>
+                                </group>
+                                <group>
+                                    <field name="property_state_by_date_rent_start" readonly="not edit_on_hist_page" help="根据计租开始日期判断资产是否处于已租状态"/>
+                                </group>
+                            </group>
+                            <group col="2">
                                 <field name="date_rent_end" readonly="not edit_on_hist_page"/>
                                 <field name="days_rent_total" readonly="1"/>
                                 <field name="days_free" readonly="not edit_on_hist_page"
