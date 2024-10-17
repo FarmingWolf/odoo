@@ -2,6 +2,23 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import fields, models, api
+from odoo.exceptions import UserError
+
+
+def check_input_vals(vals):
+    if 'billing_progress_info_month_from' in vals:
+        if vals['billing_progress_info_month_from'] > 0:
+            pass
+        else:
+            raise UserError('开始月数字须大于0!')
+
+    if 'billing_progress_info_month_every' in vals:
+        if vals['billing_progress_info_month_every'] > 0:
+            pass
+        else:
+            raise UserError('每X月数字须要大于0!')
+
+    return True
 
 
 class EstateLeaseContractRentalPeriodPercentage(models.Model):
@@ -47,10 +64,12 @@ class EstateLeaseContractRentalPeriodPercentage(models.Model):
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     _sql_constraints = [
+        ('ck_billing_progress_info_month_from', 'CHECK(billing_progress_info_month_from > 0)', '开始月数字须大于0'),
+        ('ck_billing_progress_info_month_every', 'CHECK(billing_progress_info_month_every > 0)', '每X月数字须要大于0'),
         ('name',
          'unique(billing_progress_info_month_from, billing_progress_info_month_every, '
          'billing_progress_info_up_percentage, company_id)',
-         '相同期间段，相同递增比例已存在')
+         '相同期间段，相同递增比例已存在'),
     ]
 
     @api.depends("billing_progress_info_month_from", "billing_progress_info_month_every",
@@ -60,3 +79,22 @@ class EstateLeaseContractRentalPeriodPercentage(models.Model):
             record.name_description = "从第{0}个月起每{1}个月递增{2}%".format(record.billing_progress_info_month_from,
                                                                     record.billing_progress_info_month_every,
                                                                     record.billing_progress_info_up_percentage)
+
+    @api.model
+    def write(self, vals):
+
+        if not check_input_vals(vals):
+            return False
+
+        res = super().write(vals)
+        return res
+
+    @api.model
+    def create(self, vals):
+
+        if not check_input_vals(vals):
+            return False
+
+        records = super().create(vals)
+
+        return records
