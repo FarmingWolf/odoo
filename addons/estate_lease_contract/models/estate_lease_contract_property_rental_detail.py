@@ -33,6 +33,7 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     _order = "property_id, period_date_from, rental_period_no"
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
+    name = fields.Char(string="租金明细", compute="_compute_detail_name")
     contract_id = fields.Many2one('estate.lease.contract', string="合同")
     contract_state = fields.Selection(string="合同状态", related="contract_id.state")
     property_id = fields.Many2one('estate.property', string="租赁标的")
@@ -75,6 +76,13 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
 
     rental_detail_sub_ids = fields.One2many(comodel_name="estate.lease.contract.property.rental.detail.sub",
                                             inverse_name="rental_detail_id", string="分次缴费明细")
+
+    @api.depends("property_id", "contract_id", "rental_period_no", "period_date_from", "period_date_to")
+    def _compute_detail_name(self):
+        for record in self:
+            record.name = str(record.contract_id.name) + "-" + str(record.property_id.name) + "-" + \
+                          record.period_date_from.strftime('%Y%m%d') + "-" + \
+                          record.period_date_to.strftime('%Y%m%d') + "-" + str(record.rental_period_no)
 
     @api.onchange("rental_detail_sub_ids")
     def _onchange_rental_detail_sub_ids(self):

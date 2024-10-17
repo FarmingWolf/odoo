@@ -1,17 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="estate_lease_contract_property_rental_detail_sub_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.rental.detail.sub.form</field>
+        <field name="model">estate.lease.contract.property.rental.detail.sub</field>
+        <field name="arch" type="xml">
+            <form string="estate_lease_contract_property_rental_detail_sub_view_form"
+                  create="False" delete="False" edit="False">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="party_a_unit_invisible" invisible="1"/>
+                            <field name="property_id"/>
+                            <field name="party_a_unit_id" invisible="party_a_unit_invisible"/>
+                            <field name="date_rent_start"/>
+                            <field name="date_rent_end"/>
+                            <field name="date_received"/>
+                            <field name="rental_received" digits="[12, 2]"/>
+                            <field name="rental_received_tgt_period" digits="[12, 2]"/>
+                            <field name="rental_receivable_tgt_period" digits="[12, 2]" />
+                            <field name="rental_arrears_tgt_period" digits="[12, 2]"/>
+                        </group>
+                        <group>
+                            <field name="contract_id"/>
+                            <field name="renter_id"/>
+                            <field name="rental_detail_id"/>
+                            <field name="rental_period_no"/>
+                            <field name="period_date_from"/>
+                            <field name="period_date_to"/>
+                            <field name="date_payment"/>
+                            <field name="contract_amount" digits="[12, 2]"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
     <record id="estate_lease_contract_property_rental_detail_sub_view_tree" model="ir.ui.view">
         <field name="name">estate.lease.contract.property.rental.detail.sub.tree</field>
         <field name="model">estate.lease.contract.property.rental.detail.sub</field>
         <field name="arch" type="xml">
-            <tree string="estate_lease_contract_property_rental_detail_sub_view_tree" create="False" delete="False" edit="False">
+            <tree string="estate_lease_contract_property_rental_detail_sub_view_tree" create="False" delete="False" edit="False" import="False" open_form_view="False">
+
+                <field name="party_a_unit_invisible" column_invisible="1"/>
                 <field name="property_id"/>
-                <field name="party_a_unit_id"/>
+                <field name="party_a_unit_id" invisible="party_a_unit_invisible" string=""/>
                 <field name="date_rent_start"/>
                 <field name="date_rent_end"/>
                 <field name="renter_id"/>
-                <field name="contract_amount"/>
+                <field name="contract_amount" digits="[12, 2]" />
                 <field name="rental_receivable_tgt_period" digits="[12, 2]" />
                 <field name="rental_received" string="指定期间实收（元）" digits="[12, 2]" sum="指定期间总计实收（元）"/>
                 <field name="rental_arrears_tgt_period" digits="[12, 2]"/>
