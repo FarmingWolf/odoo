@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="estate_lease_contract_property_rental_detail_sub_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.rental.detail.sub.tree</field>
+        <field name="model">estate.lease.contract.property.rental.detail.sub</field>
+        <field name="arch" type="xml">
+            <tree string="estate_lease_contract_property_rental_detail_sub_view_tree" create="False" delete="False" edit="False">
+                <field name="property_id"/>
+                <field name="party_a_unit_id"/>
+                <field name="date_rent_start"/>
+                <field name="date_rent_end"/>
+                <field name="renter_id"/>
+                <field name="contract_amount"/>
+                <field name="rental_receivable_tgt_period" digits="[12, 2]" />
+                <field name="rental_received" string="指定期间实收（元）" digits="[12, 2]" sum="指定期间总计实收（元）"/>
+                <field name="rental_arrears_tgt_period" digits="[12, 2]"/>
+                <field name="date_received"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_property_rental_detail_sub_view_search" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.rental.detail.sub.view.search</field>
+        <field name="model">estate.lease.contract.property.rental.detail.sub</field>
+        <field name="arch" type="xml">
+            <search string="实收租金检索">
+                <filter string="实收月份" name="filter_date_received" date="date_received" default_period="last_month"/>
+                <separator/>
+                <filter string="截至本日" name="date_received_2_today"
+                        domain="[('date_received', '&lt;=', context_today())]"/>
+                <separator/>
+                <filter string="截至本月" name="date_received_2_this_m"
+                        domain="[('date_received', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="截至本年" name="date_received_2_this_y"
+                        domain="[('date_received', '&lt;', (context_today() + relativedelta(years=1, month=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <field string='租赁资产名称' name="property_id" operator="like"/>
+                <searchpanel>
+                    <field string='承租人' name="renter_id" context="{'group_by': 'renter_id'}"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_property_rental_detail_sub_action" model="ir.actions.act_window">
+        <field name="name">实收租金流水明细</field>
+        <field name="res_model">estate.lease.contract.property.rental.detail.sub</field>
+        <field name="view_id" ref="estate_lease_contract_property_rental_detail_sub_view_tree"/>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{
+            'search_default_filter_date_received': True,
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                这里显示资产租赁合同各期租金明细的实际收缴明细。
+            </p>
+        </field>
+    </record>
+
+</odoo>

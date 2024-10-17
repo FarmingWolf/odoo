@@ -6,6 +6,7 @@ lease_contract_incentives_company_account_rule,Restrict Lease Contract incentive
 lease_contract_daily_status_company_account_rule,Restrict Lease Contract Daily Status by Company,model_estate_lease_contract_property_daily_status,"[('company_id','=',user.company_id.id)]"
 lease_contract_management_fee_plan_company_account_rule,Restrict Lease Contract Management Fee Plan by Company,model_estate_lease_contract_property_management_fee_plan,"[('company_id','=',user.company_id.id)]"
 lease_contract_rental_detail_company_account_rule,Restrict Lease Contract Rental Detail by Company,model_estate_lease_contract_property_rental_detail,"[('company_id','=',user.company_id.id)]"
+lease_contract_rental_detail_sub_company_account_rule,Restrict Lease Contract Rental Detail Sub by Company,model_estate_lease_contract_property_rental_detail_sub,"[('company_id','=',user.company_id.id)]"
 lease_contract_rental_business_type_account_rule,Restrict Lease Contract Rental Business Type by Company,model_estate_lease_contract_rental_business_type,"[('company_id','=',user.company_id.id)]"
 lease_contract_rental_main_category_account_rule,Restrict Lease Contract Rental Main Category by Company,model_estate_lease_contract_rental_main_category,"[('company_id','=',user.company_id.id)]"
 lease_contract_rental_period_percentage_account_rule,Restrict Lease Contract Rental Period Percentage by Company,model_estate_lease_contract_rental_period_percentage,"[('company_id','=',user.company_id.id)]"
