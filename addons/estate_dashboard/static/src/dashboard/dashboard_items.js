@@ -42,6 +42,15 @@ const items = [
         })
     },
     {
+        id: "estate_conventional_price_avg",
+        description: "在租房屋平均单价（元/天/㎡）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "在租房屋平均单价（元/天/㎡）",
+            value: data.conventional_price_avg,
+        })
+    },
+    {
         id: "ratio_conventional_quantity",
         description: "房屋出租率（间数 %）",
         Component: NumberCard,
@@ -96,6 +105,15 @@ const items = [
         })
     },
     {
+        id: "estate_unconventional_price_avg",
+        description: "在租林地等平均单价（元/天/㎡）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "在租林地等平均单价（元/天/㎡）",
+            value: data.unconventional_price_avg,
+        })
+    },
+    {
         id: "ratio_unconventional_quantity",
         description: "林地等地块出租率（地块数量 %）",
         Component: NumberCard,
@@ -147,6 +165,15 @@ const items = [
         props: (data) => ({
             title: "在租资产面积（㎡）",
             value: data.estate_property_area_lease_quantity,
+        })
+    },
+    {
+        id: "estate_property_price_avg",
+        description: "在租资产平均单价（元/天/㎡）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "在租资产平均单价（元/天/㎡）",
+            value: data.property_price_avg,
         })
     },
     {

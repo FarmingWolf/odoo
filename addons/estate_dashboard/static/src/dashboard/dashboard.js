@@ -1,16 +1,21 @@
 /** @odoo-module **/
 
-import { Component, useState } from "@odoo/owl";
-import { registry } from "@web/core/registry";
-import { Layout } from "@web/search/layout";
-import { useService } from "@web/core/utils/hooks";
-import { DashboardItem } from "./dashboard_item/dashboard_item";
+import {Component, useState} from "@odoo/owl";
+import {registry} from "@web/core/registry";
+import {Layout} from "@web/search/layout";
+import {useService} from "@web/core/utils/hooks";
+import {DashboardItem} from "./dashboard_item/dashboard_item";
 // import { PieChart } from "./pie_chart/pie_chart";
-import { items } from "./dashboard_items";
-import { Dialog } from "@web/core/dialog/dialog";
-import { CheckBox } from "@web/core/checkbox/checkbox";
-import { browser } from "@web/core/browser/browser";
-import { session } from "@web/session";
+import {items} from "./dashboard_items";
+import {Dialog} from "@web/core/dialog/dialog";
+import {CheckBox} from "@web/core/checkbox/checkbox";
+import {browser} from "@web/core/browser/browser";
+import {session} from "@web/session";
+
+let default_items = ['estate_conventional_quantity', 'estate_conventional_area_quantity',
+                    'estate_conventional_lease_quantity', 'estate_conventional_area_lease_quantity',
+                    'estate_conventional_price_avg', 'ratio_conventional_quantity', 'ratio_conventional_area_quantity',
+                    'pie_chart_ratio_conventional_quantity', 'pie_chart_ratio_conventional_area_quantity']
 
 class EstateDashboard extends Component {
     static template = "estate_dashboard.EstateDashboard";
@@ -38,11 +43,7 @@ class EstateDashboard extends Component {
             configurationSet: browser.localStorage.getItem("ConfigurationSet") || "no",
             allDataLoadedCnt: 0,
             allDataLoaded: false,
-            displayed_ini:
-                ['estate_conventional_quantity', 'estate_conventional_area_quantity',
-                    'estate_conventional_lease_quantity', 'estate_conventional_area_lease_quantity',
-                    'ratio_conventional_quantity', 'ratio_conventional_area_quantity',
-                    'pie_chart_ratio_conventional_quantity', 'pie_chart_ratio_conventional_area_quantity'],
+            displayed_ini: default_items,
         });
         // 使用 userService 获取当前用户的信息
         const { user_companies } = session;
@@ -154,14 +155,10 @@ class ConfigurationDialog extends Component {
 
     setup() {
         this.items = useState(this.props.items.map((item) => {
-            const ini_display_items = ['estate_conventional_quantity', 'estate_conventional_area_quantity',
-                'estate_conventional_lease_quantity', 'estate_conventional_area_lease_quantity',
-                'ratio_conventional_quantity', 'ratio_conventional_area_quantity',
-                'pie_chart_ratio_conventional_quantity', 'pie_chart_ratio_conventional_area_quantity']
             return {
                 ...item,
                 enabled: (browser.localStorage.getItem("ConfigurationSet") === "yes" && !this.props.disabledItems.includes(item.id)) ||
-                    (browser.localStorage.getItem("ConfigurationSet") !== "yes" && ini_display_items.includes(item.id)),
+                    (browser.localStorage.getItem("ConfigurationSet") !== "yes" && default_items.includes(item.id)),
             }
         }));
     }

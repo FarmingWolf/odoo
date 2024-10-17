@@ -28,6 +28,8 @@ class EstateDashboardService:
         estate_property_lease_quantity = 0
         estate_property_area_quantity = 0.0
         estate_property_area_lease_quantity = 0.0
+        property_area_x_price = 0.0
+        property_price_avg = 0.0
         ratio_property_quantity = 1.00
         ratio_property_area_quantity = 1.00
         # 常规计租类型
@@ -35,6 +37,8 @@ class EstateDashboardService:
         conventional_area = 0.0
         conventional_cnt_on_rent = 0
         conventional_area_on_rent = 0.0
+        conventional_area_x_price = 0.0
+        conventional_price_avg = 0.0
         ratio_conventional_cnt = 1.00
         ratio_conventional_area = 1.00
         # 非常规计租类型（在资产类型中设置计租与否）
@@ -42,6 +46,8 @@ class EstateDashboardService:
         unconventional_area = 0.0
         unconventional_cnt_on_rent = 0
         unconventional_area_on_rent = 0.0
+        unconventional_area_x_price = 0.0
+        unconventional_price_avg = 0.0
         ratio_unconventional_cnt = 1.00
         ratio_unconventional_area = 1.00
 
@@ -57,11 +63,13 @@ class EstateDashboardService:
             if record_detail.contract_id:
                 estate_property_lease_quantity += 1
                 estate_property_area_lease_quantity += float(record_detail.property_rent_area)
+                property_area_x_price += record_detail.property_rent_area * record_detail.property_id.rent_price
 
                 if (not record_detail.property_id.property_type_id) or \
                         record_detail.property_id.property_type_id.count_ratio_as_room:
                     conventional_cnt_on_rent += 1
                     conventional_area_on_rent += float(record_detail.property_rent_area)
+                    conventional_area_x_price += record_detail.property_rent_area * record_detail.property_id.rent_price
 
         if estate_property_quantity != 0:
             ratio_property_quantity = estate_property_lease_quantity / estate_property_quantity
@@ -69,21 +77,31 @@ class EstateDashboardService:
         if estate_property_area_quantity != 0:
             ratio_property_area_quantity = estate_property_area_lease_quantity / estate_property_area_quantity
 
+        if estate_property_area_lease_quantity != 0:
+            property_price_avg = property_area_x_price / estate_property_area_lease_quantity
+
         if conventional_cnt != 0:
             ratio_conventional_cnt = conventional_cnt_on_rent / conventional_cnt
 
         if conventional_area != 0:
             ratio_conventional_area = conventional_area_on_rent / conventional_area
 
+        if conventional_area_on_rent != 0:
+            conventional_price_avg = conventional_area_x_price / conventional_area_on_rent
+
         unconventional_cnt = estate_property_quantity - conventional_cnt
         unconventional_area = round(estate_property_area_quantity - conventional_area, 2)
         unconventional_cnt_on_rent = estate_property_lease_quantity - conventional_cnt_on_rent
         unconventional_area_on_rent = estate_property_area_lease_quantity - conventional_area_on_rent
+        unconventional_area_x_price = property_area_x_price - conventional_area_x_price
         if unconventional_cnt != 0:
             ratio_unconventional_cnt = unconventional_cnt_on_rent / unconventional_cnt
 
         if unconventional_area != 0:
             ratio_unconventional_area = unconventional_area_on_rent / unconventional_area
+
+        if unconventional_area_on_rent != 0:
+            unconventional_price_avg = unconventional_area_x_price / unconventional_area_on_rent
 
         _logger.info(f"estate_property_area_quantity=【{estate_property_area_quantity}】")
 
@@ -94,6 +112,7 @@ class EstateDashboardService:
             'estate_property_area_lease_quantity': round(estate_property_area_lease_quantity, 2),
             'ratio_property_quantity': round(ratio_property_quantity, 2),
             'ratio_property_area_quantity': round(ratio_property_area_quantity, 2),
+            'property_price_avg': round(property_price_avg, 2),
 
             'pie_chart_ratio_property_quantity': {
                 '在租数量': estate_property_lease_quantity,
@@ -109,6 +128,7 @@ class EstateDashboardService:
             'conventional_area': round(conventional_area, 2),
             'conventional_cnt_on_rent': conventional_cnt_on_rent,
             'conventional_area_on_rent': round(conventional_area_on_rent, 2),
+            'conventional_price_avg': round(conventional_price_avg, 2),
             'ratio_conventional_cnt': round(ratio_conventional_cnt, 2),
             'ratio_conventional_area': round(ratio_conventional_area, 2),
 
@@ -116,6 +136,7 @@ class EstateDashboardService:
             'unconventional_area': unconventional_area,
             'unconventional_cnt_on_rent': unconventional_cnt_on_rent,
             'unconventional_area_on_rent': unconventional_area_on_rent,
+            'unconventional_price_avg': round(unconventional_price_avg, 2),
             'ratio_unconventional_cnt': ratio_unconventional_cnt,
             'ratio_unconventional_area': ratio_unconventional_area,
 
