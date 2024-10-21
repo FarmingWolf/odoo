@@ -29,6 +29,9 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
+                    <field name="active" invisible="1"/>
+                    <field name="terminated" invisible="1"/>
+                    <widget name="web_ribbon" title="已归档" bg_color="text-bg-danger" invisible="(not active) or (state != 'invalid' and not terminated)"/>
                     <group col="2">
                         <group col="1">
                             <group col="2">
