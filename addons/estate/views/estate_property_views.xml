@@ -96,6 +96,8 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
+                    <field name="active" invisible="1"/>
+                    <widget name="web_ribbon" title="已归档" bg_color="text-bg-danger" invisible="active"/>
                     <group col="2">
                         <group>
                             <field name="company_id" invisible="1"/>
@@ -262,6 +264,7 @@
         <field name="arch" type="xml">
             <search string="资产检索">
                 <filter name="active" string="数据可用" domain="[('active','=','true')]" />
+                <filter name="not_active" string="数据不可用" domain="[('active','!=','true')]" />
                 <separator/>
                 <filter name="sold" string="已租" domain="[('state','=','sold')]"/>
                 <filter name="unsold" string="未租" domain="[('state','!=','sold')]"/>
