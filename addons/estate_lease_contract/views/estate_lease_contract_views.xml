@@ -9,6 +9,13 @@
         <field name="view_id" ref="estate_lease_contract_view_form"/>
     </record>
 
+    <!-- terminate client action -->
+    <record id="estate_lease_contract_terminate_popup" model="ir.actions.client">
+        <field name="name">确认终止合同</field>
+        <field name="tag">estate_lease_contract.contract_terminate_dialog</field>
+        <field name="target">new</field>
+    </record>
+
     <record id="estate_lease_contract_view_form" model="ir.ui.view">
         <field name="name">estate.lease.contract.form</field>
         <field name="model">estate.lease.contract</field>
@@ -28,9 +35,9 @@
                     <button name="action_contract_renewal" type="object" string="续租"
                             groups="estate_lease_contract.estate_lease_contract_group_manager"
                             invisible="state not in ['released', 'invalid']"/>
-<!--                    <button name="action_contract_terminate" type="object" string="退租/终止"-->
-<!--                            groups="estate_lease_contract.estate_lease_contract_group_manager"-->
-<!--                            invisible="(state not in ['to_be_released', 'released']) or terminated or not active"/>-->
+                    <button name="%(estate_lease_contract_terminate_popup)d" type="action" string="退租/终止"
+                            groups="estate_lease_contract.estate_lease_contract_group_manager"
+                            invisible="(state not in ['to_be_released', 'released']) or terminated or not active"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -818,6 +825,18 @@
         <field name="code">
 env.context['is_from_page_click'] = True
 action = model.automatic_set_party_a_status()
+        </field>
+    </record>
+
+    <!-- terminate server action -->
+    <record id="estate_lease_contract_terminate_svr_action" model="ir.actions.server">
+        <field name="name">确认终止合同</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_estate_lease_contract"/>
+        <field name="binding_model_id" ref="model_estate_lease_contract"/>
+        <field name="state">code</field>
+        <field name="code">
+action = model.terminate_tgt_contract(env.context)
         </field>
     </record>
 

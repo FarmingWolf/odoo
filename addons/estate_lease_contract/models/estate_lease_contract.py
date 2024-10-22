@@ -1963,23 +1963,16 @@ class EstateLeaseContract(models.Model):
 
         return res
 
-    # def toggle_active(self):
-    #     res = super().toggle_active()
-    #
-    #     # 反归档
-    #     if self.active:
-    #         # 把数据放在录入阶段
-    #         self.active = False
-    #         self.state = "recording"
-    #         self.terminated = False
-    #         self.rental_details.active = True
-    #         self.contract_registration_addr_rel_id.active = True
-    #     else:
-    #         # 归档：数据放在非录入状态
-    #         self.active = True
-    #         self.state = "invalid"
-    #         self.terminated = True
-    #         self.rental_details.active = False
-    #         self.contract_registration_addr_rel_id.active = False
-    #
-    #     return res
+    def terminate_tgt_contract(self, context):
+        _logger.info(f"context={context}")
+        terminate_target_contract_id = context.get('id')
+        _logger.info(f"terminate_target_contract_id={terminate_target_contract_id}")
+        search_domain = [('contract_id', '=', terminate_target_contract_id), ('active', '=', False)]
+        rental_details = self.env['estate.lease.contract.property.rental.detail'].search(search_domain)
+        _logger.info(f"终止合同签，先删除无用的租金明细:{rental_details}")
+        rental_details.unlink()
+        # 设置合同终止状态
+        tgt_contract = self.env['estate.lease.contract'].search([('id', '=', terminate_target_contract_id)])
+        tgt_contract.terminated = True
+        tgt_contract.state = "invalid"
+

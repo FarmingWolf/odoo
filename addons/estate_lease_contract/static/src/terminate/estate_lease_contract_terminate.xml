@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<templates xml:space="preserve">
+
+    <t t-name="estate_lease_contract.ContractTerminateAction">
+        <div class="ms-1 mt-1">
+            <div class="align-self-center" style="display: flex; justify-content: center;">
+                <div>
+                    <span>请确认已经完成如下工作后，点击【终止】按钮终止该合同：</span>
+                    <t t-foreach="terminate_todo_list" t-as="todo" t-key="todo.id">
+                        <TodoItem todo="todo" toggleState.bind="toggleTodo" removeTodo.bind="removeTodo"/>
+                    </t>
+                    <span>※终止该合同后，系统将自动归档该合同数据。</span><br/>
+                </div>
+            </div>
+            <div class="align-self-center" style="display: flex; justify-content: center;">
+                <div class="col-sm-5 mt16" style="display: flex; justify-content: center;">
+                    <button class="btn btn-primary mb16" t-on-click="() => this.onClickTerminateContract()" t-att-disabled="this.confirm_button_disable()">
+                        <div class="mb16 mt16">　终止　</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

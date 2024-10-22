@@ -30,6 +30,8 @@
             'web/static/src/core/registry.js',
             'web/static/src/core/assets.js',
 
+            'estate_lease_contract/static/src/terminate/*',
+
             'estate_lease_contract/static/src/js/custom_tree_render.js',
             'estate_lease_contract/static/src/xml/custom_tree_render.xml',
             'estate_lease_contract/static/src/js/tree_view_custom.js',
