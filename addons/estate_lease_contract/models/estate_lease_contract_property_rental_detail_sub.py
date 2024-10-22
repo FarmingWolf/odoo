@@ -19,7 +19,8 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
     _order = "date_received"
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    rental_detail_id = fields.Many2one('estate.lease.contract.property.rental.detail', string="租金明细ID")
+    rental_detail_id = fields.Many2one('estate.lease.contract.property.rental.detail', string="租金明细ID",
+                                       ondelete="cascade")
 
     rental_received = fields.Float(default=0.0, string="本次实收(元)", tracking=True)
 
@@ -36,18 +37,23 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
                                 compute_sudo=True)
     rental_received_2_date = fields.Date(string="实收至", readonly=True, store=True, compute="_compute_received",
                                          compute_sudo=True)
-    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True,
+                                 ondelete="cascade")
 
     # 以下字段要在页面显示
-    property_id = fields.Many2one('estate.property', related="rental_detail_id.property_id", string="资产")
-    contract_id = fields.Many2one('estate.lease.contract', related="rental_detail_id.contract_id", string="合同")
+    property_id = fields.Many2one('estate.property', related="rental_detail_id.property_id", string="资产",
+                                  ondelete="cascade")
+    contract_id = fields.Many2one('estate.lease.contract', related="rental_detail_id.contract_id", string="合同",
+                                  ondelete="cascade")
     contract_state = fields.Selection(related="contract_id.state", string="合同状态")
-    party_a_unit_id = fields.Many2one("estate.lease.contract.party.a.unit", related="contract_id.party_a_unit_id")
+    party_a_unit_id = fields.Many2one("estate.lease.contract.party.a.unit", related="contract_id.party_a_unit_id",
+                                      ondelete="set null")
     party_a_unit_invisible = fields.Boolean(string="甲方显示与否", related="contract_id.party_a_unit_invisible")
     date_start = fields.Date(string="合同开始日期", related="contract_id.date_start")
     date_rent_start = fields.Date(string="计租开始日期", related="contract_id.date_rent_start")
     date_rent_end = fields.Date(string="计租结束日期", related="contract_id.date_rent_end")
-    renter_id = fields.Many2one('res.partner', string="承租人", related='contract_id.renter_id', store=True)
+    renter_id = fields.Many2one('res.partner', string="承租人", related='contract_id.renter_id', store=True,
+                                ondelete="set null")
     contract_amount = fields.Float(string="合同总额（元）", related='contract_id.contract_amount')
     rental_receivable_tgt_period = fields.Float(string="指定期间应收（元）", related='rental_detail_id.rental_receivable')
     rental_received_tgt_period = fields.Float(string="指定期间实收（元）", related='rental_detail_id.rental_received')

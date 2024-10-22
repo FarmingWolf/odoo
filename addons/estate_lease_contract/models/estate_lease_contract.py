@@ -1048,10 +1048,16 @@ class EstateLeaseContract(models.Model):
     contract_registration_addr_rel_id = fields.One2many(string="合同分配的注册地址", copy=False,
                                                         comodel_name="estate.lease.contract.registration.addr.rel",
                                                         inverse_name="contract_id")
+    contract_registration_addr_rel_archived = fields.One2many(string="合同分配的注册地址(已归档)",
+                                                              comodel_name="estate.lease.contract.registration.addr.rel",
+                                                              inverse_name="contract_id")
     attachment_ids = fields.Many2many('ir.attachment', string="附件管理", copy=False, tracking=True)
 
     rental_details = fields.One2many('estate.lease.contract.property.rental.detail', 'contract_id', store=True,
                                      compute='_compute_rental_details', string="租金明细", readonly=False, copy=False)
+    rental_details_archived = fields.One2many(comodel_name='estate.lease.contract.property.rental.detail',
+                                              inverse_name='contract_id',
+                                              string="租金明细(已归档)")
 
     property_ini_img_ids = fields.One2many(comodel_name='estate.lease.contract.property.ini.state',
                                            inverse_name='contract_id', string="资产初始状态图",
@@ -1913,3 +1919,67 @@ class EstateLeaseContract(models.Model):
             "target": "self",
         }
         return action
+
+    def action_archive(self):
+
+        if self.state == "recording" or not self.active:
+            raise UserError("录入中合同不可归档，可直接删除！")
+
+        # 只有已发布且未终止的合同才需要退租/终止
+        if self.state in ('released', 'to_be_released') and not self.terminated:
+            res = super().action_archive()
+
+            self.active = True
+            self.terminated = True
+            self.state = "invalid"
+            # 去除无用的租金明细
+            search_domain = [('contract_id', 'in', self.ids), ('active', '=', False)]
+            rental_details = self.env['estate.lease.contract.property.rental.detail'].search(search_domain)
+            _logger.info(f"先删除无用的租金明细:{rental_details}")
+            rental_details.unlink()
+
+            # ↓↓↓由于合同状态通过state字段和terminated字段来控制，而active一直保持true，所以不能将租金明细设置为false
+            # # 再将有效的租金明细设置为inactive
+            # self.rental_details.active = False
+            # 注册地址的重复使用判断时，也考虑到了合同的terminated，所以这里也不需要设置false
+            # self.contract_registration_addr_rel_id.active = False
+        else:
+            # 已经处于归档状态的合同，要恢复提档的数据，应将其设置为录入中
+            res = self.action_unarchive()
+
+        return res
+
+    def action_unarchive(self):
+
+        res = super().action_unarchive()
+
+        self.active = False
+        self.state = "recording"
+        self.terminated = False
+
+        # 因为从未将其设置为False，所以无需多此一举
+        # self.rental_details.active = True
+        # self.contract_registration_addr_rel_id.active = True
+
+        return res
+
+    # def toggle_active(self):
+    #     res = super().toggle_active()
+    #
+    #     # 反归档
+    #     if self.active:
+    #         # 把数据放在录入阶段
+    #         self.active = False
+    #         self.state = "recording"
+    #         self.terminated = False
+    #         self.rental_details.active = True
+    #         self.contract_registration_addr_rel_id.active = True
+    #     else:
+    #         # 归档：数据放在非录入状态
+    #         self.active = True
+    #         self.state = "invalid"
+    #         self.terminated = True
+    #         self.rental_details.active = False
+    #         self.contract_registration_addr_rel_id.active = False
+    #
+    #     return res

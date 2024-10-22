@@ -19,6 +19,8 @@
                     <field name="edit_on_hist_page" invisible="1"/>
                     <field name="contract_hist" invisible="1"/>
                     <field name="party_a_unit_invisible" invisible="1"/>
+                    <field name="terminated" invisible="1"/>
+                    <field name="active" invisible="1"/>
                     <button name="action_release_contract" type="object" string="发布"
                             invisible="(not edit_on_hist_page) or (state != 'recording')"/>
                     <button name="action_cancel_release_contract" type="object" string="取消发布"
@@ -26,11 +28,12 @@
                     <button name="action_contract_renewal" type="object" string="续租"
                             groups="estate_lease_contract.estate_lease_contract_group_manager"
                             invisible="state not in ['released', 'invalid']"/>
+<!--                    <button name="action_contract_terminate" type="object" string="退租/终止"-->
+<!--                            groups="estate_lease_contract.estate_lease_contract_group_manager"-->
+<!--                            invisible="(state not in ['to_be_released', 'released']) or terminated or not active"/>-->
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
-                    <field name="active" invisible="1"/>
-                    <field name="terminated" invisible="1"/>
                     <widget name="web_ribbon" title="已归档" bg_color="text-bg-danger" invisible="(not active) or (state != 'invalid' and not terminated)"/>
                     <group col="2">
                         <group col="1">
@@ -119,7 +122,7 @@
                             <group col="3">
                                 <group col="1">
                                     <button name="action_refresh_rental_plan" type="object" string="点击刷新"
-                                            invisible="context.get('contract_read_only')" class="btn-primary"/>
+                                            invisible="context.get('contract_read_only') or state == 'invalid' or terminated" class="btn-primary"/>
                                 </group>
                                 <group>
                                     <field name="rent_count"/>
@@ -164,12 +167,12 @@
                         </page>
                         <page string="租金方案">
                             <button name="action_refresh_rental_plan" type="object" string="点击刷新"
-                                    invisible="context.get('contract_read_only')" class="btn-primary"/>
+                                    invisible="context.get('contract_read_only') or state == 'invalid' or terminated" class="btn-primary"/>
                             <field name="rental_plan_ids"/>
                         </page>
                         <page string="每期金额明细">
                             <group col="6">
-                                <group col="1" colspan="1" invisible="context.get('contract_read_only')">
+                                <group col="1" colspan="1" invisible="context.get('contract_read_only') or state == 'invalid' or terminated">
                                     <button name="action_refresh_all_money" type="object" string="点击刷新"
                                             class="btn-primary"/>
                                 </group>
@@ -191,7 +194,8 @@
 
                                         </group>
                                     </group>
-                                    <field name="rental_details" readonly="not edit_on_hist_page">
+                                    <field name="rental_details" readonly="(not edit_on_hist_page) or terminated or state == 'invalid'"
+                                           invisible="active and (state == 'invalid' or terminated)">
                                         <tree string=""
                                               decoration-info="edited and (rental_received &lt; 0.01) and (date_payment &gt;= (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d'))"
                                               decoration-muted="rental_amount &lt; 0.01 and rental_receivable &lt; 0.01"
@@ -228,6 +232,33 @@
                                             <field name="days_arrears" digits="[12, 0]" sum="总计欠缴天数"/>
                                         </tree>
                                     </field>
+                                    <field name="rental_details_archived" readonly="1"
+                                           invisible="not active or (state != 'invalid' and not terminated)">
+                                        <tree string="已归档"
+                                              decoration-info="edited and (rental_received &lt; 0.01) and (date_payment &gt;= (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d'))"
+                                              decoration-muted="rental_amount &lt; 0.01 and rental_receivable &lt; 0.01"
+                                              decoration-danger="((date_payment &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')) and rental_received &lt; 0.01 and rental_amount &gt;= 0.01 and rental_receivable &gt; 0.01) or (rental_received &gt;= 0.01 and rental_receivable - rental_received &gt;= 0.01)"
+                                              decoration-warning="(rental_amount - rental_receivable &gt;= 0.01) or (rental_receivable - rental_amount &gt;= 0.01)"
+                                              decoration-success="rental_received &gt; 0 and (rental_received == rental_receivable or rental_received - rental_receivable &gt;= 0 or rental_receivable - rental_received &lt; 0.01)">
+                                            <field name="edited" column_invisible="True"/>
+                                            <field name="property_id"/>
+                                            <field name="rental_period_no"/>
+                                            <field name="period_date_from"/>
+                                            <field name="period_date_to"/>
+                                            <field name="period_days" sum="总计天数"/>
+                                            <field name="date_payment"/>
+                                            <field name="rental_amount" digits="[12, 2]" sum="合计租金：根据资产面积、租金方案自动计算"/>
+                                            <field name="incentive_amount" digits="[12, 2]" sum="总计优惠"/>
+                                            <field name="incentive_days" digits="[12, 0]" sum="总计优惠天数"/>
+                                            <field name="rental_receivable" digits="[12, 2]"
+                                                   sum="合计应收：请谨慎调整，系统自动记录调整历史"/>
+                                            <field name="rental_received" digits="[12, 2]"
+                                                   sum="合计实收：每期租金收款后，请回填，以保证业务数据一致性"/>
+                                            <field name="days_received" digits="[12, 0]" sum="总计实收天数"/>
+                                            <field name="rental_arrears" digits="[12, 2]" sum="总计欠缴金额"/>
+                                            <field name="days_arrears" digits="[12, 0]" sum="总计欠缴天数"/>
+                                        </tree>
+                                    </field>
                                 </group>
                             </sheet>
                         </page>
@@ -258,8 +289,16 @@
                                 </tree>
                             </field>
                             <field name="contract_registration_addr_rel_id" readonly="1"
-                                   invisible="state == 'recording'">
+                                   invisible="(state == 'recording') or terminated">
                                 <tree string="查看">
+                                    <field name="registration_addr_id"/>
+                                    <field name="party_b_associated_company_id"/>
+                                    <field name="price" digits="[12, 2]"/>
+                                </tree>
+                            </field>
+                            <field name="contract_registration_addr_rel_archived" readonly="1"
+                                   invisible="(state == 'recording') or (not terminated)">
+                                <tree string="查看(归档)">
                                     <field name="registration_addr_id"/>
                                     <field name="party_b_associated_company_id"/>
                                     <field name="price" digits="[12, 2]"/>

@@ -34,9 +34,9 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(string="租金明细", compute="_compute_detail_name")
-    contract_id = fields.Many2one('estate.lease.contract', string="合同")
+    contract_id = fields.Many2one('estate.lease.contract', string="合同", ondelete="cascade")
     contract_state = fields.Selection(string="合同状态", related="contract_id.state")
-    property_id = fields.Many2one('estate.property', string="租赁标的")
+    property_id = fields.Many2one('estate.property', string="租赁标的", ondelete="cascade")
     rental_amount = fields.Float(default=0.0, string="本期租金(元)", readonly=True)
     rental_amount_zh = fields.Char(string="本期租金(元)大写", compute="_cal_rental_amount_zh", store=True, readonly=True)
     rental_receivable = fields.Float(default=0.0, string="本期应收(元)", compute="_get_default_rental_receivable",
@@ -54,7 +54,8 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     description = fields.Char(string="租金描述", readonly=True)
     active = fields.Boolean(default=True)
 
-    renter_id = fields.Many2one('res.partner', string="承租人", related='contract_id.renter_id', readonly=True, store=True)
+    renter_id = fields.Many2one('res.partner', string="承租人", related='contract_id.renter_id', readonly=True,
+                                store=True, ondelete="set null")
     renter_id_phone = fields.Char(string="电话", related='contract_id.renter_id.phone', readonly=True)
     renter_id_mobile = fields.Char(string="手机", related='contract_id.renter_id.mobile', readonly=True)
     rental_arrears = fields.Float(string="欠缴金额（元）", compute='_compute_rental_arrears', readonly=True, store=True)
@@ -62,7 +63,8 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
     edited = fields.Boolean(string="有无优惠", readonly=True)
     edited_display = fields.Char(string="有优惠", compute="_get_display_edited", store=False)
     comment = fields.Text(string="修改备注")
-    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+    company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True,
+                                 ondelete="cascade")
 
     report_print_date = fields.Date("房租缴费通知书打印日", store=False, compute="_get_report_print_date")
     rental_received_2_date = fields.Date(string="实收至", compute="_get_rental_received_2_date", readonly=True, store=True)
