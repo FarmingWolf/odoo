@@ -175,10 +175,19 @@ class EstateProperty(models.Model):
                                                                      ('state', '=', 'invalid')],
                                                                     order='date_rent_end DESC',
                                                                     limit=1)
-            record.last_rent_date_s = old_contract.date_rent_start if old_contract else False
-            record.last_rent_date_e = old_contract.date_rent_end if old_contract else False
-            record.date_availability = record.last_rent_date_e + timedelta(
-                days=1) if old_contract else record.date_availability
+
+            if old_contract:
+                record.last_rent_date_s = old_contract.date_rent_start
+
+                if old_contract.terminated and old_contract.date_terminated:
+                    record.last_rent_date_e = old_contract.date_terminated
+                else:
+                    record.last_rent_date_e = old_contract.date_rent_end
+
+                record.date_availability = record.last_rent_date_e + timedelta(days=1)
+            else:
+                record.last_rent_date_s = False
+                record.last_rent_date_e = False
 
             if record.latest_rent_date_s:
                 if record.date_availability:

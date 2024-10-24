@@ -1214,7 +1214,8 @@ class EstateLeaseContract(models.Model):
     )
 
     # 合同终止状态
-    terminated = fields.Boolean(default=False, copy=False, string="合同终止")
+    terminated = fields.Boolean(default=False, copy=False, string="合同终止/退租")
+    date_terminated = fields.Date(copy=False, string="合同终止/退租日")
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
     # 因租金明细修改后的警告提示信息
     warn_msg = fields.Text(string="提示", default="", store=False, compute="_compute_warn_msg")
@@ -1931,6 +1932,7 @@ class EstateLeaseContract(models.Model):
 
             self.active = True
             self.terminated = True
+            self.date_terminated = fields.Date.context_today(self)
             self.state = "invalid"
             # 去除无用的租金明细
             search_domain = [('contract_id', 'in', self.ids), ('active', '=', False)]
@@ -1974,5 +1976,6 @@ class EstateLeaseContract(models.Model):
         # 设置合同终止状态
         tgt_contract = self.env['estate.lease.contract'].search([('id', '=', terminate_target_contract_id)])
         tgt_contract.terminated = True
+        tgt_contract.date_terminated = fields.Date.context_today(self)
         tgt_contract.state = "invalid"
 

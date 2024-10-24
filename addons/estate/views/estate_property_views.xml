@@ -48,6 +48,7 @@
                 <field name="state" />
                 <field name="out_of_rent_days"/>
                 <field name="last_rent_date_e"/>
+                <field name="date_availability"/>
                 <field name="rent_area" string="面积（㎡）" sum="总面积（㎡）"/>
                 <field name="property_type_id" string="资产类型"/>
             </tree>

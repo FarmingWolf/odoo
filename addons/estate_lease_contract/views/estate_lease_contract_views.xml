@@ -86,22 +86,27 @@
                             <group col="2">
                                 <group>
                                     <field name="date_rent_start" readonly="not edit_on_hist_page"/>
+                                    <field name="date_rent_end" readonly="not edit_on_hist_page"/>
                                 </group>
                                 <group>
                                     <field name="property_state_by_date_rent_start" readonly="not edit_on_hist_page" help="根据计租开始日期判断资产是否处于已租状态"/>
                                 </group>
                             </group>
                             <group col="2">
-                                <field name="date_rent_end" readonly="not edit_on_hist_page"/>
-                                <field name="days_rent_total" readonly="1"/>
-                                <field name="days_free" readonly="not edit_on_hist_page"
-                                       help="目前仅用于记录合同中约定的免租期天数，系统暂不据此计算租金"/>
-                                <field name="date_decorate_start" readonly="not edit_on_hist_page"/>
-                                <field name="date_decorate_end" readonly="not edit_on_hist_page"/>
-                                <field name="days_decorate" readonly="1"/>
-                                <field name="opening_date" readonly="not edit_on_hist_page"/>
-                                <field name="rent_amount_first_period" readonly="not edit_on_hist_page"/>
-                                <field name="rent_first_payment_date" readonly="not edit_on_hist_page"/>
+                                <group>
+                                    <field name="days_rent_total" readonly="1"/>
+                                    <field name="days_free" readonly="not edit_on_hist_page"
+                                           help="目前仅用于记录合同中约定的免租期天数，系统暂不据此计算租金"/>
+                                    <field name="date_decorate_start" readonly="not edit_on_hist_page"/>
+                                    <field name="date_decorate_end" readonly="not edit_on_hist_page"/>
+                                    <field name="days_decorate" readonly="1"/>
+                                    <field name="opening_date" readonly="not edit_on_hist_page"/>
+                                    <field name="rent_amount_first_period" readonly="not edit_on_hist_page"/>
+                                    <field name="rent_first_payment_date" readonly="not edit_on_hist_page"/>
+                                </group>
+                                <group>
+                                    <field name="date_terminated" readonly="1" invisible="not terminated"/>
+                                </group>
                             </group>
                             <group col="4">
                                 <group colspan="3">
