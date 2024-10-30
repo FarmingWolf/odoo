@@ -31,7 +31,8 @@ action_type = "zip"
 
 pyinstaller -F startup.py -i ./img/491logo.png --noconsole
 xcopy /d /y .\dist\startup.exe .\
-
+del startup.py
+del utils.py
 
 """
 
@@ -574,7 +575,7 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
 
                     entry_product_code.config(state=tk.NORMAL)
                     txt_info = f"该版本是北京四九一科技有限公司为{customer_name_in_f}开发的专业版产品！\n" \
-                               f"请在下方【产品编码】输入框输入正确的产品编码后，再点击【开始/启动】按钮！" \
+                               f"请在下方【产品编码】输入框输入正确的产品编码后，再点击【开始/启动】按钮！\n" \
                                f"软件安装后，仅在第一次运行时需要输入产品编码。"
                     start_distribute_button.config(state=tk.NORMAL)
                     _logger.error(txt_info)
@@ -747,7 +748,12 @@ def unzip_files(in_root, in_label, in_bar):
 
 
 def start_em_server(in_root, in_label, in_bar):
-    cmd_1 = f'cd /d D:\\users\\Admin\\Documents\\GitHub\\farmingwolf\\"'
+    module_path = '..\\'
+
+    # cmd_1 = f'cd /d D:\\users\\Admin\\Documents\\GitHub\\farmingwolf\\"'
+    cmd_1 = f'cd /d {module_path}'
+    _logger.info(f"cmd_1={cmd_1}")
+
     """cmd_2 = f"python ../odoo-bin -c ../debian/odoo.conf -r 491oddevadm -w 491491491 --addons-path=addons 
             f"-d postgres " \
             f"-u utils,parking,estate_registration_addr,estate,estate_lease_contract,event_option,event_extend," \
