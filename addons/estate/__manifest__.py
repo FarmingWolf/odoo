@@ -3,7 +3,7 @@
 
 {
     'name': "资产管理",
-    'depends': ['base', 'web', 'mail'],
+    'depends': ['base', 'web', 'mail', 'utils'],
     'summary': '资产租赁、合同管理等等',
     'category': 'Real Estate/Brokerage',
     'website': 'https://www.491tech.com/',

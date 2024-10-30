@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
+import os
 from datetime import timedelta, datetime
 
 from odoo.http import request
@@ -11,6 +12,7 @@ from dateutil.utils import today
 from odoo import fields, models, api
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare
+from addons.utils.models.utils import Utils
 
 _logger = logging.getLogger(__name__)
 
@@ -345,3 +347,23 @@ class EstateProperty(models.Model):
                 raise UserError(_('[{0}]该条资产状态为【{1}】，不可被删除!'.format(record.name, state_label)))
 
         # return super().unlink()
+
+    @api.model
+    def create(self, vals):
+        # 资产条目数限制
+        module_path = os.path.dirname(os.path.abspath(__file__))
+        _logger.info(f"module_path={module_path}")
+        tgt_path = os.path.join(module_path, '..\\..\\..\\', 'estate_management.zip')
+        args = {
+            "file_2_customer": tgt_path,
+            "tiered_pricing_info_fn": "c_info_4_ck",
+            "zip_pwd": "491491491Tech+E50",
+        }
+        property_limit = Utils.get_property_cnt_limit(args)
+        properties_cnt = self.env['estate.property'].search_count([])
+        _logger.info(f"property_limit={property_limit};properties_cnt={properties_cnt}")
+        if properties_cnt and properties_cnt > property_limit:
+            raise UserError(f'当前版本最多支持{property_limit}条资产条目')
+
+        ret = super().create(vals)
+        return ret

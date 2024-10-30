@@ -3,6 +3,8 @@
 # 小额数字到汉字的映射
 import logging
 
+from pyzipper import AESZipFile, zipfile, WZ_AES
+
 _logger = logging.getLogger(__name__)
 
 
@@ -130,55 +132,54 @@ class Utils:
         else:
             return ''
 
+    @staticmethod
+    def get_property_cnt_limit(in_args):
+        limit_default = 100
+        limit_return = limit_default
 
+        # 从tiered_pricing_info_fn文件中读取
+        try:
+            with AESZipFile(in_args["file_2_customer"], 'r', compression=zipfile.ZIP_DEFLATED,
+                            encryption=WZ_AES) as zip_ref:
+                # 设置密码
+                zip_ref.setpassword(in_args["zip_pwd"].encode('utf-8'))
+                if ("tiered_pricing_info_fn" not in in_args.keys()) or \
+                        (in_args["tiered_pricing_info_fn"] not in zip_ref.namelist()):
+                    return limit_return
+
+                tiered_pricing_zip_info = zip_ref.getinfo(in_args['tiered_pricing_info_fn'])
+                file_content = zip_ref.read(tiered_pricing_zip_info)
+                context_text = file_content.decode('utf-8').splitlines()
+                for each_l in context_text:
+                    if "property_limit" in each_l:
+                        limit_return = int(each_l.split('=')[1])
+                        break
+
+                return limit_return
+
+        except Exception as e:
+            _logger.error(f"读取资产条目限制数出错了{e}")
+            return limit_return
+
+
+def main():
+    args = {
+        "file_2_customer": "../../../estate_management.zip",
+        "tiered_pricing_info_fn": "c_info_4_ck",
+        "zip_pwd": "491491491Tech+E50",
+    }
+    ret_val = Utils.get_property_cnt_limit(args)
+    print(ret_val)
+
+
+if __name__ == "__main__":
+    main()
 # 示例
 # print("0={0}".format(Utils.arabic_to_chinese(0)))
-# print("0.0={0}".format(Utils.arabic_to_chinese(0.0)))
-# print("0.9={0}".format(Utils.arabic_to_chinese(0.9)))
-# print("0.98={0}".format(Utils.arabic_to_chinese(0.98)))
-# print("1.89={0}".format(Utils.arabic_to_chinese(1.89)))
-# print("10.00={0}".format(Utils.arabic_to_chinese(10.00)))
-# print("12.89={0}".format(Utils.arabic_to_chinese(12.89)))
-# print("100.00={0}".format(Utils.arabic_to_chinese(100.00)))
-# print("103.89={0}".format(Utils.arabic_to_chinese(103.89)))
-# print("123.89={0}".format(Utils.arabic_to_chinese(123.89)))
-# print("1000.89={0}".format(Utils.arabic_to_chinese(1000.89)))
-# print("2001.89={0}".format(Utils.arabic_to_chinese(2001.89)))
-# print("1011.89={0}".format(Utils.arabic_to_chinese(1011.89)))
-# print("3214.89={0}".format(Utils.arabic_to_chinese(3214.89)))
-# print("1100.89={0}".format(Utils.arabic_to_chinese(1100.89)))
-# print("1109.89={0}".format(Utils.arabic_to_chinese(1109.89)))
-# print("10000.89={0}".format(Utils.arabic_to_chinese(10000.89)))
-# print("10001.89={0}".format(Utils.arabic_to_chinese(10001.89)))
-# print("10011.89={0}".format(Utils.arabic_to_chinese(10011.89)))
-# print("10111.89={0}".format(Utils.arabic_to_chinese(10111.89)))
-# print("51231.89={0}".format(Utils.arabic_to_chinese(51231.89)))
-# print("61011.89={0}".format(Utils.arabic_to_chinese(61011.89)))
-# print("71001.89={0}".format(Utils.arabic_to_chinese(71001.89)))
-# print("80100.89={0}".format(Utils.arabic_to_chinese(80100.89)))
-# print("80010.89={0}".format(Utils.arabic_to_chinese(80010.89)))
-# print("81010.89={0}".format(Utils.arabic_to_chinese(81010.89)))
-# print("901000.89={0}".format(Utils.arabic_to_chinese(901000.89)))
-# print("800100.89={0}".format(Utils.arabic_to_chinese(800100.89)))
-# print("700001.89={0}".format(Utils.arabic_to_chinese(700001.89)))
-# print("100011.89={0}".format(Utils.arabic_to_chinese(100011.89)))
-# print("100111.89={0}".format(Utils.arabic_to_chinese(100111.89)))
-# print("101111.89={0}".format(Utils.arabic_to_chinese(101111.89)))
-# print("1001000.89={0}".format(Utils.arabic_to_chinese(1001000.89)))
-# print("1000101.89={0}".format(Utils.arabic_to_chinese(1000101.89)))
-# print("1020301.89={0}".format(Utils.arabic_to_chinese(1020301.89)))
-# print("1320101.89={0}".format(Utils.arabic_to_chinese(1320101.89)))
-# print("1002101.89={0}".format(Utils.arabic_to_chinese(1002101.89)))
-# print("1010111.89={0}".format(Utils.arabic_to_chinese(1010111.89)))
-# print("1101101.89={0}".format(Utils.arabic_to_chinese(1101101.89)))
-# print("10203040.89={0}".format(Utils.arabic_to_chinese(10203040.89)))
-# print("104030201.89={0}".format(Utils.arabic_to_chinese(104030201.89)))
-# print("1405060809.89={0}".format(Utils.arabic_to_chinese(1405060809.89)))
-# print("30206070809.89={0}".format(Utils.arabic_to_chinese(30206070809.89)))
 # print("303060708090.89={0}".format(Utils.arabic_to_chinese(303060708090.89)))
 # print("360306070809.89={0}".format(Utils.arabic_to_chinese(360306070809.89)))
 # print("3040506070809.89={0}".format(Utils.arabic_to_chinese(3040506070809.89)))
 # print("51040506070809.89={0}".format(Utils.arabic_to_chinese(51040506070809.89)))
 # print("123456789012345.67={0}".format(Utils.arabic_to_chinese(123456789012345.67)))
 # print("223456789012346.7={0}".format(Utils.arabic_to_chinese(223456789012346.7)))
-_logger.debug("323456789012347.08={0}".format(Utils.arabic_to_chinese(323456789012347.08)))
+# _logger.debug("323456789012347.08={0}".format(Utils.arabic_to_chinese(323456789012347.08)))
