@@ -574,7 +574,8 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
 
                     entry_product_code.config(state=tk.NORMAL)
                     txt_info = f"该版本是北京四九一科技有限公司为{customer_name_in_f}开发的专业版产品！\n" \
-                               f"请在下方【产品编码】输入框输入正确的产品编码后，再点击【开始/启动】按钮！"
+                               f"请在下方【产品编码】输入框输入正确的产品编码后，再点击【开始/启动】按钮！" \
+                               f"软件安装后，仅在第一次运行时需要输入产品编码。"
                     start_distribute_button.config(state=tk.NORMAL)
                     _logger.error(txt_info)
                     in_label.config(text=txt_info)
