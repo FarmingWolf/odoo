@@ -771,7 +771,7 @@ def start_em_server(in_root, in_label, in_bar):
     command.extend(['-d', 'postgres'])
     em_addons = f"utils,parking,estate_registration_addr,estate,estate_lease_contract,event_option,event_extend," \
                 f"operation_contract,accounting_subject,business_items,operation_contract_event_settle_account," \
-                f"wechat,contacts,estate_dashboard"
+                f"wechat,contacts,estate_dashboard,sms_ali"
     command.extend(['-u', em_addons])
 
     _logger.debug(f"command={command}")
