@@ -44,6 +44,18 @@ def _get_payment_method_str(record):
         return None
 
 
+def _get_property_cnt_limit():
+    module_path = os.path.dirname(os.path.abspath(__file__))
+    _logger.info(f"module_path={module_path}")
+    tgt_path = os.path.join(module_path, '..\\..\\..\\', 'estate_management.zip')
+    args = {
+        "file_2_customer": tgt_path,
+        "tiered_pricing_info_fn": "c_info_4_ck",
+        "zip_pwd": "491491491Tech+E50",
+    }
+    property_limit = Utils.get_property_cnt_limit(args)
+    return property_limit
+
 class EstateProperty(models.Model):
     # def onchange(self, values: Dict, field_names: List[str], fields_spec: Dict):
     #     pass
@@ -351,19 +363,22 @@ class EstateProperty(models.Model):
     @api.model
     def create(self, vals):
         # 资产条目数限制
-        module_path = os.path.dirname(os.path.abspath(__file__))
-        _logger.info(f"module_path={module_path}")
-        tgt_path = os.path.join(module_path, '..\\..\\..\\', 'estate_management.zip')
-        args = {
-            "file_2_customer": tgt_path,
-            "tiered_pricing_info_fn": "c_info_4_ck",
-            "zip_pwd": "491491491Tech+E50",
-        }
-        property_limit = Utils.get_property_cnt_limit(args)
+        property_limit = _get_property_cnt_limit()
         properties_cnt = self.env['estate.property'].search_count([])
-        _logger.info(f"property_limit={property_limit};properties_cnt={properties_cnt}")
-        if properties_cnt and properties_cnt > property_limit:
+        _logger.info(f"property_limit={property_limit};已存在properties_cnt={properties_cnt}")
+        if properties_cnt and properties_cnt + 1 > property_limit:
             raise UserError(f'当前版本最多支持{property_limit}条资产条目')
 
         ret = super().create(vals)
+        return ret
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        property_limit = _get_property_cnt_limit()
+        properties_cnt = self.env['estate.property'].search_count([])
+        _logger.info(f"property_limit={property_limit};已存在properties_cnt={properties_cnt};准备插入{len(vals_list)}条")
+        if properties_cnt and properties_cnt + len(vals_list) > property_limit:
+            raise UserError(f'当前版本最多支持{property_limit}条资产条目')
+
+        ret = super().create(vals_list)
         return ret
