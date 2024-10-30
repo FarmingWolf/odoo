@@ -90,6 +90,18 @@ def add_file_2_zip_with_password(input_filename, name_in_zip, tmp_z_fn, password
         os.rename(tmp_z_fn, output_filename)
 
 
+def remove_temp_files(in_out_zip_fld, in_customer_name_info_fn):
+    if os.path.exists(in_out_zip_fld + in_customer_name_info_fn):
+        os.remove(in_out_zip_fld + in_customer_name_info_fn)
+
+
+def set_file_attributes(in_fn):
+    if os.path.exists(in_fn):
+        file_attributes = win32file.GetFileAttributes(in_fn)
+        new_attributes = file_attributes | win32file.FILE_ATTRIBUTE_HIDDEN
+        win32file.SetFileAttributes(in_fn, new_attributes)
+
+
 def unzip_tgt_file(in_args):
     try:
         with AESZipFile(in_args["file_2_customer"], 'r', compression=zipfile.ZIP_DEFLATED,
@@ -98,24 +110,30 @@ def unzip_tgt_file(in_args):
             zip_ref.setpassword(in_args["zip_pwd"].encode('utf-8'))
             if (in_args["customer_name_info_fn"] not in zip_ref.namelist()) or \
                     (in_args["days_limit_info_fn"] not in zip_ref.namelist()) or \
+                    (in_args["tiered_pricing_info_fn"] not in zip_ref.namelist()) or \
                     (in_args["tmp_fn"] not in zip_ref.namelist()):
                 msg = f"基础文件损坏，文件内容错误：找不到" \
-                      f"{in_args['customer_name_info_fn']}/{in_args['days_limit_info_fn']}/{in_args['tmp_fn']}，" \
+                      f"{in_args['customer_name_info_fn']}/" \
+                      f"{in_args['days_limit_info_fn']}/" \
+                      f"{in_args['tiered_pricing_info_fn']}/" \
+                      f"{in_args['tmp_fn']}，" \
                       f"文件可能遭到人为破坏。"
                 return False, msg
 
-            # 解压所有文件到目标目录，实际上就3个文件
+            # 解压所有文件到目标目录，实际上就4个文件
             mac_zip_info = zip_ref.getinfo(in_args['customer_name_info_fn'])
             zip_ref.extract(mac_zip_info, in_args['out_zip_fld'])
 
             trial_period_zip_info = zip_ref.getinfo(in_args['days_limit_info_fn'])
             zip_ref.extract(trial_period_zip_info, in_args['out_zip_fld'])
 
+            tiered_pricing_zip_info = zip_ref.getinfo(in_args['tiered_pricing_info_fn'])
+            zip_ref.extract(tiered_pricing_zip_info, in_args['out_zip_fld'])
+
             addons_zip = zip_ref.getinfo(in_args['tmp_fn'])
             extracted_bytes = 0
 
-            if os.path.exists(in_args['out_zip_file']):
-                os.remove(in_args['out_zip_file'])
+            remove_temp_files("", in_args['out_zip_file'])
             # 提取文件
             # 打开ZIP文件中的成员
             with zip_ref.open(addons_zip) as source, open(in_args['out_zip_file'], 'wb') as target:
@@ -132,18 +150,10 @@ def unzip_tgt_file(in_args):
 
         return False, f"文件解压出错{e}"
     finally:
-        if os.path.exists(in_args['out_zip_file']):
-            file_attributes = win32file.GetFileAttributes(in_args['out_zip_file'])
-            new_attributes = file_attributes | win32file.FILE_ATTRIBUTE_HIDDEN
-            win32file.SetFileAttributes(in_args['out_zip_file'], new_attributes)
-        if os.path.exists(in_args['out_zip_fld'] + in_args['customer_name_info_fn']):
-            file_attributes = win32file.GetFileAttributes(in_args['out_zip_fld'] + in_args['customer_name_info_fn'])
-            new_attributes = file_attributes | win32file.FILE_ATTRIBUTE_HIDDEN
-            win32file.SetFileAttributes(in_args['out_zip_fld'] + in_args['customer_name_info_fn'], new_attributes)
-        if os.path.exists(in_args['out_zip_fld'] + in_args['days_limit_info_fn']):
-            file_attributes = win32file.GetFileAttributes(in_args['out_zip_fld'] + in_args['days_limit_info_fn'])
-            new_attributes = file_attributes | win32file.FILE_ATTRIBUTE_HIDDEN
-            win32file.SetFileAttributes(in_args['out_zip_fld'] + in_args['days_limit_info_fn'], new_attributes)
+        set_file_attributes(in_args['out_zip_file'])
+        set_file_attributes(in_args['out_zip_fld'] + in_args['customer_name_info_fn'])
+        set_file_attributes(in_args['out_zip_fld'] + in_args['days_limit_info_fn'])
+        set_file_attributes(in_args['out_zip_fld'] + in_args['tiered_pricing_info_fn'])
 
 
 def rezip_tgt_file(in_args):
@@ -152,14 +162,17 @@ def rezip_tgt_file(in_args):
         add_file_2_zip_with_password(in_args['out_zip_fld'] + in_args['customer_name_info_fn'],
                                      in_args['customer_name_info_fn'],
                                      tmp_z_fn, in_args['zip_pwd'], 'w')
-        if os.path.exists(in_args['out_zip_fld'] + in_args['customer_name_info_fn']):
-            os.remove(in_args['out_zip_fld'] + in_args['customer_name_info_fn'])
+        remove_temp_files(in_args['out_zip_fld'], in_args['customer_name_info_fn'])
 
         add_file_2_zip_with_password(in_args['out_zip_fld'] + in_args['days_limit_info_fn'],
                                      in_args['days_limit_info_fn'], tmp_z_fn,
                                      in_args['zip_pwd'], 'a')
-        if os.path.exists(in_args['out_zip_fld'] + in_args['days_limit_info_fn']):
-            os.remove(in_args['out_zip_fld'] + in_args['days_limit_info_fn'])
+        remove_temp_files(in_args['out_zip_fld'], in_args['days_limit_info_fn'])
+
+        add_file_2_zip_with_password(in_args['out_zip_fld'] + in_args['tiered_pricing_info_fn'],
+                                     in_args['tiered_pricing_info_fn'], tmp_z_fn,
+                                     in_args['zip_pwd'], 'a')
+        remove_temp_files(in_args['out_zip_fld'], in_args['tiered_pricing_info_fn'])
 
         add_file_2_zip_with_password(in_args['in_zip_file'], in_args['tmp_fn'], tmp_z_fn, in_args['zip_pwd'], 'a',
                                      in_args['file_2_customer'])
@@ -170,12 +183,10 @@ def rezip_tgt_file(in_args):
             os.remove(tmp_z_fn)
         return False, f"zip文件处理NG{ex}"
     finally:
-        if os.path.exists(in_args['out_zip_fld'] + in_args['customer_name_info_fn']):
-            os.remove(in_args['out_zip_fld'] + in_args['customer_name_info_fn'])
-        if os.path.exists(in_args['out_zip_fld'] + in_args['days_limit_info_fn']):
-            os.remove(in_args['out_zip_fld'] + in_args['days_limit_info_fn'])
-        if os.path.exists(in_args['out_zip_file']):
-            os.remove(in_args['out_zip_file'])
+        remove_temp_files(in_args['out_zip_fld'], in_args['customer_name_info_fn'])
+        remove_temp_files(in_args['out_zip_fld'], in_args['days_limit_info_fn'])
+        remove_temp_files(in_args['out_zip_fld'], in_args['tiered_pricing_info_fn'])
+        remove_temp_files("", in_args['out_zip_file'])
 
 
 def countdown_check(in_args):
@@ -208,36 +219,93 @@ def countdown_check(in_args):
         msg = f"试用期已结束。"
         return False, msg, int(trial_period_in_f[1]), min_left
     # countdown后写回文件
-    if os.path.exists(in_args['out_zip_fld'] + in_args['days_limit_info_fn']):
-        os.remove(in_args['out_zip_fld'] + in_args['days_limit_info_fn'])
+    remove_temp_files(in_args['out_zip_fld'], in_args['days_limit_info_fn'])
 
     with open(in_args['out_zip_fld'] + in_args['days_limit_info_fn'], 'a', encoding='utf-8') as info_file:
         info_file.write(str(trial_period_in_f[0]) + "\n")
         info_file.write(str(trial_period_in_f[1]) + "\n")
         info_file.write(str(min_left) + "\n")
 
-    if os.path.exists(in_args['out_zip_fld'] + in_args['days_limit_info_fn']):
-        file_attributes = win32file.GetFileAttributes(in_args['out_zip_fld'] + in_args['days_limit_info_fn'])
-        new_attributes = file_attributes | win32file.FILE_ATTRIBUTE_HIDDEN
-        win32file.SetFileAttributes(in_args["out_zip_fld"] + in_args["days_limit_info_fn"], new_attributes)
+    set_file_attributes(in_args['out_zip_fld'] + in_args['days_limit_info_fn'])
 
     return True, "OK", int(trial_period_in_f[1]), min_left
+
+
+def read_other_params(in_args):
+    ret_v = {}
+    with open(in_args['out_zip_fld'] + in_args['tiered_pricing_info_fn'], 'r', encoding='utf-8') as info_file:
+        for line in info_file:
+            txt_line = line.strip()
+            if txt_line:
+                ret_v[txt_line.split('=')[0]] = txt_line.split('=')[1]
+
+    return ret_v
 
 
 def start_countdown_trial_period(in_args):
     unzip_res, unzip_msg = unzip_tgt_file(in_args)
     if not unzip_res:
-        return False, unzip_msg, 0, 0
+        return False, unzip_msg, 0, 0, False
 
     countdown_res, countdown_msg, min_limit, min_left = countdown_check(in_args)
     if not countdown_res:
-        return False, countdown_msg, min_limit, min_left
+        return False, countdown_msg, min_limit, min_left, False
+
+    # 在这里插入读取其他参数的处理逻辑
+    other_params = read_other_params(in_args)
+    if not other_params:
+        return False, countdown_msg, min_limit, min_left, False
 
     rezip_res, rezip_msg = rezip_tgt_file(in_args)
     if not rezip_res:
-        return False, rezip_msg, min_limit, min_left
+        return False, rezip_msg, min_limit, min_left, False
 
-    return True, "OK", min_limit, min_left
+    return True, "OK", min_limit, min_left, other_params
+
+
+def get_property_limit(in_args):
+    limit_default = 100
+    limit_return = limit_default
+
+    # 从tiered_pricing_info_fn文件中读取
+    try:
+        with AESZipFile(in_args["file_2_customer"], 'r', compression=zipfile.ZIP_DEFLATED,
+                        encryption=WZ_AES) as zip_ref:
+            # 设置密码
+            zip_ref.setpassword(in_args["zip_pwd"].encode('utf-8'))
+            if in_args["tiered_pricing_info_fn"] not in zip_ref.namelist():
+                return limit_return
+
+            tiered_pricing_zip_info = zip_ref.getinfo(in_args['tiered_pricing_info_fn'])
+            file_content = zip_ref.read(tiered_pricing_zip_info)
+            context_text = file_content.decode('utf-8').splitlines()
+            print(context_text)
+            for each_l in context_text:
+                if "property_limit" in each_l:
+                    limit_return = int(each_l.split('=')[1])
+                    break
+
+            return limit_return
+
+    except Exception as e:
+        print(f"读取资产条目限制数出错了{e}")
+        return limit_return
+
+
+def get_p_temp_code_today():
+    today_str = datetime.today().strftime("%Y%m%d")
+    month_day = int(today_str[4:8])
+    tmp_code = month_day + 3014
+    p_code_today = str(tmp_code)
+    return p_code_today
+
+
+def check_product_code(code_input, p_code):
+    p_code_today = str(p_code) + "-" + get_p_temp_code_today()
+    if code_input == p_code_today:
+        return True
+    else:
+        return False
 
 
 async def countdown(duration_minutes):
@@ -252,11 +320,18 @@ async def countdown(duration_minutes):
         await asyncio.sleep(60)  # 每分钟检查一次
 
 
-async def main():
+def main():
     """
     主函数，用于启动定时器。
     """
-    await countdown(100)  # 倒计时100分钟
+    args = {
+        "file_2_customer": "E:/testenv/temptest/estate_management.zip",
+        "tiered_pricing_info_fn": "c_info_4_ck",
+        "zip_pwd": "491491491Tech+E50",
+    }
+    ret_val = get_property_limit(args)
+    print(ret_val)
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
