@@ -9,6 +9,7 @@ from . import estate_lease_contract_incentives
 from . import estate_lease_contract_property
 from . import estate_lease_contract_property_extend
 from . import estate_lease_contract_bank_account
+from . import estate_lease_contract_heat_fee_setting
 from . import estate_lease_contract_tag
 from . import estate_lease_contract_rental_business_type
 from . import estate_lease_contract_rental_main_category

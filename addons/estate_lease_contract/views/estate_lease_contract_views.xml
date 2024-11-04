@@ -435,7 +435,15 @@
                                     </group>
                                     <group col="1">
                                         <group string="取暖费账户" col="1">
-                                            <field name="heat_bill_account" placeholder="请选择"/>
+                                            <group col="2">
+                                                <group col="1">
+                                                    <field name="heat_bill_account" placeholder="请选择" nolabel="1"/>
+                                                </group>
+                                                <group col="1" invisible="not heat_bill_account">
+                                                    <button type="object" name="print_heat_notice"
+                                                            icon="fa-file-pdf-o" string="供暖费通知单"/>
+                                                </group>
+                                            </group>
                                             <group invisible="heat_bill_account == False" col="2">
                                                 <group>
                                                     <field name="heat_bill_account_bank_name" string="银行名称"/>

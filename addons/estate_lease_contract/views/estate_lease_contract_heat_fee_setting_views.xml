@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="estate_lease_contract_heat_fee_setting_action" model="ir.actions.act_window">
+        <field name="name">资产租赁取暖费通知单设置</field>
+        <field name="res_model">estate.lease.contract.heat.fee.setting</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                设置取暖费期间、单价等信息。
+            </p>
+        </field>
+    </record>
+    <record id="estate_lease_contract_heat_fee_setting_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.heat.fee.setting.tree</field>
+        <field name="model">estate.lease.contract.heat.fee.setting</field>
+        <field name="arch" type="xml">
+            <tree string="estate_lease_contract_heat_fee_setting">
+                <field name="heat_fee_period_s"/>
+                <field name="heat_fee_period_e"/>
+                <field name="heat_fee_price" digits="[12, 2]"/>
+                <field name="contact_department"/>
+            </tree>
+        </field>
+    </record>
+    <record id="estate_lease_contract_heat_fee_setting_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.heat.fee.setting.form</field>
+        <field name="model">estate.lease.contract.heat.fee.setting</field>
+        <field name="arch" type="xml">
+            <form string="estate_lease_contract_heat_fee_setting_form">
+                <sheet>
+                    <group col="2">
+                        <group>
+                            <field name="heat_fee_period_s"/>
+                            <field name="heat_fee_period_e"/>
+                        </group>
+                        <group>
+                            <field name="heat_fee_price" digits="[12, 2]"/>
+                            <field name="contact_department"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

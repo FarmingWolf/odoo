@@ -57,6 +57,7 @@
 
         'views/estate_lease_contract_property_ini_state_views.xml',
         'views/estate_lease_contract_bank_account_views.xml',
+        'views/estate_lease_contract_heat_fee_setting_views.xml',
         'views/estate_lease_contract_party_a_unit_views.xml',
         'views/estate_lease_contract_party_b_res_partner_views.xml',
         'views/estate_lease_contract_incentives_views.xml',
@@ -80,6 +81,8 @@
 
         'report/estate_lease_contract_rent_payment_notice_reports.xml',
         'report/estate_lease_contract_rent_payment_notice_templates.xml',
+        'report/estate_lease_contract_heat_fee_notice_reports.xml',
+        'report/estate_lease_contract_heat_fee_notice_templates.xml',
     ],
     'license': 'AGPL-3'
 }

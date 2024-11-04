@@ -1,6 +1,7 @@
 id,name,model_id:id,domain_force
 lease_contract_company_account_rule,Restrict Lease Contract by Company,model_estate_lease_contract,"[('company_id','=',user.company_id.id)]"
 lease_contract_bank_company_account_rule,Restrict Lease Contract Bank Account by Company,model_estate_lease_contract_bank_account,"[('company_id','=',user.company_id.id)]"
+lease_contract_heat_fee_setting_company_account_rule,Restrict Lease Contract Heat Fee Setting by Company,model_estate_lease_contract_heat_fee_setting,"[('company_id','=',user.company_id.id)]"
 lease_contract_party_a_unit_account_rule,Restrict Lease Contract Party A Unit by Company,model_estate_lease_contract_party_a_unit,"[('company_id','=',user.company_id.id)]"
 lease_contract_incentives_company_account_rule,Restrict Lease Contract incentives by Company,model_estate_lease_contract_incentives,"[('company_id','=',user.company_id.id)]"
 lease_contract_daily_status_company_account_rule,Restrict Lease Contract Daily Status by Company,model_estate_lease_contract_property_daily_status,"[('company_id','=',user.company_id.id)]"

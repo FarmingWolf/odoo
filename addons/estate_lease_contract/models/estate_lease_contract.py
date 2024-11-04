@@ -1065,6 +1065,29 @@ class EstateLeaseContract(models.Model):
     property_ini_img_ids_readonly = fields.Boolean(string="资产初始状态图只读", default=True, store=False,
                                                    compute="_compute_property_ini_img_ids_readonly")
 
+    heat_fee_setting = fields.Many2one(comodel_name="estate.lease.contract.heat.fee.setting", string="供暖费通知设置",
+                                       compute="_get_heat_fee_setting", store=False)
+    heat_fee_amount_cn = fields.Char(string="供暖费（大写）", compute="_compute_heat_fee_amount_cn", store=False)
+
+    # todo 目前的业务上一个合同只有一个property，应该按照合同：租赁标的1对多的关系实现
+    @api.depends("heat_fee_setting")
+    def _compute_heat_fee_amount_cn(self):
+        for record in self:
+            if record.heat_fee_setting:
+                heat_fee_amount = record.heat_fee_setting.heat_fee_price * record.property_ids[0].rent_area
+                record.heat_fee_amount_cn = Utils.arabic_to_chinese(heat_fee_amount)
+            else:
+                record.heat_fee_amount_cn = False
+
+    def _get_heat_fee_setting(self):
+        for record in self:
+            heat_fee_setting_id = self.env['estate.lease.contract.heat.fee.setting'].search([
+                ('company_id', '=', record.company_id.id)], limit=1)
+            if heat_fee_setting_id:
+                record.heat_fee_setting = heat_fee_setting_id[0].id
+            else:
+                record.heat_fee_setting = False
+
     @api.depends("property_ids")
     def _compute_property_ini_img_ids(self):
         for record in self:
@@ -1979,3 +2002,5 @@ class EstateLeaseContract(models.Model):
         tgt_contract.date_terminated = fields.Date.context_today(self)
         tgt_contract.state = "invalid"
 
+    def print_heat_notice(self):
+        return self.env.ref('estate_lease_contract.action_print_heat_fee_notice').report_action(self)

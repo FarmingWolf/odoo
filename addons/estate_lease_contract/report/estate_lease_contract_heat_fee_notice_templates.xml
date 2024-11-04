@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="estate_lease_contract_heat_fee_notice_application">
+        <style type="text/css">
+            @import '/addons/estate_lease_contract/static/src/css/estate_lease_contract_report.scss';
+        </style>
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="contract">
+                <t t-call="web.internal_layout">
+                    <div class="estate_report">
+                        <t t-foreach="['物业', '客户']" t-as="i_tgt">
+                            <div style="height: 50%;">
+                                <div style="height: 100%;">
+                                    <div class="enter_exit_form_div" style="border: 0px;">
+                                        <div style="column-span: all; margin-top: 10px;">
+                                            <span style="font-size: 18px; font-weight: bold;">供暖缴费通知单</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="enter_exit_form_div" style="border-top: 1px solid black;">
+                                        <div class="grid-line">
+                                            <div class="grid-item-left" style="column-span: 11; width: 72%; padding-top: 3px; text-align: left !important; padding-left: 3px">
+                                                <span style="padding-top: 3px;">客户名称：</span><span t-esc="contract.renter_id.name"/>
+                                            </div>
+                                            <div class="grid-item-right" style="column-span: 4; width: 28%; padding-top: 3px; text-align: left !important; padding-left: 3px">
+                                                房间号：<span t-esc="contract.property_ids[0].name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="enter_exit_form_div" >
+                                        <div class="grid-line" style="column-span: 15">
+                                            <div class="grid-item-left" style="column-span: 1; width: 7%;">
+                                                <div style="width: 100%;">
+                                                    <span>序号</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span>费用项目</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 3; width: 18%">
+                                                <div style="width: 100%;">
+                                                    <span>费用期间</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 2; width: 15%">
+                                                <div style="width: 100%;">
+                                                    <span>面积（㎡）</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 3; width: 18%">
+                                                <div style="width: 100%;">
+                                                    <span>单价（元/㎡）</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span>金额（元）</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-right" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span>备注</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="enter_exit_form_div" >
+                                        <div class="grid-line" style="column-span: 15">
+                                            <div class="grid-item-left" style="column-span: 1; width: 7%;">
+                                                <div style="width: 100%;">
+                                                    <span>1</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span t-esc="contract.heat_fee_setting.name"/>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 3; width: 18%">
+                                                <div style="width: 100%; font-size: 9px !important; line-height: 0.05 !important; letter-spacing: 1px !important;">
+                                                    <span t-esc="contract.heat_fee_setting.heat_fee_period_s"/> ―<br/>
+                                                    <span t-esc="contract.heat_fee_setting.heat_fee_period_e"/> 　
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 2; width: 15%">
+                                                <div style="width: 100%;">
+                                                    <span t-esc="round(contract.property_ids[0].rent_area, 2)"/>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 3; width: 18%">
+                                                <div style="width: 100%;">
+                                                    <span t-esc="round(contract.heat_fee_setting.heat_fee_price, 2)"/>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span t-esc="'{:,}'.format(round(contract.property_ids[0].rent_area * contract.heat_fee_setting.heat_fee_price, 2))"/>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-right" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="enter_exit_form_div" >
+                                        <div class="grid-line" style="column-span: 15">
+                                            <div class="grid-item-left" style="column-span: 1; width: 7%;">
+                                                <div style="width: 100%;">
+                                                    <span>2</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 3; width: 18%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 2; width: 15%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 3; width: 18%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-right" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="enter_exit_form_div" >
+                                        <div class="grid-line" style="column-span: 15">
+                                            <div class="grid-item-left" style="column-span: 1; width: 7%;">
+                                                <div style="width: 100%;">
+                                                    <span>3</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 3; width: 18%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 2; width: 15%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 3; width: 18%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-right" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="enter_exit_form_div" style="border-bottom: 2px solid black">
+                                        <div class="grid-line">
+                                            <div class="grid-item-left" style="column-span: 10; width: 72%">
+                                                <div style="padding-top: 3px; text-align: left !important; padding-left: 3px">
+                                                    <span>合计（大写）人民币：</span><span t-esc="contract.heat_fee_amount_cn"/>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-left" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span t-esc="'{:,}'.format(round(contract.property_ids[0].rent_area * contract.heat_fee_setting.heat_fee_price, 2))"/>
+                                                </div>
+                                            </div>
+                                            <div class="grid-item-right" style="column-span: 2; width: 14%">
+                                                <div style="width: 100%;">
+                                                    <span>　</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <span>请贵公司收到本通知后，于</span>
+                                        <span t-esc="contract.heat_fee_setting.heat_fee_period_s.strftime('%Y年%m月%d日')"/>
+                                        <span>前将上述款项交至物业财务部。</span>
+                                    </div>
+                                    <div>
+                                        <span>收款单位：</span>
+                                        <span t-esc="contract.heat_bill_account_bank_account_name"/>
+                                    </div>
+                                    <div>
+                                        <div class="grid-line">
+                                            <div>
+                                                <span>账号：</span>
+                                                <span t-esc="contract.heat_bill_account_bank_account_id"/>
+                                                <span>　　　　　</span>
+                                            </div>
+                                        </div>
+                                        <div class="grid-line">
+                                            <div>
+                                                <span>开户行：</span>
+                                                <span t-esc="contract.heat_bill_account_bank_name"/>
+                                                <span t-esc="contract.heat_bill_account_bank_branch_name"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="greetings">
+                                        <div class="grid-line">
+                                            <div style="column-span: 5; width: 30%; text-align: left !important; padding-left: 3px">
+                                                <span>签收人：</span>
+                                            </div>
+                                            <div style="column-span: 5">
+                                                <span>签收日期：</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="greetings">
+                                        <div class="grid-line">
+                                            <div style="column-span: 11; width: 72%; padding-top: 5px;">
+                                            </div>
+                                            <div style="column-span: 4; width: 28%; padding-top: 5px">
+                                                <span t-esc="contract.heat_fee_setting.contact_department"/><br/>
+                                                <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y年%m月%d日')"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span>此通知单一式两联，客户一联，物业部一联(此联<t t-out="i_tgt"/>留存)</span>
+                                    </div>
+
+                                    <t t-if="i_tgt == '物业'">
+                                        <div><br/><br/><br/></div>
+                                        <div style="border-bottom: 1px dashed black;"/>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>
