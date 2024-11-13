@@ -11,6 +11,7 @@ import requests
 import odoo
 from odoo import http
 from odoo.http import request
+from odoo.addons.web.controllers.home import Home  # 即使有提示import错误也要这么写。。。启动服务和运行时没错
 
 _logger = logging.getLogger(__name__)
 
@@ -71,7 +72,8 @@ def pwd_decoded(param):
     return b_e_dec.decode('utf-8')
 
 
-class WechatHandle(http.Controller):
+class WechatHandle(Home):
+
     @http.route('/wechat/handle', auth='none', methods=['GET'])
     def get(self, **kwargs):
         """用于验证请求是否来自微信公众号服务器"""
@@ -227,6 +229,7 @@ class WechatHandle(http.Controller):
         except Exception as e:
             return f"微信access_token请求失败：{str(e)}"
 
+    """继承web.controllers.home覆盖web_login方法"""
     @http.route('/web/login', type='http', auth="none")
     def web_login(self, *args, **kw):
 
@@ -247,8 +250,10 @@ class WechatHandle(http.Controller):
                 env = request.env
                 res_user_id = env.user.id
                 if tgt_wx_usr:
+                    _logger.info(f"更新用户{res_user_id}的密码")
                     tgt_wx_usr.password = str_pwd
                 else:
+                    _logger.info(f"创建用户{res_user_id}的微信open_id：{open_id}")
                     env['wechat.users'].sudo().create({
                         'name': wx_name,
                         'open_id': open_id,
