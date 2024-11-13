@@ -11,7 +11,6 @@ import requests
 import odoo
 from odoo import http
 from odoo.http import request
-from odoo.addons.web.controllers.home import Home
 
 _logger = logging.getLogger(__name__)
 
@@ -72,9 +71,10 @@ def pwd_decoded(param):
     return b_e_dec.decode('utf-8')
 
 
-class WechatHandle(Home):
+class WechatHandle(http.Controller):
     @http.route('/wechat/handle', auth='none', methods=['GET'])
     def get(self, **kwargs):
+        """用于验证请求是否来自微信公众号服务器"""
         try:
             _logger.info(kwargs)
 
@@ -86,13 +86,18 @@ class WechatHandle(Home):
             timestamp = data.get('timestamp')
             nonce = data.get('nonce')
             echo_str = data.get('echostr')
-            token = "491tech4wechat9token1"
+            # 每个新公众号需要单独设置wechat_handle_token
+            tk_from_config = request.env['ir.config_parameter'].sudo().get_param('wechat_handle_token')
+            token = tk_from_config if tk_from_config else '491tech4wechat9token1'
 
             in_list = [token, timestamp, nonce]
             in_list.sort()
             _logger.info(f'in_list={in_list}')
             sha1 = hashlib.sha1()
-            map(sha1.update, in_list)
+
+            for item in in_list:
+                sha1.update(item.encode('utf-8'))
+
             hashcode = sha1.hexdigest()
             _logger.info(f"handle/GET func: hashcode={hashcode}, signature={signature} ")
 
@@ -118,8 +123,22 @@ class WechatHandle(Home):
         # 从回调中获取code，然后通过code换取access_token和openid
         # 最终根据openid找到对应的Odoo用户并登录
         code = kw.get('code')
+
+        app_id_from_kw = kw.get('app_id')
+        app_secret_from_kw = kw.get('app_secret')
+        redirect_url_from_kw = kw.get('redirect_url')
+
         app_id = 'wx2dadd8272b906e46'
+        redirect_url = None
+
+        if app_id_from_kw:
+            app_id = app_id_from_kw
         app_secret = "f5638550687027ce9f07016ace9e391f"
+        if app_secret_from_kw:
+            app_secret = app_secret_from_kw
+        if redirect_url_from_kw:
+            redirect_url = redirect_url_from_kw
+
         access_tk_url = f"https://api.weixin.qq.com/sns/oauth2/access_token?appid=" \
                         f"{app_id}&secret={app_secret}&code={code}&grant_type=authorization_code"
         try:
@@ -186,7 +205,7 @@ class WechatHandle(Home):
                         uid = request.session.authenticate(request.db, request.params['login'],
                                                            request.params['password'])
                         request.params['login_success'] = True
-                        return request.redirect(self._login_redirect(uid, redirect=None))
+                        return request.redirect(self._login_redirect(uid, redirect=redirect_url))
                     except Exception as ex:
                         msg = f"系统提示错误：{ex}{ex.with_traceback}。" \
                               "看起来，您最近更新了登陆密码，请输入用户名和最新密码点击登录按钮。"

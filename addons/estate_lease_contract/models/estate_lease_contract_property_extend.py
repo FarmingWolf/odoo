@@ -510,7 +510,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                     if current_contract.property_state_by_date_start:
                         depend_date = current_contract.date_start
                     if current_contract.property_state_by_date_rent_start:
-                        depend_date = current_contract.date_rent_sign
+                        depend_date = current_contract.date_rent_start
 
                     if current_date < depend_date:
                         # 如果第一条就在当前日之后，那么后边也一定在当前日之后，所以不是最后一条的未开始不更新
