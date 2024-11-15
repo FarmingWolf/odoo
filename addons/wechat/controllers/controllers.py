@@ -29,6 +29,15 @@ def get_wx_user(open_id):
     return wechat_user
 
 
+def get_wx_user_by_union_id(union_id):
+    _logger.info("checking is_wx_user_exists by union_id")
+    env = request.env
+    wechat_user = env['wechat.users'].sudo().search([('union_id', '=', union_id)], limit=1)
+    _logger.info(f"wechat_user={wechat_user}")
+
+    return wechat_user
+
+
 def pwd_encoded(param):
     pwd_rdm1 = random.randint(1, 2)
     pwd_rdm11 = random.randint(2, 3)
@@ -72,9 +81,31 @@ def pwd_decoded(param):
     return b_e_dec.decode('utf-8')
 
 
+def wechat_user_silent_login(in_self, in_wechat_user, in_redirect_url):
+
+    try:
+        request.params['login'] = in_wechat_user.res_user_id.login
+        request.params['password'] = pwd_decoded(in_wechat_user.password.encode('utf-8'))
+        uid = request.session.authenticate(request.db, request.params['login'],
+                                           request.params['password'])
+        request.params['login_success'] = True
+        return request.redirect(in_self.super()._login_redirect(uid, redirect=in_redirect_url))
+    except Exception as ex:
+        msg = f"系统提示错误：{ex}{ex.with_traceback}。" \
+              "看起来，您最近更新了登陆密码，请输入用户名和最新密码点击登录按钮。"
+        _logger.info(f"sys error:{ex}", exc_info=True)
+        traceback.print_exc()
+        # 重定向到登录页
+        return request.render('wechat.login', {
+            'wx_login_msg': msg,
+            'open_id': in_wechat_user.open_id,
+            'union_id': in_wechat_user.union_id,
+        })
+
+
 class WechatHandle(Home):
 
-    @http.route('/wechat/handle', auth='none', methods=['GET'])
+    @http.route('/wechat/handle', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def get(self, **kwargs):
         """用于验证请求是否来自微信公众号服务器"""
         try:
@@ -201,26 +232,10 @@ class WechatHandle(Home):
 
                     refresh_tk_res = requests.get(refresh_tk_url)
                     refresh_tk_data = refresh_tk_res.json()
-                    try:
-                        request.params['login'] = wechat_user.res_user_id.login
-                        request.params['password'] = pwd_decoded(wechat_user.password.encode('utf-8'))
-                        uid = request.session.authenticate(request.db, request.params['login'],
-                                                           request.params['password'])
-                        request.params['login_success'] = True
-                        return request.redirect(self._login_redirect(uid, redirect=redirect_url))
-                    except Exception as ex:
-                        msg = f"系统提示错误：{ex}{ex.with_traceback}。" \
-                              "看起来，您最近更新了登陆密码，请输入用户名和最新密码点击登录按钮。"
-                        _logger.info(f"sys error:{ex}", exc_info=True)
-                        traceback.print_exc()
-                        # 重定向到登录页
-                        return request.render('wechat.login', {
-                            'wx_login_msg': msg,
-                            'open_id': open_id,
-                            'union_id': union_id,
-                        })
 
-                return "登录成功！"
+                    login_result = wechat_user_silent_login(self, wechat_user, redirect_url)
+
+                    return login_result
             else:
                 # 错误处理
                 error_message = res_data.get('errmsg', '未知错误')
