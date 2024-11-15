@@ -1,3 +1,4 @@
+import json
 import logging
 
 from .controllers import get_wx_user, pwd_decoded, get_wx_user_by_union_id, wechat_user_silent_login
@@ -7,9 +8,43 @@ import requests
 import xml.etree.ElementTree as ET
 import urllib.parse
 
-from odoo.addons.web.controllers.home import Home  # 即使有提示import错误也要这么写。。。启动服务和运行时没错
+from ...web.controllers.home import Home
 
 _logger = logging.getLogger(__name__)
+
+
+def create_wechat_menu(access_token, app_id):
+    menu_def_url = f"https://api.weixin.qq.com/cgi-bin/menu/create?access_token={access_token}"
+    post_data_str = request.env['ir.config_parameter'].sudo().get_param('wechat_service_app_menu')
+    post_data = json.loads(post_data_str)
+    try:
+        _logger.info(f"menu_def_url={menu_def_url}")
+        post_data_json = json.dumps(post_data, ensure_ascii=False).encode('utf-8')
+        response = requests.post(menu_def_url, data=post_data_json, headers={'Content-Type': 'application/json'})
+
+        if response.status_code == 200:
+            _logger.info(f"微信菜单生成OK")
+        else:
+            _logger.error(f"微信菜单生成NG")
+
+        _logger.info(f"wechat menu：{response.text}")
+
+    except Exception as e:
+        _logger.error(f"微信菜单生成失败：{str(e)}")
+
+
+def get_wx_stable_token(in_app_id, in_app_secret):
+    stable_token_url = "https://api.weixin.qq.com/cgi-bin/stable_token"
+    token_post_data = {
+        "grant_type": "client_credential",
+        "appid": in_app_id,
+        "secret": in_app_secret
+    }
+    token_res = requests.post(stable_token_url, json=token_post_data)
+    _logger.info(f"token_res={token_res}")
+    token_ret_data = token_res.json()
+    _logger.info(f"token_ret_data={token_ret_data}")
+    return token_ret_data
 
 
 class MenuController(Home):
@@ -26,15 +61,14 @@ class MenuController(Home):
         # 检查用户是否已登录
         if request.session.uid:
             _logger.info(f"用户已登录：uid={request.session.uid}")
-            # 用户已登录，直接重定向到目标页面
-            # 资产看板：estate_dashboard.dashboard
+            # 用户已登录，直接重定向到目标页面：资产看板estate_dashboard.dashboard
             return request.redirect(tgt_url)
 
         else:
             _logger.info(f"用户未登录")
             # 微信公众号的AppID和AppSecret
-            app_id = 'wx5ee57f2a371a203e'
-            app_secret = '5e9b2cb2e3511d2f4fede3dde17e4bf7'
+            app_id = request.env['ir.config_parameter'].sudo().get_param('wechat_service_app_id')
+            app_secret = request.env['ir.config_parameter'].sudo().get_param('wechat_service_app_secret')
 
             redirect_url = tgt_url
             # 构建微信授权URL
@@ -66,8 +100,8 @@ class MenuController(Home):
             return "Authorization failed: No code provided……"
 
         # 微信公众号的AppID和AppSecret
-        app_id = 'wx5ee57f2a371a203e'
-        app_secret = '5e9b2cb2e3511d2f4fede3dde17e4bf7'
+        app_id = request.env['ir.config_parameter'].sudo().get_param('wechat_service_app_id')
+        app_secret = request.env['ir.config_parameter'].sudo().get_param('wechat_service_app_secret')
         redirect_url = "/web"
 
         app_id_from_kw = kw.get('app_id')
@@ -116,3 +150,22 @@ class MenuController(Home):
             login_result = wechat_user_silent_login(self, we_chat_user, redirect_url)
 
             return login_result
+
+    @http.route('/wechat/create_wx_menu', type='http', auth='public', methods=['GET'], csrf=False)
+    def create_wx_menu(self, **kw):
+
+        app_id = request.env['ir.config_parameter'].sudo().get_param('wechat_service_app_id')
+        app_secret = request.env['ir.config_parameter'].sudo().get_param('wechat_service_app_secret')
+
+        app_id_from_kw = kw.get('app_id')
+        app_secret_from_kw = kw.get('app_secret')
+
+        if app_id_from_kw:
+            app_id = app_id_from_kw
+        if app_secret_from_kw:
+            app_secret = app_secret_from_kw
+
+        # 获取stable_token
+        token_ret_data = get_wx_stable_token(app_id, app_secret)
+        # 创建自定义菜单
+        create_wechat_menu(token_ret_data["access_token"], app_id)

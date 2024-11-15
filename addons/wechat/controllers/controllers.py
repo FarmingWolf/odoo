@@ -11,7 +11,7 @@ import requests
 import odoo
 from odoo import http
 from odoo.http import request
-from odoo.addons.web.controllers.home import Home  # 即使有提示import错误也要这么写。。。启动服务和运行时没错
+from ...web.controllers.home import Home  # 即使有提示import错误也要这么写。。。启动服务和运行时没错
 
 _logger = logging.getLogger(__name__)
 
@@ -89,7 +89,7 @@ def wechat_user_silent_login(in_self, in_wechat_user, in_redirect_url):
         uid = request.session.authenticate(request.db, request.params['login'],
                                            request.params['password'])
         request.params['login_success'] = True
-        return request.redirect(in_self.super()._login_redirect(uid, redirect=in_redirect_url))
+        return request.redirect(in_self._login_redirect(uid, redirect=in_redirect_url))
     except Exception as ex:
         msg = f"系统提示错误：{ex}{ex.with_traceback}。" \
               "看起来，您最近更新了登陆密码，请输入用户名和最新密码点击登录按钮。"
@@ -161,12 +161,12 @@ class WechatHandle(Home):
         app_secret_from_kw = kw.get('app_secret')
         redirect_url_from_kw = kw.get('redirect_url')
 
-        app_id = 'wx2dadd8272b906e46'
+        app_id = request.env['ir.config_parameter'].sudo().get_param('wechat_open_plat_app_id')
         redirect_url = None
 
         if app_id_from_kw:
             app_id = app_id_from_kw
-        app_secret = "f5638550687027ce9f07016ace9e391f"
+        app_secret = request.env['ir.config_parameter'].sudo().get_param('wechat_open_plat_app_secret')
         if app_secret_from_kw:
             app_secret = app_secret_from_kw
         if redirect_url_from_kw:
