@@ -21,8 +21,8 @@
         </menuitem>
         <menuitem id="estate_lease_contract_menu_rental" name="租金明细" sequence="40" action="estate_lease_contract_property_rental_detail_action" groups="estate_lease_contract_group_manager" />
         <menuitem id="estate_lease_contract_menu_rental_reminder" name="租金催缴" sequence="50" action="estate_lease_contract_property_rental_detail_reminder_action" groups="estate_lease_contract_group_user" />
-        <menuitem id="estate_lease_contract_credit_menu" name="合同收款概况" sequence="50" action="estate_lease_contract_credit_action" groups="estate_lease_contract_group_manager" />
-        <menuitem id="estate_lease_contract_menu_rental_detail_sub" name="实收租金流水" sequence="55" action="estate_lease_contract_property_rental_detail_sub_action" groups="estate_lease_contract_group_manager" />
+        <menuitem id="estate_lease_contract_credit_menu" name="合同收款概况" sequence="50" action="estate_lease_contract_credit_action" groups="estate_lease_contract_group_user" />
+        <menuitem id="estate_lease_contract_menu_rental_detail_sub" name="实收租金流水" sequence="55" action="estate_lease_contract_property_rental_detail_sub_action" groups="estate_lease_contract_group_user" />
         <menuitem id="estate_lease_contract_menu_party_b" name="入驻企业花名册" sequence="60" action="estate_lease_contract_party_a_status_action" groups="estate_lease_contract_group_manager" />
     </menuitem>
 </odoo>
