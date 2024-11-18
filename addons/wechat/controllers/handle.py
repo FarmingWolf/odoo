@@ -30,7 +30,7 @@ class Handle(http.Controller):
             if isinstance(rec_msg, receive.Msg) and rec_msg.MsgType == 'text':
                 to_user = rec_msg.FromUserName
                 from_user = rec_msg.ToUserName
-                content = "test"
+                content = "test text"
                 reply_msg = reply.TextMsg(to_user, from_user, content)
                 return reply_msg.send()
             else:

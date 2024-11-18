@@ -11,6 +11,8 @@ import requests
 import odoo
 from odoo import http
 from odoo.http import request
+from . import reply
+from . import receive
 from ...web.controllers.home import Home
 # from odoo.addons.web.controllers.home import Home
 
@@ -104,41 +106,90 @@ def wechat_user_silent_login(in_self, in_wechat_user, in_redirect_url):
         })
 
 
+def get_hashcode(in_timestamp, in_nonce):
+    # 每个新公众号需要单独设置wechat_handle_token
+    tk_from_config = request.env['ir.config_parameter'].sudo().get_param('wechat_handle_token')
+    token = tk_from_config if tk_from_config else '491tech4wechat9token1'
+
+    in_list = [token, in_timestamp, in_nonce]
+    in_list.sort()
+    _logger.info(f'in_list={in_list}')
+    sha1 = hashlib.sha1()
+
+    for item in in_list:
+        sha1.update(item.encode('utf-8'))
+
+    hashcode = sha1.hexdigest()
+    return hashcode
+
+
 class WechatHandle(Home):
 
     @http.route('/wechat/handle', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def get(self, **kwargs):
-        """用于验证请求是否来自微信公众号服务器"""
         try:
-            _logger.info(kwargs)
+            _logger.info(f"/wechat/handle kwargs={kwargs}")
+            in_data = kwargs
+            """用于验证请求是否来自微信公众号服务器"""
+            if request.httprequest.method == 'GET':
+                if len(in_data) == 0:
+                    return "hello, welcome!"
 
-            data = kwargs
-            if len(data) == 0:
-                return "hello, welcome!"
+                signature = in_data.get('signature')
+                timestamp = in_data.get('timestamp')
+                nonce = in_data.get('nonce')
+                echo_str = in_data.get('echostr')
+                # 服务器有效性验证
+                if signature and timestamp and nonce:
 
-            signature = data.get('signature')
-            timestamp = data.get('timestamp')
-            nonce = data.get('nonce')
-            echo_str = data.get('echostr')
-            # 每个新公众号需要单独设置wechat_handle_token
-            tk_from_config = request.env['ir.config_parameter'].sudo().get_param('wechat_handle_token')
-            token = tk_from_config if tk_from_config else '491tech4wechat9token1'
+                    hashcode = get_hashcode(timestamp, nonce)
+                    _logger.info(f"handle/GET func: hashcode={hashcode}, signature={signature} ")
+                    if echo_str:
+                        if hashcode == signature:
+                            return echo_str
+                        else:
+                            return "hello, welcome!!"
+                    else:
+                        msg = "此时应有不同于业务处理和有效性验证的业务……暂时什么也不做，返回success"
+                        _logger.info(msg)
+                        return "success"
+            elif request.httprequest.method == 'POST':
+                signature = in_data.get('signature')
+                timestamp = in_data.get('timestamp')
+                nonce = in_data.get('nonce')
+                if signature and timestamp and nonce:
+                    hashcode = get_hashcode(timestamp, nonce)
+                    if hashcode != signature:
+                        return "hello, welcome!!!"
+                    # 消息和事件处理
+                    web_data = request.httprequest.data.decode('utf-8')
+                    _logger.info(f"web_data:{web_data}")
+                    if web_data:
 
-            in_list = [token, timestamp, nonce]
-            in_list.sort()
-            _logger.info(f'in_list={in_list}')
-            sha1 = hashlib.sha1()
+                        if len(web_data) == 0:
+                            return "success"
 
-            for item in in_list:
-                sha1.update(item.encode('utf-8'))
+                        rec_msg = receive.parse_xml(web_data)
+                        _logger.info(f"rec_msg in post:{rec_msg}")
 
-            hashcode = sha1.hexdigest()
-            _logger.info(f"handle/GET func: hashcode={hashcode}, signature={signature} ")
+                        if isinstance(rec_msg, receive.Msg) and rec_msg.MsgType == 'text':
+                            to_user = rec_msg.FromUserName
+                            from_user = rec_msg.ToUserName
+                            content = "test text"
+                            reply_msg = reply.TextMsg(to_user, from_user, content)
+                            return reply_msg.send()
+                        else:
+                            _logger.info("暂且不处理")
+                            return "success"
 
-            if hashcode == signature:
-                return echo_str
+                    else:
+                        return "hello, welcome!!!!"
+                else:
+                    return "hello, welcome!!!!!"
+
             else:
-                return "hello, welcome!!!"
+                return "hello, welcome!!!!!!"
+
         except Exception as e:
             _logger.error(e)
             return e
