@@ -187,11 +187,12 @@ class WechatQRCodeHandle(Home):
         if not wx_user:
             # 未认证用户，跳转至登录页面
             msg = "欢迎使用微信扫码登录系统。由于这是您第一次登录系统，请输入系统用户名和密码点击登录按钮，将系统用户绑定至您的微信。"
-            return request.render('wechat.login', {
-                'wx_login_msg': msg,
-                'open_id': open_id,
-                'union_id': union_id,
-            })
+            # return request.render('wechat.login', {
+            #     'wx_login_msg': msg,
+            #     'open_id': open_id,
+            #     'union_id': union_id,
+            # })
+            return request.redirect_query("/web/login", query={"wx_login_msg": msg})
 
         for we_chat_user in wx_user:
             # 已认证用户，直接登录
