@@ -26,6 +26,7 @@
         'web.assets_frontend': [
             'https://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js',
             'wechat/static/src/js/wechat_login.js',
+            'wechat/static/src/js/toggle_login_method.js',
         ],
         'web.assets_backend': [
         ],

@@ -2,19 +2,26 @@
 <odoo>
 
     <template id="wechat.login" name="Login with WeChat" inherit_id="web.login">
-        <xpath expr="//form[hasclass('oe_login_form')]" position="inside">
-            <t t-if="wx_login_msg">
-                <div id="msg_div">
-                    <span t-esc="wx_login_msg"/>
+        <xpath expr="//div[@id='div_login']" position="after">
+            <div id="div_wechat_qr_code" style="display: none">
+                <div class="login_method_hint">
+                    <a href="javascript:toggleLoginMethod()">用户名密码登录</a>
                 </div>
-            </t>
-            <t t-if="not wx_login_msg">
-                <div id="container_div">
-                    <div id="wechat_qr_code_container" class="o_wechat_qrcode_container">
-                        微信登陆二维码
-                    </div>
+                <div>
+                    <t t-if="wx_login_msg">
+                        <div id="msg_div">
+                            <span t-esc="wx_login_msg"/>
+                        </div>
+                    </t>
+                    <t t-if="not wx_login_msg">
+                        <div id="container_div">
+                            <div id="wechat_qr_code_container" class="o_wechat_qrcode_container">
+                                微信登陆二维码
+                            </div>
+                        </div>
+                    </t>
                 </div>
-            </t>
+            </div>
         </xpath>
     </template>
 
