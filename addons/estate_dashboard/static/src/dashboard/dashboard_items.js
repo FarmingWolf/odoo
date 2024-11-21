@@ -195,6 +195,96 @@ const items = [
         })
     },
     {
+        id: "rental_receivable_today",
+        description: "当日应收（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当日应收（万元）",
+            value: Math.round(data.rental_receivable_today / 10000),
+        })
+    },
+    {
+        id: "rental_receivable_week",
+        description: "当周应收（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当周应收（万元）",
+            value: Math.round(data.rental_receivable_week / 10000),
+        })
+    },
+    {
+        id: "rental_receivable_month",
+        description: "当月应收（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当月应收（万元）",
+            value: Math.round(data.rental_receivable_month / 10000),
+        })
+    },
+    {
+        id: "rental_receivable_quarter",
+        description: "当季应收（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当季应收（万元）",
+            value: Math.round(data.rental_receivable_quarter / 10000),
+        })
+    },
+    {
+        id: "rental_receivable_year",
+        description: "当年应收（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当年应收（万元）",
+            value: Math.round(data.rental_receivable_year / 10000),
+        })
+    },
+    {
+        id: "rental_received_today",
+        description: "当日实收（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当日实收（万元）",
+            value: Math.round(data.rental_received_today / 10000),
+        })
+    },
+    {
+        id: "rental_received_week",
+        description: "当周实收（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当周实收（万元）",
+            value: Math.round(data.rental_received_week / 10000),
+        })
+    },
+    {
+        id: "rental_received_month",
+        description: "当月实收（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当月实收（万元）",
+            value: Math.round(data.rental_received_month / 10000),
+        })
+    },
+    {
+        id: "rental_received_quarter",
+        description: "当季实收（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当季实收（万元）",
+            value: Math.round(data.rental_received_quarter / 10000),
+        })
+    },
+    {
+        id: "rental_received_year",
+        description: "当年实收（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当年实收（万元）",
+            value: Math.round(data.rental_received_year / 10000),
+        })
+    },
+    {
         id: "pie_chart_ratio_conventional_quantity",
         description: "资产出租、空置对比图（房屋间数）空置率",
         Component: PieChartCard,

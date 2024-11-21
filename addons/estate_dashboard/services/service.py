@@ -50,6 +50,17 @@ class EstateDashboardService:
         unconventional_price_avg = 0.0
         ratio_unconventional_cnt = 1.00
         ratio_unconventional_area = 1.00
+        # 应收实收
+        rental_receivable_today = 0.0
+        rental_receivable_week = 0.0
+        rental_receivable_month = 0.0
+        rental_receivable_quarter = 0.0
+        rental_receivable_year = 0.0
+        rental_received_today = 0.0
+        rental_received_week = 0.0
+        rental_received_month = 0.0
+        rental_received_quarter = 0.0
+        rental_received_year = 0.0
 
         for record_detail in latest_property_detail:
             estate_property_quantity += 1
@@ -70,6 +81,17 @@ class EstateDashboardService:
                     conventional_cnt_on_rent += 1
                     conventional_area_on_rent += float(record_detail.property_rent_area)
                     conventional_area_x_price += record_detail.property_rent_area * record_detail.property_id.rent_price
+            # 应收实收
+            rental_receivable_today += record_detail.property_rental_receivable_today
+            rental_receivable_week += record_detail.property_rental_receivable_week
+            rental_receivable_month += record_detail.property_rental_receivable_month
+            rental_receivable_quarter += record_detail.property_rental_receivable_quarter
+            rental_receivable_year += record_detail.property_rental_receivable_year
+            rental_received_today += record_detail.property_rental_received_today
+            rental_received_week += record_detail.property_rental_received_week
+            rental_received_month += record_detail.property_rental_received_month
+            rental_received_quarter += record_detail.property_rental_received_quarter
+            rental_received_year += record_detail.property_rental_received_year
 
         if estate_property_quantity != 0:
             ratio_property_quantity = estate_property_lease_quantity / estate_property_quantity
@@ -161,4 +183,15 @@ class EstateDashboardService:
                     round(estate_property_area_quantity - estate_property_area_lease_quantity -
                           conventional_area + conventional_area_on_rent, 2),
             },
+            # 应收实收
+            'rental_receivable_today': round(rental_receivable_today, 2),
+            'rental_receivable_week': round(rental_receivable_week, 2),
+            'rental_receivable_month': round(rental_receivable_month, 2),
+            'rental_receivable_quarter': round(rental_receivable_quarter, 2),
+            'rental_receivable_year': round(rental_receivable_year, 2),
+            'rental_received_today': round(rental_received_today, 2),
+            'rental_received_week': round(rental_received_week, 2),
+            'rental_received_month': round(rental_received_month, 2),
+            'rental_received_quarter': round(rental_received_quarter, 2),
+            'rental_received_year': round(rental_received_year, 2),
         }

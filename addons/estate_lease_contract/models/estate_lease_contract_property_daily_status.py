@@ -6,6 +6,7 @@ from typing import Dict, List
 
 from odoo import fields, models, api, SUPERUSER_ID
 from odoo.cli.scaffold import env
+from odoo.tools import end_of, start_of
 
 _logger = logging.getLogger(__name__)
 
@@ -33,6 +34,16 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
     cal_date_s = fields.Date(string="重计算开始日期")
     cal_date_e = fields.Date(string="重计算结束日期")
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+    property_rental_receivable_today = fields.Float(string="本日应收")
+    property_rental_receivable_week = fields.Float(string="本周应收")
+    property_rental_receivable_month = fields.Float(string="本月应收")
+    property_rental_receivable_quarter = fields.Float(string="本季应收")
+    property_rental_receivable_year = fields.Float(string="本年应收")
+    property_rental_received_today = fields.Float(string="本日实收")
+    property_rental_received_week = fields.Float(string="本周实收")
+    property_rental_received_month = fields.Float(string="本月实收")
+    property_rental_received_quarter = fields.Float(string="本季实收")
+    property_rental_received_year = fields.Float(string="本年实收")
 
     @api.model
     def create(self, vals):
@@ -48,6 +59,40 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                     return
 
         return super().create(vals)
+
+    def calc_record_rental_info(self, in_contract_id, in_property_id, in_date, in_rental_info):
+
+        details = self.env["estate.lease.contract.property.rental.detail"].search(
+            [('contract_id', '=', in_contract_id), ('property_id', '=', in_property_id), ('active', '=', True)])
+
+        detail_subs = self.env["estate.lease.contract.property.rental.detail.sub"].search(
+            [('rental_detail_id', 'in', details.ids)])
+
+        for rental_detail in details:
+            if rental_detail.date_payment == in_date:
+                in_rental_info['property_rental_receivable_today'] += rental_detail.rental_receivable
+            if end_of(rental_detail.date_payment, 'week') == end_of(in_date, 'week'):
+                in_rental_info['property_rental_receivable_week'] += rental_detail.rental_receivable
+            if end_of(rental_detail.date_payment, 'month') == end_of(in_date, 'month'):
+                in_rental_info['property_rental_receivable_month'] += rental_detail.rental_receivable
+            if end_of(rental_detail.date_payment, 'quarter') == end_of(in_date, 'quarter'):
+                in_rental_info['property_rental_receivable_quarter'] += rental_detail.rental_receivable
+            if end_of(rental_detail.date_payment, 'year') == end_of(in_date, 'year'):
+                in_rental_info['property_rental_receivable_year'] += rental_detail.rental_receivable
+
+        for detail_sub in detail_subs:
+            if detail_sub.date_received == in_date:
+                in_rental_info['property_rental_received_today'] += detail_sub.rental_received
+            if end_of(detail_sub.date_received, 'week') == end_of(in_date, 'week'):
+                in_rental_info['property_rental_received_week'] += detail_sub.rental_received
+            if end_of(detail_sub.date_received, 'month') == end_of(in_date, 'month'):
+                in_rental_info['property_rental_received_month'] += detail_sub.rental_received
+            if end_of(detail_sub.date_received, 'quarter') == end_of(in_date, 'quarter'):
+                in_rental_info['property_rental_received_quarter'] += detail_sub.rental_received
+            if end_of(detail_sub.date_received, 'year') == end_of(in_date, 'year'):
+                in_rental_info['property_rental_received_year'] += detail_sub.rental_received
+
+        return in_rental_info
 
     def automatic_daily_calc_status(self):
         _logger.info("开始做成资产租赁状态每日数据")
@@ -126,6 +171,19 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                     record_contract_date_rent_start = None
                     record_contract_date_rent_end = None
 
+                    rental_info = {
+                        "property_rental_receivable_today": 0,
+                        "property_rental_receivable_week": 0,
+                        "property_rental_receivable_month": 0,
+                        "property_rental_receivable_quarter": 0,
+                        "property_rental_receivable_year": 0,
+                        "property_rental_received_today": 0,
+                        "property_rental_received_week": 0,
+                        "property_rental_received_month": 0,
+                        "property_rental_received_quarter": 0,
+                        "property_rental_received_year": 0,
+                    }
+                    record_rental_info = rental_info
                     # 合同有效时才设置其资产已租状态,业务上、理论上和逻辑上时间段不会重叠
                     for contract in property_contract:
                         if (contract.property_state_by_date_sign and
@@ -144,10 +202,24 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                             record_contract_date_rent_start = contract.date_rent_start
                             record_contract_date_rent_end = contract.date_rent_end
 
+                            record_rental_info = self.calc_record_rental_info(contract.id, each_property.id,
+                                                                              record_status_date, rental_info)
+
                     if record_contract_id:
                         record_contract_id_id = record_contract_id.id
                     else:
                         record_contract_id_id = None
+
+                    # 对于当年失效的合同，也要统计其当年已收租金
+                    contract_invalid = [('property_ids', '=', each_property.id), ('active', '=', True),
+                                        ('state', '=', 'invalid'),
+                                        ('date_rent_end', '<', record_status_date),
+                                        ('date_rent_end', '>=', start_of(record_status_date, 'year')), ]
+                    property_contract_invalid = self.env['estate.lease.contract'].search(contract_invalid,
+                                                                                         order='date_rent_end DESC')
+                    for contract in property_contract_invalid:
+                        record_rental_info = self.calc_record_rental_info(contract.id, each_property.id,
+                                                                          record_status_date, record_rental_info)
 
                     self.env['estate.lease.contract.property.daily.status'].create({
                         'name': record_name,
@@ -166,6 +238,16 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         'cal_date_s': record_status_date_s,
                         'cal_date_e': record_status_date_end,
                         'company_id': company_id[0],
+                        "property_rental_receivable_today": record_rental_info['property_rental_receivable_today'],
+                        "property_rental_receivable_week": record_rental_info['property_rental_receivable_week'],
+                        "property_rental_receivable_month": record_rental_info['property_rental_receivable_month'],
+                        "property_rental_receivable_quarter": record_rental_info['property_rental_receivable_quarter'],
+                        "property_rental_receivable_year": record_rental_info['property_rental_receivable_year'],
+                        "property_rental_received_today": record_rental_info['property_rental_received_today'],
+                        "property_rental_received_week": record_rental_info['property_rental_received_week'],
+                        "property_rental_received_month": record_rental_info['property_rental_received_month'],
+                        "property_rental_received_quarter": record_rental_info['property_rental_received_quarter'],
+                        "property_rental_received_year": record_rental_info['property_rental_received_year'],
                     })
                     int_cnt += 1
 

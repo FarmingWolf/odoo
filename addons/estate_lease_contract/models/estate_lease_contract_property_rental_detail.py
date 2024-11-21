@@ -380,9 +380,20 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
 
     def action_confirm_received(self):
         for record in self:
+            # 防止空点
+            if abs(record.rental_receivable - record.rental_received) < 0.01:
+                continue
+
             received_bef = record.rental_received
             received_aft = record.rental_receivable
+
             msg = f"{fields.Date.context_today(self)}本期租金收齐[{round(received_bef, 2)}]→[{round(received_aft, 2)}]。"
             record.comment = msg if not record.comment else msg + record.comment
             record.rental_received = received_aft
             record.edited = True
+            # 增加相应的分次收缴明细
+            rental_detail_sub = [{
+                "rental_detail_id": record.id,
+                "rental_received": received_aft - received_bef,
+            }]
+            self.env["estate.lease.contract.property.rental.detail.sub"].create(rental_detail_sub)

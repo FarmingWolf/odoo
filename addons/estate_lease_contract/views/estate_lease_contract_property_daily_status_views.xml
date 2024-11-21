@@ -39,6 +39,16 @@ action = model.automatic_daily_calc_status()
                 <field name="contract_date_start" readonly="1"/>
                 <field name="contract_date_rent_start" readonly="1"/>
                 <field name="contract_date_rent_end" readonly="1"/>
+                <field name="property_rental_receivable_today" readonly="1"/>
+                <field name="property_rental_receivable_week" readonly="1"/>
+                <field name="property_rental_receivable_month" readonly="1"/>
+                <field name="property_rental_receivable_quarter" readonly="1"/>
+                <field name="property_rental_receivable_year" readonly="1"/>
+                <field name="property_rental_received_today" readonly="1"/>
+                <field name="property_rental_received_week" readonly="1"/>
+                <field name="property_rental_received_month" readonly="1"/>
+                <field name="property_rental_received_quarter" readonly="1"/>
+                <field name="property_rental_received_year" readonly="1"/>
             </tree>
         </field>
     </record>
@@ -65,6 +75,11 @@ action = model.automatic_daily_calc_status()
                             <field name="property_rent_area" readonly="1"/>
                             <field name="property_state" readonly="1"/>
                             <field name="property_date_availability" readonly="1"/>
+                            <field name="property_rental_receivable_today" readonly="1"/>
+                            <field name="property_rental_receivable_week" readonly="1"/>
+                            <field name="property_rental_receivable_month" readonly="1"/>
+                            <field name="property_rental_receivable_quarter" readonly="1"/>
+                            <field name="property_rental_receivable_year" readonly="1"/>
                         </group>
                         <group>
                             <field name="contract_id" readonly="1"/>
@@ -73,6 +88,11 @@ action = model.automatic_daily_calc_status()
                             <field name="contract_date_start" readonly="1"/>
                             <field name="contract_date_rent_start" readonly="1"/>
                             <field name="contract_date_rent_end" readonly="1"/>
+                            <field name="property_rental_received_today" readonly="1"/>
+                            <field name="property_rental_received_week" readonly="1"/>
+                            <field name="property_rental_received_month" readonly="1"/>
+                            <field name="property_rental_received_quarter" readonly="1"/>
+                            <field name="property_rental_received_year" readonly="1"/>
                         </group>
                     </group>
                 </sheet>
