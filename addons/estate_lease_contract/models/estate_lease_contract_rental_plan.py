@@ -128,7 +128,7 @@ class EstateLeaseContractRentalPlan(models.Model):
             if i > 0:
                 df = by_period_method.billing_progress_info_month_from - \
                      record_sorted[i - 1].billing_progress_info_month_from
-                if df == 0 or math.fmod(df, by_period_method.billing_progress_info_month_every) != 0:
+                if df == 0 or math.fmod(df, record_sorted[i - 1].billing_progress_info_month_every) != 0:
                     err_msg = f"期间段递增率明细设置有误！\n" \
                               f"【{by_period_method.name}】与【{record_sorted[i - 1].name}】的起始月相差月数：" \
                               f"{by_period_method.billing_progress_info_month_from} - " \
