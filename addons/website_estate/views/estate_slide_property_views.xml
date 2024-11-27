@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_estate_slide_form" model="ir.ui.view">
+            <field name="name">estate.slide.form</field>
+            <field name="model">estate.slide.property</field>
+            <field name="arch" type="xml">
+                <form string="设置在线招商资产">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="estate_property_id"/>
+                                <field name="company_id"/>
+                                <field name="state"/>
+                            </group>
+                            <group>
+                                <field name="show_ads"/>
+                                <field name="sequence"/>
+                                <field name="name"/>
+                                <field name="description"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_estate_slide_tree" model="ir.ui.view">
+            <field name="name">estate.slide.tree</field>
+            <field name="model">estate.slide.property</field>
+            <field name="arch" type="xml">
+                <tree string="Contents" sample="1" multi_edit="0">
+                    <field name="sequence"/>
+                    <field name="show_ads"/>
+                    <field name="name"/>
+                    <field name="estate_property_id"/>
+                    <field name="state"/>
+                    <field name="company_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_estate_slide_search" model="ir.ui.view">
+            <field name="name">estate.slide.filter</field>
+            <field name="model">estate.slide.property</field>
+            <field name="arch" type="xml">
+                <search string="Search Contents">
+                    <field name="name"/>
+                    <field name="estate_property_id"/>
+                    <filter name="filter_show_ads" string="对外展示" domain="[('show_ads', '=', True)]"/>
+                    <separator/>
+                    <filter string="未租房源" name="filter_state" domain="[('state', '!=', 'sold')]"/>
+                    <searchpanel>
+                        <field string='公司' name="company_id" context="{'group_by': 'company_id'}"/>
+                    </searchpanel>
+                </search>
+            </field>
+        </record>
+
+        <record id="estate_slide_action" model="ir.actions.act_window">
+            <field name="name">在线招商</field>
+            <field name="res_model">estate.slide.property</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="context">{'search_default_filter_show_ads': True}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    添加在线展示房源
+                </p>
+                <p>
+                    设置房源是否在线对外展示
+                    <br/>以及展示排序等。
+                </p>
+            </field>
+        </record>
+
+        <record id="estate_slide_property_sync_action" model="ir.actions.server">
+            <field name="name">更新房源</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="website_estate.model_estate_slide_property"/>
+            <field name="state">code</field>
+            <field name="code">
+action = model.action_estate_slide_property_sync()
+            </field>
+        </record>
+
+    </data>
+</odoo>

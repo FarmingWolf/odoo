@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_website_estate_slide_public,estate.slide.all,model_estate_slide_property,base.group_public,1,1,0,0
+access_website_estate_slide_portal,estate.slide.all,model_estate_slide_property,base.group_portal,1,1,0,0
+access_website_estate_slide_employee,estate.slide.all,model_estate_slide_property,base.group_user,1,1,0,0
+access_website_estate_slide_officer,estate.slide.officer,model_estate_slide_property,website_estate.group_website_estate_officer,1,1,1,0
+access_website_estate_slide_manager,estate.slide.manager,model_estate_slide_property,website_estate.group_website_estate_manager,1,1,1,1

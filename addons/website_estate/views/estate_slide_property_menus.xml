@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="estate_slide_property_menu_root" groups="group_website_estate_manager" name="在线招商" action="estate_slide_action">
+        <menuitem id="estate_slide_property_sync_menu" name="同步房源" action="estate_slide_property_sync_action"/>
+    </menuitem>
+</odoo>

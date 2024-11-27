@@ -3,6 +3,9 @@ access_estate_property_read,access.estate.property.read,model_estate_property,es
 access_estate_type_read,access.estate.type.read,model_estate_property_type,estate_group_user,1,0,0,0
 access_estate_tag_read,access.estate.tag.read,model_estate_property_tag,estate_group_user,1,0,0,0
 access_estate_offer_full,access.estate.offer.full,model_estate_property_offer,estate_group_user,1,1,1,1
+access_estate_property_ads_img_full,access.estate.property.ads.img.full,model_estate_property_ads_img,estate_group_user,1,1,1,1
+access_estate_property_ads_img_read,access.estate.property.ads.img.read,model_estate_property_ads_img,base.group_user,1,0,0,0
+access_estate_property_ads_img_base,access.estate.property.ads.img.base,model_estate_property_ads_img,base.group_public,1,0,0,0
 access_estate_res_users_read,access.estate.res.users.read,model_res_users,estate_group_user,1,0,0,0
 access_estate_property_nodelink,access.estate.property.nodelink,model_estate_property,estate_group_manager,1,1,1,1
 access_estate_property_type_manager,access.estate.property.type.manager,model_estate_property_type,estate_group_manager,1,1,1,1

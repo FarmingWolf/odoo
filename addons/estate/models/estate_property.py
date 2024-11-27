@@ -56,6 +56,7 @@ def _get_property_cnt_limit():
     property_limit = Utils.get_property_cnt_limit(args)
     return property_limit
 
+
 class EstateProperty(models.Model):
     # def onchange(self, values: Dict, field_names: List[str], fields_spec: Dict):
     #     pass
@@ -246,6 +247,8 @@ class EstateProperty(models.Model):
 
     # property_offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价")
     property_offer_count = fields.Integer(compute="_compute_property_offer_count", default=0, string="报价条数")
+
+    ads_img_ids = fields.One2many(comodel_name="estate.property.ads.img", inverse_name="property_id")
 
     @api.depends("offer_ids")
     def _compute_property_offer_count(self):

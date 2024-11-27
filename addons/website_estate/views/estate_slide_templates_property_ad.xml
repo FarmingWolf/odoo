@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<odoo><data>
+
+<!-- estate_slide_home template -->
+<template id='estate_slide_property_ad' name="estate slide property ad">
+    <t t-set="body_classname" t-value="'o_wslides_body'"/>
+    <t t-call="website.layout">
+        <div id="wrap" class="wrap o_wslides_wrap">
+            <div class="oe_structure oe_empty">
+                <section class="s_banner overflow-hidden" style="background-color:(0, 0, 0, 0); background-image: url(&quot;/website_slides/static/src/img/banner_default.svg&quot;); background-size: cover; background-position: 55% 65%" data-snippet="s_banner">
+                    <t t-set="channel_frontend_tags" t-value="property_ad.tag_ids.filtered(lambda tag: tag.color)"/>
+                    <div class="container align-items-center d-flex mb-5 mt-lg-5 pt-lg-4 pb-lg-1">
+                        <div class="text-white">
+                            <h4 class="display-3 mb-0" t-field="property_ad.name"/>
+                            <h5 class="mb-4" t-field="property_ad.description"/>
+
+                            <div class="d-flex align-items-center">
+                                <div t-if="channel_frontend_tags" class="mt-auto pt-1 o_wslides_desc_truncate_2_badges">
+                                    <t t-foreach="channel_frontend_tags" t-as="tag">
+                                        <a t-attf-class="badge post_link o_wslides_channel_tag #{'o_tag_color_'+str(tag.color)}" t-att-rel="search_tags and 'nofollow'" t-esc="tag.name"/>
+                                    </t>
+                                </div>
+                                <span>　</span>
+                                <small t-if="property_ad.times_liked">
+                                    <div class="o_wslides_js_slide_like d-flex flex-grow-1 justify-content-start" data-bs-toggle="popover" >
+                                        <span t-attf-class="d-inline-block text-center o_wslides_js_slide_like_heart " tabindex="0" t-att-data-slide-id="property_ad.id">
+                                            <b t-esc="property_ad.times_liked"/>
+                                            <span class="fa fa-heart"/>
+                                        </span>
+                                    </div>
+                                </small>
+                                <span>　</span>
+                                <small t-if="property_ad.times_viewed">
+                                    <b t-esc="property_ad.times_viewed"/>
+                                    <span class="fa fa-eye" role="img" aria-label="浏览"/>
+                                </small>
+                            </div>
+                            <div class="row mt-1 mb-3">
+                                <div class="col">
+                                    <p>联系电话：<span t-field="property_ad.sales_person_phone"/>　<span t-field="property_ad.sales_person_name"/></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="s_banner overflow-hidden" style="background-color:(0, 0, 0, 0);background-size: cover; background-position: 55% 65%" data-snippet="s_banner">
+                        <div class="container-fluid">
+                            <div class="row justify-content-center">
+                                <div class="o_jobs_hr_recruiter col-10 o_cc o_cc1 mt24 p-4 border none rounded shadow">
+                                    <div class="row align-items-center">
+                                        <t t-foreach="property_ad.ads_img_ids" t-as="img_item">
+                                            <div class="col-lg-5 pb16 o_not_editable">
+                                                <img t-att-src="image_data_uri(img_item.image_512)" alt="房源高清图" class="o_kanban_image"/>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </section>
+            </div>
+            <t t-call="website_estate.courses_footer"/>
+        </div>
+    </t>
+</template>
+</data></odoo>

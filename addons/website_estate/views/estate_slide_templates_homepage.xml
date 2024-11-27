@@ -1,0 +1,408 @@
+<?xml version="1.0" ?>
+<odoo>
+    <data>
+
+        <!-- estate_slide_home template -->
+        <template id='estate_slide_home' name="estate slide">
+            <t t-set="body_classname" t-value="'o_wslides_body'"/>
+            <t t-call="website.layout">
+                <div id="wrap" class="wrap o_wslides_wrap">
+                    <div class="oe_structure oe_empty">
+                        <section class="s_banner overflow-hidden"
+                                 style="background-color:(0, 0, 0, 0); background-image: url(&quot;/website_slides/static/src/img/banner_default.svg&quot;); background-size: cover; background-position: 55% 65%"
+                                 data-snippet="s_banner">
+                            <div class="container align-items-center d-flex mb-5 mt-lg-5 pt-lg-4 pb-lg-1">
+                                <div class="text-white">
+                                    <h1 class="display-3 mb-0">在线房源信息</h1>
+                                    <h2 class="mb-4">保障所有信息真实性！</h2>
+                                    <div class="row mt-1 mb-3">
+                                        <div class="col">
+                                            <p>现在就开始挑选你中意的房源吧！</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <!--            <div class="container mt16 o_wslides_home_nav position-relative">-->
+                    <!--                <nav class="navbar navbar-expand-lg navbar-light shadow-sm">-->
+                    <!--                    <t t-call="website.website_search_box_input">-->
+                    <!--                        <t t-set="_form_classes" t-valuef="o_wslides_nav_navbar_right order-lg-3"/>-->
+                    <!--                        <t t-set="search_type" t-valuef="slides"/>-->
+                    <!--                        <t t-set="action" t-valuef="/estate_slides/all"/>-->
+                    <!--                        <t t-set="display_description" t-valuef="true"/>-->
+                    <!--                        <t t-set="display_detail" t-valuef="false"/>-->
+                    <!--                        <t t-set="placeholder">Search courses</t>-->
+                    <!--                    </t>-->
+                    <!--                    <button class="navbar-toggler px-2 order-1" type="button"-->
+                    <!--                        data-bs-toggle="collapse" data-bs-target="#navbarSlidesHomepage"-->
+                    <!--                        aria-controls="navbarSlidesHomepage" aria-expanded="false" aria-label="Toggle navigation">-->
+                    <!--                        <span class="navbar-toggler-icon"/>-->
+                    <!--                    </button>-->
+                    <!--                    <div class="collapse navbar-collapse order-2" id="navbarSlidesHomepage">-->
+                    <!--                        <div class="navbar-nav pt-3 pt-lg-0">-->
+                    <!--                            <a class="nav-link nav-link me-md-2 o_wslides_home_all_slides" href="/estate_slides/all"><i class="fa fa-graduation-cap me-1"/>All courses</a>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
+                    <!--                </nav>-->
+                    <!--                <div class="o_wprofile_email_validation_container">-->
+                    <!--                    <t t-call="website_profile.email_validation_banner">-->
+                    <!--                        <t t-set="redirect_url" t-value="'/estate_slides'"/>-->
+                    <!--                        <t t-set="send_alert_classes" t-value="'alert alert-danger alert-dismissable mt-4 mb-0'"/>-->
+                    <!--                        <t t-set="done_alert_classes" t-value="'alert alert-success alert-dismissable mt-4 mb-0'"/>-->
+                    <!--                        <t t-set="additional_validation_email_message"> and join this Community</t>-->
+                    <!--                        <t t-set="additional_validated_email_message"> You may now participate in our eLearning.</t>-->
+                    <!--                    </t>-->
+                    <!--                </div>-->
+                    <!--            </div>-->
+
+                    <div class="container o_wslides_home_main">
+                        <div class="row">
+                            <t t-set="has_side_column" t-value="is_view_active('website_estate.toggle_leaderboard')"/>
+                            <t t-if="is_public_user">
+                                <div t-if="has_side_column" class="col-lg-3 order-3 order-lg-2">
+                                    <div class="row">
+                                        <div class="col-12 col-md-5 col-lg-12">
+                                            <div class="ps-md-5 ps-lg-0">
+                                                <t t-call="website_estate.slides_home_users_small"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                            <div t-else="" class="col-lg-3 order-lg-2">
+                                <t t-set="has_side_column" t-value="True"/>
+                                <div class="o_wslides_home_aside_loggedin card p-3 p-lg-0 mb-4">
+                                    <div class="o_wslides_home_aside_title">
+                                        <div class="d-flex align-items-center">
+                                            <t t-call="website_estate.slides_misc_user_image">
+                                                <t t-set="img_class" t-value="'rounded-circle me-1'"/>
+                                                <t t-set="img_style" t-value="'width: 22px; height: 22px;'"/>
+                                            </t>
+                                            <h5 t-esc="user.name" class="d-flex flex-grow-1 mb-0"/>
+                                            <a class="d-none d-lg-block" t-att-href="'/profile/user/%s' % user.id">
+                                                View
+                                            </a>
+                                            <a class="d-lg-none btn btn-sm bg-white border" href="#"
+                                               data-bs-toggle="collapse" data-bs-target="#o_wslides_home_aside_content">
+                                                More info
+                                            </a>
+                                        </div>
+                                        <hr class="d-none d-lg-block mt-2 mb-2 mb-1"/>
+                                    </div>
+                                    <div id="o_wslides_home_aside_content" class="collapse d-lg-block">
+                                        <div class="row g-0 mb-5 mt-3 mt-lg-0">
+                                            <div class="col-12 col-sm-6 col-lg-12">
+                                                <t t-call="website_estate.slides_home_user_profile_small"/>
+                                            </div>
+                                            <div class="col-12 col-sm-6 col-lg-12 ps-md-5 ps-lg-0 mt-lg-4">
+                                                <t t-call="website_estate.slides_home_user_achievements_small"/>
+                                            </div>
+                                            <div class="col-12 col-md-7 col-lg-12 ps-md-5 ps-lg-0 mt-lg-4 mb-3">
+                                                <t t-call="website_estate.slides_home_achievements_small"/>
+                                            </div>
+                                            <div class="col-12 col-sm-6 col-lg-12 ps-md-5 ps-lg-0 mt-lg-4">
+                                                <t t-call="website_estate.slides_home_users_small"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div t-att-class="'col-lg-9 pe-lg-5 order-lg-1' if has_side_column else 'col-lg pr-lg'">
+                                <div t-if="invite_error_msg" role="alert"
+                                     class="o_not_editable alert alert-danger text-center" t-esc="invite_error_msg"/>
+                                <div class="o_wslides_home_content_section mb-3" t-if="not estate_ads_all">
+                                    <p class="h2">No Estate Ads created yet.</p>
+                                </div>
+                                <div class="o_wslides_home_content_section mb-3"
+                                     t-if="estate_ads_popular">
+                                    <div class="row o_wslides_home_content_section_title align-items-center">
+                                        <div class="col">
+                                            <a href="estate_slides/all?orderby=most_popular" class="float-end">View all</a>
+                                            <h5 class="m-0">Most popular estates</h5>
+                                            <hr class="mt-2 mb-2"/>
+                                        </div>
+                                    </div>
+                                    <div class="row mx-n2 mt8">
+                                        <t t-foreach="estate_ads_popular[:3]" t-as="estate_ad">
+                                            <div class="col-md-4 col-sm-6 px-2 col-xs-12 d-flex">
+                                                <t t-call="website_estate.estate_card"/>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                                <div class="o_wslides_home_content_section mb-3"
+                                     t-if="estate_ads_newest">
+                                    <div class="row o_wslides_home_content_section_title align-items-center">
+                                        <div class="col">
+                                            <a href="estate_slides/all?orderby=newest" class="float-end">View all</a>
+                                            <h5 class="m-0">Newest estates</h5>
+                                            <hr class="mt-2 mb-2"/>
+                                        </div>
+                                    </div>
+                                    <div class="row mx-n2 mt8">
+                                        <t t-foreach="estate_ads_newest[:3]" t-as="estate_ad">
+                                            <div class="col-md-4 col-sm-6 px-2 col-xs-12 d-flex">
+                                                <t t-call="website_estate.estate_card"/>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <t t-call="website_estate.courses_footer"/>
+                </div>
+            </t>
+        </template>
+
+        <template id='estate_ads_slides_all' name="all estate online ads">
+            <t t-set="body_classname" t-value="'o_wslides_body'"/>
+            <t t-call="website.layout">
+                <div id="wrap" class="wrap o_wslides_wrap">
+                    <!-- Repeat structure for every section to allow customization through website editor. !-->
+                    <div class="oe_structure oe_empty">
+                        <section class="s_banner" data-snippet="s_banner"
+                                 style="background-color:(0, 0, 0, 0); background-image: url(&quot;/website_slides/static/src/img/banner_default_all.svg&quot;); background-size: cover; background-position: 80% 20%">
+                            <div class="container py-5">
+                                <h1 class="display-3 mb-0 text-white">在线房源</h1>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="container o_wslides_home_main">
+                        <div class="row">
+                            <div class="row mx-n2 mt8">
+                                <t t-foreach="estate_ads_all" t-as="estate_ad">
+                                    <div class="col-md-4 col-sm-6 px-2 col-xs-12 d-flex">
+                                        <t t-call="website_estate.estate_card"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                    <t t-call="website_estate.courses_footer"/>
+                </div>
+            </t>
+        </template>
+
+        <template id='courses_footer'>
+            <section class="s_banner">
+                <div class="oe_structure oe_empty" id="oe_structure_website_slides_course_footer_1"/>
+            </section>
+        </template>
+        <!-- like button action -->
+        <record id="like_button_click_action" model="ir.actions.client">
+            <field name="name">喜欢点赞</field>
+            <field name="tag">website_estate.LikeButtonClickAction</field>
+        </record>
+
+        <template id='website_estate.estate_card' name="Estate Card">
+            <div t-attf-class="card w-100 o_wslides_estate_card mb-4 #{'o_wslides_course_unpublished' if estate_ad.state == 'sold' else ''}"
+                 t-cache="estate_ad if is_public_user and not search_tags else None">
+                <t t-set="channel_frontend_tags" t-value="estate_ad.tag_ids.filtered(lambda tag: tag.color)"/>
+                <a t-attf-href="/estate_slides/#{estate_ad.id}" t-title="estate_ad.name" style="height:120px">
+                    <div t-field="estate_ad.image_1920" t-options="{'widget': 'image', 'preview_image': 'image_512'}"
+                         class="o_wslides_background_image h-100">
+                        <!--                <t t-if="estate_ad.partner_has_new_content" t-call="website_estate.estate_card_information"/>-->
+                    </div>
+                </a>
+                <div class="card-body p-3">
+                    <a class="card-title h5 mb-2 o_wslides_desc_truncate_2" t-attf-href="/estate_slides/#{estate_ad.id}"
+                       t-field="estate_ad.name"/>
+                    <span t-if="estate_ad.state == 'sold'" class="badge text-bg-danger p-1">In rent</span>
+                    <div class="card-text d-flex flex-column flex-grow-1 mt-1">
+                        <div class="fw-light o_wslides_desc_truncate_3"
+                             t-field="estate_ad.estate_property_id.description"/>
+                        <div t-if="channel_frontend_tags" class="mt-auto pt-1 o_wslides_desc_truncate_2_badges">
+                            <t t-foreach="channel_frontend_tags" t-as="tag">
+                                <a t-attf-class="badge post_link o_wslides_channel_tag #{'o_tag_color_'+str(tag.color)}"
+                                   t-att-rel="search_tags and 'nofollow'" t-esc="tag.name"/>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white text-600 px-3">
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <t t-call="website_estate.like_button"/>
+
+                        <div class="d-flex flex-grow-1 justify-content-end">
+                            <small t-if="estate_ad.times_viewed">
+                                <b t-esc="estate_ad.times_viewed"/>　
+                                <span class="fa fa-eye" role="img" aria-label="浏览"/>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="website_estate.like_button" name="like button">
+            <small t-if="estate_ad.times_liked">
+                <div class="o_wslides_js_slide_like d-flex flex-grow-1 justify-content-start" data-bs-toggle="popover" >
+                    <span t-attf-class="d-inline-block text-center o_wslides_js_slide_like_heart " tabindex="0" t-att-data-slide-id="estate_ad.id">
+                        <b t-esc="estate_ad.times_liked"/>　
+                        <span class="fa fa-heart"/>
+                    </span>
+                </div>
+            </small>
+        </template>
+
+        <template id="estate_card_information" name='Course Information'>
+            <t id="estate_card_information_content">
+            </t>
+        </template>
+
+        <template id="estate_card_information_arrow" inherit_id="website_estate.estate_card_information"
+                  active="True" name='New Content Ribbon'>
+            <xpath expr="//t[@id='estate_card_information_content']" position="inside">
+                <span class="o_wslides_arrow">New Content</span>
+            </xpath>
+        </template>
+
+        <template id='slides_home_achievements_small' name="Users">
+            <t class="o_wslides_home_aside">
+            </t>
+        </template>
+
+        <template id="toggle_latest_achievements" inherit_id="website_estate.slides_home_achievements_small"
+                  active="True" name='Display Achievements'>
+            <xpath expr="//t[hasclass('o_wslides_home_aside')]" position="inside">
+                <div t-if="achievements">
+                    <div class="row o_wslides_home_aside_title">
+                        <div class="col">
+                            <h5 class="m-0">Latest achievements</h5>
+                            <hr class="mt-2"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <t t-foreach="achievements" t-as="achievement">
+                                <t t-call="website_estate.achievement_card"/>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </template>
+
+        <template id='achievement_card' name="Achivement Card">
+            <div class="d-flex g-0 mt8 align-items-center">
+                <t t-call="website_estate.slides_misc_user_image">
+                    <t t-set="user" t-value="achievement.user_id"/>
+                </t>
+                <div style="line-height: 1.3">
+                    <span class="fw-bold" t-esc="achievement.user_id.name"/>
+                    achieved
+                    <span class="fw-bold" t-esc="achievement.badge_id.name"/>
+                </div>
+            </div>
+        </template>
+
+        <template id='slides_home_users_small' name="Users">
+            <div class="o_wslides_home_aside">
+            </div>
+        </template>
+
+        <template id="toggle_leaderboard" inherit_id="website_estate.slides_home_users_small" active="True"
+                  name='Display Leaderboard'>
+            <xpath expr="//div[hasclass('o_wslides_home_aside')]" position="inside">
+                <div class="row o_wslides_home_aside_title">
+                    <div class="col">
+                        <a t-if="users" href="/profile/users" class="float-end">View all</a>
+                        <h5 class="m-0">Leaderboard</h5>
+                        <hr class="mt-2 mb-2"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <t t-if="users">
+                        <div class="col">
+                            <t t-set="counter" t-value="1"/>
+                            <t t-foreach="users" t-as="user">
+                                <t t-call="website_estate.user_quickkarma_card"/>
+                                <t t-set="counter" t-value="counter + 1"/>
+                            </t>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <p class="col mt8">No leaderboard currently :(</p>
+                    </t>
+                </div>
+            </xpath>
+        </template>
+
+        <template id='user_quickkarma_card' name="User QuickKarma Card">
+            <div class="d-flex mb-3 align-items-center">
+                <b class="me-2 text-muted" t-esc="counter"/>
+                <t t-call="website_estate.slides_misc_user_image"/>
+                <div style="line-height:1.3">
+                    <span class="fw-bold" t-esc="user.name"/>
+                    <div class="d-flex align-items-center">
+                        <t t-esc="user.rank_id.name"/>
+                        <span class="text-500 mx-2">&#8226;</span>
+                        <span class="badge text-bg-success">
+                            <t t-esc="user.karma"/>
+                            xp
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id='slides_home_user_profile_small' name="User Profile">
+            <div class="o_wslides_home_aside">
+                <div t-if="user.rank_id" class="d-flex align-items-center">
+                    <span class="fw-bold text-muted me-2">Current rank:</span>
+                    <img t-att-src="website.image_url(user.rank_id, 'image_128')" width="16" height="16" alt=""
+                         class="o_object_fit_cover me-1"/>
+                    <a href="/profile/ranks_badges" t-field="user.rank_id"/>
+                </div>
+                <t t-set="next_rank_id" t-value="user._get_next_rank()"/>
+                <div t-if="next_rank_id" class="fw-bold text-muted mt-1">Next rank:</div>
+                <t t-if="next_rank_id or user.rank_id" t-call="website_profile.profile_next_rank_card">
+                    <t t-set="bg_class" t-valuef="bg-200"/>
+                    <t t-set="img_max_width" t-value="'50%'"/>
+                </t>
+                <div t-if="next_rank_id" t-field="next_rank_id.description_motivational"/>
+                <div t-else="">Congratulations, you have reached the last rank!</div>
+            </div>
+        </template>
+
+        <template id='slides_home_user_achievements_small' name="User Achievements">
+            <div class="o_wslides_home_aside flex-grow-1">
+                <div class="row o_wslides_home_aside_title">
+                    <div class="col">
+                        <a href="/profile/ranks_badges?badge_category=slides" class="float-end">View all</a>
+                        <h5 class="m-0">Badges</h5>
+                        <hr class="mt-2 mt-2"/>
+                    </div>
+                </div>
+                <t t-foreach="challenges" t-as="challenge">
+                    <t t-set="challenge_done" t-value="challenge in challenges_done if challenges_done else False"/>
+                    <div t-attf-class="d-flex mb-3 align-items-center #{'o_wslides_entry_muted' if not challenge_done else ''}">
+                        <div t-if="challenge.reward_id.image_1920" t-field="challenge.reward_id.image_1920"
+                             t-options="{'widget': 'image', 'preview_image': 'image_128', 'class': 'me-2', 'style': 'max-height: 36px'}"/>
+                        <img t-else=""
+                             t-attf-src="'/website_profile/static/src/img/badge_%s.svg' % (challenge.reward_id.level)"
+                             t-att-alt="challenge.reward_id.name" style="max-height: 36px" class="me-2"/>
+                        <div class="flex-grow-1">
+                            <b class="text_small_caps" t-esc="challenge.reward_id.name"/>
+                            <br/>
+                            <span class="text-muted" t-esc="challenge.reward_id.description"/>
+                        </div>
+                        <i t-if="challenge_done" class="fa fa-check h5 text-success" aria-label="Done" title="Done"
+                           role="img"/>
+                    </div>
+                </t>
+            </div>
+        </template>
+
+        <template id='slides_misc_user_image' name="User Avatar">
+            <img t-attf-class="o_avatar {{img_class or 'rounded-circle float-start'}}"
+                 t-att-style="img_style if img_style else 'width: 32px; height: 32px;'"
+                 t-att-src="'/profile/avatar/%s?field=avatar_128' % user.id"
+                 t-att-alt="user.name"/>
+        </template>
+
+    </data>
+</odoo>

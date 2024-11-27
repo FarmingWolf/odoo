@@ -248,6 +248,15 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="招商用图" groups="estate.estate_group_business">
+                            <field name="ads_img_ids" nolabel="True">
+                                <tree create="1" delete="1" edit="1" import="0" editable="bottom">
+                                    <field name="sequence" help="第一张图用于广告看板主图，其他用于在线浏览"/>
+                                    <field name="image_1920" widget="image" class="oe_avatar"
+                                           options="{'preview_image': 'image_512'}" nolabel="1"/>
+                                </tree>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
                 <div class="oe_chatter" groups="estate.estate_group_tutorial_research">
