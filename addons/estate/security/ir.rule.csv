@@ -3,4 +3,3 @@ property_company_account_rule,Restrict Properties by Company,model_estate_proper
 property_offer_company_account_rule,Restrict Properties Offer by Company,model_estate_property_offer,"[('company_id','=',user.company_id.id)]"
 property_tag_company_account_rule,Restrict Properties Tag by Company,model_estate_property_tag,"[('company_id','=',user.company_id.id)]"
 property_type_company_account_rule,Restrict Properties Type by Company,model_estate_property_type,"[('company_id','=',user.company_id.id)]"
-property_ads_img_rule,Restrict Properties Ads Img by Company,model_estate_property_ads_img,"[('company_id','=',user.company_id.id)]"
