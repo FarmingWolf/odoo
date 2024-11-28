@@ -22,6 +22,7 @@
     'data': [
         'security/project_security.xml',
         'security/ir.model.access.csv',
+        'security/ir.rule.csv',
         'security/ir.model.access.xml',
         'data/digest_data.xml',
         'report/project_task_burndown_chart_report_views.xml',
