@@ -108,7 +108,8 @@ class Task(models.Model):
     def _default_company_id(self):
         if self._context.get('default_project_id'):
             return self.env['project.project'].browse(self._context['default_project_id']).company_id
-        return False
+        else:
+            return self.env.user.company_id
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
