@@ -50,7 +50,7 @@
                                     <div class="row align-items-center">
                                         <t t-foreach="property_ad.ads_img_ids" t-as="img_item">
                                             <div class="col-lg-5 pb16 o_not_editable">
-                                                <img t-att-src="image_data_uri(img_item.image_512)" alt="房源高清图" class="o_kanban_image"/>
+                                                <img t-att-src="image_data_uri(img_item.image_512)" alt="房源高清图" class="img img-fluid"/>
                                             </div>
                                         </t>
                                     </div>
