@@ -102,7 +102,10 @@ class Task(models.Model):
 
     @api.model
     def _default_user_ids(self):
-        return self.env.context.keys() & {'default_personal_stage_type_ids', 'default_personal_stage_type_id'} and self.env.user
+        ret_v = self.env.context.keys() & {'default_personal_stage_type_ids', 'default_personal_stage_type_id'} and self.env.user
+        if not ret_v:
+            ret_v = self.env.user
+        return ret_v
 
     @api.model
     def _default_company_id(self):
