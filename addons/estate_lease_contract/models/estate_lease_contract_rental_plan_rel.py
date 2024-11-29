@@ -26,15 +26,57 @@ class EstateLeaseContractRentalPlanRel(models.Model):
                                                           ('out_dated', '租约已到期')],
                                                )
     contract_property_rent_price = fields.Float(related="rental_plan_id.rent_price", string="租金单价（元/天/㎡）")
-    contract_property_building_area = fields.Float(default=0.0, string="建筑面积（㎡）")  # 可能拆铺合铺
-    contract_property_area = fields.Float(default=0.0, string="面积（㎡）")
-    contract_rent_amount_monthly = fields.Float(string="月租金（元）", default=0)
+    contract_property_building_area = fields.Float(default=0.0, string="建筑面积(㎡)")  # 可能拆铺合铺
+    contract_property_area = fields.Float(default=0.0, string="面积(㎡)")
+    contract_rent_amount_monthly = fields.Float(string="月租金(元)", default=0)
     contract_rent_amount_year = fields.Float(string="年租金(元)", default=0)
     contract_rent_payment_method = fields.Char(string="付款方式")
     contract_deposit_months = fields.Float(string="押金月数", default=0)
-    contract_deposit_amount = fields.Float(string="押金金额", default=0)
+    contract_deposit_amount = fields.Float(string="押金(元)", default=0)
+    deposit_receivable = fields.Float(string="押金应收(元)", default=lambda self: self.contract_deposit_amount)
+    contract_deposit_amount_received = fields.Float(string="累计实收(元)", default=0, compute="_calc_deposit_received")
+    contract_deposit_amount_arrears = fields.Float(string="押金欠缴(元)",
+                                                   default=lambda self: (self.deposit_receivable -
+                                                                         self.contract_deposit_amount_received),
+                                                   compute="_calc_deposit_received")
+    contract_property_deposit_ids = fields.One2many(comodel_name="estate.lease.contract.property.deposit",
+                                                    inverse_name="contract_rental_plan_rel_id", string="押金收缴明细")
+
+    @api.depends("contract_property_deposit_ids")
+    def _calc_deposit_received(self):
+        for record in self:
+            received = 0
+            for deposit_rcd in record.contract_property_deposit_ids:
+                received += deposit_rcd.deposit_received
+            record.contract_deposit_amount_received = received
+            record.contract_deposit_amount_arrears = record.deposit_receivable - received
+
+    @api.onchange("contract_property_deposit_ids")
+    def _onchange_deposit_received(self):
+        received = 0
+        for deposit_rcd in self.contract_property_deposit_ids:
+            received += deposit_rcd.deposit_received
+        self.contract_deposit_amount_received = received
+        self.contract_deposit_amount_arrears = self.deposit_receivable - received
 
     _sql_constraints = [
         ('contract_property_rental_plan_unique', 'unique(contract_id, property_id)',
          "同一合同内，同一资产，不能有不同的租金方案"),
     ]
+
+    def action_confirm_deposit_received(self):
+        for record in self:
+            # 防止空点
+            if abs(record.deposit_receivable - record.contract_deposit_amount_received) < 0.01:
+                continue
+
+            received_bef = record.contract_deposit_amount_received
+            received_aft = record.deposit_receivable
+
+            record.contract_deposit_amount_received = received_aft
+            # 增加相应的分次收缴明细
+            deposit_detail = [{
+                "contract_rental_plan_rel_id": record.id,
+                "deposit_received": received_aft - received_bef,
+            }]
+            self.env["estate.lease.contract.property.deposit"].create(deposit_detail)

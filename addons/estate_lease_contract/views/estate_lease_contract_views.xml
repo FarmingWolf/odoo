@@ -74,9 +74,22 @@
                                 </group>
                             </group>
                             <group col="2">
-                                <field name="lease_deposit"/>
-                                <field name="rent_amount"/>
-                                <field name="rent_amount_year"/>
+                                <group>
+                                    <field name="lease_deposit"/>
+                                    <field name="lease_deposit_receivable"/>
+                                </group>
+                                <group>
+                                    <field name="lease_deposit_received"/>
+                                    <field name="lease_deposit_arrears" invisible="lease_deposit_arrears &lt; 0.01"/>
+                                </group>
+                            </group>
+                            <group col="2">
+                                <group>
+                                    <field name="rent_amount"/>
+                                </group>
+                                <group>
+                                    <field name="rent_amount_year"/>
+                                </group>
                             </group>
                         </group>
                         <group col="1">
@@ -160,11 +173,14 @@
                                     <field name="latest_monthly_rent" invisible="latest_monthly_rent &lt; 0.01"/>
                                     <field name="latest_annual_rent" invisible="latest_annual_rent &lt; 0.01"/>
                                     <field name="latest_payment_method"/>
+                                    <field name="deposit_amount" invisible="deposit_amount &lt; 0.01"/>
                                 </tree>
                             </field>
-                            <field name="contract_hist" readonly="1" invisible="state == 'recording'">
+                            <field name="contract_hist" invisible="state == 'recording'">
                                 <tree string="" decoration-success="contract_property_state=='sold'"
-                                      decoration-warning="contract_property_state=='canceled'">
+                                      decoration-warning="contract_property_state=='canceled'"
+                                      decoration-danger="contract_deposit_amount_arrears &gt; 0.01"
+                                      create="0" edit="1" delete="0" open_form_view="1">
                                     <field name="sequence" widget="handle"/>
                                     <field name="contract_property_name"/>
                                     <field name="contract_renter_id"/>
@@ -174,6 +190,9 @@
                                     <field name="contract_rent_amount_monthly"/>
                                     <field name="contract_rent_amount_year"/>
                                     <field name="contract_rent_payment_method"/>
+                                    <field name="contract_deposit_amount" invisible="contract_deposit_amount &lt; 0.01"/>
+                                    <field name="contract_deposit_amount_arrears" invisible="contract_deposit_amount_arrears &lt; 0.01"/>
+                                    <button type="object" name="action_confirm_deposit_received" title="点击确认押金已全部收齐（等于本行应收押金）" icon="fa-thumbs-o-up" groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面修改"/>
                                 </tree>
                             </field>
                         </page>

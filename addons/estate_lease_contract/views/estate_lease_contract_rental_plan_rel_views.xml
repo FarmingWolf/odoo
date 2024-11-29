@@ -42,21 +42,33 @@
                 <sheet>
                     <group col="2">
                         <group>
-                            <field name="contract_id"/>
-                            <field name="contract_property_name"/>
-                            <field name="rental_plan_id"/>
-                            <field name="contract_renter_id"/>
-                            <field name="contract_property_state"/>
-                            <field name="contract_rent_payment_method"/>
+                            <field name="contract_id" readonly="1"/>
+                            <field name="contract_property_name" readonly="1"/>
+                            <field name="rental_plan_id" readonly="1"/>
+                            <field name="contract_renter_id" readonly="1"/>
+                            <field name="contract_property_state" readonly="1"/>
+                            <field name="contract_rent_payment_method" readonly="1"/>
+                            <field name="contract_deposit_amount_received" digits="[12, 2]" readonly="1"/>
                         </group>
                         <group>
-                            <field name="contract_property_area"/>
-                            <field name="contract_property_rent_price"/>
-                            <field name="contract_rent_amount_monthly" digits="[12, 2]"/>
-                            <field name="contract_rent_amount_year" digits="[12, 2]"/>
-                            <field name="contract_deposit_amount" digits="[12, 2]"/>
-                            <field name="contract_deposit_months" digits="[3, 1]"/>
+                            <field name="contract_property_area" readonly="1"/>
+                            <field name="contract_property_rent_price" readonly="1"/>
+                            <field name="contract_rent_amount_monthly" digits="[12, 2]" readonly="1"/>
+                            <field name="contract_rent_amount_year" digits="[12, 2]" readonly="1"/>
+                            <field name="contract_deposit_amount" digits="[12, 2]" readonly="1"/>
+                            <field name="contract_deposit_months" digits="[3, 1]" readonly="1"/>
+                            <field name="contract_deposit_amount_arrears" digits="[12, 2]" readonly="1"/>
                         </group>
+                    </group>
+                    <group>
+                        <field name="contract_property_deposit_ids">
+                            <tree string="押金分次缴费明细" create="1" delete="1" edit="1" import="0" editable="bottom">
+                                <field name="date_received"/>
+                                <field name="deposit_received" digits="[12, 2]"/>
+                                <field name="deposit_received_sum" digits="[12, 2]"/>
+                                <field name="deposit_arrears" digits="[12, 2]"/>
+                            </tree>
+                        </field>
                     </group>
                 </sheet>
             </form>

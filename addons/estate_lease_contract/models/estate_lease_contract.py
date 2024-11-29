@@ -920,6 +920,9 @@ class EstateLeaseContract(models.Model):
             rent_amount_total = 0
             rent_amount_year_total = 0
             deposit_total = 0
+            deposit_receivable_total = 0
+            deposit_received_total = 0
+            deposit_arrears_total = 0
             if record.property_ids:
                 if record.state == "recording":
                     for rent_property in record.property_ids:
@@ -936,6 +939,9 @@ class EstateLeaseContract(models.Model):
                             rent_amount_year_total += rent_property.rent_amount_yearly_adjust
 
                         deposit_total += rent_property.deposit_amount
+                        deposit_receivable_total += rent_property.deposit_amount
+                        deposit_received_total += 0
+                        deposit_arrears_total += deposit_receivable_total
                 else:
                     for each_hist in record.contract_hist:
                         rent_cnt_total += 1
@@ -944,6 +950,9 @@ class EstateLeaseContract(models.Model):
                         rent_amount_total += each_hist.contract_rent_amount_monthly
                         rent_amount_year_total += each_hist.contract_rent_amount_year
                         deposit_total += each_hist.contract_deposit_amount
+                        deposit_receivable_total += each_hist.contract_deposit_amount
+                        deposit_received_total += each_hist.contract_deposit_amount_received
+                        deposit_arrears_total += each_hist.contract_deposit_amount_arrears
 
             record.rent_count = rent_cnt_total
             record.building_area = building_area_total
@@ -951,6 +960,9 @@ class EstateLeaseContract(models.Model):
             record.rent_amount = rent_amount_total
             record.rent_amount_year = rent_amount_year_total
             record.lease_deposit = deposit_total
+            record.lease_deposit_receivable = deposit_receivable_total
+            record.lease_deposit_received = deposit_received_total
+            record.lease_deposit_arrears = deposit_arrears_total
 
     rent_amount = fields.Float(default=0.0, string="总月租金（元/月）", compute="_calc_rent_total_info", readonly=True)
     rent_amount_year = fields.Float(default=0.0, string="总年租金（元/年）", compute="_calc_rent_total_info", readonly=True)
@@ -1029,6 +1041,12 @@ class EstateLeaseContract(models.Model):
     performance_guarantee = fields.Float(default=0.0, string="履约保证金（元）", tracking=True)
     lease_deposit = fields.Float(default=0.0, string="租赁押金（元）", compute="_calc_rent_total_info", tracking=True,
                                  copy=False)
+    lease_deposit_receivable = fields.Float(default=0.0, string="押金应收（元）", compute="_calc_rent_total_info",
+                                            tracking=True, copy=False)
+    lease_deposit_received = fields.Float(default=0.0, string="押金实收（元）", compute="_calc_rent_total_info",
+                                          tracking=True, copy=False)
+    lease_deposit_arrears = fields.Float(default=0.0, string="押金欠缴（元）", compute="_calc_rent_total_info",
+                                         tracking=True, copy=False)
     property_management_fee_guarantee = fields.Float(default=0.0, string="物管费保证金（元）", tracking=True)
 
     decoration_deposit = fields.Float(default=0.0, string="装修押金（元）", tracking=True, copy=False)
@@ -1446,16 +1464,16 @@ class EstateLeaseContract(models.Model):
 
     def _insert_contract_property_rental_plan_rel(self, records):
         _logger.info(f"进入 _insert_contract_property_rental_plan_rel 方法")
+        create_new = False
         if records:
             rgt_rcd = records
+            create_new = True
         else:
             rgt_rcd = self
+            create_new = False
 
         contract_rental_plan_rel = []
         for record in rgt_rcd:
-            # self.env['estate.lease.contract.rental.plan.rel'].flush_model(['contract_id'])
-            # self.env['estate.lease.contract.rental.plan.rel'].flush_model(['property_id'])
-            # self.env['estate.lease.contract.rental.plan.rel'].flush_model(['rental_plan_id'])
 
             for each_property in record.property_ids:
                 contract_rent_amount_monthly = each_property.rent_amount_monthly_adjust \
@@ -1474,20 +1492,25 @@ class EstateLeaseContract(models.Model):
                     "contract_property_building_area": each_property.building_area,
                     "contract_deposit_months": each_property.deposit_months,
                     "contract_deposit_amount": each_property.deposit_amount,
+                    "deposit_receivable": each_property.deposit_amount,
                     "contract_rent_amount_monthly": contract_rent_amount_monthly,
                     "contract_rent_amount_year": contract_rent_amount_yearly,
                     "contract_rent_payment_method": each_property.latest_payment_method,
                 })
-                # self.env.cr.execute("INSERT INTO estate_lease_contract_rental_plan_rel ("
-                #                     "contract_id, property_id, rental_plan_id, company_id) VALUES (%s, %s, %s, %s)",
-                #                     [record.id, each_property.id,
-                #                      each_property.rent_plan_id.id if each_property.rent_plan_id.id else None,
-                #                      self.env.user.company_id.id])
-            # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['contract_id'])
-            # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['property_id'])
-            # self.env['estate.lease.contract.rental.plan.rel'].invalidate_model(['rental_plan_id'])
+
         if contract_rental_plan_rel:
-            self.env['estate.lease.contract.rental.plan.rel'].create(contract_rental_plan_rel)
+            if create_new:
+                self.env['estate.lease.contract.rental.plan.rel'].create(contract_rental_plan_rel)
+            else:
+                for rel_data in contract_rental_plan_rel:
+                    search_domain = [('contract_id', '=', rel_data["contract_id"]),
+                                     ('property_id', '=', rel_data["property_id"]),
+                                     ('rental_plan_id', '=', rel_data["rental_plan_id"])]
+                    search_rst = self.env['estate.lease.contract.rental.plan.rel'].search(search_domain)
+                    if search_rst:
+                        search_rst.write(rel_data)
+                    else:
+                        search_rst.create(rel_data)
 
     @api.model
     def create(self, vals):
@@ -1560,8 +1583,11 @@ class EstateLeaseContract(models.Model):
             _logger.info(f"不更新合同-资产-租金方案历史表、不更新合同-注册地址历史表")
         else:
             # 合同-资产-租金方案历史表
-            self._delete_contract_property_rental_plan_rel()
+            """押金分次收缴表estate_lease_contract_property_deposit是合同资产方案关系表contract_property_rental_plan_rel的子表
+            押金收缴子表写入数据时依赖关系父表的id，所以不能采用上述删除→创建的方式，改为采用更新的方式"""
+            # self._delete_contract_property_rental_plan_rel()
             self._insert_contract_property_rental_plan_rel(None)
+
             # 合同-注册地址历史表
             self._delete_contract_registration_addr_rel()
             self._insert_contract_registration_addr_rel(None)

@@ -107,7 +107,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
         fields.Boolean(string="计费方式保底抽成取高组不可见",
                        compute="_compute_billing_method_group_invisible")
     deposit_months = fields.Float(string="押金月数", default=0)
-    deposit_amount = fields.Float(string="押金金额", default=0)
+    deposit_amount = fields.Float(string="押金(元)", default=0)
     # 物业费信息
     management_fee_name_description = fields.Char(string="方案描述", readonly=True,
                                                   compute="_get_property_management_fee_info")
