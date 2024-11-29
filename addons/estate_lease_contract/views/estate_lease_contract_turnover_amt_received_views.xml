@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="estate_lease_contract_turnover_amt_received_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.turnover.amt.received.form</field>
+        <field name="model">estate.lease.contract.turnover.amt.received</field>
+        <field name="arch" type="xml">
+            <form string="estate_lease_contract_turnover_amt_received_view_form"
+                  create="False" delete="False" edit="False">
+                <sheet>
+                    <group>
+                        <field name="party_a_unit_invisible" invisible="1"/>
+                        <field name="property_id"/>
+                        <field name="contract_id"/>
+                        <field name="renter_id"/>
+                        <field name="party_a_unit_id" invisible="party_a_unit_invisible"/>
+                        <field name="date_rent_start"/>
+                        <field name="date_rent_end"/>
+                        <field name="date_received"/>
+                        <field name="amount_type"/>
+                        <field name="amount_received" digits="[12, 2]"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_turnover_amt_received_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.turnover.amt.received.tree</field>
+        <field name="model">estate.lease.contract.turnover.amt.received</field>
+        <field name="arch" type="xml">
+            <tree string="estate_lease_contract_turnover_amt_received_view_tree" create="False" delete="False" edit="False" import="False" open_form_view="False">
+                <field name="party_a_unit_invisible" column_invisible="1"/>
+                <field name="property_id"/>
+                <field name="party_a_unit_id" invisible="party_a_unit_invisible" string=""/>
+                <field name="date_rent_start"/>
+                <field name="date_rent_end"/>
+                <field name="renter_id"/>
+                <field name="amount_type"/>
+                <field name="amount_received" digits="[12, 2]" sum="总计实收（元）"/>
+                <field name="date_received"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_turnover_amt_received_view_search" model="ir.ui.view">
+        <field name="name">estate.lease.contract.turnover.amt.received.view.search</field>
+        <field name="model">estate.lease.contract.turnover.amt.received</field>
+        <field name="arch" type="xml">
+            <search string="实收租金检索">
+                <filter string="实收月份" name="filter_date_received" date="date_received" default_period="last_month"/>
+                <separator/>
+                <filter string="截至本日" name="date_received_2_today"
+                        domain="[('date_received', '&lt;=', context_today())]"/>
+                <separator/>
+                <filter string="截至本月" name="date_received_2_this_m"
+                        domain="[('date_received', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="截至本年" name="date_received_2_this_y"
+                        domain="[('date_received', '&lt;', (context_today() + relativedelta(years=1, month=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <field string='租赁资产名称' name="property_id" operator="like"/>
+                <searchpanel>
+                    <field string='承租人' name="renter_id" context="{'group_by': 'renter_id'}"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_turnover_amt_received_action" model="ir.actions.act_window">
+        <field name="name">实收流水明细</field>
+        <field name="res_model">estate.lease.contract.turnover.amt.received</field>
+        <field name="view_id" ref="estate_lease_contract_turnover_amt_received_view_tree"/>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{
+            'search_default_filter_date_received': True,
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                这里显示资产租赁合同押金和各期租金明细的实际收缴明细。
+            </p>
+        </field>
+    </record>
+
+</odoo>

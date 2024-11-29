@@ -28,4 +28,18 @@
         <field name="active" eval="True"/> <!-- 设置任务为激活状态 -->
     </record>
 
+    <record id="estate_lease_contract_turnover_amount_received_daily_cron" model="ir.cron">
+        <field name="name">每日自动计算合同收款流水</field>
+        <field name="model_id" ref="estate_lease_contract.model_estate_lease_contract_turnover_amt_received"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field> <!-- -1 表示无限次执行 -->
+        <!-- 执行时间15：00，实际上是东八区的23:0，生成当日数据 -->
+        <field name="nextcall" eval="(DateTime.now().replace(hour=15, minute=00)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="doall" eval="True"/> <!-- True表示即使服务器关闭期间错过执行也会补执行 -->
+        <field name="code">model.automatic_daily_pick_turnover_amount_received()</field>
+        <field name="user_id" eval="2"/><!--admin-->
+        <field name="active" eval="True"/> <!-- 设置任务为激活状态 -->
+    </record>
+
 </odoo>
