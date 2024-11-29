@@ -33,6 +33,7 @@
             <field name="arch" type="xml">
                 <form string="Project" class="o_form_project_project" js_class="project_form">
                     <field name="company_id" invisible="1"/>
+                    <field name="department_id" invisible="1"/>
                     <field name="analytic_account_id" invisible="1"/>
                     <header>
                         <button name="%(project.project_share_wizard_action)d" string="Share Read-only" type="action" class="oe_highlight" groups="project.group_project_manager"
@@ -83,6 +84,7 @@
                             <field name="partner_id" widget="res_partner_many2one"/>
                             <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                             <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="department_id" invisible="1"/>
                         </group>
                         <group>
                             <field name="active" invisible="1"/>
@@ -186,6 +188,7 @@
                     <field name="tag_ids"/>
                     <field name="user_id" string="Project Manager"/>
                     <field name="stage_id" groups="project.group_project_stages"/>
+                    <field name="department_id" groups="project.group_project_manager"/>
                     <field name="partner_id" string="Customer" filter_domain="[('partner_id', 'child_of', self)]"/>
                     <filter string="My Projects" name="own_projects" domain="[('user_id', '=', uid)]"/>
                     <filter string="My Favorites" name="my_projects" domain="[('favorite_user_ids', 'in', uid)]"/>
@@ -211,7 +214,12 @@
                         <filter string="Status" name="status" context="{'group_by': 'last_update_status'}"/>
                         <filter string="Tags" name="tags" context="{'group_by': 'tag_ids'}"/>
                         <filter string="Company" name="company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                        <filter string="部门" name="department_id" context="{'group_by': 'department_id'}" groups="project.group_project_manager"/>
                     </group>
+                    <searchpanel>
+<!--                        <field name="company_id" groups="base.group_multi_company" icon="fa-building" enable_counters="1"/>-->
+                        <field string="部门" name="department_id" icon="fa-users" enable_counters="1"/>
+                    </searchpanel>
                 </search>
             </field>
         </record>
@@ -230,6 +238,7 @@
                     <field name="partner_id" optional="show" string="Customer"/>
                     <field name="company_id" optional="show" groups="base.group_multi_company" options="{'no_create': True, 'no_open': True}"/>
                     <field name="company_id" column_invisible="True"/>
+                    <field name="department_id" column_invisible="True"/>
                     <field name="date_start" string="Planned Date" widget="daterange" options="{'end_date_field': 'date', 'always_range': '1'}" optional="hide"/>
                     <field name="date" column_invisible="True" />
                     <field name="user_id" optional="show" string="Project Manager" widget="many2one_avatar_user" options="{'no_open':True, 'no_create': True, 'no_create_edit': True}"/>

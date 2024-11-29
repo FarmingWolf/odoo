@@ -143,6 +143,8 @@ class Project(models.Model):
                                domain=lambda self: [('state', 'in', self.env['project.task'].OPEN_STATES)])
     color = fields.Integer(string='Color Index')
     user_id = fields.Many2one('res.users', string='Project Manager', default=lambda self: self.env.user, tracking=True)
+
+    department_id = fields.Many2one('hr.department', related="user_id.employee_id.department_id", store=True)
     alias_id = fields.Many2one(help="Internal email associated with this project. Incoming emails are automatically synchronized "
                                     "with Tasks (or optionally Issues if the Issue Tracker module is installed).")
     privacy_visibility = fields.Selection([

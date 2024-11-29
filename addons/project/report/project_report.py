@@ -20,6 +20,7 @@ class ReportProjectTaskUser(models.Model):
     date_deadline = fields.Datetime(string='Deadline', readonly=True)
     date_last_stage_update = fields.Datetime(string='Last Stage Update', readonly=True)
     project_id = fields.Many2one('project.project', string='Project', readonly=True)
+    department_id = fields.Many2one('hr.department', related="project_id.department_id")
     working_days_close = fields.Float(string='Working Days to Close',
         digits=(16, 2), readonly=True, group_operator="avg")
     working_days_open = fields.Float(string='Working Days to Assign',
@@ -90,6 +91,7 @@ class ReportProjectTaskUser(models.Model):
                 t.working_days_open,
                 t.working_hours_open,
                 t.working_hours_close,
+                t.department_id,
                 (extract('epoch' from (t.date_deadline-(now() at time zone 'UTC'))))/(3600*24) as delay_endings_days,
                 COUNT(td.task_id) as dependent_ids_count
         """
@@ -117,6 +119,7 @@ class ReportProjectTaskUser(models.Model):
                 t.working_hours_open,
                 t.working_hours_close,
                 t.milestone_id,
+                t.department_id,
                 pm.id,
                 td.depends_on_id
         """
