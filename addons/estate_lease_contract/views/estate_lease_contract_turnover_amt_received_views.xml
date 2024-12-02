@@ -60,6 +60,9 @@
                         domain="[('date_received', '&lt;', (context_today() + relativedelta(years=1, month=1, day=1)).strftime('%Y-%m-%d'))]"/>
                 <separator/>
                 <field string='租赁资产名称' name="property_id" operator="like"/>
+                <separator/>
+                <filter string="合同租金" name="amount_type_rental" domain="[('amount_type','=', 'contract_rental')]"/>
+                <filter string="合同押金" name="amount_type_deposit" domain="[('amount_type','=', 'contract_deposit')]"/>
                 <searchpanel>
                     <field string='承租人' name="renter_id" context="{'group_by': 'renter_id'}"/>
                 </searchpanel>

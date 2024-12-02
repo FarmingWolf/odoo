@@ -78,6 +78,14 @@ class EstateLeaseContractPropertyRentalDetail(models.Model):
 
     rental_detail_sub_ids = fields.One2many(comodel_name="estate.lease.contract.property.rental.detail.sub",
                                             inverse_name="rental_detail_id", string="分次缴费明细")
+    button_icon_invisible = fields.Boolean(string="切换操作按钮", default=True)
+
+    def action_show_button_icons(self):
+        for record in self:
+            if record.button_icon_invisible:
+                record.button_icon_invisible = False
+            else:
+                record.button_icon_invisible = True
 
     @api.depends("property_id", "contract_id", "rental_period_no", "period_date_from", "period_date_to")
     def _compute_detail_name(self):

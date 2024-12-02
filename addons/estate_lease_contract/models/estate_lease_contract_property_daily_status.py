@@ -34,16 +34,22 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
     cal_date_s = fields.Date(string="重计算开始日期")
     cal_date_e = fields.Date(string="重计算结束日期")
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
-    property_rental_receivable_today = fields.Float(string="本日应收")
-    property_rental_receivable_week = fields.Float(string="本周应收")
-    property_rental_receivable_month = fields.Float(string="本月应收")
-    property_rental_receivable_quarter = fields.Float(string="本季应收")
-    property_rental_receivable_year = fields.Float(string="本年应收")
-    property_rental_received_today = fields.Float(string="本日实收")
-    property_rental_received_week = fields.Float(string="本周实收")
-    property_rental_received_month = fields.Float(string="本月实收")
-    property_rental_received_quarter = fields.Float(string="本季实收")
-    property_rental_received_year = fields.Float(string="本年实收")
+    property_rental_receivable_today = fields.Float(string="本日应收租金")
+    property_rental_receivable_week = fields.Float(string="本周应收租金")
+    property_rental_receivable_month = fields.Float(string="本月应收租金")
+    property_rental_receivable_quarter = fields.Float(string="本季应收租金")
+    property_rental_receivable_year = fields.Float(string="本年应收租金")
+    property_rental_received_today = fields.Float(string="本日实收租金")
+    property_rental_received_week = fields.Float(string="本周实收租金")
+    property_rental_received_month = fields.Float(string="本月实收租金")
+    property_rental_received_quarter = fields.Float(string="本季实收租金")
+    property_rental_received_year = fields.Float(string="本年实收租金")
+    # 押金
+    property_rent_deposit_received_today = fields.Float(string="本日实收押金")
+    property_rent_deposit_received_week = fields.Float(string="本周实收押金")
+    property_rent_deposit_received_month = fields.Float(string="本月实收押金")
+    property_rent_deposit_received_quarter = fields.Float(string="本季实收押金")
+    property_rent_deposit_received_year = fields.Float(string="本年实收押金")
 
     @api.model
     def create(self, vals):
@@ -93,6 +99,25 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                 in_rental_info['property_rental_received_year'] += detail_sub.rental_received
 
         return in_rental_info
+
+    def calc_rent_deposit_info(self, in_contract_id, in_property_id, in_date, in_rent_deposit_info):
+
+        deposit_details = self.env["estate.lease.contract.property.deposit"].search(
+            [('contract_id', '=', in_contract_id), ('property_id', '=', in_property_id)])
+
+        for deposit_rcd in deposit_details:
+            if deposit_rcd.date_received == in_date:
+                in_rent_deposit_info['property_rent_deposit_received_today'] += deposit_rcd.deposit_received
+            if end_of(deposit_rcd.date_received, 'week') == end_of(in_date, 'week'):
+                in_rent_deposit_info['property_rent_deposit_received_week'] += deposit_rcd.deposit_received
+            if end_of(deposit_rcd.date_received, 'month') == end_of(in_date, 'month'):
+                in_rent_deposit_info['property_rent_deposit_received_month'] += deposit_rcd.deposit_received
+            if end_of(deposit_rcd.date_received, 'quarter') == end_of(in_date, 'quarter'):
+                in_rent_deposit_info['property_rent_deposit_received_quarter'] += deposit_rcd.deposit_received
+            if end_of(deposit_rcd.date_received, 'year') == end_of(in_date, 'year'):
+                in_rent_deposit_info['property_rent_deposit_received_year'] += deposit_rcd.deposit_received
+
+        return in_rent_deposit_info
 
     def automatic_daily_calc_status(self):
         _logger.info("开始做成资产租赁状态每日数据")
@@ -183,6 +208,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_rental_received_quarter": 0,
                         "property_rental_received_year": 0,
                     }
+                    rent_deposit_info = {
+                        "property_rent_deposit_received_today": 0,
+                        "property_rent_deposit_received_week": 0,
+                        "property_rent_deposit_received_month": 0,
+                        "property_rent_deposit_received_quarter": 0,
+                        "property_rent_deposit_received_year": 0,
+                    }
                     record_rental_info = rental_info
                     # 合同有效时才设置其资产已租状态,业务上、理论上和逻辑上时间段不会重叠
                     for contract in property_contract:
@@ -204,6 +236,9 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
 
                             record_rental_info = self.calc_record_rental_info(contract.id, each_property.id,
                                                                               record_status_date, rental_info)
+                            # 押金收取情况
+                            rent_deposit_info = self.calc_rent_deposit_info(contract.id, each_property.id,
+                                                                            record_status_date, rent_deposit_info)
 
                     if record_contract_id:
                         record_contract_id_id = record_contract_id.id
@@ -220,6 +255,10 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                     for contract in property_contract_invalid:
                         record_rental_info = self.calc_record_rental_info(contract.id, each_property.id,
                                                                           record_status_date, record_rental_info)
+
+                        # 无效合同中，在过去尚有效期间的押金收取情况
+                        rent_deposit_info = self.calc_rent_deposit_info(contract.id, each_property.id,
+                                                                        record_status_date, rent_deposit_info)
 
                     self.env['estate.lease.contract.property.daily.status'].create({
                         'name': record_name,
@@ -248,6 +287,11 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_rental_received_month": record_rental_info['property_rental_received_month'],
                         "property_rental_received_quarter": record_rental_info['property_rental_received_quarter'],
                         "property_rental_received_year": record_rental_info['property_rental_received_year'],
+                        "property_rent_deposit_received_today": rent_deposit_info['property_rent_deposit_received_today'],
+                        "property_rent_deposit_received_week": rent_deposit_info['property_rent_deposit_received_week'],
+                        "property_rent_deposit_received_month": rent_deposit_info['property_rent_deposit_received_month'],
+                        "property_rent_deposit_received_quarter": rent_deposit_info['property_rent_deposit_received_quarter'],
+                        "property_rent_deposit_received_year": rent_deposit_info['property_rent_deposit_received_year'],
                     })
                     int_cnt += 1
 

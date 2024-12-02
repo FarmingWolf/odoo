@@ -18,7 +18,7 @@ class EstateDashboardService:
             f"AND company_id =  {company_id};")
         latest_property_detail_record = env.cr.fetchall()
         for record_tuple in latest_property_detail_record:
-            latest_property_detail_ids.append(record_tuple[0])  # 假设id是每条记录的第一个元素
+            latest_property_detail_ids.append(record_tuple[0])  # 每条记录的第一个元素：id
 
         if latest_property_detail_ids:
             latest_property_detail = env['estate.lease.contract.property.daily.status'].browse(
@@ -50,7 +50,7 @@ class EstateDashboardService:
         unconventional_price_avg = 0.0
         ratio_unconventional_cnt = 1.00
         ratio_unconventional_area = 1.00
-        # 应收实收
+        # 租金应收实收
         rental_receivable_today = 0.0
         rental_receivable_week = 0.0
         rental_receivable_month = 0.0
@@ -61,6 +61,12 @@ class EstateDashboardService:
         rental_received_month = 0.0
         rental_received_quarter = 0.0
         rental_received_year = 0.0
+        # 押金实收
+        rent_deposit_received_today = 0.0
+        rent_deposit_received_week = 0.0
+        rent_deposit_received_month = 0.0
+        rent_deposit_received_quarter = 0.0
+        rent_deposit_received_year = 0.0
 
         for record_detail in latest_property_detail:
             estate_property_quantity += 1
@@ -92,6 +98,11 @@ class EstateDashboardService:
             rental_received_month += record_detail.property_rental_received_month
             rental_received_quarter += record_detail.property_rental_received_quarter
             rental_received_year += record_detail.property_rental_received_year
+            rent_deposit_received_today += record_detail.property_rent_deposit_received_today
+            rent_deposit_received_week += record_detail.property_rent_deposit_received_week
+            rent_deposit_received_month += record_detail.property_rent_deposit_received_month
+            rent_deposit_received_quarter += record_detail.property_rent_deposit_received_quarter
+            rent_deposit_received_year += record_detail.property_rent_deposit_received_year
 
         if estate_property_quantity != 0:
             ratio_property_quantity = estate_property_lease_quantity / estate_property_quantity
@@ -194,4 +205,9 @@ class EstateDashboardService:
             'rental_received_month': round(rental_received_month, 2),
             'rental_received_quarter': round(rental_received_quarter, 2),
             'rental_received_year': round(rental_received_year, 2),
+            'rent_deposit_received_today': round(rent_deposit_received_today, 2),
+            'rent_deposit_received_week': round(rent_deposit_received_week, 2),
+            'rent_deposit_received_month': round(rent_deposit_received_month, 2),
+            'rent_deposit_received_quarter': round(rent_deposit_received_quarter, 2),
+            'rent_deposit_received_year': round(rent_deposit_received_year, 2),
         }
