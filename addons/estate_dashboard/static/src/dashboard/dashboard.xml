@@ -10,18 +10,20 @@
             </t>
 
             <t t-if="statistics.isReady">
-                <t t-foreach="statistics.data" t-as="each_company_data" t-key="each_company_data">
-                    <t t-if="Object.values(companies).length &gt; 1">
-                        <div t-esc="companies[each_company_data].name" class="o_company_name"/>
-                    </t>
-                    <div class="d-flex flex-wrap">
-                        <t t-foreach="items" t-as="item" t-key="item.id">
-                            <DashboardItem t-if="(state.configurationSet == 'yes' and !state.disabledItems.includes(item.id)) || (state.configurationSet != 'yes' and state.displayed_ini.includes(item.id))" size="item.size || 1">
-                                <t t-set="itemProp" t-value="item.props ? item.props(statistics.data[each_company_data]) : {'data': statistics.data[each_company_data]}"/>
-                                <t t-component="item.Component" t-props="itemProp"/>
-                            </DashboardItem>
+                <t t-if="showPropertyDashboard">
+                    <t t-foreach="statistics.data" t-as="each_company_data" t-key="each_company_data">
+                        <t t-if="Object.values(companies).length &gt; 1">
+                            <div t-esc="companies[each_company_data].name" class="o_company_name"/>
                         </t>
-                    </div>
+                        <div class="d-flex flex-wrap">
+                            <t t-foreach="items" t-as="item" t-key="item.id">
+                                <DashboardItem t-if="(state.configurationSet == 'yes' and !state.disabledItems.includes(item.id)) || (state.configurationSet != 'yes' and state.displayed_ini.includes(item.id))" size="item.size || 1">
+                                    <t t-set="itemProp" t-value="item.props ? item.props(statistics.data[each_company_data]) : {'data': statistics.data[each_company_data]}"/>
+                                    <t t-component="item.Component" t-props="itemProp"/>
+                                </DashboardItem>
+                            </t>
+                        </div>
+                    </t>
                 </t>
             </t>
         </Layout>

@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import {Component, useState} from "@odoo/owl";
+import {Component, onWillStart, useState} from "@odoo/owl";
 import {registry} from "@web/core/registry";
 import {Layout} from "@web/search/layout";
 import {useService} from "@web/core/utils/hooks";
@@ -53,7 +53,11 @@ class EstateDashboard extends Component {
         console.log("Initialized companies:", this.companies);
         console.log("Initialized statistics:", this.statistics);
         console.log("Initialized statistics.isReady:", this.statistics.isReady);
+        this.showPropertyDashboard = false;
 
+        onWillStart(async () => {
+            this.showPropertyDashboard = await this.userService.hasGroup("estate.estate_group_manager");
+        });
         /**
         // 202408250730 从这里获取所有数据
         for (const companyId in user_companies.allowed_companies) {
