@@ -1512,6 +1512,20 @@ class EstateLeaseContract(models.Model):
                     else:
                         search_rst.create(rel_data)
 
+        # 界面上操作了删除的租赁标的
+        for record in self:
+            del_domain = [('contract_id', '=', record.id)]
+            rel_rcd_exist = self.env['estate.lease.contract.rental.plan.rel'].search(del_domain)
+            for old_rcd in rel_rcd_exist:
+                old_rcd_exist = False
+                for new_rcd in contract_rental_plan_rel:
+                    if old_rcd.property_id.id == new_rcd["property_id"]:
+                        old_rcd_exist = True
+                        continue
+                if not old_rcd_exist:
+                    _logger.info(f"删除old_rcd={old_rcd}")
+                    old_rcd.unlink()
+
     @api.model
     def create(self, vals):
         # 将contract_id,property_id,rental_plan_id 写进 estate.lease.contract.rental.plan.rel 表

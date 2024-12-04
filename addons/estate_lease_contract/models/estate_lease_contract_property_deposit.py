@@ -20,7 +20,7 @@ class EstateLeaseContractPropertyDeposit(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     contract_rental_plan_rel_id = fields.Many2one(comodel_name='estate.lease.contract.rental.plan.rel',
-                                                  string='合同-资产关系表ID', required=True)
+                                                  string='合同-资产关系表ID', required=True, ondelete="cascade")
     deposit_received = fields.Float(default=0.0, string="本次实收(元)", tracking=True)
 
     date_received = fields.Date(string="实收日期", default=lambda self: fields.Date.context_today(self), tracking=True)
