@@ -153,7 +153,7 @@ class Project(models.Model):
             ('portal', 'Invited portal users and all internal users (public)'),
         ],
         string='Visibility', required=True,
-        default='portal',
+        default='followers',
         help="People to whom this project and its tasks will be visible.\n\n"
             "- Invited internal users: when following a project, internal users will get access to all of its tasks without distinction. "
             "Otherwise, they will only get access to the specific tasks they are following.\n "
