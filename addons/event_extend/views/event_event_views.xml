@@ -124,9 +124,9 @@
                                 string="进出场单" title="点击打印进出场单" help="财务确认收款后方可打印进出场单"/>
                     </div>
                 </xpath>
-                <xpath expr="//notebook" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
+<!--                <xpath expr="//notebook" position="attributes">-->
+<!--                    <attribute name="invisible">1</attribute>-->
+<!--                </xpath>-->
 
             </field>
         </record>
