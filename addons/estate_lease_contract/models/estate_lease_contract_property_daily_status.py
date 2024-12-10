@@ -77,26 +77,32 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
         for rental_detail in details:
             if rental_detail.date_payment == in_date:
                 in_rental_info['property_rental_receivable_today'] += rental_detail.rental_receivable
-            if end_of(rental_detail.date_payment, 'week') == end_of(in_date, 'week'):
-                in_rental_info['property_rental_receivable_week'] += rental_detail.rental_receivable
-            if end_of(rental_detail.date_payment, 'month') == end_of(in_date, 'month'):
-                in_rental_info['property_rental_receivable_month'] += rental_detail.rental_receivable
-            if end_of(rental_detail.date_payment, 'quarter') == end_of(in_date, 'quarter'):
-                in_rental_info['property_rental_receivable_quarter'] += rental_detail.rental_receivable
-            if end_of(rental_detail.date_payment, 'year') == end_of(in_date, 'year'):
-                in_rental_info['property_rental_receivable_year'] += rental_detail.rental_receivable
+            if rental_detail.date_payment:
+                if end_of(rental_detail.date_payment, 'week') == end_of(in_date, 'week'):
+                    in_rental_info['property_rental_receivable_week'] += rental_detail.rental_receivable
+                if end_of(rental_detail.date_payment, 'month') == end_of(in_date, 'month'):
+                    in_rental_info['property_rental_receivable_month'] += rental_detail.rental_receivable
+                if end_of(rental_detail.date_payment, 'quarter') == end_of(in_date, 'quarter'):
+                    in_rental_info['property_rental_receivable_quarter'] += rental_detail.rental_receivable
+                if end_of(rental_detail.date_payment, 'year') == end_of(in_date, 'year'):
+                    in_rental_info['property_rental_receivable_year'] += rental_detail.rental_receivable
+            else:
+                _logger.error(f"rental_detail.date_payment为空，请确认！rental_detail.id={rental_detail.id}")
 
         for detail_sub in detail_subs:
             if detail_sub.date_received == in_date:
                 in_rental_info['property_rental_received_today'] += detail_sub.rental_received
-            if end_of(detail_sub.date_received, 'week') == end_of(in_date, 'week'):
-                in_rental_info['property_rental_received_week'] += detail_sub.rental_received
-            if end_of(detail_sub.date_received, 'month') == end_of(in_date, 'month'):
-                in_rental_info['property_rental_received_month'] += detail_sub.rental_received
-            if end_of(detail_sub.date_received, 'quarter') == end_of(in_date, 'quarter'):
-                in_rental_info['property_rental_received_quarter'] += detail_sub.rental_received
-            if end_of(detail_sub.date_received, 'year') == end_of(in_date, 'year'):
-                in_rental_info['property_rental_received_year'] += detail_sub.rental_received
+            if detail_sub.date_received:
+                if end_of(detail_sub.date_received, 'week') == end_of(in_date, 'week'):
+                    in_rental_info['property_rental_received_week'] += detail_sub.rental_received
+                if end_of(detail_sub.date_received, 'month') == end_of(in_date, 'month'):
+                    in_rental_info['property_rental_received_month'] += detail_sub.rental_received
+                if end_of(detail_sub.date_received, 'quarter') == end_of(in_date, 'quarter'):
+                    in_rental_info['property_rental_received_quarter'] += detail_sub.rental_received
+                if end_of(detail_sub.date_received, 'year') == end_of(in_date, 'year'):
+                    in_rental_info['property_rental_received_year'] += detail_sub.rental_received
+            else:
+                _logger.error(f"detail_sub.date_received为空，请确认！detail_sub.id={detail_sub.id}")
 
         return in_rental_info
 
@@ -108,14 +114,17 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
         for deposit_rcd in deposit_details:
             if deposit_rcd.date_received == in_date:
                 in_rent_deposit_info['property_rent_deposit_received_today'] += deposit_rcd.deposit_received
-            if end_of(deposit_rcd.date_received, 'week') == end_of(in_date, 'week'):
-                in_rent_deposit_info['property_rent_deposit_received_week'] += deposit_rcd.deposit_received
-            if end_of(deposit_rcd.date_received, 'month') == end_of(in_date, 'month'):
-                in_rent_deposit_info['property_rent_deposit_received_month'] += deposit_rcd.deposit_received
-            if end_of(deposit_rcd.date_received, 'quarter') == end_of(in_date, 'quarter'):
-                in_rent_deposit_info['property_rent_deposit_received_quarter'] += deposit_rcd.deposit_received
-            if end_of(deposit_rcd.date_received, 'year') == end_of(in_date, 'year'):
-                in_rent_deposit_info['property_rent_deposit_received_year'] += deposit_rcd.deposit_received
+            if deposit_rcd.date_received:
+                if end_of(deposit_rcd.date_received, 'week') == end_of(in_date, 'week'):
+                    in_rent_deposit_info['property_rent_deposit_received_week'] += deposit_rcd.deposit_received
+                if end_of(deposit_rcd.date_received, 'month') == end_of(in_date, 'month'):
+                    in_rent_deposit_info['property_rent_deposit_received_month'] += deposit_rcd.deposit_received
+                if end_of(deposit_rcd.date_received, 'quarter') == end_of(in_date, 'quarter'):
+                    in_rent_deposit_info['property_rent_deposit_received_quarter'] += deposit_rcd.deposit_received
+                if end_of(deposit_rcd.date_received, 'year') == end_of(in_date, 'year'):
+                    in_rent_deposit_info['property_rent_deposit_received_year'] += deposit_rcd.deposit_received
+            else:
+                _logger.error(f"deposit_rcd.date_received为空，请确认！deposit_rcd.id={deposit_rcd.id}")
 
         return in_rent_deposit_info
 
