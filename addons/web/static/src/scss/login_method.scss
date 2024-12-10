@@ -15,3 +15,17 @@
     right: 0px;
     top: -20px;
 }
+
+/* 在小屏幕上隐藏元素 */
+@media only screen and (max-width: 768px) {
+    #mobile-hide-sw-btn {
+        display: none;
+    }
+}
+
+/* 在更大屏幕上显示 */
+@media only screen and (min-width: 769px) {
+    #mobile-hide-sw-btn {
+        display: block; /* 或者 inline, flex 等其他合适的值 */
+    }
+}
