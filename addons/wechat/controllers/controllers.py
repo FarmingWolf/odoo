@@ -299,7 +299,7 @@ class WechatHandle(Home):
     """继承web.controllers.home覆盖web_login方法"""
     @http.route('/web/login', type='http', auth="none")
     def web_login(self, *args, **kw):
-
+        # todo 确认可否给args传递tgt_url
         response = super().web_login(*args, **kw)
         _logger.info(f"response.is_qweb={response.is_qweb}")
         _logger.info(f"response.status_code={response.status_code}")

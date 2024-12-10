@@ -59,10 +59,21 @@ class MenuController(Home):
             tgt_url = f'/web#action={action_id}'
 
         _logger.info(f"tgt_url={tgt_url}")
+        request.session['wechat_tgt_url'] = tgt_url
         # 检查用户是否已登录
         if request.session.uid:
             _logger.info(f"用户已登录：uid={request.session.uid}")
-            # 用户已登录，直接重定向到目标页面：资产看板estate_dashboard.dashboard
+            # 用户已登录，直接重定向到目标页面：资产看板estate_dashboard.dashboard/工作汇报
+            """强制静默登录，排除安卓/鸿蒙系统的重定向至login页面的bug"""
+            wechat_usr = request.env['wechat.users'].sudo().search(
+                [('res_user_id', '=', request.session.uid)], order="id DESC",
+                limit=1)
+
+            if wechat_usr:
+                _logger.info(f"静默登录:{wechat_usr[0]}")
+                return wechat_user_silent_login(self, wechat_usr[0], tgt_url)
+
+            # 如果上述wechat_user没找到那么由框架决定进入登录页与否
             return request.redirect(tgt_url)
 
         else:

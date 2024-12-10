@@ -179,12 +179,15 @@ class WechatQRCodeHandle(Home):
 
         open_id = data['openid']
         union_id = data['unionid']
+        _logger.info(f"来自微信的回调：open_id={open_id};union_id={union_id}")
 
         # 检查用户是否已认证
         wx_user = get_wx_user_by_union_id(union_id)
         _logger.info(f"wx_user={wx_user}")
 
         if not wx_user:
+            request.session['callback_data_open_id'] = open_id
+            request.session['callback_data_union_id'] = union_id
             # 未认证用户，跳转至登录页面
             msg = "欢迎使用微信扫码登录系统。由于这是您第一次登录系统，请输入系统用户名和密码点击登录按钮，将系统用户绑定至您的微信。"
             # return request.render('wechat.login', {
