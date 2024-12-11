@@ -172,12 +172,27 @@ class WechatHandle(Home):
                         rec_msg = receive.parse_xml(web_data)
                         _logger.info(f"rec_msg in post:{rec_msg}")
 
-                        if isinstance(rec_msg, receive.Msg) and rec_msg.MsgType == 'text':
+                        if isinstance(rec_msg, receive.Msg):
                             to_user = rec_msg.FromUserName
                             from_user = rec_msg.ToUserName
-                            content = "test text"
-                            reply_msg = reply.TextMsg(to_user, from_user, content)
-                            return reply_msg.send()
+
+                            if rec_msg.MsgType == 'text':
+                                content = "您好！公众号交互功能研发中，将陆续上线，敬请期待！"
+                                reply_msg = reply.TextMsg(to_user, from_user, content)
+                                return reply_msg.send()
+                            elif rec_msg.MsgType == 'event':
+                                if rec_msg.Event == 'subscribe':
+                                    content = "您好！欢迎关注491科技！北京四九一科技公司坐落于北京朝阳491园区。" \
+                                              "我们是一支充满激情朝气磅礴的团队！我们的愿景是试图通过构建一个具有颠覆意义的软件系统、" \
+                                              "一个具有颠覆意义的产品！以此提升每一家中小企业的产品品质， " \
+                                              "来解决各位在商业活动中遇到的诸多经营问题！"
+                                    reply_msg = reply.TextMsg(to_user, from_user, content)
+                                    return reply_msg.send()
+
+                                _logger.info(f"rec_msg.MsgType=event, rec_msg.Event={rec_msg.Event}")
+
+                            _logger.info(f"其他情况待处理:rec_msg.MsgType={rec_msg.MsgType}")
+                            return "success"
                         else:
                             _logger.info("暂且不处理")
                             return "success"
