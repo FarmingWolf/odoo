@@ -63,6 +63,10 @@
                 <separator/>
                 <filter string="合同租金" name="amount_type_rental" domain="[('amount_type','=', 'contract_rental')]"/>
                 <filter string="合同押金" name="amount_type_deposit" domain="[('amount_type','=', 'contract_deposit')]"/>
+                <filter string="水费" name="amount_type_water" domain="[('amount_type','=', 'contract_fee_water')]"/>
+                <filter string="电费" name="amount_type_electricity" domain="[('amount_type','=', 'contract_fee_electricity')]"/>
+                <filter string="电力维护费" name="amount_type_electricity_maintenance" domain="[('amount_type','=', 'contract_fee_electricity_maintenance')]"/>
+                <filter string="物业费" name="amount_type_maintenance" domain="[('amount_type','=', 'contract_fee_maintenance')]"/>
                 <searchpanel>
                     <field string='承租人' name="renter_id" context="{'group_by': 'renter_id'}"/>
                 </searchpanel>
