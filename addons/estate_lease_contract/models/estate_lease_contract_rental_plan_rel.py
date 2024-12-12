@@ -42,6 +42,18 @@ class EstateLeaseContractRentalPlanRel(models.Model):
     contract_property_deposit_ids = fields.One2many(comodel_name="estate.lease.contract.property.deposit",
                                                     inverse_name="contract_rental_plan_rel_id", string="押金收缴明细")
 
+    contract_property_fee_water_ids = fields.One2many(comodel_name="estate.lease.contract.property.fee.water",
+                                                      inverse_name="contract_rental_plan_rel_id", string="水费明细")
+    contract_property_fee_electricity_ids = fields.One2many(
+        comodel_name="estate.lease.contract.property.fee.electricity",
+        inverse_name="contract_rental_plan_rel_id", string="电费明细")
+    contract_property_fee_electricity_maintenance_ids = fields.One2many(
+        comodel_name="estate.lease.contract.property.fee.electricity.maintenance",
+        inverse_name="contract_rental_plan_rel_id", string="电力维护费明细")
+    contract_property_fee_maintenance_ids = fields.One2many(
+        comodel_name="estate.lease.contract.property.fee.maintenance",
+        inverse_name="contract_rental_plan_rel_id", string="物业费明细")
+
     @api.depends("contract_property_deposit_ids")
     def _calc_deposit_received(self):
         for record in self:

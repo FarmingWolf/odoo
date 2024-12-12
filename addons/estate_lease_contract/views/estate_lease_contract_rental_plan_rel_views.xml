@@ -60,16 +60,74 @@
                             <field name="contract_deposit_amount_arrears" digits="[12, 2]" readonly="1"/>
                         </group>
                     </group>
-                    <group>
-                        <field name="contract_property_deposit_ids">
-                            <tree string="押金分次缴费明细" create="1" delete="1" edit="1" import="0" editable="bottom">
-                                <field name="date_received"/>
-                                <field name="deposit_received" digits="[12, 2]"/>
-                                <field name="deposit_received_sum" digits="[12, 2]"/>
-                                <field name="deposit_arrears" digits="[12, 2]"/>
-                            </tree>
-                        </field>
-                    </group>
+                    <notebook>
+                        <page string="押金明细" >
+                            <field name="contract_property_deposit_ids" nolabel="1">
+                                <tree create="1" delete="1" edit="1" import="0" editable="bottom">
+                                    <field name="date_received"/>
+                                    <field name="deposit_received" digits="[12, 2]"/>
+                                    <field name="deposit_received_sum" digits="[12, 2]"/>
+                                    <field name="deposit_arrears" digits="[12, 2]"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="水费明细">
+                            <field name="contract_property_fee_water_ids" nolabel="1">
+                                <tree create="1" delete="1" edit="1" import="0" editable="bottom">
+                                    <field name="period_d_start"/>
+                                    <field name="period_d_end"/>
+                                    <field name="date_received"/>
+                                    <field name="water_receivable" digits="[12, 2]"/>
+                                    <field name="water_received" digits="[12, 2]"/>
+                                    <field name="water_arrears" digits="[12, 2]"/>
+                                    <field name="water_received_sum" digits="[12, 2]"/>
+                                    <field name="water_arrears_sum" digits="[12, 2]"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="电费明细">
+                            <field name="contract_property_fee_electricity_ids" nolabel="1">
+                                <tree create="1" delete="1" edit="1" import="0" editable="bottom">
+                                    <field name="period_d_start"/>
+                                    <field name="period_d_end"/>
+                                    <field name="date_received"/>
+                                    <field name="electricity_receivable" digits="[12, 2]"/>
+                                    <field name="electricity_received" digits="[12, 2]"/>
+                                    <field name="electricity_arrears" digits="[12, 2]"/>
+                                    <field name="electricity_received_sum" digits="[12, 2]"/>
+                                    <field name="electricity_arrears_sum" digits="[12, 2]"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="电力维护费明细">
+                            <field name="contract_property_fee_electricity_maintenance_ids" nolabel="1">
+                                <tree create="1" delete="1" edit="1" import="0" editable="bottom">
+                                    <field name="period_d_start"/>
+                                    <field name="period_d_end"/>
+                                    <field name="date_received"/>
+                                    <field name="electricity_maintenance_receivable" digits="[12, 2]"/>
+                                    <field name="electricity_maintenance_received" digits="[12, 2]"/>
+                                    <field name="electricity_maintenance_arrears" digits="[12, 2]"/>
+                                    <field name="electricity_maintenance_received_sum" digits="[12, 2]"/>
+                                    <field name="electricity_maintenance_arrears_sum" digits="[12, 2]"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="物业费明细">
+                            <field name="contract_property_fee_maintenance_ids" nolabel="1">
+                                <tree create="1" delete="1" edit="1" import="0" editable="bottom">
+                                    <field name="period_d_start"/>
+                                    <field name="period_d_end"/>
+                                    <field name="date_received"/>
+                                    <field name="maintenance_receivable" digits="[12, 2]"/>
+                                    <field name="maintenance_received" digits="[12, 2]"/>
+                                    <field name="maintenance_arrears" digits="[12, 2]"/>
+                                    <field name="maintenance_received_sum" digits="[12, 2]"/>
+                                    <field name="maintenance_arrears_sum" digits="[12, 2]"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>

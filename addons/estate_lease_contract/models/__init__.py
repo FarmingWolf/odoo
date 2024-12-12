@@ -19,6 +19,10 @@ from . import estate_lease_contract_property_management_fee_plan
 from . import estate_lease_contract_rental_plan
 from . import estate_lease_contract_property_deposit
 from . import estate_lease_contract_rental_plan_rel
+from . import estate_lease_contract_property_fee_water
+from . import estate_lease_contract_property_fee_electricity
+from . import estate_lease_contract_property_fee_electricity_maintenance
+from . import estate_lease_contract_property_fee_maintenance
 from . import estate_lease_contract_registration_addr_rel
 from . import estate_lease_contract
 from . import estate_lease_contract_property_daily_status

@@ -201,7 +201,7 @@
                                     invisible="context.get('contract_read_only') or state == 'invalid' or terminated" class="btn-primary"/>
                             <field name="rental_plan_ids"/>
                         </page>
-                        <page string="每期金额明细">
+                        <page string="租金明细">
                             <group col="6">
                                 <group col="1" colspan="1" invisible="context.get('contract_read_only') or state == 'invalid' or terminated">
                                     <button name="action_refresh_all_money" type="object" string="点击刷新"
