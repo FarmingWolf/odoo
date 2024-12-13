@@ -51,6 +51,53 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
     property_rent_deposit_received_quarter = fields.Float(string="本季实收押金")
     property_rent_deposit_received_year = fields.Float(string="本年实收押金")
 
+    # 水费
+    property_rent_fee_water_receivable_today = fields.Float(string="本日应收水费")
+    property_rent_fee_water_receivable_week = fields.Float(string="本周应收水费")
+    property_rent_fee_water_receivable_month = fields.Float(string="本月应收水费")
+    property_rent_fee_water_receivable_quarter = fields.Float(string="本季应收水费")
+    property_rent_fee_water_receivable_year = fields.Float(string="本年应收水费")
+    property_rent_fee_water_received_today = fields.Float(string="本日实收水费")
+    property_rent_fee_water_received_week = fields.Float(string="本周实收水费")
+    property_rent_fee_water_received_month = fields.Float(string="本月实收水费")
+    property_rent_fee_water_received_quarter = fields.Float(string="本季实收水费")
+    property_rent_fee_water_received_year = fields.Float(string="本年实收水费")
+    # 电费
+    property_rent_fee_electricity_receivable_today = fields.Float(string="本日应收电费")
+    property_rent_fee_electricity_receivable_week = fields.Float(string="本周应收电费")
+    property_rent_fee_electricity_receivable_month = fields.Float(string="本月应收电费")
+    property_rent_fee_electricity_receivable_quarter = fields.Float(string="本季应收电费")
+    property_rent_fee_electricity_receivable_year = fields.Float(string="本年应收电费")
+    property_rent_fee_electricity_received_today = fields.Float(string="本日实收电费")
+    property_rent_fee_electricity_received_week = fields.Float(string="本周实收电费")
+    property_rent_fee_electricity_received_month = fields.Float(string="本月实收电费")
+    property_rent_fee_electricity_received_quarter = fields.Float(string="本季实收电费")
+    property_rent_fee_electricity_received_year = fields.Float(string="本年实收电费")
+
+    # 电力维护费
+    property_rent_fee_electricity_maintenance_receivable_today = fields.Float(string="本日应收电力维护费")
+    property_rent_fee_electricity_maintenance_receivable_week = fields.Float(string="本周应收电力维护费")
+    property_rent_fee_electricity_maintenance_receivable_month = fields.Float(string="本月应收电力维护费")
+    property_rent_fee_electricity_maintenance_receivable_quarter = fields.Float(string="本季应收电力维护费")
+    property_rent_fee_electricity_maintenance_receivable_year = fields.Float(string="本年应收电力维护费")
+    property_rent_fee_electricity_maintenance_received_today = fields.Float(string="本日实收电力维护费")
+    property_rent_fee_electricity_maintenance_received_week = fields.Float(string="本周实收电力维护费")
+    property_rent_fee_electricity_maintenance_received_month = fields.Float(string="本月实收电力维护费")
+    property_rent_fee_electricity_maintenance_received_quarter = fields.Float(string="本季实收电力维护费")
+    property_rent_fee_electricity_maintenance_received_year = fields.Float(string="本年实收电力维护费")
+
+    # 物业费
+    property_rent_fee_maintenance_receivable_today = fields.Float(string="本日应收物业费")
+    property_rent_fee_maintenance_receivable_week = fields.Float(string="本周应收物业费")
+    property_rent_fee_maintenance_receivable_month = fields.Float(string="本月应收物业费")
+    property_rent_fee_maintenance_receivable_quarter = fields.Float(string="本季应收物业费")
+    property_rent_fee_maintenance_receivable_year = fields.Float(string="本年应收物业费")
+    property_rent_fee_maintenance_received_today = fields.Float(string="本日实收物业费")
+    property_rent_fee_maintenance_received_week = fields.Float(string="本周实收物业费")
+    property_rent_fee_maintenance_received_month = fields.Float(string="本月实收物业费")
+    property_rent_fee_maintenance_received_quarter = fields.Float(string="本季实收物业费")
+    property_rent_fee_maintenance_received_year = fields.Float(string="本年实收物业费")
+
     @api.model
     def create(self, vals):
         for record in self:
@@ -66,6 +113,7 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
 
         return super().create(vals)
 
+    # 租金
     def calc_record_rental_info(self, in_contract_id, in_property_id, in_date, in_rental_info):
 
         details = self.env["estate.lease.contract.property.rental.detail"].search(
@@ -106,6 +154,7 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
 
         return in_rental_info
 
+    # 押金
     def calc_rent_deposit_info(self, in_contract_id, in_property_id, in_date, in_rent_deposit_info):
 
         deposit_details = self.env["estate.lease.contract.property.deposit"].search(
@@ -127,6 +176,118 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                 _logger.error(f"deposit_rcd.date_received为空，请确认！deposit_rcd.id={deposit_rcd.id}")
 
         return in_rent_deposit_info
+
+    # 水费
+    def calc_fee_water_info(self, in_contract_id, in_property_id, in_date, in_fee_info):
+
+        water_details = self.env["estate.lease.contract.property.fee.water"].search(
+            [('contract_id', '=', in_contract_id), ('property_id', '=', in_property_id)])
+
+        for water_rcd in water_details:
+            if water_rcd.date_received == in_date:
+                in_fee_info['property_fee_water_receivable_today'] += water_rcd.water_receivable
+                in_fee_info['property_fee_water_received_today'] += water_rcd.water_received
+            if water_rcd.date_received:
+                if end_of(water_rcd.date_received, 'week') == end_of(in_date, 'week'):
+                    in_fee_info['property_fee_water_receivable_week'] += water_rcd.water_receivable
+                    in_fee_info['property_fee_water_received_week'] += water_rcd.water_received
+                if end_of(water_rcd.date_received, 'month') == end_of(in_date, 'month'):
+                    in_fee_info['property_fee_water_receivable_month'] += water_rcd.water_receivable
+                    in_fee_info['property_fee_water_received_month'] += water_rcd.water_received
+                if end_of(water_rcd.date_received, 'quarter') == end_of(in_date, 'quarter'):
+                    in_fee_info['property_fee_water_receivable_quarter'] += water_rcd.water_receivable
+                    in_fee_info['property_fee_water_received_quarter'] += water_rcd.water_received
+                if end_of(water_rcd.date_received, 'year') == end_of(in_date, 'year'):
+                    in_fee_info['property_fee_water_receivable_year'] += water_rcd.water_receivable
+                    in_fee_info['property_fee_water_received_year'] += water_rcd.water_received
+            else:
+                _logger.error(f"water_rcd.date_received为空，请确认！water_rcd.id={water_rcd.id}")
+
+        return in_fee_info
+
+    # 电费
+    def calc_fee_electricity_info(self, in_contract_id, in_property_id, in_date, in_fee_info):
+
+        electricity_details = self.env["estate.lease.contract.property.fee.electricity"].search(
+            [('contract_id', '=', in_contract_id), ('property_id', '=', in_property_id)])
+
+        for electricity_rcd in electricity_details:
+            if electricity_rcd.date_received == in_date:
+                in_fee_info['property_fee_electricity_receivable_today'] += electricity_rcd.electricity_receivable
+                in_fee_info['property_fee_electricity_received_today'] += electricity_rcd.electricity_received
+            if electricity_rcd.date_received:
+                if end_of(electricity_rcd.date_received, 'week') == end_of(in_date, 'week'):
+                    in_fee_info['property_fee_electricity_receivable_week'] += electricity_rcd.electricity_receivable
+                    in_fee_info['property_fee_electricity_received_week'] += electricity_rcd.electricity_received
+                if end_of(electricity_rcd.date_received, 'month') == end_of(in_date, 'month'):
+                    in_fee_info['property_fee_electricity_receivable_month'] += electricity_rcd.electricity_receivable
+                    in_fee_info['property_fee_electricity_received_month'] += electricity_rcd.electricity_received
+                if end_of(electricity_rcd.date_received, 'quarter') == end_of(in_date, 'quarter'):
+                    in_fee_info['property_fee_electricity_receivable_quarter'] += electricity_rcd.electricity_receivable
+                    in_fee_info['property_fee_electricity_received_quarter'] += electricity_rcd.electricity_received
+                if end_of(electricity_rcd.date_received, 'year') == end_of(in_date, 'year'):
+                    in_fee_info['property_fee_electricity_receivable_year'] += electricity_rcd.electricity_receivable
+                    in_fee_info['property_fee_electricity_received_year'] += electricity_rcd.electricity_received
+            else:
+                _logger.error(f"electricity_rcd.date_received为空，请确认！electricity_rcd.id={electricity_rcd.id}")
+
+        return in_fee_info
+
+    # 电力维护费
+    def calc_fee_electricity_maintenance_info(self, in_contract_id, in_property_id, in_date, in_fee_info):
+
+        electricity_maintenance_details = self.env["estate.lease.contract.property.fee.electricity.maintenance"].search(
+            [('contract_id', '=', in_contract_id), ('property_id', '=', in_property_id)])
+
+        for electricity_maintenance_rcd in electricity_maintenance_details:
+            if electricity_maintenance_rcd.date_received == in_date:
+                in_fee_info['property_fee_electricity_maintenance_receivable_today'] += electricity_maintenance_rcd.electricity_maintenance_receivable
+                in_fee_info['property_fee_electricity_maintenance_received_today'] += electricity_maintenance_rcd.electricity_maintenance_received
+            if electricity_maintenance_rcd.date_received:
+                if end_of(electricity_maintenance_rcd.date_received, 'week') == end_of(in_date, 'week'):
+                    in_fee_info['property_fee_electricity_maintenance_receivable_week'] += electricity_maintenance_rcd.electricity_maintenance_receivable
+                    in_fee_info['property_fee_electricity_maintenance_received_week'] += electricity_maintenance_rcd.electricity_maintenance_received
+                if end_of(electricity_maintenance_rcd.date_received, 'month') == end_of(in_date, 'month'):
+                    in_fee_info['property_fee_electricity_maintenance_receivable_month'] += electricity_maintenance_rcd.electricity_maintenance_receivable
+                    in_fee_info['property_fee_electricity_maintenance_received_month'] += electricity_maintenance_rcd.electricity_maintenance_received
+                if end_of(electricity_maintenance_rcd.date_received, 'quarter') == end_of(in_date, 'quarter'):
+                    in_fee_info['property_fee_electricity_maintenance_receivable_quarter'] += electricity_maintenance_rcd.electricity_maintenance_receivable
+                    in_fee_info['property_fee_electricity_maintenance_received_quarter'] += electricity_maintenance_rcd.electricity_maintenance_received
+                if end_of(electricity_maintenance_rcd.date_received, 'year') == end_of(in_date, 'year'):
+                    in_fee_info['property_fee_electricity_maintenance_receivable_year'] += electricity_maintenance_rcd.electricity_maintenance_receivable
+                    in_fee_info['property_fee_electricity_maintenance_received_year'] += electricity_maintenance_rcd.electricity_maintenance_received
+            else:
+                _logger.error(f"electricity_maintenance_rcd.date_received为空，请确认！electricity_maintenance_rcd.id={electricity_maintenance_rcd.id}")
+
+        return in_fee_info
+
+    # 物业费
+    def calc_fee_maintenance_info(self, in_contract_id, in_property_id, in_date, in_fee_info):
+
+        maintenance_details = self.env["estate.lease.contract.property.fee.maintenance"].search(
+            [('contract_id', '=', in_contract_id), ('property_id', '=', in_property_id)])
+
+        for maintenance_rcd in maintenance_details:
+            if maintenance_rcd.date_received == in_date:
+                in_fee_info['property_fee_maintenance_receivable_today'] += maintenance_rcd.maintenance_receivable
+                in_fee_info['property_fee_maintenance_received_today'] += maintenance_rcd.maintenance_received
+            if maintenance_rcd.date_received:
+                if end_of(maintenance_rcd.date_received, 'week') == end_of(in_date, 'week'):
+                    in_fee_info['property_fee_maintenance_receivable_week'] += maintenance_rcd.maintenance_receivable
+                    in_fee_info['property_fee_maintenance_received_week'] += maintenance_rcd.maintenance_received
+                if end_of(maintenance_rcd.date_received, 'month') == end_of(in_date, 'month'):
+                    in_fee_info['property_fee_maintenance_receivable_month'] += maintenance_rcd.maintenance_receivable
+                    in_fee_info['property_fee_maintenance_received_month'] += maintenance_rcd.maintenance_received
+                if end_of(maintenance_rcd.date_received, 'quarter') == end_of(in_date, 'quarter'):
+                    in_fee_info['property_fee_maintenance_receivable_quarter'] += maintenance_rcd.maintenance_receivable
+                    in_fee_info['property_fee_maintenance_received_quarter'] += maintenance_rcd.maintenance_received
+                if end_of(maintenance_rcd.date_received, 'year') == end_of(in_date, 'year'):
+                    in_fee_info['property_fee_maintenance_receivable_year'] += maintenance_rcd.maintenance_receivable
+                    in_fee_info['property_fee_maintenance_received_year'] += maintenance_rcd.maintenance_received
+            else:
+                _logger.error(f"maintenance_rcd.date_received为空，请确认！maintenance_rcd.id={maintenance_rcd.id}")
+
+        return in_fee_info
 
     def automatic_daily_calc_status(self):
         _logger.info("开始做成资产租赁状态每日数据")
@@ -224,6 +385,61 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_rent_deposit_received_quarter": 0,
                         "property_rent_deposit_received_year": 0,
                     }
+
+                    fee_water_info = {
+                        # 水费
+                        "property_fee_water_receivable_today": 0,
+                        "property_fee_water_receivable_week": 0,
+                        "property_fee_water_receivable_month": 0,
+                        "property_fee_water_receivable_quarter": 0,
+                        "property_fee_water_receivable_year": 0,
+                        "property_fee_water_received_today": 0,
+                        "property_fee_water_received_week": 0,
+                        "property_fee_water_received_month": 0,
+                        "property_fee_water_received_quarter": 0,
+                        "property_fee_water_received_year": 0,
+                    }
+                    fee_electricity_info = {
+                        # 电费
+                        "property_fee_electricity_receivable_today": 0,
+                        "property_fee_electricity_receivable_week": 0,
+                        "property_fee_electricity_receivable_month": 0,
+                        "property_fee_electricity_receivable_quarter": 0,
+                        "property_fee_electricity_receivable_year": 0,
+                        "property_fee_electricity_received_today": 0,
+                        "property_fee_electricity_received_week": 0,
+                        "property_fee_electricity_received_month": 0,
+                        "property_fee_electricity_received_quarter": 0,
+                        "property_fee_electricity_received_year": 0,
+                    }
+                    fee_electricity_maintenance_info = {
+                        # 电力维护费
+                        "property_fee_electricity_maintenance_receivable_today": 0,
+                        "property_fee_electricity_maintenance_receivable_week": 0,
+                        "property_fee_electricity_maintenance_receivable_month": 0,
+                        "property_fee_electricity_maintenance_receivable_quarter": 0,
+                        "property_fee_electricity_maintenance_receivable_year": 0,
+                        "property_fee_electricity_maintenance_received_today": 0,
+                        "property_fee_electricity_maintenance_received_week": 0,
+                        "property_fee_electricity_maintenance_received_month": 0,
+                        "property_fee_electricity_maintenance_received_quarter": 0,
+                        "property_fee_electricity_maintenance_received_year": 0,
+                    }
+
+                    fee_maintenance_info = {
+                        # 物业费
+                        "property_fee_maintenance_receivable_today": 0,
+                        "property_fee_maintenance_receivable_week": 0,
+                        "property_fee_maintenance_receivable_month": 0,
+                        "property_fee_maintenance_receivable_quarter": 0,
+                        "property_fee_maintenance_receivable_year": 0,
+                        "property_fee_maintenance_received_today": 0,
+                        "property_fee_maintenance_received_week": 0,
+                        "property_fee_maintenance_received_month": 0,
+                        "property_fee_maintenance_received_quarter": 0,
+                        "property_fee_maintenance_received_year": 0,
+                    }
+
                     record_rental_info = rental_info
                     # 合同有效时才设置其资产已租状态,业务上、理论上和逻辑上时间段不会重叠
                     for contract in property_contract:
@@ -248,6 +464,19 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                             # 押金收取情况
                             rent_deposit_info = self.calc_rent_deposit_info(contract.id, each_property.id,
                                                                             record_status_date, rent_deposit_info)
+                            # 水费收取情况
+                            fee_water_info = self.calc_fee_water_info(contract.id, each_property.id,
+                                                                      record_status_date, fee_water_info)
+                            # 电费收取情况
+                            fee_electricity_info = self.calc_fee_electricity_info(contract.id, each_property.id,
+                                                                                  record_status_date,
+                                                                                  fee_electricity_info)
+                            # 电力维护费收取情况
+                            fee_electricity_maintenance_info = self.calc_fee_electricity_maintenance_info(
+                                contract.id, each_property.id, record_status_date, fee_electricity_maintenance_info)
+                            # 物业费收取情况
+                            fee_maintenance_info = self.calc_fee_maintenance_info(
+                                contract.id, each_property.id, record_status_date, fee_maintenance_info)
 
                     if record_contract_id:
                         record_contract_id_id = record_contract_id.id
@@ -268,6 +497,19 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         # 无效合同中，在过去尚有效期间的押金收取情况
                         rent_deposit_info = self.calc_rent_deposit_info(contract.id, each_property.id,
                                                                         record_status_date, rent_deposit_info)
+                        # 无效合同中，在过去尚有效期间的水费收取情况
+                        fee_water_info = self.calc_fee_water_info(contract.id, each_property.id,
+                                                                  record_status_date, fee_water_info)
+                        # 无效合同中，在过去尚有效期间的电费收取情况
+                        fee_electricity_info = self.calc_fee_electricity_info(contract.id, each_property.id,
+                                                                              record_status_date,
+                                                                              fee_electricity_info)
+                        # 无效合同中，在过去尚有效期间的电力维护费收取情况
+                        fee_electricity_maintenance_info = self.calc_fee_electricity_maintenance_info(
+                            contract.id, each_property.id, record_status_date, fee_electricity_maintenance_info)
+                        # 无效合同中，在过去尚有效期间的物业费收取情况
+                        fee_maintenance_info = self.calc_fee_maintenance_info(
+                            contract.id, each_property.id, record_status_date, fee_maintenance_info)
 
                     self.env['estate.lease.contract.property.daily.status'].create({
                         'name': record_name,
@@ -301,6 +543,51 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_rent_deposit_received_month": rent_deposit_info['property_rent_deposit_received_month'],
                         "property_rent_deposit_received_quarter": rent_deposit_info['property_rent_deposit_received_quarter'],
                         "property_rent_deposit_received_year": rent_deposit_info['property_rent_deposit_received_year'],
+
+                        "property_rent_fee_water_receivable_today": fee_water_info['property_fee_water_receivable_today'],
+                        "property_rent_fee_water_receivable_week": fee_water_info['property_fee_water_receivable_week'],
+                        "property_rent_fee_water_receivable_month": fee_water_info['property_fee_water_receivable_month'],
+                        "property_rent_fee_water_receivable_quarter": fee_water_info['property_fee_water_receivable_quarter'],
+                        "property_rent_fee_water_receivable_year": fee_water_info['property_fee_water_receivable_year'],
+                        "property_rent_fee_water_received_today": fee_water_info['property_fee_water_received_today'],
+                        "property_rent_fee_water_received_week": fee_water_info['property_fee_water_received_week'],
+                        "property_rent_fee_water_received_month": fee_water_info['property_fee_water_received_month'],
+                        "property_rent_fee_water_received_quarter": fee_water_info['property_fee_water_received_quarter'],
+                        "property_rent_fee_water_received_year": fee_water_info['property_fee_water_received_year'],
+
+                        "property_rent_fee_electricity_receivable_today": fee_electricity_info['property_fee_electricity_receivable_today'],
+                        "property_rent_fee_electricity_receivable_week": fee_electricity_info['property_fee_electricity_receivable_week'],
+                        "property_rent_fee_electricity_receivable_month": fee_electricity_info['property_fee_electricity_receivable_month'],
+                        "property_rent_fee_electricity_receivable_quarter": fee_electricity_info['property_fee_electricity_receivable_quarter'],
+                        "property_rent_fee_electricity_receivable_year": fee_electricity_info['property_fee_electricity_receivable_year'],
+                        "property_rent_fee_electricity_received_today": fee_electricity_info['property_fee_electricity_received_today'],
+                        "property_rent_fee_electricity_received_week": fee_electricity_info['property_fee_electricity_received_week'],
+                        "property_rent_fee_electricity_received_month": fee_electricity_info['property_fee_electricity_received_month'],
+                        "property_rent_fee_electricity_received_quarter": fee_electricity_info['property_fee_electricity_received_quarter'],
+                        "property_rent_fee_electricity_received_year": fee_electricity_info['property_fee_electricity_received_year'],
+
+                        "property_rent_fee_electricity_maintenance_receivable_today": fee_electricity_maintenance_info['property_fee_electricity_maintenance_receivable_today'],
+                        "property_rent_fee_electricity_maintenance_receivable_week": fee_electricity_maintenance_info['property_fee_electricity_maintenance_receivable_week'],
+                        "property_rent_fee_electricity_maintenance_receivable_month": fee_electricity_maintenance_info['property_fee_electricity_maintenance_receivable_month'],
+                        "property_rent_fee_electricity_maintenance_receivable_quarter": fee_electricity_maintenance_info['property_fee_electricity_maintenance_receivable_quarter'],
+                        "property_rent_fee_electricity_maintenance_receivable_year": fee_electricity_maintenance_info['property_fee_electricity_maintenance_receivable_year'],
+                        "property_rent_fee_electricity_maintenance_received_today": fee_electricity_maintenance_info['property_fee_electricity_maintenance_received_today'],
+                        "property_rent_fee_electricity_maintenance_received_week": fee_electricity_maintenance_info['property_fee_electricity_maintenance_received_week'],
+                        "property_rent_fee_electricity_maintenance_received_month": fee_electricity_maintenance_info['property_fee_electricity_maintenance_received_month'],
+                        "property_rent_fee_electricity_maintenance_received_quarter": fee_electricity_maintenance_info['property_fee_electricity_maintenance_received_quarter'],
+                        "property_rent_fee_electricity_maintenance_received_year": fee_electricity_maintenance_info['property_fee_electricity_maintenance_received_year'],
+
+                        "property_rent_fee_maintenance_receivable_today": fee_maintenance_info['property_fee_maintenance_receivable_today'],
+                        "property_rent_fee_maintenance_receivable_week": fee_maintenance_info['property_fee_maintenance_receivable_week'],
+                        "property_rent_fee_maintenance_receivable_month": fee_maintenance_info['property_fee_maintenance_receivable_month'],
+                        "property_rent_fee_maintenance_receivable_quarter": fee_maintenance_info['property_fee_maintenance_receivable_quarter'],
+                        "property_rent_fee_maintenance_receivable_year": fee_maintenance_info['property_fee_maintenance_receivable_year'],
+                        "property_rent_fee_maintenance_received_today": fee_maintenance_info['property_fee_maintenance_received_today'],
+                        "property_rent_fee_maintenance_received_week": fee_maintenance_info['property_fee_maintenance_received_week'],
+                        "property_rent_fee_maintenance_received_month": fee_maintenance_info['property_fee_maintenance_received_month'],
+                        "property_rent_fee_maintenance_received_quarter": fee_maintenance_info['property_fee_maintenance_received_quarter'],
+                        "property_rent_fee_maintenance_received_year": fee_maintenance_info['property_fee_maintenance_received_year'],
+
                     })
                     int_cnt += 1
 

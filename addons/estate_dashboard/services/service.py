@@ -67,6 +67,50 @@ class EstateDashboardService:
         rent_deposit_received_month = 0.0
         rent_deposit_received_quarter = 0.0
         rent_deposit_received_year = 0.0
+        # 水费
+        fee_water_receivable_today = 0.0
+        fee_water_receivable_week = 0.0
+        fee_water_receivable_month = 0.0
+        fee_water_receivable_quarter = 0.0
+        fee_water_receivable_year = 0.0
+        fee_water_received_today = 0.0
+        fee_water_received_week = 0.0
+        fee_water_received_month = 0.0
+        fee_water_received_quarter = 0.0
+        fee_water_received_year = 0.0
+        # 电费
+        fee_electricity_receivable_today = 0.0
+        fee_electricity_receivable_week = 0.0
+        fee_electricity_receivable_month = 0.0
+        fee_electricity_receivable_quarter = 0.0
+        fee_electricity_receivable_year = 0.0
+        fee_electricity_received_today = 0.0
+        fee_electricity_received_week = 0.0
+        fee_electricity_received_month = 0.0
+        fee_electricity_received_quarter = 0.0
+        fee_electricity_received_year = 0.0
+        # 电力维护费
+        fee_electricity_maintenance_receivable_today = 0.0
+        fee_electricity_maintenance_receivable_week = 0.0
+        fee_electricity_maintenance_receivable_month = 0.0
+        fee_electricity_maintenance_receivable_quarter = 0.0
+        fee_electricity_maintenance_receivable_year = 0.0
+        fee_electricity_maintenance_received_today = 0.0
+        fee_electricity_maintenance_received_week = 0.0
+        fee_electricity_maintenance_received_month = 0.0
+        fee_electricity_maintenance_received_quarter = 0.0
+        fee_electricity_maintenance_received_year = 0.0
+        # 物业费
+        fee_maintenance_receivable_today = 0.0
+        fee_maintenance_receivable_week = 0.0
+        fee_maintenance_receivable_month = 0.0
+        fee_maintenance_receivable_quarter = 0.0
+        fee_maintenance_receivable_year = 0.0
+        fee_maintenance_received_today = 0.0
+        fee_maintenance_received_week = 0.0
+        fee_maintenance_received_month = 0.0
+        fee_maintenance_received_quarter = 0.0
+        fee_maintenance_received_year = 0.0
 
         for record_detail in latest_property_detail:
             estate_property_quantity += 1
@@ -103,6 +147,50 @@ class EstateDashboardService:
             rent_deposit_received_month += record_detail.property_rent_deposit_received_month
             rent_deposit_received_quarter += record_detail.property_rent_deposit_received_quarter
             rent_deposit_received_year += record_detail.property_rent_deposit_received_year
+            # 水费
+            fee_water_receivable_today += record_detail.property_rent_fee_water_receivable_today
+            fee_water_receivable_week += record_detail.property_rent_fee_water_receivable_week
+            fee_water_receivable_month += record_detail.property_rent_fee_water_receivable_month
+            fee_water_receivable_quarter += record_detail.property_rent_fee_water_receivable_quarter
+            fee_water_receivable_year += record_detail.property_rent_fee_water_receivable_year
+            fee_water_received_today += record_detail.property_rent_fee_water_received_today
+            fee_water_received_week += record_detail.property_rent_fee_water_received_week
+            fee_water_received_month += record_detail.property_rent_fee_water_received_month
+            fee_water_received_quarter += record_detail.property_rent_fee_water_received_quarter
+            fee_water_received_year += record_detail.property_rent_fee_water_received_year
+            # 电费
+            fee_electricity_receivable_today += record_detail.property_rent_fee_electricity_receivable_today
+            fee_electricity_receivable_week += record_detail.property_rent_fee_electricity_receivable_week
+            fee_electricity_receivable_month += record_detail.property_rent_fee_electricity_receivable_month
+            fee_electricity_receivable_quarter += record_detail.property_rent_fee_electricity_receivable_quarter
+            fee_electricity_receivable_year += record_detail.property_rent_fee_electricity_receivable_year
+            fee_electricity_received_today += record_detail.property_rent_fee_electricity_received_today
+            fee_electricity_received_week += record_detail.property_rent_fee_electricity_received_week
+            fee_electricity_received_month += record_detail.property_rent_fee_electricity_received_month
+            fee_electricity_received_quarter += record_detail.property_rent_fee_electricity_received_quarter
+            fee_electricity_received_year += record_detail.property_rent_fee_electricity_received_year
+            # 电力维护费
+            fee_electricity_maintenance_receivable_today += record_detail.property_rent_fee_electricity_maintenance_receivable_today
+            fee_electricity_maintenance_receivable_week += record_detail.property_rent_fee_electricity_maintenance_receivable_week
+            fee_electricity_maintenance_receivable_month += record_detail.property_rent_fee_electricity_maintenance_receivable_month
+            fee_electricity_maintenance_receivable_quarter += record_detail.property_rent_fee_electricity_maintenance_receivable_quarter
+            fee_electricity_maintenance_receivable_year += record_detail.property_rent_fee_electricity_maintenance_receivable_year
+            fee_electricity_maintenance_received_today += record_detail.property_rent_fee_electricity_maintenance_received_today
+            fee_electricity_maintenance_received_week += record_detail.property_rent_fee_electricity_maintenance_received_week
+            fee_electricity_maintenance_received_month += record_detail.property_rent_fee_electricity_maintenance_received_month
+            fee_electricity_maintenance_received_quarter += record_detail.property_rent_fee_electricity_maintenance_received_quarter
+            fee_electricity_maintenance_received_year += record_detail.property_rent_fee_electricity_maintenance_received_year
+            # 物业费
+            fee_maintenance_receivable_today += record_detail.property_rent_fee_maintenance_receivable_today
+            fee_maintenance_receivable_week += record_detail.property_rent_fee_maintenance_receivable_week
+            fee_maintenance_receivable_month += record_detail.property_rent_fee_maintenance_receivable_month
+            fee_maintenance_receivable_quarter += record_detail.property_rent_fee_maintenance_receivable_quarter
+            fee_maintenance_receivable_year += record_detail.property_rent_fee_maintenance_receivable_year
+            fee_maintenance_received_today += record_detail.property_rent_fee_maintenance_received_today
+            fee_maintenance_received_week += record_detail.property_rent_fee_maintenance_received_week
+            fee_maintenance_received_month += record_detail.property_rent_fee_maintenance_received_month
+            fee_maintenance_received_quarter += record_detail.property_rent_fee_maintenance_received_quarter
+            fee_maintenance_received_year += record_detail.property_rent_fee_maintenance_received_year
 
         if estate_property_quantity != 0:
             ratio_property_quantity = estate_property_lease_quantity / estate_property_quantity
@@ -210,4 +298,48 @@ class EstateDashboardService:
             'rent_deposit_received_month': round(rent_deposit_received_month, 2),
             'rent_deposit_received_quarter': round(rent_deposit_received_quarter, 2),
             'rent_deposit_received_year': round(rent_deposit_received_year, 2),
+            # 水费
+            'fee_water_receivable_today': round(fee_water_receivable_today, 2),
+            'fee_water_receivable_week': round(fee_water_receivable_week, 2),
+            'fee_water_receivable_month': round(fee_water_receivable_month, 2),
+            'fee_water_receivable_quarter': round(fee_water_receivable_quarter, 2),
+            'fee_water_receivable_year': round(fee_water_receivable_year, 2),
+            'fee_water_received_today': round(fee_water_received_today, 2),
+            'fee_water_received_week': round(fee_water_received_week, 2),
+            'fee_water_received_month': round(fee_water_received_month, 2),
+            'fee_water_received_quarter': round(fee_water_received_quarter, 2),
+            'fee_water_received_year': round(fee_water_received_year, 2),
+            # 电费
+            'fee_electricity_receivable_today': round(fee_electricity_receivable_today, 2),
+            'fee_electricity_receivable_week': round(fee_electricity_receivable_week, 2),
+            'fee_electricity_receivable_month': round(fee_electricity_receivable_month, 2),
+            'fee_electricity_receivable_quarter': round(fee_electricity_receivable_quarter, 2),
+            'fee_electricity_receivable_year': round(fee_electricity_receivable_year, 2),
+            'fee_electricity_received_today': round(fee_electricity_received_today, 2),
+            'fee_electricity_received_week': round(fee_electricity_received_week, 2),
+            'fee_electricity_received_month': round(fee_electricity_received_month, 2),
+            'fee_electricity_received_quarter': round(fee_electricity_received_quarter, 2),
+            'fee_electricity_received_year': round(fee_electricity_received_year, 2),
+            # 电力维护费
+            'fee_electricity_maintenance_receivable_today': round(fee_electricity_maintenance_receivable_today, 2),
+            'fee_electricity_maintenance_receivable_week': round(fee_electricity_maintenance_receivable_week, 2),
+            'fee_electricity_maintenance_receivable_month': round(fee_electricity_maintenance_receivable_month, 2),
+            'fee_electricity_maintenance_receivable_quarter': round(fee_electricity_maintenance_receivable_quarter, 2),
+            'fee_electricity_maintenance_receivable_year': round(fee_electricity_maintenance_receivable_year, 2),
+            'fee_electricity_maintenance_received_today': round(fee_electricity_maintenance_received_today, 2),
+            'fee_electricity_maintenance_received_week': round(fee_electricity_maintenance_received_week, 2),
+            'fee_electricity_maintenance_received_month': round(fee_electricity_maintenance_received_month, 2),
+            'fee_electricity_maintenance_received_quarter': round(fee_electricity_maintenance_received_quarter, 2),
+            'fee_electricity_maintenance_received_year': round(fee_electricity_maintenance_received_year, 2),
+            # 物业费
+            'fee_maintenance_receivable_today': round(fee_maintenance_receivable_today, 2),
+            'fee_maintenance_receivable_week': round(fee_maintenance_receivable_week, 2),
+            'fee_maintenance_receivable_month': round(fee_maintenance_receivable_month, 2),
+            'fee_maintenance_receivable_quarter': round(fee_maintenance_receivable_quarter, 2),
+            'fee_maintenance_receivable_year': round(fee_maintenance_receivable_year, 2),
+            'fee_maintenance_received_today': round(fee_maintenance_received_today, 2),
+            'fee_maintenance_received_week': round(fee_maintenance_received_week, 2),
+            'fee_maintenance_received_month': round(fee_maintenance_received_month, 2),
+            'fee_maintenance_received_quarter': round(fee_maintenance_received_quarter, 2),
+            'fee_maintenance_received_year': round(fee_maintenance_received_year, 2),
         }

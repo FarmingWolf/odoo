@@ -11,18 +11,29 @@ import {Dialog} from "@web/core/dialog/dialog";
 import {CheckBox} from "@web/core/checkbox/checkbox";
 import {browser} from "@web/core/browser/browser";
 import {session} from "@web/session";
+import {CURRENT_VERSION, migrate} from "./dashboard_migration";
 
 let default_items = ['estate_conventional_quantity', 'estate_conventional_area_quantity',
     'estate_conventional_lease_quantity', 'estate_conventional_area_lease_quantity',
     'estate_conventional_price_avg', 'ratio_conventional_quantity', 'ratio_conventional_area_quantity',
     'rental_received_month', 'rent_deposit_received_month',
+    'fee_water_electricity_maintenance_received_month', 'fee_maintenance_received_month', 'fee_maintenance_received_year',
     'pie_chart_ratio_conventional_quantity', 'pie_chart_ratio_conventional_area_quantity']
 
 class EstateDashboard extends Component {
     static template = "estate_dashboard.EstateDashboard";
     static components = { Layout, DashboardItem };
+    static version = CURRENT_VERSION;
 
     setup() {
+
+        const localState = migrate(JSON.parse(browser.localStorage.getItem("dashboardState")));
+        const dashboardModel = localState ? EstateDashboard.fromJSON(localState): new EstateDashboard();
+
+        setInterval(() => {
+            browser.localStorage.setItem("dashboardState", JSON.stringify(dashboardModel))
+        }, 10000);
+
         this.action = useService("action");
         this.statistics = useState(useService("estate_dashboard.statistics"));
         // 初始化统计数据
@@ -35,7 +46,7 @@ class EstateDashboard extends Component {
         };
         this.items = registry.category("estate_dashboard").getAll();
         this.state = useState({
-            disabledItems: browser.localStorage.getItem("disabledDashboardItems")?.split(",") || [],
+            enabledItems: browser.localStorage.getItem("enabledDashboardItems")?.split(",") || default_items,
             /** 202408250730 现在看以下四个不放在state中也无妨
             // statisticsByCompany: this.statistics.statisticsByCompany || {},
             // companies: session.allowed_companies || [],
@@ -89,6 +100,12 @@ class EstateDashboard extends Component {
 
     }
 
+    static fromJSON(json) {
+        const dashboard = new EstateDashboard();
+        const dashboardInstance = Object.assign(dashboard, json);
+        return dashboardInstance;
+    }
+
     /**
      * 这是从service中直接取得已经存在的statistics
      * @param companyId
@@ -140,13 +157,13 @@ class EstateDashboard extends Component {
     openConfiguration() {
         this.dialog.add(ConfigurationDialog, {
             items: this.items,
-            disabledItems: this.state.disabledItems,
+            enabledItems: this.state.enabledItems,
             onUpdateConfiguration: this.updateConfiguration.bind(this),
         })
     }
 
-    updateConfiguration(newDisabledItems) {
-        this.state.disabledItems = newDisabledItems;
+    updateConfiguration(newEnabledItems) {
+        this.state.enabledItems = newEnabledItems;
         this.state.configurationSet = "yes";
     }
 
@@ -156,13 +173,13 @@ class EstateDashboard extends Component {
 class ConfigurationDialog extends Component {
     static template = "estate_dashboard.ConfigurationDialog";
     static components = { Dialog, CheckBox };
-    static props = ["close", "items", "disabledItems", "onUpdateConfiguration"];
+    static props = ["close", "items", "enabledItems", "onUpdateConfiguration"];
 
     setup() {
         this.items = useState(this.props.items.map((item) => {
             return {
                 ...item,
-                enabled: (browser.localStorage.getItem("ConfigurationSet") === "yes" && !this.props.disabledItems.includes(item.id)) ||
+                enabled: (browser.localStorage.getItem("ConfigurationSet") === "yes" && this.props.enabledItems.includes(item.id)) ||
                     (browser.localStorage.getItem("ConfigurationSet") !== "yes" && default_items.includes(item.id)),
             }
         }));
@@ -174,8 +191,8 @@ class ConfigurationDialog extends Component {
 
     onChange(checked, changedItem) {
         changedItem.enabled = checked;
-        const newDisabledItems = Object.values(this.items).filter(
-            (item) => !item.enabled
+        const newEnabledItems = Object.values(this.items).filter(
+            (item) => item.enabled
         ).map((item) => item.id)
 
         browser.localStorage.setItem(
@@ -183,11 +200,11 @@ class ConfigurationDialog extends Component {
             "yes",
         );
         browser.localStorage.setItem(
-            "disabledDashboardItems",
-            newDisabledItems,
+            "enabledDashboardItems",
+            newEnabledItems,
         );
 
-        this.props.onUpdateConfiguration(newDisabledItems);
+        this.props.onUpdateConfiguration(newEnabledItems);
     }
 
 }

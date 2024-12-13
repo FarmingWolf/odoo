@@ -17,7 +17,7 @@
                         </t>
                         <div class="d-flex flex-wrap">
                             <t t-foreach="items" t-as="item" t-key="item.id">
-                                <DashboardItem t-if="(state.configurationSet == 'yes' and !state.disabledItems.includes(item.id)) || (state.configurationSet != 'yes' and state.displayed_ini.includes(item.id))" size="item.size || 1">
+                                <DashboardItem t-if="(state.configurationSet == 'yes' and state.enabledItems.includes(item.id)) || (state.configurationSet != 'yes' and state.displayed_ini.includes(item.id))" size="item.size || 1">
                                     <t t-set="itemProp" t-value="item.props ? item.props(statistics.data[each_company_data]) : {'data': statistics.data[each_company_data]}"/>
                                     <t t-component="item.Component" t-props="itemProp"/>
                                 </DashboardItem>
