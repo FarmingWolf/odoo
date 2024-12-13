@@ -322,6 +322,14 @@
                 <filter string="截至本年" name="date_payment_2_this_year"
                         domain="[('date_payment', '&lt;', (context_today() + relativedelta(years=1, month=1, day=1)).strftime('%Y-%m-%d'))]"/>
                 <separator/>
+                <filter string="下个月" name="date_payment_next_month"
+                        domain="[('date_payment', '&gt;=', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d')),
+                        ('date_payment', '&lt;', (context_today() + relativedelta(months=2, day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="下下个月" name="date_payment_next_month"
+                        domain="[('date_payment', '&gt;=', (context_today() + relativedelta(months=2, day=1)).strftime('%Y-%m-%d')),
+                        ('date_payment', '&lt;', (context_today() + relativedelta(months=3, day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
                 <filter string="有欠缴" name="is_rental_arrears" domain="[('rental_arrears', '&gt;=', 0.01)]"/>
                 <filter string="无欠缴" name="no_rental_arrears" domain="[('rental_arrears', '&lt;', 0.01)]"/>
                 <separator/>
