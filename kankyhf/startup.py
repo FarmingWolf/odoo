@@ -53,6 +53,7 @@ zip_tgt_folders = [
     'estate_dashboard',
     'estate_account',
     'sms_ali',
+    'website_estate',
 ]
 
 zip_all_addons = True
