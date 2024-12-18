@@ -58,8 +58,8 @@ zip_tgt_folders = [
 
 zip_all_addons = True
 tmp_fn = "estate_management.x_pptx"
-customer_dis_name = "中广艺伍零"
-customer_name = "E50"
+customer_dis_name = "四九一电台"
+customer_name = "491DT"
 # 初始化时，仅客户名写入此文件，第一次运行时，客户mac地址写入此文件，压缩包里必须有此文件，如无则判错
 customer_name_info_fn = "c_info_2_ck"
 
@@ -859,7 +859,14 @@ def update_log_and_progress(in_root, in_label, in_bar):
                         latest_time_read = log_time
                     # 如果日志时间比刚才读出的时间还小，说明log文件尚未更新又都出来了
                     if log_time < latest_time_read:
-                        time.sleep(5)
+                        # 也有可能服务器启动完毕，日志更新变慢了
+                        if is_server_started(in_root, in_label, in_bar):
+                            in_bar['value'] = 100
+                            in_root.update_idletasks()
+                            server_start_success.set()
+                        else:
+                            time.sleep(5)
+
                         break
                 else:
                     continue
