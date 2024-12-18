@@ -139,9 +139,10 @@
         <t t-call="web.login_layout">
             <form class="oe_login_form" role="form" t-attf-action="/web/login" method="post" onsubmit="this.action = '/web/login' + location.hash">
                 <div id="div_login">
-                    <div class="login_method_switch-button" onclick="toggleLoginMethod()" id="mobile-hide-sw-btn">
-
-                    </div>
+                    <t t-if="'localhost' not in request.httprequest.host">
+                        <div class="login_method_switch-button" onclick="toggleLoginMethod()" id="mobile-hide-sw-btn">
+                        </div>
+                    </t>
                     <div id="div_uid_pwd">
                         <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
 
