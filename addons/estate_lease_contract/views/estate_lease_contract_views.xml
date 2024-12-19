@@ -289,7 +289,6 @@
                                                    sum="合计实收：每期租金收款后，请回填，以保证业务数据一致性"/>
                                             <button type="object" name="action_confirm_received" title="点击确认本期租金已收齐（等于本期应收）" icon="fa-thumbs-o-up"
                                                     groups="estate_lease_contract.estate_lease_contract_group_manager"
-                                                    invisible="button_icon_invisible"
                                                     help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
                                             <field name="days_received" digits="[12, 0]" sum="总计实收天数"/>
                                             <field name="rental_arrears" digits="[12, 2]" sum="总计欠缴金额"/>
@@ -811,7 +810,7 @@
     </record>
 
     <record id="estate_lease_contract_action" model="ir.actions.act_window">
-        <field name="name">资产租赁合同列表（查看）</field>
+        <field name="name">查看已发布生效合同</field>
         <field name="res_model">estate.lease.contract</field>
         <field name="view_mode">tree,form,kanban</field>
         <field name="views">[False, "tree"]</field>
@@ -837,7 +836,7 @@
     </record>
 
     <record id="estate_lease_contract_action_recording" model="ir.actions.act_window">
-        <field name="name">资产租赁合同列表（录入）</field>
+        <field name="name">新建待发布合同</field>
         <field name="res_model">estate.lease.contract</field>
         <field name="views">[False, "tree"]</field>
         <field name="view_id" ref="estate_lease_contract_view_inactive_tree"/>

@@ -21,6 +21,8 @@ class EstateLeaseContractPropertyDeposit(models.Model):
 
     contract_rental_plan_rel_id = fields.Many2one(comodel_name='estate.lease.contract.rental.plan.rel',
                                                   string='合同-资产关系表ID', required=True, ondelete="cascade")
+    deposit_receivable_this = fields.Float(default=0.0, string="本次应收(元)", compute="_compute_received",
+                                           store=True, compute_sudo=True)
     deposit_received = fields.Float(default=0.0, string="本次实收(元)", tracking=True)
 
     date_received = fields.Date(string="实收日期", default=lambda self: fields.Date.context_today(self), tracking=True)
@@ -66,9 +68,16 @@ class EstateLeaseContractPropertyDeposit(models.Model):
                     if rcd.deposit_arrears != deposit_arrears:
                         rcd.deposit_arrears = deposit_arrears
 
+                    # 根据本次实收和本次欠缴反算本次应收（不同于总应收）
+                    if rcd.deposit_receivable_this != rcd.deposit_received + rcd.deposit_arrears:
+                        rcd.deposit_receivable_this = rcd.deposit_received + rcd.deposit_arrears
+
             deposit_arrears = record.contract_rental_plan_rel_id.deposit_receivable - record.deposit_received_sum
             if record.deposit_arrears != deposit_arrears:
                 record.deposit_arrears = deposit_arrears
+            # 根据本次实收和本次欠缴反算本次应收（不同于总应收）
+            if record.deposit_receivable_this != record.deposit_received + record.deposit_arrears:
+                record.deposit_receivable_this = record.deposit_received + record.deposit_arrears
 
             # 更新回到父级记录
             record.contract_rental_plan_rel_id.contract_deposit_amount_received = received_sum

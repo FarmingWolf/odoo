@@ -22,6 +22,8 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
     rental_detail_id = fields.Many2one('estate.lease.contract.property.rental.detail', string="租金明细ID",
                                        ondelete="cascade")
 
+    rental_receivable_this = fields.Float(default=0.0, string="本次应收(元)", compute="_compute_received",
+                                          store=True, compute_sudo=True)
     rental_received = fields.Float(default=0.0, string="本次实收(元)", tracking=True)
 
     date_received = fields.Date(string="实收日期", default=lambda self: fields.Date.context_today(self), tracking=True)
@@ -62,6 +64,7 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
     period_date_to = fields.Date(string="本期结束日", related="rental_detail_id.period_date_to")
     date_payment = fields.Date(string="本期约定支付日", related="rental_detail_id.date_payment")
     rental_period_no = fields.Integer(string="本期期数", related="rental_detail_id.rental_period_no")
+    active = fields.Boolean(related="rental_detail_id.active", store=True)
 
     @api.depends("rental_received", "date_received")
     def _compute_received(self):
@@ -92,6 +95,10 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
                     if rcd.rental_arrears != record.rental_detail_id.rental_receivable - rcd.rental_received_sum:
                         rcd.rental_arrears = record.rental_detail_id.rental_receivable - rcd.rental_received_sum
 
+                    # 根据本次实收和欠缴反算本次应收（不同于总应收）
+                    if rcd.rental_receivable_this != rcd.rental_received + rcd.rental_arrears:
+                        rcd.rental_receivable_this = rcd.rental_received + rcd.rental_arrears
+
                     if rcd.days_arrears != record.rental_detail_id.days_receivable - rcd.days_received_sum:
                         rcd.days_arrears = record.rental_detail_id.days_receivable - rcd.days_received_sum
 
@@ -118,6 +125,10 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
 
             if record.days_arrears != record.rental_detail_id.days_receivable - record.days_received_sum:
                 record.days_arrears = record.rental_detail_id.days_receivable - record.days_received_sum
+
+            # 计算本次应收（不同于总应收）
+            if record.rental_receivable_this != record.rental_received + record.rental_arrears:
+                record.rental_receivable_this = record.rental_received + record.rental_arrears
 
             date_2_this_time = record.rental_detail_id.period_date_from + timedelta(days=record.days_received_sum)
             if record.rental_received_2_date != date_2_this_time:

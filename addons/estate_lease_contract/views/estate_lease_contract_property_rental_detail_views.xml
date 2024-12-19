@@ -82,7 +82,6 @@
                         help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
                 <field name="rental_received" digits="[12, 2]" sum="总计实收"/>
                 <button type="object" name="action_confirm_received" title="点击确认本期租金已收齐（等于本期应收）" icon="fa-thumbs-o-up"
-                        invisible="button_icon_invisible"
                         groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
                 <field name="rental_received_2_date"/>
                 <field name="days_received" digits="[12, 0]" sum="总计实收天数"/>
@@ -276,7 +275,6 @@
                 <field name="rental_received" digits="[12, 2]" sum="总计实收"/>
                 <button type="object" name="action_confirm_received" title="点击确认本期租金已收齐（等于本期应收）" icon="fa-thumbs-o-up"
                         groups="estate_lease_contract.estate_lease_contract_group_manager"
-                        invisible="button_icon_invisible"
                         help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
                 <field name="rental_received_2_date"/>
                 <field name="days_received" digits="[12, 0]" sum="总计实收天数"/>

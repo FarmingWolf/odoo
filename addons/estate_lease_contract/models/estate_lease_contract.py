@@ -1504,8 +1504,11 @@ class EstateLeaseContract(models.Model):
             else:
                 for rel_data in contract_rental_plan_rel:
                     search_domain = [('contract_id', '=', rel_data["contract_id"]),
-                                     ('property_id', '=', rel_data["property_id"]),
-                                     ('rental_plan_id', '=', rel_data["rental_plan_id"])]
+                                     ('property_id', '=', rel_data["property_id"])]
+                    # todo 此处为暂时应对，需要进一步调查什么情况下已经写入历史关系表中的租金方案id为空
+                    if rel_data["rental_plan_id"]:
+                        search_domain.append(('rental_plan_id', '=', rel_data["rental_plan_id"]))
+
                     search_rst = self.env['estate.lease.contract.rental.plan.rel'].search(search_domain)
                     if search_rst:
                         search_rst.write(rel_data)
