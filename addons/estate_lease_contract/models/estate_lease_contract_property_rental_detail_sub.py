@@ -69,70 +69,7 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
     @api.depends("rental_received", "date_received")
     def _compute_received(self):
         for record in self:
-            domain = [('rental_detail_id', '=', record.rental_detail_id.id)]
-            rcds = self.env["estate.lease.contract.property.rental.detail.sub"].search(domain)
-            received_sum = 0.0
-            days_cal_sum = 0.0
-            received_sum_this_time = 0.0
-            days_cal_this_time = 0.0
-            days_cal_sum_this_time = 0.0
-
-            for rcd in rcds:
-                received_sum += rcd.rental_received
-                if rcd.rental_received_sum != received_sum:
-                    rcd.rental_received_sum = received_sum
-
-                if record.rental_detail_id.rental_receivable:
-                    days_cal = rcd.rental_received / record.rental_detail_id.rental_receivable * \
-                               record.rental_detail_id.days_receivable
-                    days_cal_sum += days_cal
-                    if rcd.days_received != days_cal:
-                        rcd.days_received = days_cal
-
-                    if rcd.days_received_sum != days_cal_sum:
-                        rcd.days_received_sum = days_cal_sum
-
-                    if rcd.rental_arrears != record.rental_detail_id.rental_receivable - rcd.rental_received_sum:
-                        rcd.rental_arrears = record.rental_detail_id.rental_receivable - rcd.rental_received_sum
-
-                    # 根据本次实收和欠缴反算本次应收（不同于总应收）
-                    if rcd.rental_receivable_this != rcd.rental_received + rcd.rental_arrears:
-                        rcd.rental_receivable_this = rcd.rental_received + rcd.rental_arrears
-
-                    if rcd.days_arrears != record.rental_detail_id.days_receivable - rcd.days_received_sum:
-                        rcd.days_arrears = record.rental_detail_id.days_receivable - rcd.days_received_sum
-
-                    date_2 = record.rental_detail_id.period_date_from + timedelta(days=rcd.days_received_sum)
-                    if rcd.rental_received_2_date != date_2:
-                        rcd.rental_received_2_date = date_2
-
-                    if rcd.date_received <= record.date_received:
-                        received_sum_this_time = received_sum
-                        days_cal_this_time = days_cal
-                        days_cal_sum_this_time = days_cal_sum
-
-            if record.rental_received_sum != received_sum_this_time:
-                record.rental_received_sum = received_sum_this_time
-
-            if record.days_received != days_cal_this_time:
-                record.days_received = days_cal_this_time
-
-            if record.days_received_sum != days_cal_sum_this_time:
-                record.days_received_sum = days_cal_sum_this_time
-
-            if record.rental_arrears != record.rental_detail_id.rental_receivable - record.rental_received_sum:
-                record.rental_arrears = record.rental_detail_id.rental_receivable - record.rental_received_sum
-
-            if record.days_arrears != record.rental_detail_id.days_receivable - record.days_received_sum:
-                record.days_arrears = record.rental_detail_id.days_receivable - record.days_received_sum
-
-            # 计算本次应收（不同于总应收）
-            if record.rental_receivable_this != record.rental_received + record.rental_arrears:
-                record.rental_receivable_this = record.rental_received + record.rental_arrears
-
-            date_2_this_time = record.rental_detail_id.period_date_from + timedelta(days=record.days_received_sum)
-            if record.rental_received_2_date != date_2_this_time:
-                record.rental_received_2_date = date_2_this_time
+            self._compute_by_received(record)
 
     @api.onchange("rental_received", "date_received")
     def _onchange_rental_received(self):
@@ -144,3 +81,76 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
             received_sum += record.rental_received
             if record.rental_received_sum != received_sum:
                 record.rental_received_sum = received_sum
+
+    def automatic_cal_by_received(self):
+        rcds = self.env["estate.lease.contract.property.rental.detail.sub"].sudo().search([('active', '=', True)],
+                                                                                          order="date_received ASC")
+        for rcd in rcds:
+            self._compute_by_received(rcd)
+
+    def _compute_by_received(self, in_rcd):
+        _logger.debug(f"开始计算company_id={in_rcd.company_id},detail_sub_id={in_rcd.id}")
+        domain = [('rental_detail_id', '=', in_rcd.rental_detail_id.id)]
+        rcds = self.env["estate.lease.contract.property.rental.detail.sub"].search(domain)
+        received_sum = 0.0
+        days_cal_sum = 0.0
+        received_sum_this_time = 0.0
+        days_cal_this_time = 0.0
+        days_cal_sum_this_time = 0.0
+
+        for rcd in rcds:
+            received_sum += rcd.rental_received
+            if rcd.rental_received_sum != received_sum:
+                rcd.rental_received_sum = received_sum
+
+            if in_rcd.rental_detail_id.rental_receivable:
+                days_cal = rcd.rental_received / in_rcd.rental_detail_id.rental_receivable * \
+                           in_rcd.rental_detail_id.days_receivable
+                days_cal_sum += days_cal
+                if rcd.days_received != days_cal:
+                    rcd.days_received = days_cal
+
+                if rcd.days_received_sum != days_cal_sum:
+                    rcd.days_received_sum = days_cal_sum
+
+                if rcd.rental_arrears != in_rcd.rental_detail_id.rental_receivable - rcd.rental_received_sum:
+                    rcd.rental_arrears = in_rcd.rental_detail_id.rental_receivable - rcd.rental_received_sum
+
+                # 根据本次实收和欠缴反算本次应收（不同于总应收）
+                if rcd.rental_receivable_this != rcd.rental_received + rcd.rental_arrears:
+                    rcd.rental_receivable_this = rcd.rental_received + rcd.rental_arrears
+
+                if rcd.days_arrears != in_rcd.rental_detail_id.days_receivable - rcd.days_received_sum:
+                    rcd.days_arrears = in_rcd.rental_detail_id.days_receivable - rcd.days_received_sum
+
+                date_2 = in_rcd.rental_detail_id.period_date_from + timedelta(days=rcd.days_received_sum)
+                if rcd.rental_received_2_date != date_2:
+                    rcd.rental_received_2_date = date_2
+
+                if rcd.date_received <= in_rcd.date_received:
+                    received_sum_this_time = received_sum
+                    days_cal_this_time = days_cal
+                    days_cal_sum_this_time = days_cal_sum
+
+        if in_rcd.rental_received_sum != received_sum_this_time:
+            in_rcd.rental_received_sum = received_sum_this_time
+
+        if in_rcd.days_received != days_cal_this_time:
+            in_rcd.days_received = days_cal_this_time
+
+        if in_rcd.days_received_sum != days_cal_sum_this_time:
+            in_rcd.days_received_sum = days_cal_sum_this_time
+
+        if in_rcd.rental_arrears != in_rcd.rental_detail_id.rental_receivable - in_rcd.rental_received_sum:
+            in_rcd.rental_arrears = in_rcd.rental_detail_id.rental_receivable - in_rcd.rental_received_sum
+
+        if in_rcd.days_arrears != in_rcd.rental_detail_id.days_receivable - in_rcd.days_received_sum:
+            in_rcd.days_arrears = in_rcd.rental_detail_id.days_receivable - in_rcd.days_received_sum
+
+        # 计算本次应收（不同于总应收）
+        if in_rcd.rental_receivable_this != in_rcd.rental_received + in_rcd.rental_arrears:
+            in_rcd.rental_receivable_this = in_rcd.rental_received + in_rcd.rental_arrears
+
+        date_2_this_time = in_rcd.rental_detail_id.period_date_from + timedelta(days=in_rcd.days_received_sum)
+        if in_rcd.rental_received_2_date != date_2_this_time:
+            in_rcd.rental_received_2_date = date_2_this_time
