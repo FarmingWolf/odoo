@@ -90,8 +90,8 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
 
     def _compute_by_received(self, in_rcd):
         _logger.debug(f"开始计算company_id={in_rcd.company_id},detail_sub_id={in_rcd.id}")
-        domain = [('rental_detail_id', '=', in_rcd.rental_detail_id.id)]
-        rcds = self.env["estate.lease.contract.property.rental.detail.sub"].search(domain)
+        domain = [('rental_detail_id', '=', in_rcd.rental_detail_id.id), ('active', '=', True)]
+        rcds = self.env["estate.lease.contract.property.rental.detail.sub"].sudo().search(domain)
         received_sum = 0.0
         days_cal_sum = 0.0
         received_sum_this_time = 0.0
