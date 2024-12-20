@@ -133,3 +133,14 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
             date_2_this_time = record.rental_detail_id.period_date_from + timedelta(days=record.days_received_sum)
             if record.rental_received_2_date != date_2_this_time:
                 record.rental_received_2_date = date_2_this_time
+
+    @api.onchange("rental_received", "date_received")
+    def _onchange_rental_received(self):
+        records = self.browse(self.env.context.get('active_ids', [])) | self
+        records = records.sorted(key=lambda r: r.date_received)
+
+        received_sum = 0
+        for record in records:
+            received_sum += record.rental_received
+            if record.rental_received_sum != received_sum:
+                record.rental_received_sum = received_sum
