@@ -2,11 +2,11 @@
 
 import {browser} from "@web/core/browser/browser";
 
-export const CURRENT_VERSION = 1.00;
+export const CURRENT_VERSION = 1.01;
 export const migrations = [
     {
-        fromVersion: 1.00,
-        toVersion: 1.01,
+        fromVersion: 1.01,
+        toVersion: 1.02,
         apply: (state) => {
             browser.localStorage.setItem("ConfigurationSet", "no",);
         },

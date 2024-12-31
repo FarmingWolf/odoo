@@ -240,6 +240,51 @@ const items = [
         })
     },
     {
+        id: "rental_receivable_tomorrow",
+        description: "明日应收租金（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "明日应收租金（万元）",
+            value: Math.round(data.rental_receivable_tomorrow / 100) / 100,
+        })
+    },
+    {
+        id: "rental_receivable_week_next",
+        description: "下周应收租金（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下周应收租金（万元）",
+            value: Math.round(data.rental_receivable_week_next / 100) / 100,
+        })
+    },
+    {
+        id: "rental_receivable_month_next",
+        description: "下月应收租金（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下月应收租金（万元）",
+            value: Math.round(data.rental_receivable_month_next / 100) / 100,
+        })
+    },
+    {
+        id: "rental_receivable_quarter_next",
+        description: "下季应收租金（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下季应收租金（万元）",
+            value: Math.round(data.rental_receivable_quarter_next / 100) / 100,
+        })
+    },
+    {
+        id: "rental_receivable_year_next",
+        description: "来年应收租金（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "来年应收租金（万元）",
+            value: Math.round(data.rental_receivable_year_next / 100) / 100,
+        })
+    },
+    {
         id: "rental_received_today",
         description: "当日实收租金（万元）",
         Component: NumberCard,
@@ -375,6 +420,51 @@ const items = [
         })
     },
     {
+        id: "fee_water_receivable_tomorrow",
+        description: "明日应收水费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "明日应收水费（万元）",
+            value: Math.round(data.fee_water_receivable_tomorrow / 100) / 100,
+        })
+    },
+    {
+        id: "fee_water_receivable_week_next",
+        description: "下周应收水费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下周应收水费（万元）",
+            value: Math.round(data.fee_water_receivable_week_next / 100) / 100,
+        })
+    },
+    {
+        id: "fee_water_receivable_month_next",
+        description: "下月应收水费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下月应收水费（万元）",
+            value: Math.round(data.fee_water_receivable_month_next / 100) / 100,
+        })
+    },
+    {
+        id: "fee_water_receivable_quarter_next",
+        description: "下季应收水费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下季应收水费（万元）",
+            value: Math.round(data.fee_water_receivable_quarter_next / 100) / 100,
+        })
+    },
+    {
+        id: "fee_water_receivable_year_next",
+        description: "来年应收水费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "来年应收水费（万元）",
+            value: Math.round(data.fee_water_receivable_year_next / 100) / 100,
+        })
+    },
+    {
         id: "fee_water_received_today",
         description: "当日实收水费（万元）",
         Component: NumberCard,
@@ -462,6 +552,51 @@ const items = [
         props: (data) => ({
             title: "当年应收电费（万元）",
             value: Math.round(data.fee_electricity_receivable_year / 100) / 100,
+        })
+    },
+    {
+        id: "fee_electricity_receivable_tomorrow",
+        description: "明日应收电费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "明日应收电费（万元）",
+            value: Math.round(data.fee_electricity_receivable_tomorrow / 100) / 100,
+        })
+    },
+    {
+        id: "fee_electricity_receivable_week_next",
+        description: "下周应收电费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下周应收电费（万元）",
+            value: Math.round(data.fee_electricity_receivable_week_next / 100) / 100,
+        })
+    },
+    {
+        id: "fee_electricity_receivable_month_next",
+        description: "下月应收电费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下月应收电费（万元）",
+            value: Math.round(data.fee_electricity_receivable_month_next / 100) / 100,
+        })
+    },
+    {
+        id: "fee_electricity_receivable_quarter_next",
+        description: "下季应收电费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下季应收电费（万元）",
+            value: Math.round(data.fee_electricity_receivable_quarter_next / 100) / 100,
+        })
+    },
+    {
+        id: "fee_electricity_receivable_year_next",
+        description: "来年应收电费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "来年应收电费（万元）",
+            value: Math.round(data.fee_electricity_receivable_year_next / 100) / 100,
         })
     },
     {
@@ -555,6 +690,51 @@ const items = [
         })
     },
     {
+        id: "fee_electricity_maintenance_receivable_tomorrow",
+        description: "明日应收电力维护费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "明日应收电力维护费（万元）",
+            value: Math.round(data.fee_electricity_maintenance_receivable_tomorrow / 100) / 100,
+        })
+    },
+    {
+        id: "fee_electricity_maintenance_receivable_week_next",
+        description: "下周应收电力维护费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下周应收电力维护费（万元）",
+            value: Math.round(data.fee_electricity_maintenance_receivable_week_next / 100) / 100,
+        })
+    },
+    {
+        id: "fee_electricity_maintenance_receivable_month_next",
+        description: "下月应收电力维护费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下月应收电力维护费（万元）",
+            value: Math.round(data.fee_electricity_maintenance_receivable_month_next / 100) / 100,
+        })
+    },
+    {
+        id: "fee_electricity_maintenance_receivable_quarter_next",
+        description: "下季应收电力维护费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下季应收电力维护费（万元）",
+            value: Math.round(data.fee_electricity_maintenance_receivable_quarter_next / 100) / 100,
+        })
+    },
+    {
+        id: "fee_electricity_maintenance_receivable_year_next",
+        description: "来年应收电力维护费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "来年应收电力维护费（万元）",
+            value: Math.round(data.fee_electricity_maintenance_receivable_year_next / 100) / 100,
+        })
+    },
+    {
         id: "fee_electricity_maintenance_received_today",
         description: "当日实收电力维护费（万元）",
         Component: NumberCard,
@@ -645,6 +825,51 @@ const items = [
         })
     },
     {
+        id: "fee_water_electricity_maintenance_receivable_tomorrow",
+        description: "明日应收水电费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "明日应收水电费（万元）",
+            value: Math.round((data.fee_water_receivable_tomorrow + data.fee_electricity_receivable_tomorrow + data.fee_electricity_maintenance_receivable_tomorrow) / 100) / 100,
+        })
+    },
+    {
+        id: "fee_water_electricity_maintenance_receivable_week_next",
+        description: "下周应收水电费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下周应收水电费（万元）",
+            value: Math.round((data.fee_water_receivable_week_next + data.fee_electricity_receivable_week_next + data.fee_electricity_maintenance_receivable_week_next) / 100) / 100,
+        })
+    },
+    {
+        id: "fee_water_electricity_maintenance_receivable_month_next",
+        description: "下月应收水电费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下月应收水电费（万元）",
+            value: Math.round((data.fee_water_receivable_month_next + data.fee_electricity_receivable_month_next + data.fee_electricity_maintenance_receivable_month_next) / 100) / 100,
+        })
+    },
+    {
+        id: "fee_water_electricity_maintenance_receivable_quarter_next",
+        description: "下季应收水电费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下季应收水电费（万元）",
+            value: Math.round((data.fee_water_receivable_quarter_next + data.fee_electricity_receivable_quarter_next + data.fee_electricity_maintenance_receivable_quarter_next) / 100) / 100,
+        })
+    },
+    {
+        id: "fee_water_electricity_maintenance_receivable_year_next",
+        description: "来年应收水电费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "来年应收水电费（万元）",
+            value: Math.round((data.fee_water_receivable_year_next + data.fee_electricity_receivable_year_next + data.fee_electricity_maintenance_receivable_year_next) / 100) / 100,
+        })
+    },
+    {
         id: "fee_water_electricity_maintenance_received_today",
         description: "当日实收水电费（万元）",
         Component: NumberCard,
@@ -732,6 +957,51 @@ const items = [
         props: (data) => ({
             title: "当年应收物业费（万元）",
             value: Math.round(data.fee_maintenance_receivable_year / 100) / 100,
+        })
+    },
+    {
+        id: "fee_maintenance_receivable_tomorrow",
+        description: "明日应收物业费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "明日应收物业费（万元）",
+            value: Math.round(data.fee_maintenance_receivable_tomorrow / 100) / 100,
+        })
+    },
+    {
+        id: "fee_maintenance_receivable_week_next",
+        description: "下周应收物业费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下周应收物业费（万元）",
+            value: Math.round(data.fee_maintenance_receivable_week_next / 100) / 100,
+        })
+    },
+    {
+        id: "fee_maintenance_receivable_month_next",
+        description: "下月应收物业费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下月应收物业费（万元）",
+            value: Math.round(data.fee_maintenance_receivable_month_next / 100) / 100,
+        })
+    },
+    {
+        id: "fee_maintenance_receivable_quarter_next",
+        description: "下季应收物业费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "下季应收物业费（万元）",
+            value: Math.round(data.fee_maintenance_receivable_quarter_next / 100) / 100,
+        })
+    },
+    {
+        id: "fee_maintenance_receivable_year_next",
+        description: "来年应收物业费（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "来年应收物业费（万元）",
+            value: Math.round(data.fee_maintenance_receivable_year_next / 100) / 100,
         })
     },
     {

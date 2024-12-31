@@ -56,6 +56,13 @@ class EstateDashboardService:
         rental_receivable_month = 0.0
         rental_receivable_quarter = 0.0
         rental_receivable_year = 0.0
+
+        rental_receivable_tomorrow = 0.0
+        rental_receivable_week_next = 0.0
+        rental_receivable_month_next = 0.0
+        rental_receivable_quarter_next = 0.0
+        rental_receivable_year_next = 0.0
+
         rental_received_today = 0.0
         rental_received_week = 0.0
         rental_received_month = 0.0
@@ -73,6 +80,13 @@ class EstateDashboardService:
         fee_water_receivable_month = 0.0
         fee_water_receivable_quarter = 0.0
         fee_water_receivable_year = 0.0
+
+        fee_water_receivable_tomorrow = 0.0
+        fee_water_receivable_week_next = 0.0
+        fee_water_receivable_month_next = 0.0
+        fee_water_receivable_quarter_next = 0.0
+        fee_water_receivable_year_next = 0.0
+
         fee_water_received_today = 0.0
         fee_water_received_week = 0.0
         fee_water_received_month = 0.0
@@ -84,6 +98,13 @@ class EstateDashboardService:
         fee_electricity_receivable_month = 0.0
         fee_electricity_receivable_quarter = 0.0
         fee_electricity_receivable_year = 0.0
+
+        fee_electricity_receivable_tomorrow = 0.0
+        fee_electricity_receivable_week_next = 0.0
+        fee_electricity_receivable_month_next = 0.0
+        fee_electricity_receivable_quarter_next = 0.0
+        fee_electricity_receivable_year_next = 0.0
+
         fee_electricity_received_today = 0.0
         fee_electricity_received_week = 0.0
         fee_electricity_received_month = 0.0
@@ -95,6 +116,13 @@ class EstateDashboardService:
         fee_electricity_maintenance_receivable_month = 0.0
         fee_electricity_maintenance_receivable_quarter = 0.0
         fee_electricity_maintenance_receivable_year = 0.0
+
+        fee_electricity_maintenance_receivable_tomorrow = 0.0
+        fee_electricity_maintenance_receivable_week_next = 0.0
+        fee_electricity_maintenance_receivable_month_next = 0.0
+        fee_electricity_maintenance_receivable_quarter_next = 0.0
+        fee_electricity_maintenance_receivable_year_next = 0.0
+
         fee_electricity_maintenance_received_today = 0.0
         fee_electricity_maintenance_received_week = 0.0
         fee_electricity_maintenance_received_month = 0.0
@@ -106,6 +134,13 @@ class EstateDashboardService:
         fee_maintenance_receivable_month = 0.0
         fee_maintenance_receivable_quarter = 0.0
         fee_maintenance_receivable_year = 0.0
+
+        fee_maintenance_receivable_tomorrow = 0.0
+        fee_maintenance_receivable_week_next = 0.0
+        fee_maintenance_receivable_month_next = 0.0
+        fee_maintenance_receivable_quarter_next = 0.0
+        fee_maintenance_receivable_year_next = 0.0
+
         fee_maintenance_received_today = 0.0
         fee_maintenance_received_week = 0.0
         fee_maintenance_received_month = 0.0
@@ -137,6 +172,13 @@ class EstateDashboardService:
             rental_receivable_month += record_detail.property_rental_receivable_month
             rental_receivable_quarter += record_detail.property_rental_receivable_quarter
             rental_receivable_year += record_detail.property_rental_receivable_year
+
+            rental_receivable_tomorrow += record_detail.property_rental_receivable_tomorrow
+            rental_receivable_week_next += record_detail.property_rental_receivable_week_next
+            rental_receivable_month_next += record_detail.property_rental_receivable_month_next
+            rental_receivable_quarter_next += record_detail.property_rental_receivable_quarter_next
+            rental_receivable_year_next += record_detail.property_rental_receivable_year_next
+
             rental_received_today += record_detail.property_rental_received_today
             rental_received_week += record_detail.property_rental_received_week
             rental_received_month += record_detail.property_rental_received_month
@@ -153,6 +195,13 @@ class EstateDashboardService:
             fee_water_receivable_month += record_detail.property_rent_fee_water_receivable_month
             fee_water_receivable_quarter += record_detail.property_rent_fee_water_receivable_quarter
             fee_water_receivable_year += record_detail.property_rent_fee_water_receivable_year
+
+            fee_water_receivable_tomorrow += record_detail.property_rent_fee_water_receivable_tomorrow
+            fee_water_receivable_week_next += record_detail.property_rent_fee_water_receivable_week_next
+            fee_water_receivable_month_next += record_detail.property_rent_fee_water_receivable_month_next
+            fee_water_receivable_quarter_next += record_detail.property_rent_fee_water_receivable_quarter_next
+            fee_water_receivable_year_next += record_detail.property_rent_fee_water_receivable_year_next
+
             fee_water_received_today += record_detail.property_rent_fee_water_received_today
             fee_water_received_week += record_detail.property_rent_fee_water_received_week
             fee_water_received_month += record_detail.property_rent_fee_water_received_month
@@ -164,6 +213,13 @@ class EstateDashboardService:
             fee_electricity_receivable_month += record_detail.property_rent_fee_electricity_receivable_month
             fee_electricity_receivable_quarter += record_detail.property_rent_fee_electricity_receivable_quarter
             fee_electricity_receivable_year += record_detail.property_rent_fee_electricity_receivable_year
+
+            fee_electricity_receivable_tomorrow += record_detail.property_rent_fee_electricity_receivable_tomorrow
+            fee_electricity_receivable_week_next += record_detail.property_rent_fee_electricity_receivable_week_next
+            fee_electricity_receivable_month_next += record_detail.property_rent_fee_electricity_receivable_month_next
+            fee_electricity_receivable_quarter_next += record_detail.property_rent_fee_electricity_receivable_quarter_next
+            fee_electricity_receivable_year_next += record_detail.property_rent_fee_electricity_receivable_year_next
+
             fee_electricity_received_today += record_detail.property_rent_fee_electricity_received_today
             fee_electricity_received_week += record_detail.property_rent_fee_electricity_received_week
             fee_electricity_received_month += record_detail.property_rent_fee_electricity_received_month
@@ -175,6 +231,13 @@ class EstateDashboardService:
             fee_electricity_maintenance_receivable_month += record_detail.property_rent_fee_electricity_maintenance_receivable_month
             fee_electricity_maintenance_receivable_quarter += record_detail.property_rent_fee_electricity_maintenance_receivable_quarter
             fee_electricity_maintenance_receivable_year += record_detail.property_rent_fee_electricity_maintenance_receivable_year
+
+            fee_electricity_maintenance_receivable_tomorrow += record_detail.property_rent_fee_electricity_maintenance_receivable_tomorrow
+            fee_electricity_maintenance_receivable_week_next += record_detail.property_rent_fee_electricity_maintenance_receivable_week_next
+            fee_electricity_maintenance_receivable_month_next += record_detail.property_rent_fee_electricity_maintenance_receivable_month_next
+            fee_electricity_maintenance_receivable_quarter_next += record_detail.property_rent_fee_electricity_maintenance_receivable_quarter_nx
+            fee_electricity_maintenance_receivable_year_next += record_detail.property_rent_fee_electricity_maintenance_receivable_year_next
+
             fee_electricity_maintenance_received_today += record_detail.property_rent_fee_electricity_maintenance_received_today
             fee_electricity_maintenance_received_week += record_detail.property_rent_fee_electricity_maintenance_received_week
             fee_electricity_maintenance_received_month += record_detail.property_rent_fee_electricity_maintenance_received_month
@@ -186,6 +249,13 @@ class EstateDashboardService:
             fee_maintenance_receivable_month += record_detail.property_rent_fee_maintenance_receivable_month
             fee_maintenance_receivable_quarter += record_detail.property_rent_fee_maintenance_receivable_quarter
             fee_maintenance_receivable_year += record_detail.property_rent_fee_maintenance_receivable_year
+
+            fee_maintenance_receivable_tomorrow += record_detail.property_rent_fee_maintenance_receivable_tomorrow
+            fee_maintenance_receivable_week_next += record_detail.property_rent_fee_maintenance_receivable_week_next
+            fee_maintenance_receivable_month_next += record_detail.property_rent_fee_maintenance_receivable_month_next
+            fee_maintenance_receivable_quarter_next += record_detail.property_rent_fee_maintenance_receivable_quarter_next
+            fee_maintenance_receivable_year_next += record_detail.property_rent_fee_maintenance_receivable_year_next
+
             fee_maintenance_received_today += record_detail.property_rent_fee_maintenance_received_today
             fee_maintenance_received_week += record_detail.property_rent_fee_maintenance_received_week
             fee_maintenance_received_month += record_detail.property_rent_fee_maintenance_received_month
@@ -288,6 +358,13 @@ class EstateDashboardService:
             'rental_receivable_month': round(rental_receivable_month, 2),
             'rental_receivable_quarter': round(rental_receivable_quarter, 2),
             'rental_receivable_year': round(rental_receivable_year, 2),
+
+            'rental_receivable_tomorrow': round(rental_receivable_tomorrow, 2),
+            'rental_receivable_week_next': round(rental_receivable_week_next, 2),
+            'rental_receivable_month_next': round(rental_receivable_month_next, 2),
+            'rental_receivable_quarter_next': round(rental_receivable_quarter_next, 2),
+            'rental_receivable_year_next': round(rental_receivable_year_next, 2),
+
             'rental_received_today': round(rental_received_today, 2),
             'rental_received_week': round(rental_received_week, 2),
             'rental_received_month': round(rental_received_month, 2),
@@ -304,6 +381,13 @@ class EstateDashboardService:
             'fee_water_receivable_month': round(fee_water_receivable_month, 2),
             'fee_water_receivable_quarter': round(fee_water_receivable_quarter, 2),
             'fee_water_receivable_year': round(fee_water_receivable_year, 2),
+
+            'fee_water_receivable_tomorrow': round(fee_water_receivable_tomorrow, 2),
+            'fee_water_receivable_week_next': round(fee_water_receivable_week_next, 2),
+            'fee_water_receivable_month_next': round(fee_water_receivable_month_next, 2),
+            'fee_water_receivable_quarter_next': round(fee_water_receivable_quarter_next, 2),
+            'fee_water_receivable_year_next': round(fee_water_receivable_year_next, 2),
+
             'fee_water_received_today': round(fee_water_received_today, 2),
             'fee_water_received_week': round(fee_water_received_week, 2),
             'fee_water_received_month': round(fee_water_received_month, 2),
@@ -315,6 +399,13 @@ class EstateDashboardService:
             'fee_electricity_receivable_month': round(fee_electricity_receivable_month, 2),
             'fee_electricity_receivable_quarter': round(fee_electricity_receivable_quarter, 2),
             'fee_electricity_receivable_year': round(fee_electricity_receivable_year, 2),
+
+            'fee_electricity_receivable_tomorrow': round(fee_electricity_receivable_tomorrow, 2),
+            'fee_electricity_receivable_week_next': round(fee_electricity_receivable_week_next, 2),
+            'fee_electricity_receivable_month_next': round(fee_electricity_receivable_month_next, 2),
+            'fee_electricity_receivable_quarter_next': round(fee_electricity_receivable_quarter_next, 2),
+            'fee_electricity_receivable_year_next': round(fee_electricity_receivable_year_next, 2),
+
             'fee_electricity_received_today': round(fee_electricity_received_today, 2),
             'fee_electricity_received_week': round(fee_electricity_received_week, 2),
             'fee_electricity_received_month': round(fee_electricity_received_month, 2),
@@ -326,6 +417,13 @@ class EstateDashboardService:
             'fee_electricity_maintenance_receivable_month': round(fee_electricity_maintenance_receivable_month, 2),
             'fee_electricity_maintenance_receivable_quarter': round(fee_electricity_maintenance_receivable_quarter, 2),
             'fee_electricity_maintenance_receivable_year': round(fee_electricity_maintenance_receivable_year, 2),
+
+            'fee_electricity_maintenance_receivable_tomorrow': round(fee_electricity_maintenance_receivable_tomorrow, 2),
+            'fee_electricity_maintenance_receivable_week_next': round(fee_electricity_maintenance_receivable_week_next, 2),
+            'fee_electricity_maintenance_receivable_month_next': round(fee_electricity_maintenance_receivable_month_next, 2),
+            'fee_electricity_maintenance_receivable_quarter_next': round(fee_electricity_maintenance_receivable_quarter_next, 2),
+            'fee_electricity_maintenance_receivable_year_next': round(fee_electricity_maintenance_receivable_year_next, 2),
+
             'fee_electricity_maintenance_received_today': round(fee_electricity_maintenance_received_today, 2),
             'fee_electricity_maintenance_received_week': round(fee_electricity_maintenance_received_week, 2),
             'fee_electricity_maintenance_received_month': round(fee_electricity_maintenance_received_month, 2),
@@ -337,6 +435,13 @@ class EstateDashboardService:
             'fee_maintenance_receivable_month': round(fee_maintenance_receivable_month, 2),
             'fee_maintenance_receivable_quarter': round(fee_maintenance_receivable_quarter, 2),
             'fee_maintenance_receivable_year': round(fee_maintenance_receivable_year, 2),
+
+            'fee_maintenance_receivable_tomorrow': round(fee_maintenance_receivable_tomorrow, 2),
+            'fee_maintenance_receivable_week_next': round(fee_maintenance_receivable_week_next, 2),
+            'fee_maintenance_receivable_month_next': round(fee_maintenance_receivable_month_next, 2),
+            'fee_maintenance_receivable_quarter_next': round(fee_maintenance_receivable_quarter_next, 2),
+            'fee_maintenance_receivable_year_next': round(fee_maintenance_receivable_year_next, 2),
+
             'fee_maintenance_received_today': round(fee_maintenance_received_today, 2),
             'fee_maintenance_received_week': round(fee_maintenance_received_week, 2),
             'fee_maintenance_received_month': round(fee_maintenance_received_month, 2),

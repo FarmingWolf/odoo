@@ -6,7 +6,7 @@ from typing import Dict, List
 
 from odoo import fields, models, api, SUPERUSER_ID
 from odoo.cli.scaffold import env
-from odoo.tools import end_of, start_of
+from odoo.tools import add, end_of, start_of
 
 _logger = logging.getLogger(__name__)
 
@@ -39,6 +39,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
     property_rental_receivable_month = fields.Float(string="本月应收租金")
     property_rental_receivable_quarter = fields.Float(string="本季应收租金")
     property_rental_receivable_year = fields.Float(string="本年应收租金")
+
+    property_rental_receivable_tomorrow = fields.Float(string="明日应收租金")
+    property_rental_receivable_week_next = fields.Float(string="下周应收租金")
+    property_rental_receivable_month_next = fields.Float(string="下月应收租金")
+    property_rental_receivable_quarter_next = fields.Float(string="下季应收租金")
+    property_rental_receivable_year_next = fields.Float(string="来年应收租金")
+
     property_rental_received_today = fields.Float(string="本日实收租金")
     property_rental_received_week = fields.Float(string="本周实收租金")
     property_rental_received_month = fields.Float(string="本月实收租金")
@@ -57,6 +64,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
     property_rent_fee_water_receivable_month = fields.Float(string="本月应收水费")
     property_rent_fee_water_receivable_quarter = fields.Float(string="本季应收水费")
     property_rent_fee_water_receivable_year = fields.Float(string="本年应收水费")
+
+    property_rent_fee_water_receivable_tomorrow = fields.Float(string="明日应收水费")
+    property_rent_fee_water_receivable_week_next = fields.Float(string="下周应收水费")
+    property_rent_fee_water_receivable_month_next = fields.Float(string="下月应收水费")
+    property_rent_fee_water_receivable_quarter_next = fields.Float(string="下季应收水费")
+    property_rent_fee_water_receivable_year_next = fields.Float(string="来年应收水费")
+
     property_rent_fee_water_received_today = fields.Float(string="本日实收水费")
     property_rent_fee_water_received_week = fields.Float(string="本周实收水费")
     property_rent_fee_water_received_month = fields.Float(string="本月实收水费")
@@ -68,6 +82,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
     property_rent_fee_electricity_receivable_month = fields.Float(string="本月应收电费")
     property_rent_fee_electricity_receivable_quarter = fields.Float(string="本季应收电费")
     property_rent_fee_electricity_receivable_year = fields.Float(string="本年应收电费")
+
+    property_rent_fee_electricity_receivable_tomorrow = fields.Float(string="明日应收电费")
+    property_rent_fee_electricity_receivable_week_next = fields.Float(string="下周应收电费")
+    property_rent_fee_electricity_receivable_month_next = fields.Float(string="下月应收电费")
+    property_rent_fee_electricity_receivable_quarter_next = fields.Float(string="下季应收电费")
+    property_rent_fee_electricity_receivable_year_next = fields.Float(string="来年应收电费")
+
     property_rent_fee_electricity_received_today = fields.Float(string="本日实收电费")
     property_rent_fee_electricity_received_week = fields.Float(string="本周实收电费")
     property_rent_fee_electricity_received_month = fields.Float(string="本月实收电费")
@@ -80,6 +101,14 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
     property_rent_fee_electricity_maintenance_receivable_month = fields.Float(string="本月应收电力维护费")
     property_rent_fee_electricity_maintenance_receivable_quarter = fields.Float(string="本季应收电力维护费")
     property_rent_fee_electricity_maintenance_receivable_year = fields.Float(string="本年应收电力维护费")
+
+    property_rent_fee_electricity_maintenance_receivable_tomorrow = fields.Float(string="明日应收电力维护费")
+    property_rent_fee_electricity_maintenance_receivable_week_next = fields.Float(string="下周应收电力维护费")
+    property_rent_fee_electricity_maintenance_receivable_month_next = fields.Float(string="下月应收电力维护费")
+    # 字段最长63个字符
+    property_rent_fee_electricity_maintenance_receivable_quarter_nx = fields.Float(string="下季应收电力维护费")
+    property_rent_fee_electricity_maintenance_receivable_year_next = fields.Float(string="来年应收电力维护费")
+
     property_rent_fee_electricity_maintenance_received_today = fields.Float(string="本日实收电力维护费")
     property_rent_fee_electricity_maintenance_received_week = fields.Float(string="本周实收电力维护费")
     property_rent_fee_electricity_maintenance_received_month = fields.Float(string="本月实收电力维护费")
@@ -92,6 +121,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
     property_rent_fee_maintenance_receivable_month = fields.Float(string="本月应收物业费")
     property_rent_fee_maintenance_receivable_quarter = fields.Float(string="本季应收物业费")
     property_rent_fee_maintenance_receivable_year = fields.Float(string="本年应收物业费")
+
+    property_rent_fee_maintenance_receivable_tomorrow = fields.Float(string="明日应收物业费")
+    property_rent_fee_maintenance_receivable_week_next = fields.Float(string="下周应收物业费")
+    property_rent_fee_maintenance_receivable_month_next = fields.Float(string="下月应收物业费")
+    property_rent_fee_maintenance_receivable_quarter_next = fields.Float(string="下季应收物业费")
+    property_rent_fee_maintenance_receivable_year_next = fields.Float(string="来年应收物业费")
+
     property_rent_fee_maintenance_received_today = fields.Float(string="本日实收物业费")
     property_rent_fee_maintenance_received_week = fields.Float(string="本周实收物业费")
     property_rent_fee_maintenance_received_month = fields.Float(string="本月实收物业费")
@@ -125,6 +161,9 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
         for rental_detail in details:
             if rental_detail.date_payment == in_date:
                 in_rental_info['property_rental_receivable_today'] += rental_detail.rental_receivable
+            if rental_detail.date_payment == add(in_date, days=1):
+                in_rental_info['property_rental_receivable_tomorrow'] += rental_detail.rental_receivable
+
             if rental_detail.date_payment:
                 if end_of(rental_detail.date_payment, 'week') == end_of(in_date, 'week'):
                     in_rental_info['property_rental_receivable_week'] += rental_detail.rental_receivable
@@ -134,6 +173,16 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                     in_rental_info['property_rental_receivable_quarter'] += rental_detail.rental_receivable
                 if end_of(rental_detail.date_payment, 'year') == end_of(in_date, 'year'):
                     in_rental_info['property_rental_receivable_year'] += rental_detail.rental_receivable
+
+                if start_of(rental_detail.date_payment, 'week') == add(end_of(in_date, 'week'), days=1):
+                    in_rental_info['property_rental_receivable_week_next'] += rental_detail.rental_receivable
+                if start_of(rental_detail.date_payment, 'month') == add(end_of(in_date, 'month'), days=1):
+                    in_rental_info['property_rental_receivable_month_next'] += rental_detail.rental_receivable
+                if start_of(rental_detail.date_payment, 'quarter') == add(end_of(in_date, 'quarter'), days=1):
+                    in_rental_info['property_rental_receivable_quarter_next'] += rental_detail.rental_receivable
+                if start_of(rental_detail.date_payment, 'year') == add(end_of(in_date, 'year'), days=1):
+                    in_rental_info['property_rental_receivable_year_next'] += rental_detail.rental_receivable
+
             else:
                 _logger.error(f"rental_detail.date_payment为空，请确认！rental_detail.id={rental_detail.id}")
 
@@ -187,6 +236,9 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
             if water_rcd.date_received == in_date:
                 in_fee_info['property_fee_water_receivable_today'] += water_rcd.water_receivable
                 in_fee_info['property_fee_water_received_today'] += water_rcd.water_received
+            if water_rcd.date_received == add(in_date, days=1):
+                in_fee_info['property_fee_water_receivable_tomorrow'] += water_rcd.water_receivable
+
             if water_rcd.date_received:
                 if end_of(water_rcd.date_received, 'week') == end_of(in_date, 'week'):
                     in_fee_info['property_fee_water_receivable_week'] += water_rcd.water_receivable
@@ -200,6 +252,15 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                 if end_of(water_rcd.date_received, 'year') == end_of(in_date, 'year'):
                     in_fee_info['property_fee_water_receivable_year'] += water_rcd.water_receivable
                     in_fee_info['property_fee_water_received_year'] += water_rcd.water_received
+
+                if start_of(water_rcd.date_received, 'week') == add(end_of(in_date, 'week'), days=1):
+                    in_fee_info['property_fee_water_receivable_week_next'] += water_rcd.water_receivable
+                if start_of(water_rcd.date_received, 'month') == add(end_of(in_date, 'month'), days=1):
+                    in_fee_info['property_fee_water_receivable_month_next'] += water_rcd.water_receivable
+                if start_of(water_rcd.date_received, 'quarter') == add(end_of(in_date, 'quarter'), days=1):
+                    in_fee_info['property_fee_water_receivable_quarter_next'] += water_rcd.water_receivable
+                if start_of(water_rcd.date_received, 'year') == add(end_of(in_date, 'year'), days=1):
+                    in_fee_info['property_fee_water_receivable_year_next'] += water_rcd.water_receivable
             else:
                 _logger.error(f"water_rcd.date_received为空，请确认！water_rcd.id={water_rcd.id}")
 
@@ -215,6 +276,9 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
             if electricity_rcd.date_received == in_date:
                 in_fee_info['property_fee_electricity_receivable_today'] += electricity_rcd.electricity_receivable
                 in_fee_info['property_fee_electricity_received_today'] += electricity_rcd.electricity_received
+            if electricity_rcd.date_received == add(in_date, days=1):
+                in_fee_info['property_fee_electricity_receivable_tomorrow'] += electricity_rcd.electricity_receivable
+
             if electricity_rcd.date_received:
                 if end_of(electricity_rcd.date_received, 'week') == end_of(in_date, 'week'):
                     in_fee_info['property_fee_electricity_receivable_week'] += electricity_rcd.electricity_receivable
@@ -228,6 +292,15 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                 if end_of(electricity_rcd.date_received, 'year') == end_of(in_date, 'year'):
                     in_fee_info['property_fee_electricity_receivable_year'] += electricity_rcd.electricity_receivable
                     in_fee_info['property_fee_electricity_received_year'] += electricity_rcd.electricity_received
+
+                if start_of(electricity_rcd.date_received, 'week') == add(end_of(in_date, 'week'), days=1):
+                    in_fee_info['property_fee_electricity_receivable_week_next'] += electricity_rcd.electricity_receivable
+                if start_of(electricity_rcd.date_received, 'month') == add(end_of(in_date, 'month'), days=1):
+                    in_fee_info['property_fee_electricity_receivable_month_next'] += electricity_rcd.electricity_receivable
+                if start_of(electricity_rcd.date_received, 'quarter') == add(end_of(in_date, 'quarter'), days=1):
+                    in_fee_info['property_fee_electricity_receivable_quarter_next'] += electricity_rcd.electricity_receivable
+                if start_of(electricity_rcd.date_received, 'year') == add(end_of(in_date, 'year'), days=1):
+                    in_fee_info['property_fee_electricity_receivable_year_next'] += electricity_rcd.electricity_receivable
             else:
                 _logger.error(f"electricity_rcd.date_received为空，请确认！electricity_rcd.id={electricity_rcd.id}")
 
@@ -243,6 +316,9 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
             if electricity_maintenance_rcd.date_received == in_date:
                 in_fee_info['property_fee_electricity_maintenance_receivable_today'] += electricity_maintenance_rcd.electricity_maintenance_receivable
                 in_fee_info['property_fee_electricity_maintenance_received_today'] += electricity_maintenance_rcd.electricity_maintenance_received
+            if electricity_maintenance_rcd.date_received == add(in_date, days=1):
+                in_fee_info['property_fee_electricity_maintenance_receivable_tomorrow'] += electricity_maintenance_rcd.electricity_maintenance_receivable
+
             if electricity_maintenance_rcd.date_received:
                 if end_of(electricity_maintenance_rcd.date_received, 'week') == end_of(in_date, 'week'):
                     in_fee_info['property_fee_electricity_maintenance_receivable_week'] += electricity_maintenance_rcd.electricity_maintenance_receivable
@@ -256,6 +332,15 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                 if end_of(electricity_maintenance_rcd.date_received, 'year') == end_of(in_date, 'year'):
                     in_fee_info['property_fee_electricity_maintenance_receivable_year'] += electricity_maintenance_rcd.electricity_maintenance_receivable
                     in_fee_info['property_fee_electricity_maintenance_received_year'] += electricity_maintenance_rcd.electricity_maintenance_received
+
+                if start_of(electricity_maintenance_rcd.date_received, 'week') == add(end_of(in_date, 'week'), days=1):
+                    in_fee_info['property_fee_electricity_maintenance_receivable_week_next'] += electricity_maintenance_rcd.electricity_maintenance_receivable
+                if start_of(electricity_maintenance_rcd.date_received, 'month') == add(end_of(in_date, 'month'), days=1):
+                    in_fee_info['property_fee_electricity_maintenance_receivable_month_next'] += electricity_maintenance_rcd.electricity_maintenance_receivable
+                if start_of(electricity_maintenance_rcd.date_received, 'quarter') == add(end_of(in_date, 'quarter'), days=1):
+                    in_fee_info['property_fee_electricity_maintenance_receivable_quarter_next'] += electricity_maintenance_rcd.electricity_maintenance_receivable
+                if start_of(electricity_maintenance_rcd.date_received, 'year') == add(end_of(in_date, 'year'), days=1):
+                    in_fee_info['property_fee_electricity_maintenance_receivable_year_next'] += electricity_maintenance_rcd.electricity_maintenance_receivable
             else:
                 _logger.error(f"electricity_maintenance_rcd.date_received为空，请确认！electricity_maintenance_rcd.id={electricity_maintenance_rcd.id}")
 
@@ -271,6 +356,10 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
             if maintenance_rcd.date_received == in_date:
                 in_fee_info['property_fee_maintenance_receivable_today'] += maintenance_rcd.maintenance_receivable
                 in_fee_info['property_fee_maintenance_received_today'] += maintenance_rcd.maintenance_received
+
+            if maintenance_rcd.date_received == add(in_date, days=1):
+                in_fee_info['property_fee_maintenance_receivable_tomorrow'] += maintenance_rcd.maintenance_receivable
+
             if maintenance_rcd.date_received:
                 if end_of(maintenance_rcd.date_received, 'week') == end_of(in_date, 'week'):
                     in_fee_info['property_fee_maintenance_receivable_week'] += maintenance_rcd.maintenance_receivable
@@ -284,6 +373,15 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                 if end_of(maintenance_rcd.date_received, 'year') == end_of(in_date, 'year'):
                     in_fee_info['property_fee_maintenance_receivable_year'] += maintenance_rcd.maintenance_receivable
                     in_fee_info['property_fee_maintenance_received_year'] += maintenance_rcd.maintenance_received
+
+                if start_of(maintenance_rcd.date_received, 'week') == add(end_of(in_date, 'week'), days=1):
+                    in_fee_info['property_fee_maintenance_receivable_week_next'] += maintenance_rcd.maintenance_receivable
+                if start_of(maintenance_rcd.date_received, 'month') == add(end_of(in_date, 'month'), days=1):
+                    in_fee_info['property_fee_maintenance_receivable_month_next'] += maintenance_rcd.maintenance_receivable
+                if start_of(maintenance_rcd.date_received, 'quarter') == add(end_of(in_date, 'quarter'), days=1):
+                    in_fee_info['property_fee_maintenance_receivable_quarter_next'] += maintenance_rcd.maintenance_receivable
+                if start_of(maintenance_rcd.date_received, 'year') == add(end_of(in_date, 'year'), days=1):
+                    in_fee_info['property_fee_maintenance_receivable_year_next'] += maintenance_rcd.maintenance_receivable
             else:
                 _logger.error(f"maintenance_rcd.date_received为空，请确认！maintenance_rcd.id={maintenance_rcd.id}")
 
@@ -372,6 +470,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_rental_receivable_month": 0,
                         "property_rental_receivable_quarter": 0,
                         "property_rental_receivable_year": 0,
+
+                        "property_rental_receivable_tomorrow": 0,
+                        "property_rental_receivable_week_next": 0,
+                        "property_rental_receivable_month_next": 0,
+                        "property_rental_receivable_quarter_next": 0,
+                        "property_rental_receivable_year_next": 0,
+
                         "property_rental_received_today": 0,
                         "property_rental_received_week": 0,
                         "property_rental_received_month": 0,
@@ -393,6 +498,11 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_fee_water_receivable_month": 0,
                         "property_fee_water_receivable_quarter": 0,
                         "property_fee_water_receivable_year": 0,
+                        "property_fee_water_receivable_tomorrow": 0,
+                        "property_fee_water_receivable_week_next": 0,
+                        "property_fee_water_receivable_month_next": 0,
+                        "property_fee_water_receivable_quarter_next": 0,
+                        "property_fee_water_receivable_year_next": 0,
                         "property_fee_water_received_today": 0,
                         "property_fee_water_received_week": 0,
                         "property_fee_water_received_month": 0,
@@ -406,6 +516,11 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_fee_electricity_receivable_month": 0,
                         "property_fee_electricity_receivable_quarter": 0,
                         "property_fee_electricity_receivable_year": 0,
+                        "property_fee_electricity_receivable_tomorrow": 0,
+                        "property_fee_electricity_receivable_week_next": 0,
+                        "property_fee_electricity_receivable_month_next": 0,
+                        "property_fee_electricity_receivable_quarter_next": 0,
+                        "property_fee_electricity_receivable_year_next": 0,
                         "property_fee_electricity_received_today": 0,
                         "property_fee_electricity_received_week": 0,
                         "property_fee_electricity_received_month": 0,
@@ -419,6 +534,11 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_fee_electricity_maintenance_receivable_month": 0,
                         "property_fee_electricity_maintenance_receivable_quarter": 0,
                         "property_fee_electricity_maintenance_receivable_year": 0,
+                        "property_fee_electricity_maintenance_receivable_tomorrow": 0,
+                        "property_fee_electricity_maintenance_receivable_week_next": 0,
+                        "property_fee_electricity_maintenance_receivable_month_next": 0,
+                        "property_fee_electricity_maintenance_receivable_quarter_next": 0,
+                        "property_fee_electricity_maintenance_receivable_year_next": 0,
                         "property_fee_electricity_maintenance_received_today": 0,
                         "property_fee_electricity_maintenance_received_week": 0,
                         "property_fee_electricity_maintenance_received_month": 0,
@@ -433,6 +553,11 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_fee_maintenance_receivable_month": 0,
                         "property_fee_maintenance_receivable_quarter": 0,
                         "property_fee_maintenance_receivable_year": 0,
+                        "property_fee_maintenance_receivable_tomorrow": 0,
+                        "property_fee_maintenance_receivable_week_next": 0,
+                        "property_fee_maintenance_receivable_month_next": 0,
+                        "property_fee_maintenance_receivable_quarter_next": 0,
+                        "property_fee_maintenance_receivable_year_next": 0,
                         "property_fee_maintenance_received_today": 0,
                         "property_fee_maintenance_received_week": 0,
                         "property_fee_maintenance_received_month": 0,
@@ -533,11 +658,19 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_rental_receivable_month": record_rental_info['property_rental_receivable_month'],
                         "property_rental_receivable_quarter": record_rental_info['property_rental_receivable_quarter'],
                         "property_rental_receivable_year": record_rental_info['property_rental_receivable_year'],
+
+                        "property_rental_receivable_tomorrow": record_rental_info['property_rental_receivable_tomorrow'],
+                        "property_rental_receivable_week_next": record_rental_info['property_rental_receivable_week_next'],
+                        "property_rental_receivable_month_next": record_rental_info['property_rental_receivable_month_next'],
+                        "property_rental_receivable_quarter_next": record_rental_info['property_rental_receivable_quarter_next'],
+                        "property_rental_receivable_year_next": record_rental_info['property_rental_receivable_year_next'],
+
                         "property_rental_received_today": record_rental_info['property_rental_received_today'],
                         "property_rental_received_week": record_rental_info['property_rental_received_week'],
                         "property_rental_received_month": record_rental_info['property_rental_received_month'],
                         "property_rental_received_quarter": record_rental_info['property_rental_received_quarter'],
                         "property_rental_received_year": record_rental_info['property_rental_received_year'],
+
                         "property_rent_deposit_received_today": rent_deposit_info['property_rent_deposit_received_today'],
                         "property_rent_deposit_received_week": rent_deposit_info['property_rent_deposit_received_week'],
                         "property_rent_deposit_received_month": rent_deposit_info['property_rent_deposit_received_month'],
@@ -549,6 +682,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_rent_fee_water_receivable_month": fee_water_info['property_fee_water_receivable_month'],
                         "property_rent_fee_water_receivable_quarter": fee_water_info['property_fee_water_receivable_quarter'],
                         "property_rent_fee_water_receivable_year": fee_water_info['property_fee_water_receivable_year'],
+
+                        "property_rent_fee_water_receivable_tomorrow": fee_water_info['property_fee_water_receivable_tomorrow'],
+                        "property_rent_fee_water_receivable_week_next": fee_water_info['property_fee_water_receivable_week_next'],
+                        "property_rent_fee_water_receivable_month_next": fee_water_info['property_fee_water_receivable_month_next'],
+                        "property_rent_fee_water_receivable_quarter_next": fee_water_info['property_fee_water_receivable_quarter_next'],
+                        "property_rent_fee_water_receivable_year_next": fee_water_info['property_fee_water_receivable_year_next'],
+
                         "property_rent_fee_water_received_today": fee_water_info['property_fee_water_received_today'],
                         "property_rent_fee_water_received_week": fee_water_info['property_fee_water_received_week'],
                         "property_rent_fee_water_received_month": fee_water_info['property_fee_water_received_month'],
@@ -560,6 +700,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_rent_fee_electricity_receivable_month": fee_electricity_info['property_fee_electricity_receivable_month'],
                         "property_rent_fee_electricity_receivable_quarter": fee_electricity_info['property_fee_electricity_receivable_quarter'],
                         "property_rent_fee_electricity_receivable_year": fee_electricity_info['property_fee_electricity_receivable_year'],
+
+                        "property_rent_fee_electricity_receivable_tomorrow": fee_electricity_info['property_fee_electricity_receivable_tomorrow'],
+                        "property_rent_fee_electricity_receivable_week_next": fee_electricity_info['property_fee_electricity_receivable_week_next'],
+                        "property_rent_fee_electricity_receivable_month_next": fee_electricity_info['property_fee_electricity_receivable_month_next'],
+                        "property_rent_fee_electricity_receivable_quarter_next": fee_electricity_info['property_fee_electricity_receivable_quarter_next'],
+                        "property_rent_fee_electricity_receivable_year_next": fee_electricity_info['property_fee_electricity_receivable_year_next'],
+
                         "property_rent_fee_electricity_received_today": fee_electricity_info['property_fee_electricity_received_today'],
                         "property_rent_fee_electricity_received_week": fee_electricity_info['property_fee_electricity_received_week'],
                         "property_rent_fee_electricity_received_month": fee_electricity_info['property_fee_electricity_received_month'],
@@ -571,6 +718,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_rent_fee_electricity_maintenance_receivable_month": fee_electricity_maintenance_info['property_fee_electricity_maintenance_receivable_month'],
                         "property_rent_fee_electricity_maintenance_receivable_quarter": fee_electricity_maintenance_info['property_fee_electricity_maintenance_receivable_quarter'],
                         "property_rent_fee_electricity_maintenance_receivable_year": fee_electricity_maintenance_info['property_fee_electricity_maintenance_receivable_year'],
+
+                        "property_rent_fee_electricity_maintenance_receivable_tomorrow": fee_electricity_maintenance_info['property_fee_electricity_maintenance_receivable_tomorrow'],
+                        "property_rent_fee_electricity_maintenance_receivable_week_next": fee_electricity_maintenance_info['property_fee_electricity_maintenance_receivable_week_next'],
+                        "property_rent_fee_electricity_maintenance_receivable_month_next": fee_electricity_maintenance_info['property_fee_electricity_maintenance_receivable_month_next'],
+                        "property_rent_fee_electricity_maintenance_receivable_quarter_nx": fee_electricity_maintenance_info['property_fee_electricity_maintenance_receivable_quarter_next'],
+                        "property_rent_fee_electricity_maintenance_receivable_year_next": fee_electricity_maintenance_info['property_fee_electricity_maintenance_receivable_year_next'],
+
                         "property_rent_fee_electricity_maintenance_received_today": fee_electricity_maintenance_info['property_fee_electricity_maintenance_received_today'],
                         "property_rent_fee_electricity_maintenance_received_week": fee_electricity_maintenance_info['property_fee_electricity_maintenance_received_week'],
                         "property_rent_fee_electricity_maintenance_received_month": fee_electricity_maintenance_info['property_fee_electricity_maintenance_received_month'],
@@ -582,6 +736,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_rent_fee_maintenance_receivable_month": fee_maintenance_info['property_fee_maintenance_receivable_month'],
                         "property_rent_fee_maintenance_receivable_quarter": fee_maintenance_info['property_fee_maintenance_receivable_quarter'],
                         "property_rent_fee_maintenance_receivable_year": fee_maintenance_info['property_fee_maintenance_receivable_year'],
+
+                        "property_rent_fee_maintenance_receivable_tomorrow": fee_maintenance_info['property_fee_maintenance_receivable_tomorrow'],
+                        "property_rent_fee_maintenance_receivable_week_next": fee_maintenance_info['property_fee_maintenance_receivable_week_next'],
+                        "property_rent_fee_maintenance_receivable_month_next": fee_maintenance_info['property_fee_maintenance_receivable_month_next'],
+                        "property_rent_fee_maintenance_receivable_quarter_next": fee_maintenance_info['property_fee_maintenance_receivable_quarter_next'],
+                        "property_rent_fee_maintenance_receivable_year_next": fee_maintenance_info['property_fee_maintenance_receivable_year_next'],
+
                         "property_rent_fee_maintenance_received_today": fee_maintenance_info['property_fee_maintenance_received_today'],
                         "property_rent_fee_maintenance_received_week": fee_maintenance_info['property_fee_maintenance_received_week'],
                         "property_rent_fee_maintenance_received_month": fee_maintenance_info['property_fee_maintenance_received_month'],

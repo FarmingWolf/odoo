@@ -16,8 +16,9 @@ import {CURRENT_VERSION, migrate} from "./dashboard_migration";
 let default_items = ['estate_conventional_quantity', 'estate_conventional_area_quantity',
     'estate_conventional_lease_quantity', 'estate_conventional_area_lease_quantity',
     'estate_conventional_price_avg', 'ratio_conventional_quantity', 'ratio_conventional_area_quantity',
-    'rental_received_month', 'rent_deposit_received_month',
-    'fee_water_electricity_maintenance_received_month', 'fee_maintenance_received_month', 'fee_maintenance_received_year',
+    'rental_received_month',
+    'fee_water_electricity_maintenance_received_month',
+    'fee_maintenance_received_month',
     'pie_chart_ratio_conventional_quantity', 'pie_chart_ratio_conventional_area_quantity']
 
 class EstateDashboard extends Component {
