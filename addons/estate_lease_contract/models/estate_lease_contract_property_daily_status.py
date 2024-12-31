@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from typing import Dict, List
 
 from odoo import fields, models, api, SUPERUSER_ID
@@ -9,6 +9,23 @@ from odoo.cli.scaffold import env
 from odoo.tools import add, end_of, start_of
 
 _logger = logging.getLogger(__name__)
+
+
+def date_equal(param1, param2):
+    if isinstance(param1, datetime):
+        date1 = param1.date()
+    else:
+        date1 = param1
+
+    if isinstance(param2, datetime):
+        date2 = param2.date()
+    else:
+        date2 = param2
+
+    if date1 == date2:
+        return True
+    else:
+        return False
 
 
 class EstateLeaseContractPropertyDailyStatus(models.Model):
@@ -174,13 +191,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                 if end_of(rental_detail.date_payment, 'year') == end_of(in_date, 'year'):
                     in_rental_info['property_rental_receivable_year'] += rental_detail.rental_receivable
 
-                if start_of(rental_detail.date_payment, 'week') == add(end_of(in_date, 'week'), days=1):
+                if date_equal(start_of(rental_detail.date_payment, 'week'), add(end_of(in_date, 'week'), days=1)):
                     in_rental_info['property_rental_receivable_week_next'] += rental_detail.rental_receivable
-                if start_of(rental_detail.date_payment, 'month') == add(end_of(in_date, 'month'), days=1):
+                if date_equal(start_of(rental_detail.date_payment, 'month'), add(end_of(in_date, 'month'), days=1)):
                     in_rental_info['property_rental_receivable_month_next'] += rental_detail.rental_receivable
-                if start_of(rental_detail.date_payment, 'quarter') == add(end_of(in_date, 'quarter'), days=1):
+                if date_equal(start_of(rental_detail.date_payment, 'quarter'), add(end_of(in_date, 'quarter'), days=1)):
                     in_rental_info['property_rental_receivable_quarter_next'] += rental_detail.rental_receivable
-                if start_of(rental_detail.date_payment, 'year') == add(end_of(in_date, 'year'), days=1):
+                if date_equal(start_of(rental_detail.date_payment, 'year'), add(end_of(in_date, 'year'), days=1)):
                     in_rental_info['property_rental_receivable_year_next'] += rental_detail.rental_receivable
 
             else:
@@ -253,13 +270,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                     in_fee_info['property_fee_water_receivable_year'] += water_rcd.water_receivable
                     in_fee_info['property_fee_water_received_year'] += water_rcd.water_received
 
-                if start_of(water_rcd.date_received, 'week') == add(end_of(in_date, 'week'), days=1):
+                if date_equal(start_of(water_rcd.date_received, 'week'), add(end_of(in_date, 'week'), days=1)):
                     in_fee_info['property_fee_water_receivable_week_next'] += water_rcd.water_receivable
-                if start_of(water_rcd.date_received, 'month') == add(end_of(in_date, 'month'), days=1):
+                if date_equal(start_of(water_rcd.date_received, 'month'), add(end_of(in_date, 'month'), days=1)):
                     in_fee_info['property_fee_water_receivable_month_next'] += water_rcd.water_receivable
-                if start_of(water_rcd.date_received, 'quarter') == add(end_of(in_date, 'quarter'), days=1):
+                if date_equal(start_of(water_rcd.date_received, 'quarter'), add(end_of(in_date, 'quarter'), days=1)):
                     in_fee_info['property_fee_water_receivable_quarter_next'] += water_rcd.water_receivable
-                if start_of(water_rcd.date_received, 'year') == add(end_of(in_date, 'year'), days=1):
+                if date_equal(start_of(water_rcd.date_received, 'year'), add(end_of(in_date, 'year'), days=1)):
                     in_fee_info['property_fee_water_receivable_year_next'] += water_rcd.water_receivable
             else:
                 _logger.error(f"water_rcd.date_received为空，请确认！water_rcd.id={water_rcd.id}")
@@ -293,13 +310,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                     in_fee_info['property_fee_electricity_receivable_year'] += electricity_rcd.electricity_receivable
                     in_fee_info['property_fee_electricity_received_year'] += electricity_rcd.electricity_received
 
-                if start_of(electricity_rcd.date_received, 'week') == add(end_of(in_date, 'week'), days=1):
+                if date_equal(start_of(electricity_rcd.date_received, 'week'), add(end_of(in_date, 'week'), days=1)):
                     in_fee_info['property_fee_electricity_receivable_week_next'] += electricity_rcd.electricity_receivable
-                if start_of(electricity_rcd.date_received, 'month') == add(end_of(in_date, 'month'), days=1):
+                if date_equal(start_of(electricity_rcd.date_received, 'month'), add(end_of(in_date, 'month'), days=1)):
                     in_fee_info['property_fee_electricity_receivable_month_next'] += electricity_rcd.electricity_receivable
-                if start_of(electricity_rcd.date_received, 'quarter') == add(end_of(in_date, 'quarter'), days=1):
+                if date_equal(start_of(electricity_rcd.date_received, 'quarter'), add(end_of(in_date, 'quarter'), days=1)):
                     in_fee_info['property_fee_electricity_receivable_quarter_next'] += electricity_rcd.electricity_receivable
-                if start_of(electricity_rcd.date_received, 'year') == add(end_of(in_date, 'year'), days=1):
+                if date_equal(start_of(electricity_rcd.date_received, 'year'), add(end_of(in_date, 'year'), days=1)):
                     in_fee_info['property_fee_electricity_receivable_year_next'] += electricity_rcd.electricity_receivable
             else:
                 _logger.error(f"electricity_rcd.date_received为空，请确认！electricity_rcd.id={electricity_rcd.id}")
@@ -333,13 +350,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                     in_fee_info['property_fee_electricity_maintenance_receivable_year'] += electricity_maintenance_rcd.electricity_maintenance_receivable
                     in_fee_info['property_fee_electricity_maintenance_received_year'] += electricity_maintenance_rcd.electricity_maintenance_received
 
-                if start_of(electricity_maintenance_rcd.date_received, 'week') == add(end_of(in_date, 'week'), days=1):
+                if date_equal(start_of(electricity_maintenance_rcd.date_received, 'week'), add(end_of(in_date, 'week'), days=1)):
                     in_fee_info['property_fee_electricity_maintenance_receivable_week_next'] += electricity_maintenance_rcd.electricity_maintenance_receivable
-                if start_of(electricity_maintenance_rcd.date_received, 'month') == add(end_of(in_date, 'month'), days=1):
+                if date_equal(start_of(electricity_maintenance_rcd.date_received, 'month'), add(end_of(in_date, 'month'), days=1)):
                     in_fee_info['property_fee_electricity_maintenance_receivable_month_next'] += electricity_maintenance_rcd.electricity_maintenance_receivable
-                if start_of(electricity_maintenance_rcd.date_received, 'quarter') == add(end_of(in_date, 'quarter'), days=1):
+                if date_equal(start_of(electricity_maintenance_rcd.date_received, 'quarter'), add(end_of(in_date, 'quarter'), days=1)):
                     in_fee_info['property_fee_electricity_maintenance_receivable_quarter_next'] += electricity_maintenance_rcd.electricity_maintenance_receivable
-                if start_of(electricity_maintenance_rcd.date_received, 'year') == add(end_of(in_date, 'year'), days=1):
+                if date_equal(start_of(electricity_maintenance_rcd.date_received, 'year'), add(end_of(in_date, 'year'), days=1)):
                     in_fee_info['property_fee_electricity_maintenance_receivable_year_next'] += electricity_maintenance_rcd.electricity_maintenance_receivable
             else:
                 _logger.error(f"electricity_maintenance_rcd.date_received为空，请确认！electricity_maintenance_rcd.id={electricity_maintenance_rcd.id}")
@@ -374,13 +391,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                     in_fee_info['property_fee_maintenance_receivable_year'] += maintenance_rcd.maintenance_receivable
                     in_fee_info['property_fee_maintenance_received_year'] += maintenance_rcd.maintenance_received
 
-                if start_of(maintenance_rcd.date_received, 'week') == add(end_of(in_date, 'week'), days=1):
+                if date_equal(start_of(maintenance_rcd.date_received, 'week'),  add(end_of(in_date, 'week'), days=1)):
                     in_fee_info['property_fee_maintenance_receivable_week_next'] += maintenance_rcd.maintenance_receivable
-                if start_of(maintenance_rcd.date_received, 'month') == add(end_of(in_date, 'month'), days=1):
+                if date_equal(start_of(maintenance_rcd.date_received, 'month'), add(end_of(in_date, 'month'), days=1)):
                     in_fee_info['property_fee_maintenance_receivable_month_next'] += maintenance_rcd.maintenance_receivable
-                if start_of(maintenance_rcd.date_received, 'quarter') == add(end_of(in_date, 'quarter'), days=1):
+                if date_equal(start_of(maintenance_rcd.date_received, 'quarter'), add(end_of(in_date, 'quarter'), days=1)):
                     in_fee_info['property_fee_maintenance_receivable_quarter_next'] += maintenance_rcd.maintenance_receivable
-                if start_of(maintenance_rcd.date_received, 'year') == add(end_of(in_date, 'year'), days=1):
+                if date_equal(start_of(maintenance_rcd.date_received, 'year'), add(end_of(in_date, 'year'), days=1)):
                     in_fee_info['property_fee_maintenance_receivable_year_next'] += maintenance_rcd.maintenance_receivable
             else:
                 _logger.error(f"maintenance_rcd.date_received为空，请确认！maintenance_rcd.id={maintenance_rcd.id}")
