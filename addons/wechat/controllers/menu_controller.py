@@ -1,7 +1,7 @@
 import json
 import logging
 
-from .controllers import get_wx_user, pwd_decoded, get_wx_user_by_union_id, wechat_user_silent_login
+from .controllers import wechat_user_silent_login, get_wx_stable_token
 from odoo import http
 from odoo.http import request
 import requests
@@ -32,20 +32,6 @@ def create_wechat_menu(access_token, app_id):
 
     except Exception as e:
         _logger.error(f"微信菜单生成失败：{str(e)}")
-
-
-def get_wx_stable_token(in_app_id, in_app_secret):
-    stable_token_url = "https://api.weixin.qq.com/cgi-bin/stable_token"
-    token_post_data = {
-        "grant_type": "client_credential",
-        "appid": in_app_id,
-        "secret": in_app_secret
-    }
-    token_res = requests.post(stable_token_url, json=token_post_data)
-    _logger.info(f"token_res={token_res}")
-    token_ret_data = token_res.json()
-    _logger.info(f"token_ret_data={token_ret_data}")
-    return token_ret_data
 
 
 class MenuController(Home):

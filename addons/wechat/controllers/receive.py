@@ -12,6 +12,8 @@ def parse_xml(web_data):
         return TextMsg(xml_data)
     elif msg_type == 'image':
         return ImageMsg(xml_data)
+    elif msg_type == 'voice':
+        return VoiceMsg(xml_data)
     elif msg_type == 'event':
         return EventMsg(xml_data)
 
@@ -37,6 +39,15 @@ class ImageMsg(Msg):
         self.PicUrl = xml_data.find('PicUrl').text
         self.MediaId = xml_data.find('MediaId').text
         self.MsgId = xml_data.find('MsgId').text
+
+
+class VoiceMsg(Msg):
+    def __init__(self, xml_data):
+        Msg.__init__(self, xml_data)
+        self.Format = xml_data.find('Format').text
+        self.MediaId = xml_data.find('MediaId').text
+        self.MsgId = xml_data.find('MsgId').text
+        self.MediaId16K = xml_data.find('MediaId16K').text
 
 
 class EventMsg(Msg):

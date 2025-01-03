@@ -4,6 +4,7 @@ import binascii
 import hashlib
 import logging
 import random
+import re
 import traceback
 
 import requests
@@ -108,6 +109,30 @@ def wechat_user_silent_login(in_self, in_wechat_user, in_redirect_url):
         })
 
 
+def get_wechat_token():
+
+    app_id = request.env['ir.config_parameter'].sudo().get_param('wechat_service_app_id')
+    app_secret = request.env['ir.config_parameter'].sudo().get_param('wechat_service_app_secret')
+    token_data = get_wx_stable_token(app_id, app_secret)
+    token = token_data["access_token"]
+
+    return token
+
+
+def get_wx_stable_token(in_app_id, in_app_secret):
+    stable_token_url = "https://api.weixin.qq.com/cgi-bin/stable_token"
+    token_post_data = {
+        "grant_type": "client_credential",
+        "appid": in_app_id,
+        "secret": in_app_secret
+    }
+    token_res = requests.post(stable_token_url, json=token_post_data)
+    _logger.info(f"token_res={token_res}")
+    token_ret_data = token_res.json()
+    _logger.info(f"token_ret_data={token_ret_data}")
+    return token_ret_data
+
+
 def get_hashcode(in_timestamp, in_nonce):
     # 每个新公众号需要单独设置wechat_handle_token
     tk_from_config = request.env['ir.config_parameter'].sudo().get_param('wechat_handle_token')
@@ -197,14 +222,61 @@ class WechatHandle(Home):
                                 if not ret_deepseek:
                                     ret_deepseek = "您好！公众号交互功能研发中，将陆续上线，敬请期待！"
 
+                                ret_deepseek = ret_deepseek.replace("\n\n", "\n")
+                                ret_deepseek = ret_deepseek.replace("**", "")
+                                ret_deepseek = ret_deepseek.replace("- ", "")
+                                ret_deepseek = ret_deepseek[0: 800]
+                                _logger.info(f"处理后的返回值={ret_deepseek}")
+
                                 reply_msg = reply.TextMsg(to_user, from_user, ret_deepseek)
                                 return reply_msg.send()
+                            elif rec_msg.MsgType == 'voice':
+                                # 语音转文字
+                                wec_token = get_wechat_token()
+                                _logger.info(f"rec_msg.voice_id={rec_msg.MediaId};wec_token={wec_token}")
+                                voice_url_s = f"https://api.weixin.qq.com/cgi-bin/media/voice/addvoicetorecofortext?" \
+                                              f"access_token={wec_token}&format=&voice_id={rec_msg.MediaId}&lang=zh_CN"
+
+                                ret_res = requests.post(voice_url_s)
+                                _logger.info(f"ret_res={ret_res}")
+                                res_txt = ret_res.json()
+                                txt_content = res_txt["errmsg"]
+                                _logger.info(f"errmsg={txt_content}")
+
+                                reply_txt = "您好！公众号语音交互功能研发中，将陆续上线，敬请期待！"
+                                if txt_content == "ok":
+                                    res_url = f"https://api.weixin.qq.com/cgi-bin/media/voice/queryrecoresultfortext?" \
+                                              f"access_token={wec_token}&voice_id={rec_msg.MediaId}&lang=zh_CN"
+
+                                    ret_res = requests.post(res_url)
+                                    res_txt = ret_res.json()
+                                    txt_content = res_txt["result"]
+                                    _logger.info(f"语音转换文字={txt_content}")
+                                    deepseek_config_json = get_deepseek_base()
+                                    ret_deepseek = deepseek_chat(txt_content,
+                                                                 deepseek_config_json["in_base_url"],
+                                                                 deepseek_config_json["tgt_model"],
+                                                                 deepseek_config_json["in_api_key"])
+
+                                    if ret_deepseek:
+                                        ret_deepseek = ret_deepseek.replace("\n\n", "\n")
+                                        ret_deepseek = ret_deepseek.replace("**", "")
+                                        ret_deepseek = ret_deepseek.replace("- ", "")
+                                        reply_txt = ret_deepseek[0: 800]
+                                        _logger.info(f"处理后的返回值={reply_txt}")
+
+                                else:
+                                    reply_txt = "您好！目前公众号仅识别中文普通话，其他语言版本将陆续上线，敬请期待！"
+
+                                reply_msg = reply.TextMsg(to_user, from_user, reply_txt)
+                                return reply_msg.send()
+
                             elif rec_msg.MsgType == 'event':
                                 if rec_msg.Event == 'subscribe':
                                     content = "您好！欢迎关注491科技！北京四九一科技公司坐落于北京朝阳491园区。" \
                                               "我们是一支充满激情朝气磅礴的团队！我们的愿景是试图通过构建一个具有颠覆意义的软件系统、" \
                                               "一个具有颠覆意义的产品！以此提升每一家中小企业的产品品质， " \
-                                              "来解决各位在商业活动中遇到的诸多经营问题！"
+                                              "来解决各位在商业活动中遇到的诸多经营问题！您可以随时文字或语音提问，我将努力解答^_^"
                                     reply_msg = reply.TextMsg(to_user, from_user, content)
                                     return reply_msg.send()
 
