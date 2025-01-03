@@ -127,6 +127,7 @@ def get_hashcode(in_timestamp, in_nonce):
 
 def get_deepseek_base():
     deepseek_config_str = request.env['ir.config_parameter'].sudo().get_param('wechat_deepseek_config')
+    _logger.info(f"deepseek_config_str={deepseek_config_str}")
     config_json = json.loads(deepseek_config_str)
     return config_json
 
@@ -185,8 +186,10 @@ class WechatHandle(Home):
                             from_user = rec_msg.ToUserName
 
                             if rec_msg.MsgType == 'text':
+                                _logger.info(f"rec_msg.Content={rec_msg.Content}")
+                                _logger.info(f"rec_msg.Content.decode={rec_msg.Content.decode('utf-8')}")
                                 deepseek_config_json = get_deepseek_base()
-                                ret_deepseek = deepseek_chat(rec_msg.Content,
+                                ret_deepseek = deepseek_chat(rec_msg.Content.decode('utf-8'),
                                                              deepseek_config_json["in_base_url"],
                                                              deepseek_config_json["tgt_model"],
                                                              deepseek_config_json["in_api_key"])
