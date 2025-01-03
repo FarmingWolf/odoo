@@ -11,8 +11,10 @@ import requests
 import odoo
 from odoo import http
 from odoo.http import request
+from odoo.tools import json
 from . import reply
 from . import receive
+from .deepseek_controllers import deepseek_chat
 from ...web.controllers.home import Home
 # from odoo.addons.web.controllers.home import Home
 
@@ -123,6 +125,12 @@ def get_hashcode(in_timestamp, in_nonce):
     return hashcode
 
 
+def get_deepseek_base():
+    deepseek_config_str = request.env['ir.config_parameter'].sudo().get_param('wechat_deepseek_config')
+    config_json = json.loads(deepseek_config_str)
+    return config_json
+
+
 class WechatHandle(Home):
 
     @http.route('/wechat/handle', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
@@ -177,8 +185,16 @@ class WechatHandle(Home):
                             from_user = rec_msg.ToUserName
 
                             if rec_msg.MsgType == 'text':
-                                content = "您好！公众号交互功能研发中，将陆续上线，敬请期待！"
-                                reply_msg = reply.TextMsg(to_user, from_user, content)
+                                deepseek_config_json = get_deepseek_base()
+                                ret_deepseek = deepseek_chat(rec_msg.Content,
+                                                             deepseek_config_json["in_base_url"],
+                                                             deepseek_config_json["tgt_model"],
+                                                             deepseek_config_json["in_api_key"])
+
+                                if not ret_deepseek:
+                                    ret_deepseek = "您好！公众号交互功能研发中，将陆续上线，敬请期待！"
+
+                                reply_msg = reply.TextMsg(to_user, from_user, ret_deepseek)
                                 return reply_msg.send()
                             elif rec_msg.MsgType == 'event':
                                 if rec_msg.Event == 'subscribe':
