@@ -489,6 +489,12 @@ class Partner(models.Model):
         return action
 
 
+class IrAttachment(models.Model):
+    _inherit = 'ir.attachment'
+
+    public = fields.Boolean(default=False)
+
+
 class EstateLeaseContract(models.Model):
     # def onchange(self, values, field_names, fields_spec):
     #     super().onchange(values, field_names, fields_spec)
