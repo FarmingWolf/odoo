@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
+import hashlib
+import hmac
+import urllib
 from ast import literal_eval
 from dateutil.relativedelta import relativedelta
 
@@ -27,6 +29,24 @@ _logger = logging.getLogger(__name__)
 def handle_website_estate_slide_error(exception):
     if isinstance(exception, AccessError):
         return request.redirect("/estate_slides?invite_error=no_rights", 302)
+
+
+def create_baidu_map_api_sk_url():
+    # 生成百度地图API的SN
+    ak = "CoqENPooJHD5XtUCsJPemcRPl9fVgJu1"  # 你的百度地图AK
+    sk = "你的Secret Key"  # 你的百度地图SK
+    base_url = "https://api.map.baidu.com/api"
+    query_params = {
+        'v': '3.0',
+        'ak': ak,
+    }
+    query_string = urllib.parse.urlencode(query_params)
+    raw_string = f"/api?{query_string}{sk}"
+    sn = hmac.new(sk.encode('utf-8'), raw_string.encode('utf-8'), hashlib.sha1).hexdigest()
+
+    # 生成百度地图API的完整URL
+    api_url = f"{base_url}?{query_string}&sn={sn}"
+    return api_url
 
 
 class WebsiteEstateSlides(Home):
@@ -389,6 +409,66 @@ class WebsiteEstateSlides(Home):
         })
 
         return request.render('website_estate.estate_ads_slides_all', render_values)
+
+    @http.route(['/estate_slides/baidu_map/get_ak'], type='http', auth="public", website=True, sitemap=True)
+    def get_baidu_map_ak(self, **post):
+        # 从系统参数中获取百度地图AK
+        baidu_map_ak = request.env['ir.config_parameter'].sudo().get_param('baidu_map_ak')
+        _logger.info(f"baidu_map_ak={baidu_map_ak}")
+        return request.make_response(
+            json.dumps({'ak': baidu_map_ak}),  # 将AK转换为JSON
+            headers=[('Content-Type', 'application/json')]
+        )
+
+    @http.route(['/estate_slides/baidu_map/get_markers'], type='http', auth="public", website=True, sitemap=True)
+    def get_baidu_map_markers(self, **post):
+        estate_ads_all = tools.lazy(lambda: request.env['estate.slide.property'].search([('show_ads', '=', True)]))
+        properties = []
+        for estate_ad in estate_ads_all:
+            if estate_ad.latitude and estate_ad.longitude:
+                properties.append({
+                    'latitude': estate_ad.latitude,
+                    'longitude': estate_ad.longitude,
+                    'name': estate_ad.name,  # 可选：添加房源名称
+                })
+        _logger.info(f"properties={properties}")
+        return request.make_response(
+            json.dumps(properties),  # 将点位信息转换为JSON
+            headers=[('Content-Type', 'application/json')]
+        )
+
+    @http.route(['/estate_slides/property_map'], type='http', auth="public", website=True, sitemap=True)
+    def slides_estate_all(self, **post):
+
+        # estate_ads_all = tools.lazy(lambda: request.env['estate.slide.property'].search([('show_ads', '=', True)]))
+        # render_values = self._slide_render_context_base()
+        # render_values.update({
+        #     'estate_ads_all': estate_ads_all,
+        # })
+
+        # baidu_map_ak = request.env['ir.config_parameter'].sudo().get_param('baidu_map_ak')
+        # baidu_map_api_url = f"https://api.map.baidu.com/api?v=3.0&ak={baidu_map_ak}"
+        # # 获取地点坐标列表
+        # properties = []
+        # for estate_ad in estate_ads_all:
+        #     if estate_ad.latitude and estate_ad.longitude:
+        #         properties.append({
+        #             'latitude': estate_ad.latitude,
+        #             'longitude': estate_ad.longitude,
+        #             'name': estate_ad.name,  # 可选：添加房源名称
+        #         })
+
+        # _logger.info(f"json.dumps(properties)={json.dumps(properties)}")
+        # 传递给前端模板
+        render_values = self._slide_render_context_base()
+        render_values.update({
+            # 'estate_ads_all': estate_ads_all,
+            # 'baidu_map_api_url': baidu_map_api_url,  # 百度地图API的URL
+            # 'properties': json.dumps(properties),  # 地点坐标列表
+            # 'baidu_map_ak': baidu_map_ak,
+        })
+
+        return request.render('website_estate.property_baidu_map', render_values)
 
     def slides_channel_all_values(self, slide_category=None, slug_tags=None, my=False, **post):
         """ Home page displaying a list of courses displayed according to some

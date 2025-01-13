@@ -48,6 +48,8 @@ class EstateSlideProperty(models.Model):
                                     related="estate_property_id.sales_person_id.name", readonly=True)
 
     ads_img_ids = fields.One2many(comodel_name="estate.property.ads.img", related="estate_property_id.ads_img_ids")
+    latitude = fields.Float(string="latitude")
+    longitude = fields.Float(string="longitude")
 
     @api.depends('estate_property_id.ads_img_ids.sequence', 'estate_property_id.ads_img_ids.image_1920')
     def _get_property_main_img(self):

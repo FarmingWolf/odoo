@@ -18,6 +18,8 @@
         'views/estate_slide_property_menus.xml',
         'views/estate_slide_templates_homepage.xml',
         'views/estate_slide_templates_property_ad.xml',
+        'views/baidu_map.xml',
+        'views/estate_slide_property_baidu_map.xml',
     ],
 
     'installable': True,
@@ -33,7 +35,6 @@
             'web/static/src/legacy/js/public/public_widget',
             'website_estate/static/src/scss/website_property_slides.scss',
             'website_estate/static/src/js/property_ad.js',
-
         ],
         'website.assets_editor': [
         ],

@@ -12,6 +12,8 @@
                                 <field name="estate_property_id"/>
                                 <field name="company_id"/>
                                 <field name="state"/>
+                                <field name="longitude"/>
+                                <field name="latitude"/>
                             </group>
                             <group>
                                 <field name="show_ads"/>

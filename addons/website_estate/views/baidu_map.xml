@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="baidu_map_template" name="Baidu Map Template">
+        <!-- 地图容器 -->
+        <div id="baidu-map-container" style="width:100%; height:550px;"/>
+        <script type="text/javascript" src="/website_estate/static/src/js/baidu_map.js"/>
+    </template>
+</odoo>

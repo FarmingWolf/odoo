@@ -9,7 +9,22 @@ msgstr "# 积极参与者"
 #. module: website_estate
 #: model:ir.model.fields,field_description:website_estate.field_slide_channel__members_engaged_count
 msgid "estate slide"
-msgstr "在线招商"
+msgstr "在线房源"
+
+#. module: website_estate
+#: model:ir.model.fields,field_description:website_estate.field_slide_channel__members_engaged_count
+msgid "property map"
+msgstr "房源地图"
+
+#. module: website_estate
+#: model:ir.model.fields,field_description:website_estate.field_estate_slide_property__latitude
+msgid "latitude"
+msgstr "纬度"
+
+#. module: website_estate
+#: model:ir.model.fields,field_description:website_estate.field_estate_slide_property__longitude
+msgid "longitude"
+msgstr "经度"
 
 #. module: website_estate
 #: model_terms:ir.ui.view,arch_db:website_estate.estate_slide_home
@@ -20,6 +35,11 @@ msgstr "尚未创建在线房源广告"
 #: model_terms:ir.ui.view,arch_db:website_estate.estate_slide_home
 msgid "Most popular estates"
 msgstr "最受欢迎房源"
+
+#. module: website_estate
+#: model_terms:ir.ui.view,arch_db:website_estate.estate_slide_home
+msgid "Map"
+msgstr "地图"
 
 #. module: website_estate
 #: model_terms:ir.ui.view,arch_db:website_estate.estate_slide_home
