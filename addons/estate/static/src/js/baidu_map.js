@@ -59,7 +59,7 @@ async function initBaiduMap() {
     // 初始化地图
     const map = new BMap.Map("baidu-map-container");
     const point = new BMap.Point(longitude, latitude);
-    map.centerAndZoom(point, 20); // 初始化地图，设置中心点坐标和地图级别
+    map.centerAndZoom(point, 18); // 初始化地图，设置中心点坐标和地图级别
     map.enableScrollWheelZoom(true); // 启用滚轮缩放
 
     // 存储当前标记
@@ -81,7 +81,7 @@ async function initBaiduMap() {
                 // currentMarker = new BMap.Marker(point, {icon: new BMap.Icon(icon_smile, new BMap.Size(20, 20))});
                 currentMarker = new BMap.Marker(point);
                 map.addOverlay(currentMarker);
-                map.centerAndZoom(point, 20); // 初始化地图，设置中心点坐标和地图级别
+                map.centerAndZoom(point, 18); // 初始化地图，设置中心点坐标和地图级别
                 // 添加信息窗口（可选）
                 infoWindow = new BMap.InfoWindow(marker.name);
                 currentMarker.openInfoWindow(infoWindow);
