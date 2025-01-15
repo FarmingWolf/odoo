@@ -134,6 +134,26 @@ class EstateProperty(models.Model):
     latest_free_days = fields.Date(string="免租期", copy=False)
     more_info_invisible = fields.Boolean(string="更多信息", copy=False, default=False, store=False)
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+    latitude = fields.Float(string="latitude")
+    longitude = fields.Float(string="longitude")
+
+    @api.model
+    def update_property_location(self, record_id, latitude, longitude):
+        """
+        更新模型的经纬度信息
+        :param record_id: 当前记录的ID
+        :param latitude: 纬度
+        :param longitude: 经度
+        :return: True
+        """
+        record = self.browse(record_id)
+        if record:
+            record.write({
+                'latitude': latitude,
+                'longitude': longitude,
+            })
+            return True
+        return False
 
     @api.depends("name", 'order_by_name')
     def _compute_sequence(self):

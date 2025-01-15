@@ -1,0 +1,12 @@
+msgid ""
+msgstr ""
+
+#. module: estate
+#: model:ir.model.fields,field_description:estate.field_estate_property__latitude
+msgid "latitude"
+msgstr "纬度"
+
+#. module: estate
+#: model:ir.model.fields,field_description:estate.field_estate_property__longitude
+msgid "longitude"
+msgstr "经度"

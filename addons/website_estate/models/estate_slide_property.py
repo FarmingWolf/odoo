@@ -62,22 +62,40 @@ class EstateSlideProperty(models.Model):
 
     def action_estate_slide_property_sync(self):
         """同步在线广告房源"""
-        self.env.cr.execute(f"SELECT ep.id, ep.name, ep.company_id FROM estate_property ep "
+        self.env.cr.execute(f"SELECT ep.id, ep.name, ep.company_id, ep.latitude, ep.longitude FROM estate_property ep "
                             f"WHERE ep.active is TRUE "
-                            f"  AND ep.id not in (SELECT estate_property_id FROM estate_slide_property)")
+                            f"  AND (ep.id not in (SELECT estate_property_id FROM estate_slide_property))")
         estate_properties = self.env.cr.fetchall()
         lang = self.env.context.get('lang')
 
         if lang.startswith('zh_HANS'):
             lang = 'zh_CN'
 
-        for property_id, property_name, property_company_id in estate_properties:
+        for property_id, property_name, property_company_id, latitude, longitude in estate_properties:
             new_estate_slide = [{
                 'estate_property_id': property_id,
                 'company_id': property_company_id,
-                'name': property_name.get(lang) or property_name.get('zh_CN') or property_name.get('en_US')
+                'name': property_name.get(lang) or property_name.get('zh_CN') or property_name.get('en_US'),
+                'latitude': latitude,
+                'longitude': longitude,
             }]
             self.env['estate.slide.property'].create(new_estate_slide)
+
+        # 更新名称有变化的信息
+        self.env.cr.execute(f"SELECT ep.id, ep.name, ep.company_id, ep.latitude, ep.longitude FROM estate_property ep "
+                            f"WHERE ep.active is TRUE "
+                            f"  AND (ep.id in (SELECT t_ep.id from estate_property t_ep, estate_slide_property t_ad "
+                            f"                  WHERE t_ep.id = t_ad.estate_property_id"
+                            f"                    AND t_ep.write_date > t_ad.write_date "
+                            f"                )"
+                            f"       )")
+
+        estate_properties = self.env.cr.fetchall()
+        for property_id, property_name, property_company_id, latitude, longitude in estate_properties:
+            property_ad = self.env['estate.slide.property'].search([('estate_property_id', '=', property_id)])
+            property_ad.name = property_name.get(lang) or property_name.get('zh_CN') or property_name.get('en_US')
+            property_ad.latitude = latitude
+            property_ad.longitude = longitude
 
     def like_button_click(self):
         _logger.info(f"like_button_clicked")
