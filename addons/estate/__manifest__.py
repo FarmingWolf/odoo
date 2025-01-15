@@ -32,6 +32,7 @@
     'assets': {
         'web.assets_backend': [
             'estate/static/src/css/estate_property.css',
+            'estate/static/src/**/*',
         ],
     },
     'license': 'AGPL-3'

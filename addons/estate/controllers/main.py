@@ -80,6 +80,7 @@ class EstatePropertyController(Home):
                     'latitude': estate_ad.latitude,
                     'longitude': estate_ad.longitude,
                     'name': property_name,
+                    'default_company_loc': "0",
                 })
         # 如果该资产尚未定位经纬度，那么默认取公司地址
         if not property_markers:
@@ -88,6 +89,7 @@ class EstatePropertyController(Home):
                 'latitude': location["latitude"],
                 'longitude': location["longitude"],
                 'name': property_name,
+                'default_company_loc': "1",
             })
         _logger.info(f"property_markers={property_markers}")
         return request.make_response(
@@ -106,3 +108,32 @@ class EstatePropertyController(Home):
             'longitude': longitude,
         })
         return {'success': True}
+
+    @http.route(['/estate/baidu_map/get_all_properties'], type='http', auth="user", website=True, sitemap=True)
+    def get_baidu_properties_all(self, **kwargs):
+        estate_properties = tools.lazy(lambda: request.env['estate.property'].search([]))
+        property_markers = []
+        for estate_ad in estate_properties:
+            property_name = estate_ad.name
+            if estate_ad.latitude and estate_ad.longitude:
+                property_markers.append({
+                    'latitude': estate_ad.latitude,
+                    'longitude': estate_ad.longitude,
+                    'name': property_name,
+                })
+        return request.make_response(
+            json.dumps(property_markers),  # 将点位信息转换为JSON
+            headers=[('Content-Type', 'application/json')]
+        )
+
+    @http.route(['/estate/baidu_map/get_company_loc'], type='http', auth="user", website=True, sitemap=True)
+    def get_baidu_company_marker(self, **kwargs):
+        location = get_company_lat_lng()
+        company_marker = [{
+            'latitude': location["latitude"],
+            'longitude': location["longitude"],
+        }]
+        return request.make_response(
+            json.dumps(company_marker),  # 将点位信息转换为JSON
+            headers=[('Content-Type', 'application/json')]
+        )

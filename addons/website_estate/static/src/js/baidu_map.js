@@ -6,6 +6,48 @@ function loadBaiduMapScript(apiKey, callback) {
     document.head.appendChild(script);
 }
 
+function getCenterMarker(markers) {
+    if (markers.length <= 0) {
+        return null;
+    }
+    if (markers.length === 1) {
+        return markers[0];
+    }
+    // 1. 提取所有点的经纬度
+    const lngs = markers.map(marker => marker.longitude);
+    const lats = markers.map(marker => marker.latitude);
+
+    const maxLng = Math.max(...lngs);
+    const minLng = Math.min(...lngs);
+    const maxLat = Math.max(...lats);
+    const minLat = Math.min(...lats);
+
+    const medianLng = (maxLng + minLng) / 2;
+    const medianLat = (maxLat + minLat) / 2;
+
+    // 4. 找到距离中位点最近的点
+    let closestMarker = markers[0];
+    let minDistance = Infinity;
+
+    markers.forEach(marker => {
+        const distance = Math.sqrt(
+            Math.pow(marker.longitude - medianLng, 2) +
+            Math.pow(marker.latitude - medianLat, 2)
+        );
+
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestMarker = marker;
+        }
+    });
+
+    // 输出结果
+    console.log('中位点:', closestMarker);
+    console.log('中位点经度:', closestMarker.longitude);
+    console.log('中位点纬度:', closestMarker.latitude);
+    return closestMarker;
+}
+
 // 在页面加载完成后初始化地图
 document.addEventListener('DOMContentLoaded', function () {
     // 从Controller获取百度地图AK
@@ -31,36 +73,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     console.log('百度地图API已成功加载');
                 }
+                const zoom = 18
                 // 初始化地图
                 const map = new BMap.Map("baidu-map-container");
                 // console.log('百度地图map已成功初始化');
                 // const point = new BMap.Point(116.404, 39.915); // 默认中心点 天安门故宫
                 const point = new BMap.Point(116.590, 39.896); // 默认中心点491Park
-                map.centerAndZoom(point, 15); // 初始化地图，设置中心点坐标和地图级别
+                map.centerAndZoom(point, zoom); // 初始化地图，设置中心点坐标和地图级别
                 // 启用滚轮缩放
                 map.enableScrollWheelZoom(true);
-                // //     // 监听地图点击事件
-                // map.addEventListener('click', function (e) {
-                //     // 获取点击点的经纬度
-                //     const latitude = e.point.lat; // 纬度
-                //     const longitude = e.point.lng; // 经度
-                //
-                //     // 在控制台输出经纬度
-                //     console.log(`纬度: ${latitude}, 经度: ${longitude}`);
-                //
-                //     // 可选：在地图上显示点击点的标记
-                //     const marker = new BMap.Marker(e.point);
-                //     map.addOverlay(marker);
-                //
-                //     // 可选：显示信息窗口
-                //     const infoWindow = new BMap.InfoWindow(`纬度: ${latitude}, 经度: ${longitude}`);
-                //     map.openInfoWindow(infoWindow, e.point);
-                // });
 
                 // 从Controller获取点位信息
                 fetch('/estate_slides/baidu_map/get_markers')
                     .then(response => response.json())
                     .then(markers => {
+                        // 获取中位点
+                        const centerMarker = getCenterMarker(markers);
                         // 动态添加标记
                         console.log("markers", markers)
                         markers.forEach(marker => {
@@ -74,6 +102,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                 this.openInfoWindow(infoWindow);
                             });
                         });
+                        if (typeof centerMarker === "undefined") {
+                        } else {
+                            const point = new BMap.Point(centerMarker.longitude, centerMarker.latitude);
+                            map.centerAndZoom(point, zoom);
+                        }
                     })
                     .catch(error => {
                         console.error('获取点位信息失败:', error);

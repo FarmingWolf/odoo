@@ -25,10 +25,15 @@ function getHashParams() {
 async function initBaiduMap() {
     console.log("enter initBaiduMap");
     if (typeof BMap === 'undefined') {
-        console.error('百度地图API未成功加载');
+        console.log('百度地图API未成功加载');
         return;
     }
-
+    // 获取地图容器
+    const mapContainer = document.getElementById('baidu-map-container');
+    if (!mapContainer) {
+        console.error('baidu-map-container地图容器未找到');
+        return;
+    }
     // 创建矢量图标
     const symbol_smile = new BMap.Symbol(BMap_Symbol_SHAPE_SMILE, {
         scale: 5, // 图标大小
@@ -41,13 +46,6 @@ async function initBaiduMap() {
         imageOffset: new BMap.Size(0, 0) // 图片偏移量，用于调整图标颜色
     });
 
-    // 获取地图容器
-    const mapContainer = document.getElementById('baidu-map-container');
-    if (!mapContainer) {
-        console.error('地图容器未找到');
-        return;
-    }
-
     // 获取记录ID、纬度和经度
 
     const hashParams = getHashParams();
@@ -59,12 +57,14 @@ async function initBaiduMap() {
     // 初始化地图
     const map = new BMap.Map("baidu-map-container");
     const point = new BMap.Point(longitude, latitude);
-    map.centerAndZoom(point, 18); // 初始化地图，设置中心点坐标和地图级别
+    const zoom = 18
+    map.centerAndZoom(point, zoom); // 初始化地图，设置中心点坐标和地图级别
     map.enableScrollWheelZoom(true); // 启用滚轮缩放
 
     // 存储当前标记
     let currentMarker = null;
     let infoWindow = null;
+    const infoMsg = "尚未明确标注地图点位！请点击地图标注点位"
     // 从Controller获取点位信息
     await fetch(`/estate/baidu_map/get_markers?property_id=${property_id}`, {
         method: 'GET',
@@ -78,12 +78,15 @@ async function initBaiduMap() {
             property_markers.forEach(marker => {
                 const point = new BMap.Point(marker.longitude, marker.latitude);
 
-                // currentMarker = new BMap.Marker(point, {icon: new BMap.Icon(icon_smile, new BMap.Size(20, 20))});
                 currentMarker = new BMap.Marker(point);
                 map.addOverlay(currentMarker);
-                map.centerAndZoom(point, 18); // 初始化地图，设置中心点坐标和地图级别
+                map.centerAndZoom(point, zoom); // 初始化地图，设置中心点坐标和地图级别
                 // 添加信息窗口（可选）
-                infoWindow = new BMap.InfoWindow(marker.name);
+                let infoName = marker.name
+                if (marker.default_company_loc === "1") {
+                    infoName = `<div> ${marker.name}<br>${infoMsg}</div>`
+                }
+                infoWindow = new BMap.InfoWindow(infoName);
                 currentMarker.openInfoWindow(infoWindow);
             });
         })
@@ -105,6 +108,11 @@ async function initBaiduMap() {
         currentMarker = new BMap.Marker(e.point);
         map.addOverlay(currentMarker);
         // const infoWindow = new BMap.InfoWindow(currentMarker.name || "");
+        if (typeof infoWindow === 'undefined') {
+        } else {
+            const newInfo = infoWindow.getContent().replace(infoMsg, "")
+            infoWindow.setContent(newInfo)
+        }
         currentMarker.openInfoWindow(infoWindow);
 
         // 如果是第一次点击，注册模块
@@ -129,16 +137,25 @@ async function initBaiduMap() {
                 }
                 // 将方法暴露给模块
                 window.updatePropertyLocation = updatePropertyLocation;
+
+                // 注册后调用已注册的方法
+                window.updatePropertyLocation(property_id, e.point.lat, e.point.lng)
+                    .then(function (result) {
+                        console.log('click 1 Location updated successfully:', result);
+                    })
+                    .catch(function (error) {
+                        console.error('click 1 Failed to update location:', error);
+                    });
             });
         } else {
 
             // 直接调用已注册的方法
             window.updatePropertyLocation(property_id, e.point.lat, e.point.lng)
                 .then(function (result) {
-                    console.log('Location updated successfully:', result);
+                    console.log('not click 1 Location updated successfully:', result);
                 })
                 .catch(function (error) {
-                    console.error('Failed to update location:', error);
+                    console.error('not click 1 Failed to update location:', error);
                 });
         }
     });

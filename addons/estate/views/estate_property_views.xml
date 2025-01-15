@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <record id="estate_property_property_map_view" model="ir.ui.view">
+        <field name="name">estate.property.property.map</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <property_map id="id" name="name"/>
+        </field>
+    </record>
+
     <record id="491_real_estate_action" model="ir.actions.act_window">
         <field name="name">租赁资产管理</field>
         <field name="res_model">estate.property</field>
-        <field name="view_mode">tree,form,kanban</field>
+        <field name="view_mode">tree,form,kanban,property_map</field>
         <field name="context">{
             'search_default_active': True,
             'contract_read_only': False,
