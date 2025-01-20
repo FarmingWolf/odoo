@@ -393,7 +393,7 @@ class WebsiteEstateSlides(Home):
         }
 
     @http.route(['/estate_slides/all'], type='http', auth="public", website=True, sitemap=True)
-    def slides_estate_all(self, **post):
+    def slides_estates_all(self, **post):
 
         order_by = 'create_date DESC'
         if post.get('orderby') == "most_popular":
