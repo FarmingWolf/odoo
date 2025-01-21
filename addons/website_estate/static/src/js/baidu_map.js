@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // 定义回调函数
             window.initBaiduMap = function () {
                 if (typeof BMap === 'undefined') {
-                    console.error('百度地图API未成功加载');
+                    console.info('百度地图API未成功加载');
                     return;
                 } else {
                     console.log('百度地图API已成功加载');

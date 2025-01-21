@@ -11,7 +11,7 @@ function loadPropertiesBaiduMapScript(apiKey, callback) {
 async function initPropertiesBaiduMap() {
     console.log("enter initPropertiesBaiduMap");
     if (typeof BMap === 'undefined') {
-        console.error('百度地图API未成功加载');
+        console.info('百度地图API未成功加载');
         return;
     }
 
