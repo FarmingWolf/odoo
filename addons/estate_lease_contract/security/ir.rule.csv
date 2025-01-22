@@ -14,6 +14,7 @@ lease_contract_rental_period_percentage_account_rule,Restrict Lease Contract Ren
 lease_contract_rental_plan_account_rule,Restrict Lease Contract Rental Plan by Company,model_estate_lease_contract_rental_plan,"[('company_id','=',user.company_id.id)]"
 lease_contract_rental_plan_rel_account_rule,Restrict Lease Contract Rental Plan Rel by Company,model_estate_lease_contract_rental_plan_rel,"[('company_id','=',user.company_id.id)]"
 lease_contract_property_deposit_rule,Restrict Lease Contract Property Deposit by Company,model_estate_lease_contract_property_deposit,"[('company_id','=',user.company_id.id)]"
+lease_contract_property_tax_rule,Restrict Lease Contract Property Tax by Company,model_estate_lease_contract_property_tax,"[('company_id','=',user.company_id.id)]"
 lease_contract_property_fee_water_rule,Restrict Lease Contract Property Fee Water by Company,model_estate_lease_contract_property_fee_water,"[('company_id','=',user.company_id.id)]"
 lease_contract_property_fee_electricity_rule,Restrict Lease Contract Property Fee Electricity by Company,model_estate_lease_contract_property_fee_electricity,"[('company_id','=',user.company_id.id)]"
 lease_contract_property_fee_electricity_maintenance_rule,Restrict Lease Contract Property Fee Electricity Maintenance by Company,model_estate_lease_contract_property_fee_electricity_maintenance,"[('company_id','=',user.company_id.id)]"

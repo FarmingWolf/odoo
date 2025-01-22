@@ -18,6 +18,7 @@ from . import estate_lease_contract_rental_period_percentage
 from . import estate_lease_contract_property_management_fee_plan
 from . import estate_lease_contract_rental_plan
 from . import estate_lease_contract_property_deposit
+from . import estate_lease_contract_property_tax
 from . import estate_lease_contract_rental_plan_rel
 from . import estate_lease_contract_property_fee_water
 from . import estate_lease_contract_property_fee_electricity

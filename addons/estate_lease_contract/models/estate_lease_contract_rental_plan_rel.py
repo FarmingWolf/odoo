@@ -34,7 +34,7 @@ class EstateLeaseContractRentalPlanRel(models.Model):
     contract_deposit_months = fields.Float(string="押金月数", default=0)
     contract_deposit_amount = fields.Float(string="押金(元)", default=0)
     deposit_receivable = fields.Float(string="押金应收(元)", default=lambda self: self.contract_deposit_amount)
-    contract_deposit_amount_received = fields.Float(string="累计实收(元)", default=0, compute="_calc_deposit_received")
+    contract_deposit_amount_received = fields.Float(string="押金实收(元)", default=0, compute="_calc_deposit_received")
     contract_deposit_amount_arrears = fields.Float(string="押金欠缴(元)",
                                                    default=lambda self: (self.deposit_receivable -
                                                                          self.contract_deposit_amount_received),
@@ -54,6 +54,22 @@ class EstateLeaseContractRentalPlanRel(models.Model):
         comodel_name="estate.lease.contract.property.fee.maintenance",
         inverse_name="contract_rental_plan_rel_id", string="物业费明细")
 
+    contract_property_tax_ids = fields.One2many(comodel_name="estate.lease.contract.property.tax",
+                                                inverse_name="contract_rental_plan_rel_id", string="房产税收缴明细")
+    contract_property_tax_amount = fields.Float(string="房产税(元)", default=0)
+    property_tax_receivable = fields.Float(string="房产税应收(元)", default=lambda self: self.contract_property_tax_amount)
+    property_tax_amount_received = fields.Float(string="房产税实收(元)", default=0,
+                                                compute="_calc_property_tax_received")
+    property_tax_amount_arrears = fields.Float(string="房产税欠缴(元)",
+                                               default=lambda self: (self.property_tax_receivable -
+                                                                     self.property_tax_amount_received),
+                                               compute="_calc_property_tax_received")
+
+    _sql_constraints = [
+        ('contract_property_rental_plan_unique', 'unique(contract_id, property_id)',
+         "同一合同内，同一资产，不能有不同的租金方案"),
+    ]
+
     @api.depends("contract_property_deposit_ids")
     def _calc_deposit_received(self):
         for record in self:
@@ -71,11 +87,6 @@ class EstateLeaseContractRentalPlanRel(models.Model):
         self.contract_deposit_amount_received = received
         self.contract_deposit_amount_arrears = self.deposit_receivable - received
 
-    _sql_constraints = [
-        ('contract_property_rental_plan_unique', 'unique(contract_id, property_id)',
-         "同一合同内，同一资产，不能有不同的租金方案"),
-    ]
-
     def action_confirm_deposit_received(self):
         for record in self:
             # 防止空点
@@ -92,3 +103,37 @@ class EstateLeaseContractRentalPlanRel(models.Model):
                 "deposit_received": received_aft - received_bef,
             }]
             self.env["estate.lease.contract.property.deposit"].create(deposit_detail)
+
+    @api.depends("contract_property_tax_ids")
+    def _calc_property_tax_received(self):
+        for record in self:
+            received = 0
+            for property_tax_rcd in record.contract_property_tax_ids:
+                received += property_tax_rcd.tax_received
+            record.property_tax_amount_received = received
+            record.property_tax_amount_arrears = record.property_tax_receivable - received
+
+    @api.onchange("contract_property_tax_ids")
+    def _onchange_property_tax_received(self):
+        received = 0
+        for property_tax_rcd in self.contract_property_tax_ids:
+            received += property_tax_rcd.tax_received
+        self.property_tax_amount_received = received
+        self.property_tax_amount_arrears = self.property_tax_receivable - received
+
+    def action_confirm_property_tax_received(self):
+        for record in self:
+            # 防止空点
+            if abs(record.property_tax_receivable - record.property_tax_amount_received) < 0.01:
+                continue
+
+            received_bef = record.property_tax_amount_received
+            received_aft = record.property_tax_receivable
+
+            record.property_tax_amount_received = received_aft
+            # 增加相应的分次收缴明细
+            property_tax_detail = [{
+                "contract_rental_plan_rel_id": record.id,
+                "tax_received": received_aft - received_bef,
+            }]
+            self.env["estate.lease.contract.property.tax"].create(property_tax_detail)

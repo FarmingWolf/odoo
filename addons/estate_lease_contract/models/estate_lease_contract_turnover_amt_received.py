@@ -33,12 +33,15 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
         ondelete="cascade")
     maintenance_detail_ids = fields.Many2one(comodel_name='estate.lease.contract.property.fee.maintenance',
                                              string='物业费明细', ondelete="cascade")
+    property_tax_detail_ids = fields.Many2one(comodel_name='estate.lease.contract.property.tax',
+                                              string='房产税明细', ondelete="cascade")
 
     amount_type = fields.Selection(string="实收类别", compute="_compute_received", store=True,
                                    selection=[('contract_rental', '合同租金'), ('contract_deposit', '合同押金'),
                                               ('contract_fee_water', '水费'), ('contract_fee_electricity', '电费'),
                                               ('contract_fee_electricity_maintenance', '电力维护费'),
-                                              ('contract_fee_maintenance', '物业费')], )
+                                              ('contract_fee_maintenance', '物业费'),
+                                              ('contract_property_tax', '房产税')], )
 
     amount_receivable = fields.Float(default=0.0, string="本次应收(元)", compute="_compute_received", store=True)
     amount_received = fields.Float(default=0.0, string="本次实收(元)", compute="_compute_received", store=True)
@@ -70,7 +73,7 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
 
     @api.depends("rental_detail_sub_ids", "deposit_detail_ids", "water_detail_ids", "electricity_detail_ids",
                  "electricity_maintenance_detail_ids", "maintenance_detail_ids", "amount_received", "date_received",
-                 "amount_receivable")
+                 "amount_receivable", "property_tax_detail_ids")
     def _compute_received(self):
         for record in self:
             record.amount_type = 'contract_rental'
@@ -135,6 +138,16 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 record.period_d_start = record.maintenance_detail_ids.period_d_start
                 record.period_d_end = record.maintenance_detail_ids.period_d_end
 
+            if record.property_tax_detail_ids:
+                record.amount_type = 'contract_property_tax'
+                record.amount_receivable = record.property_tax_detail_ids.tax_receivable_this
+                record.amount_received = record.property_tax_detail_ids.tax_received
+                record.date_received = record.property_tax_detail_ids.date_received
+                record.property_id = record.property_tax_detail_ids.property_id
+                record.contract_id = record.property_tax_detail_ids.contract_id
+                record.period_d_start = record.property_tax_detail_ids.date_rent_start
+                record.period_d_end = record.property_tax_detail_ids.date_rent_end
+
             record.amount_arrears = record.amount_receivable - record.amount_received
             record.company_id = record.contract_id.company_id
 
@@ -142,7 +155,7 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
     def automatic_daily_pick_turnover_amount_received(self):
         # 合同押金
         _order = "company_id, contract_id, date_received DESC"
-        # 最近7天发生变更的数据
+        # 最近30天发生变更的数据
         tgt_date = fields.Datetime.now() - relativedelta(days=30)
         _domain = ('write_date', '>=', tgt_date)
         deposit_rcds = self.env["estate.lease.contract.property.deposit"].sudo().search([_domain], order=_order)
@@ -305,3 +318,31 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                     "maintenance_detail_ids": fee_maintenance.id,
                 }
                 self.env["estate.lease.contract.turnover.amt.received"].sudo().create(fee_maintenance_tgt)
+
+        # 房产税
+        property_tax_rcds = self.env["estate.lease.contract.property.tax"].sudo().search([_domain], order=_order)
+
+        for tax_rcd in property_tax_rcds:
+            search_rst = self.env["estate.lease.contract.turnover.amt.received"].sudo().search([
+                ('property_tax_detail_ids', '=', tax_rcd.id)])
+            if search_rst:
+                # 如果存在也只能存在一个，变化的也只可能是金额或日期
+                if search_rst[0].amount_receivable != tax_rcd.tax_receivable_this:
+                    search_rst[0].amount_receivable = tax_rcd.tax_receivable_this
+                if search_rst[0].amount_received != tax_rcd.tax_received:
+                    search_rst[0].amount_received = tax_rcd.tax_received
+                if search_rst[0].amount_arrears != search_rst[0].amount_receivable - search_rst[0].amount_received:
+                    search_rst[0].amount_arrears = search_rst[0].amount_receivable - search_rst[0].amount_received
+                if search_rst[0].date_received != tax_rcd.date_received:
+                    search_rst[0].date_received = tax_rcd.date_received
+                if search_rst[0].period_d_start != tax_rcd.date_rent_start:
+                    search_rst[0].period_d_start = tax_rcd.date_rent_start
+                if search_rst[0].period_d_end != tax_rcd.date_rent_end:
+                    search_rst[0].period_d_end = tax_rcd.date_rent_end
+
+            else:
+                property_tax_tgt = {
+                    "property_tax_detail_ids": tax_rcd.id,
+
+                }
+                self.env["estate.lease.contract.turnover.amt.received"].sudo().create(property_tax_tgt)

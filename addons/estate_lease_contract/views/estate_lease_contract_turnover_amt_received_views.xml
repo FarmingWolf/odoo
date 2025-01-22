@@ -58,7 +58,7 @@
         <field name="name">estate.lease.contract.turnover.amt.received.view.search</field>
         <field name="model">estate.lease.contract.turnover.amt.received</field>
         <field name="arch" type="xml">
-            <search string="实收租金检索">
+            <search string="实收检索">
                 <filter string="实收月份" name="filter_date_received" date="date_received" default_period="last_month"/>
                 <separator/>
                 <filter string="截至本日" name="date_received_2_today"
@@ -78,6 +78,7 @@
                 <filter string="电费" name="amount_type_electricity" domain="[('amount_type','=', 'contract_fee_electricity')]"/>
                 <filter string="电力维护费" name="amount_type_electricity_maintenance" domain="[('amount_type','=', 'contract_fee_electricity_maintenance')]"/>
                 <filter string="物业费" name="amount_type_maintenance" domain="[('amount_type','=', 'contract_fee_maintenance')]"/>
+                <filter string="房产税" name="amount_type_property_tax" domain="[('amount_type','=', 'contract_property_tax')]"/>
                 <separator/>
                 <filter string="有实收" name="amount_received_gt0" domain="[('amount_received','&gt;=', 0.01)]"/>
                 <filter string="无实收" name="amount_received_eq0" domain="[('amount_received','&lt;', 0.01)]"/>

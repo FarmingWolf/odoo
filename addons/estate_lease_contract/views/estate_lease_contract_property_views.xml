@@ -52,6 +52,13 @@
                     <attribute name="invisible">context.get('contract_read_only')</attribute>
                 </xpath>
 
+                <xpath expr="//field[@name='announced_price']" position="after">
+                    <field name="tax_amount"/>
+                </xpath>
+                <xpath expr="//field[@name='latest_free_days']" position="after">
+                    <field name="tax_amount"/>
+                </xpath>
+
                 <xpath expr="//page" position="before">
                     <page string="租金方案" invisible="state not in ['offer_received', 'offer_accepted', 'sold'] and context.get('contract_read_only') and context.get('menu_root') == 'estate.property'">
                         <field name="default_rental_plan" invisible="1"/>

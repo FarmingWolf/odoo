@@ -1,0 +1,7 @@
+msgid ""
+msgstr ""
+
+#. module: estate_lease_contract
+#: model:ir.model,name:estate_lease_contract.model_estate_lease_contract_property_tax
+msgid "Property Tax"
+msgstr "房产税"

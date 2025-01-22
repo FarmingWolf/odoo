@@ -970,6 +970,33 @@ class EstateLeaseContract(models.Model):
             record.lease_deposit_received = deposit_received_total
             record.lease_deposit_arrears = deposit_arrears_total
 
+    @api.depends("property_ids")
+    def _calc_rent_tax_info(self):
+        for record in self:
+            tax_total = 0
+            tax_receivable_total = 0
+            tax_received_total = 0
+            tax_arrears_total = 0
+            if record.property_ids:
+                if record.state == "recording":
+                    for rent_property in record.property_ids:
+
+                        tax_total += rent_property.tax_amount
+                        tax_receivable_total += rent_property.tax_amount
+                        tax_received_total += 0
+                        tax_arrears_total += tax_receivable_total
+                else:
+                    for each_hist in record.contract_hist:
+                        tax_total += each_hist.contract_property_tax_amount
+                        tax_receivable_total += each_hist.property_tax_receivable
+                        tax_received_total += each_hist.property_tax_amount_received
+                        tax_arrears_total += each_hist.property_tax_amount_arrears
+
+            record.properties_tax = tax_total
+            record.properties_tax_receivable = tax_receivable_total
+            record.properties_tax_received = tax_received_total
+            record.properties_tax_arrears = tax_arrears_total
+
     rent_amount = fields.Float(default=0.0, string="总月租金（元/月）", compute="_calc_rent_total_info", readonly=True)
     rent_amount_year = fields.Float(default=0.0, string="总年租金（元/年）", compute="_calc_rent_total_info", readonly=True)
     rent_amount_first_period = fields.Float(default=0.0, string="首期租金（元）")
@@ -1053,6 +1080,14 @@ class EstateLeaseContract(models.Model):
                                           tracking=True, copy=False)
     lease_deposit_arrears = fields.Float(default=0.0, string="押金欠缴（元）", compute="_calc_rent_total_info",
                                          tracking=True, copy=False)
+    properties_tax = fields.Float(default=0.0, string="房产税合计（元）", compute="_calc_rent_tax_info", tracking=True,
+                                  copy=False)
+    properties_tax_receivable = fields.Float(default=0.0, string="房产税应收（元）", compute="_calc_rent_tax_info",
+                                             tracking=True, copy=False)
+    properties_tax_received = fields.Float(default=0.0, string="房产税实收（元）", compute="_calc_rent_tax_info",
+                                           tracking=True, copy=False)
+    properties_tax_arrears = fields.Float(default=0.0, string="房产税欠缴（元）", compute="_calc_rent_tax_info",
+                                          tracking=True, copy=False)
     property_management_fee_guarantee = fields.Float(default=0.0, string="物管费保证金（元）", tracking=True)
 
     decoration_deposit = fields.Float(default=0.0, string="装修押金（元）", tracking=True, copy=False)
@@ -1502,6 +1537,9 @@ class EstateLeaseContract(models.Model):
                     "contract_rent_amount_monthly": contract_rent_amount_monthly,
                     "contract_rent_amount_year": contract_rent_amount_yearly,
                     "contract_rent_payment_method": each_property.latest_payment_method,
+                    "contract_property_tax_amount": each_property.tax_amount,
+                    "property_tax_receivable": each_property.tax_amount,
+                    "property_tax_amount_arrears": each_property.tax_amount,
                 })
 
         if contract_rental_plan_rel:
