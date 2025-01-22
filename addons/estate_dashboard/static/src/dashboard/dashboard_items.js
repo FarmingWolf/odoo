@@ -1050,6 +1050,51 @@ const items = [
         })
     },
     {
+        id: "property_tax_received_today",
+        description: "当日实收房产税（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当日实收房产税（万元）",
+            value: Math.round(data.property_tax_received_today / 100) / 100,
+        })
+    },
+    {
+        id: "property_tax_received_week",
+        description: "当周实收房产税（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当周实收房产税（万元）",
+            value: Math.round(data.property_tax_received_week / 100) / 100,
+        })
+    },
+    {
+        id: "property_tax_received_month",
+        description: "当月实收房产税（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当月实收房产税（万元）",
+            value: Math.round(data.property_tax_received_month / 100) / 100,
+        })
+    },
+    {
+        id: "property_tax_received_quarter",
+        description: "当季实收房产税（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当季实收房产税（万元）",
+            value: Math.round(data.property_tax_received_quarter / 100) / 100,
+        })
+    },
+    {
+        id: "property_tax_received_year",
+        description: "当年实收房产税（万元）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "当年实收房产税（万元）",
+            value: Math.round(data.property_tax_received_year / 100) / 100,
+        })
+    },
+    {
         id: "pie_chart_ratio_conventional_quantity",
         description: "资产出租、空置对比图（房屋间数）空置率",
         Component: PieChartCard,

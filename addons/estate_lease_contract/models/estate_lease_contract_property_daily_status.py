@@ -75,6 +75,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
     property_rent_deposit_received_quarter = fields.Float(string="本季实收押金")
     property_rent_deposit_received_year = fields.Float(string="本年实收押金")
 
+    # 房产税
+    property_tax_received_today = fields.Float(string="本日实收房产税")
+    property_tax_received_week = fields.Float(string="本周实收房产税")
+    property_tax_received_month = fields.Float(string="本月实收房产税")
+    property_tax_received_quarter = fields.Float(string="本季实收房产税")
+    property_tax_received_year = fields.Float(string="本年实收房产税")
+
     # 水费
     property_rent_fee_water_receivable_today = fields.Float(string="本日应收水费")
     property_rent_fee_water_receivable_week = fields.Float(string="本周应收水费")
@@ -242,6 +249,29 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                 _logger.error(f"deposit_rcd.date_received为空，请确认！deposit_rcd.id={deposit_rcd.id}")
 
         return in_rent_deposit_info
+
+    # 房产税
+    def calc_property_tax_info(self, in_contract_id, in_property_id, in_date, in_property_tax_info):
+
+        property_tax_details = self.env["estate.lease.contract.property.tax"].search(
+            [('contract_id', '=', in_contract_id), ('property_id', '=', in_property_id)])
+
+        for each_rcd in property_tax_details:
+            if each_rcd.date_received == in_date:
+                in_property_tax_info['property_tax_received_today'] += each_rcd.tax_received
+            if each_rcd.date_received:
+                if end_of(each_rcd.date_received, 'week') == end_of(in_date, 'week'):
+                    in_property_tax_info['property_tax_received_week'] += each_rcd.tax_received
+                if end_of(each_rcd.date_received, 'month') == end_of(in_date, 'month'):
+                    in_property_tax_info['property_tax_received_month'] += each_rcd.tax_received
+                if end_of(each_rcd.date_received, 'quarter') == end_of(in_date, 'quarter'):
+                    in_property_tax_info['property_tax_received_quarter'] += each_rcd.tax_received
+                if end_of(each_rcd.date_received, 'year') == end_of(in_date, 'year'):
+                    in_property_tax_info['property_tax_received_year'] += each_rcd.tax_received
+            else:
+                _logger.error(f"each_rcd.date_received为空，请确认！each_rcd.id={each_rcd.id}")
+
+        return in_property_tax_info
 
     # 水费
     def calc_fee_water_info(self, in_contract_id, in_property_id, in_date, in_fee_info):
@@ -507,6 +537,13 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_rent_deposit_received_quarter": 0,
                         "property_rent_deposit_received_year": 0,
                     }
+                    property_tax_info = {
+                        "property_tax_received_today": 0,
+                        "property_tax_received_week": 0,
+                        "property_tax_received_month": 0,
+                        "property_tax_received_quarter": 0,
+                        "property_tax_received_year": 0,
+                    }
 
                     fee_water_info = {
                         # 水费
@@ -606,6 +643,9 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                             # 押金收取情况
                             rent_deposit_info = self.calc_rent_deposit_info(contract.id, each_property.id,
                                                                             record_status_date, rent_deposit_info)
+                            # 房产税收取情况
+                            property_tax_info = self.calc_property_tax_info(contract.id, each_property.id,
+                                                                            record_status_date, property_tax_info)
                             # 水费收取情况
                             fee_water_info = self.calc_fee_water_info(contract.id, each_property.id,
                                                                       record_status_date, fee_water_info)
@@ -639,6 +679,9 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         # 无效合同中，在过去尚有效期间的押金收取情况
                         rent_deposit_info = self.calc_rent_deposit_info(contract.id, each_property.id,
                                                                         record_status_date, rent_deposit_info)
+                        # 无效合同中，在过去尚有效期间的房产税收取情况
+                        property_tax_info = self.calc_property_tax_info(contract.id, each_property.id,
+                                                                        record_status_date, property_tax_info)
                         # 无效合同中，在过去尚有效期间的水费收取情况
                         fee_water_info = self.calc_fee_water_info(contract.id, each_property.id,
                                                                   record_status_date, fee_water_info)
@@ -693,6 +736,12 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                         "property_rent_deposit_received_month": rent_deposit_info['property_rent_deposit_received_month'],
                         "property_rent_deposit_received_quarter": rent_deposit_info['property_rent_deposit_received_quarter'],
                         "property_rent_deposit_received_year": rent_deposit_info['property_rent_deposit_received_year'],
+
+                        "property_tax_received_today": property_tax_info['property_tax_received_today'],
+                        "property_tax_received_week": property_tax_info['property_tax_received_week'],
+                        "property_tax_received_month": property_tax_info['property_tax_received_month'],
+                        "property_tax_received_quarter": property_tax_info['property_tax_received_quarter'],
+                        "property_tax_received_year": property_tax_info['property_tax_received_year'],
 
                         "property_rent_fee_water_receivable_today": fee_water_info['property_fee_water_receivable_today'],
                         "property_rent_fee_water_receivable_week": fee_water_info['property_fee_water_receivable_week'],

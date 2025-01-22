@@ -74,6 +74,12 @@ class EstateDashboardService:
         rent_deposit_received_month = 0.0
         rent_deposit_received_quarter = 0.0
         rent_deposit_received_year = 0.0
+        # 房产税实收
+        property_tax_received_today = 0.0
+        property_tax_received_week = 0.0
+        property_tax_received_month = 0.0
+        property_tax_received_quarter = 0.0
+        property_tax_received_year = 0.0
         # 水费
         fee_water_receivable_today = 0.0
         fee_water_receivable_week = 0.0
@@ -184,11 +190,18 @@ class EstateDashboardService:
             rental_received_month += record_detail.property_rental_received_month
             rental_received_quarter += record_detail.property_rental_received_quarter
             rental_received_year += record_detail.property_rental_received_year
+            # 押金
             rent_deposit_received_today += record_detail.property_rent_deposit_received_today
             rent_deposit_received_week += record_detail.property_rent_deposit_received_week
             rent_deposit_received_month += record_detail.property_rent_deposit_received_month
             rent_deposit_received_quarter += record_detail.property_rent_deposit_received_quarter
             rent_deposit_received_year += record_detail.property_rent_deposit_received_year
+            # 房产税
+            property_tax_received_today += record_detail.property_tax_received_today
+            property_tax_received_week += record_detail.property_tax_received_week
+            property_tax_received_month += record_detail.property_tax_received_month
+            property_tax_received_quarter += record_detail.property_tax_received_quarter
+            property_tax_received_year += record_detail.property_tax_received_year
             # 水费
             fee_water_receivable_today += record_detail.property_rent_fee_water_receivable_today
             fee_water_receivable_week += record_detail.property_rent_fee_water_receivable_week
@@ -370,11 +383,18 @@ class EstateDashboardService:
             'rental_received_month': round(rental_received_month, 2),
             'rental_received_quarter': round(rental_received_quarter, 2),
             'rental_received_year': round(rental_received_year, 2),
+            # 押金
             'rent_deposit_received_today': round(rent_deposit_received_today, 2),
             'rent_deposit_received_week': round(rent_deposit_received_week, 2),
             'rent_deposit_received_month': round(rent_deposit_received_month, 2),
             'rent_deposit_received_quarter': round(rent_deposit_received_quarter, 2),
             'rent_deposit_received_year': round(rent_deposit_received_year, 2),
+            # 房产税
+            'property_tax_received_today': round(property_tax_received_today, 2),
+            'property_tax_received_week': round(property_tax_received_week, 2),
+            'property_tax_received_month': round(property_tax_received_month, 2),
+            'property_tax_received_quarter': round(property_tax_received_quarter, 2),
+            'property_tax_received_year': round(property_tax_received_year, 2),
             # 水费
             'fee_water_receivable_today': round(fee_water_receivable_today, 2),
             'fee_water_receivable_week': round(fee_water_receivable_week, 2),
