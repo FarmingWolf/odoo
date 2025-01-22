@@ -207,7 +207,7 @@
                                     <field name="property_tax_receivable" invisible="property_tax_receivable &lt; 0.01"/>
                                     <field name="property_tax_amount_arrears" invisible="property_tax_amount_arrears &lt; 0.01"/>
                                     <button type="object" name="action_confirm_property_tax_received" title="点击确认房产税已全部收齐（等于本行应收房产税）" icon="fa-thumbs-o-up"
-                                            groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面修改房产税收缴明细" invisible="property_tax_receivable &lt; 0.01"/>
+                                            groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面修改房产税收缴明细" invisible="property_tax_amount_arrears &lt; 0.01"/>
 
                                 </tree>
                             </field>
