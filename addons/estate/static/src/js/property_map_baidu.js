@@ -1,6 +1,12 @@
 // 动态加载百度地图API
 function loadPropertiesBaiduMapScript(apiKey, callback) {
     console.log("enter loadPropertiesBaiduMapScript")
+    // 获取地图容器
+    const mapContainer = document.getElementById('properties_baidu_map_container');
+    if (!mapContainer) {
+        console.info('properties_baidu_map_container无地图容器页面不加载API');
+        return;
+    }
     const script = document.createElement('script');
     script.src = `https://api.map.baidu.com/api?v=3.0&ak=${apiKey}&callback=${callback}`;
     script.async = true; // 异步加载
@@ -35,7 +41,7 @@ async function initPropertiesBaiduMap() {
     // 获取地图容器
     const mapContainer = document.getElementById('properties_baidu_map_container');
     if (!mapContainer) {
-        console.error('properties_baidu_map_container地图容器未找到');
+        console.info('properties_baidu_map_container地图容器未找到');
         return;
     }
 
