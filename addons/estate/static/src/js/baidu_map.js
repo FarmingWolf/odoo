@@ -29,8 +29,8 @@ function getHashParams() {
 }
 
 // 初始化地图
-async function initBaiduMap() {
-    console.log("enter initBaiduMap");
+async function initEstateBaiduMap() {
+    console.log("enter initEstateBaiduMap");
     if (typeof BMap === 'undefined') {
         console.log('百度地图API未成功加载');
         return;
@@ -181,7 +181,7 @@ fetch('/estate_slides/baidu_map/get_ak')
         }
 
         // 加载百度地图API
-        loadBaiduMapScript(baiduMapAK, 'initBaiduMap');
+        loadBaiduMapScript(baiduMapAK, 'initEstateBaiduMap');
         console.info('页面加载完成后初始化地图完成');
     })
     .catch(error => {

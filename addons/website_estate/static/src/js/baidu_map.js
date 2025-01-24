@@ -63,19 +63,27 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             // 加载百度地图API
-            loadBaiduMapScript(baiduMapAK, 'initBaiduMap');
+            loadBaiduMapScript(baiduMapAK, 'initEstateAdBaiduMap');
 
             // 定义回调函数
-            window.initBaiduMap = function () {
+            window.initEstateAdBaiduMap = function () {
                 if (typeof BMap === 'undefined') {
                     console.info('百度地图API未成功加载');
                     return;
                 } else {
                     console.log('百度地图API已成功加载');
                 }
+
+                // 获取地图容器
+                const mapContainer = document.getElementById('et-ad-baidu-map-container');
+                if (!mapContainer) {
+                    console.info('et-ad-baidu-map-container地图容器未找到');
+                    return;
+                }
+
                 const zoom = 18
                 // 初始化地图
-                const map = new BMap.Map("baidu-map-container");
+                const map = new BMap.Map("et-ad-baidu-map-container");
                 // console.log('百度地图map已成功初始化');
                 // const point = new BMap.Point(116.404, 39.915); // 默认中心点 天安门故宫
                 const point = new BMap.Point(116.590, 39.896); // 默认中心点491Park
