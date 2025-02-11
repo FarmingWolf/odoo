@@ -840,6 +840,7 @@ class EstateLeaseContract(models.Model):
     order_by_name = fields.Boolean(string="以名称排序", default=True,
                                    help="勾选则以租赁标的名称为排序基准，不勾选则以合同列表中的拖拽顺序为排序基准")
     vat = fields.Char("企业统一信用代码", related="renter_id.vat")
+    street2 = fields.Char("经营执照地址", related="renter_id.street2")
     registered_capital = fields.Float(string="注册资金（万元）", related="renter_id.registered_capital")
     industry_id = fields.Many2one('res.partner.industry', string='行业类型', related="renter_id.industry_id")
 
