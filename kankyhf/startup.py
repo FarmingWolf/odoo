@@ -54,6 +54,8 @@ zip_tgt_folders = [
     'estate_account',
     'sms_ali',
     'website_estate',
+    'project',
+    'ocr_partner',
 ]
 
 zip_all_addons = True
