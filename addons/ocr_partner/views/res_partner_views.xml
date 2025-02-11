@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="view_partners_form_ocr" model="ir.ui.view">
+        <field name="name">view.res.partner.form.ocr.inherited1</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field eval="1" name="priority"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_type']" position="after">
+                <div class="float-end" invisible="company_type != 'company'" >
+                    <field name="file_upload" widget="binary" options="{'accepted_file_extensions': 'image/*'}"/>
+                    <button string="读取营业执照内容" type="object" name="extract_text_from_file" help="读取文字后，请仔细检查公司名称、注册地址、统一信用代码和注册资本金额信息是否有误！"/>
+                    <span>请上传营业执照无水印清晰照片。不要旋转照片，尺寸不超过5M。</span>
+                    <field name="file_preview" widget="html" nolabel="1" readonly="1"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
