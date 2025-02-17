@@ -228,6 +228,7 @@
                 <field name="message_needaction" column_invisible="True"/>
                 <field name="name"/>
                 <field name="request_date" groups="base.group_no_one"/>
+                <field name="schedule_date"/>
                 <field name="owner_user_id"/>
                 <field name="user_id"/>
                 <field name="category_id" readonly="1" groups="maintenance.group_equipment_manager"/>
