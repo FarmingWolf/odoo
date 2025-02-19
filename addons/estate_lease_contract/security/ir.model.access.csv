@@ -1,5 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_estate_lease_contract_read,access.estate.lease.contract.read,model_estate_lease_contract,estate_lease_contract_group_user,1,1,1,1
+access_estate_lease_contract_portal_read,access.estate.lease.contract.portal.read,model_estate_lease_contract,base.group_portal,1,0,0,0
 access_estate_lease_contract_bank_account_read,access.estate.lease.contract.bank.account.read,model_estate_lease_contract_bank_account,estate_lease_contract_group_user,1,0,0,0
 access_estate_lease_contract_heat_fee_setting_read,access.estate.lease.contract.heat.fee.setting.read,model_estate_lease_contract_heat_fee_setting,estate_lease_contract_group_user,1,0,0,0
 access_estate_lease_contract_party_a_unit_read,access.estate.lease.contract.party.a.unit.read,model_estate_lease_contract_party_a_unit,estate_lease_contract_group_user,1,0,0,0

@@ -60,3 +60,17 @@ class DownloadContractPropertyIniImagesController(http.Controller):
             raise ex
         finally:
             _logger.info(f"finally try complete……")
+
+    # todo 客户权限看合同
+    @http.route('/my/estate_lease_contract', type='http', auth='user', website=True)
+    def model_a_form(self):
+        # 获取当前用户的公司
+        company_id = request.env.user.company_id.id
+        _logger.info(f"当前user：{request.env.user};company:{company_id}")
+        # 获取 model_a 的记录（根据公司过滤）
+        model_a_records = request.env['estate.lease.contract'].search([('company_id', '=', company_id)])
+        _logger.info(f"model_a_records：{model_a_records}")
+        # 渲染视图
+        return request.render('estate_lease_contract.estate_lease_contract_view_tree', {
+            'estate_lease_contract_records': model_a_records,
+        })

@@ -921,4 +921,22 @@ action = model.terminate_tgt_contract(env.context)
         </field>
     </record>
 
+    <!--  todo 客户权限看合同  -->
+    <template id="estate_lease_contract_portal_home_content" name="Custom Portal Home Content">
+        <t t-call="portal.portal_layout">
+            <div class="o_portal_my_home">
+                <div class="oe_structure" id="oe_structure_portal_my_home_1"/>
+                <div class="o_portal_docs row g-2">
+                    <!-- 显示 model_a 的 form 视图 -->
+                    <a href="/my/estate_lease_contract" class="btn btn-primary">View Model A</a>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="estate_lease_contract_portal_my_home" inherit_id="portal.portal_my_home">
+        <xpath expr="//div[@id='oe_structure_portal_my_home_1']" position="replace">
+            <a href="/my/estate_lease_contract" class="btn btn-primary">我的合同</a>
+        </xpath>
+    </template>
 </odoo>
