@@ -310,30 +310,49 @@ z                                   <div id="baidu-map-container" style="width:1
     <record id="view_estate_property_kanban" model="ir.ui.view">
         <field name="name">estate.property.kanban</field>
         <field name="model">estate.property</field>
+
         <field name="arch" type="xml">
-            <kanban default_group_by="property_type_id"
+            <kanban default_group_by="building_no" group_create="False" group_delete="False" group_edit="False"
+                    groups_draggable="False" quick_create="False" archivable="False"
                     edit="False"> <!-- 添加default_group_by属性以按type分组，readonly="1"禁止拖放 -->
+                <field name="state"/>
+                <field name="state_color"/>
+                <field name="latest_rent_date_e"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click">
-                            <div class="o_kanban_card">
-                                <div class="o_kanban_record_title">
-                                    <field name="name"/>
-                                    <br/>
-                                    <div class="o_kanban_record_bottom">
-                                        <div class="oe_kanban_bottom_left">
+                            <div class="o_kanban_card" t-attf-class="{{!selection_mode ? 'oe_kanban_bg_color_' + kanban_getcolor(record.state_color.raw_value) : ''}}">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings mt4 h-100 d-flex flex-row">
+                                        <div class="col-12 col-sm-6 o_kanban_primary_left">
+                                            <field name="name"/>
+                                        </div>
+                                        <div class="col-12 col-sm-6 o_kanban_primary_right align-items-center justify-content-end">
                                             <field name="rent_area"/>
                                             <span>㎡</span>
-                                            <div invisible="out_of_rent_days &lt;= 0 or state == 'sold'">
-                                                <span>空置</span>
-                                                <field name="out_of_rent_days"/>
-                                                <span>天</span>
-                                            </div>
                                         </div>
-                                        <div class="oe_kanban_bottom_right">
-                                            <field name="state" widget="badge" decoration-success="state == 'sold'"
-                                                   decoration-warning="state == 'canceled'"/>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body h-100 d-flex flex-column" invisible="state != 'sold'">
+                                    <field name="latest_contact_person"/>
+                                    <div class="mt4 h-100 d-flex flex-row">
+                                        <field name="latest_rent_date_s"/>
+                                        <span>　-　</span>
+                                        <field name="latest_rent_date_e"/>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom col-12 ">
+                                    <div class="oe_kanban_bottom_left">
+                                        <div invisible="out_of_rent_days &lt;= 0 or state == 'sold'">
+                                            <span>空置</span>
+                                            <field name="out_of_rent_days"/>
+                                            <span>天</span>
                                         </div>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right" >
+                                        <field name="state" widget="badge"
+                                               decoration-success="(state == 'sold') and (latest_rent_date_e &lt; (datetime.datetime.combine(context_today() + relativedelta(days=60), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d'))"
+                                               />
                                     </div>
                                 </div>
                             </div>
@@ -356,4 +375,21 @@ action = model.automatic_daily_calc_property_status()
         </field>
     </record>
 
+    <record id="action_state_color_config" model="ir.actions.act_window">
+        <field name="name">租控图颜色设置</field>
+        <field name="res_model">estate.property.state.color</field>
+        <field name="view_mode">kanban</field>
+    </record>
+
+    <record id="estate_lease_contract_property_state_color_manual_action" model="ir.actions.server">
+        <field name="name">租控图颜色设置</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="estate.model_estate_property_state_color"/>
+        <field name="binding_model_id" ref="estate.model_estate_property_state_color"/>
+        <field name="state">code</field>
+        <field name="code">
+env.context['click_from_menu_state_color'] = True
+action = model.init_state_color()
+        </field>
+    </record>
 </odoo>

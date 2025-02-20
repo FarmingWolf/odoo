@@ -5,3 +5,66 @@
 .o_estate_lease_contract_tree_invisible {
     width: 0px !important;
 }
+
+/* 自定义背景色 */
+.bg-green {
+    background-color: #d4edda; /* 绿色 */
+}
+.bg-yellow {
+    background-color: #fff3cd; /* 黄色 */
+}
+.bg-red {
+    background-color: #f8d7da; /* 红色 */
+}
+.bg-blue {
+    background-color: #d1ecf1; /* 蓝色 */
+}
+/* 默认无颜色 */
+.no-color {
+    background-color: transparent;
+}
+
+/* Odoo预定义颜色类 */
+.oe_kanban_bg_color_1 {
+    background-color: #fc9c9c; /* 红色 */
+}
+
+.oe_kanban_bg_color_2 {
+    background-color: #f4c49c; /* 橙色 */
+}
+
+.oe_kanban_bg_color_3 {
+    background-color: #fce48c; /* 黄色 */
+}
+
+.oe_kanban_bg_color_4 {
+    background-color: #bcd4fc; /* 浅蓝色 */
+}
+
+.oe_kanban_bg_color_5 {
+    background-color: #dcaccc; /* 深紫色 */
+}
+
+.oe_kanban_bg_color_6 {
+    background-color: #fcd4cc; /* 粉色 */
+}
+
+.oe_kanban_bg_color_7 {
+    background-color: #8ce4dc; /* 深蓝色 */
+}
+
+.oe_kanban_bg_color_8 {
+    background-color: #94a4fc; /* 蓝色 */
+}
+
+.oe_kanban_bg_color_9 {
+    background-color: #fc9ccc; /* 紫色 */
+}
+
+.oe_kanban_bg_color_10 {
+    background-color: #b4ecbc; /* 绿色 */
+}
+
+.oe_kanban_bg_color_11 {
+    background-color: #e4dcfc; /* 灰色 */
+}

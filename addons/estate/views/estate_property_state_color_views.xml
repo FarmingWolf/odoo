@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_estate_property_state_color_tree" model="ir.ui.view">
+        <field name="name">estate.property.state.color.tree</field>
+        <field name="model">estate.property.state.color</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="state" />
+                <field name="color"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_estate_property_state_color_form" model="ir.ui.view">
+        <field name="name">estate.property.state.color.form</field>
+        <field name="model">estate.property.state.color</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="state"/>
+                        <field name="color"/>
+                        <ul class="oe_kanban_colorpicker" data-field="color"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_estate_property_state_color_kanban" model="ir.ui.view">
+        <field name="name">estate.property.state.color.kanban</field>
+        <field name="model">estate.property.state.color</field>
+        <field name="priority">999</field>
+        <field name="groups_id" eval="[(4, ref('base.group_portal')), (4, ref('base.group_user'))]"/>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile o_kanban_dashboard o_kanban_small_column" create="0" default_group_by="state"
+                    on_create="False" group_create="False"
+                    group_delete="False" group_edit="False" quick_create="False" archivable="0" import="0"
+                    groups_draggable="0" default_order="state DESC">
+                <field name="color"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="kanban-menu" t-if="!selection_mode">
+                        <div role="separator" class="dropdown-divider"/>
+                        <ul class="oe_kanban_colorpicker" data-field="color"/>
+                    </t>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="{{!selection_mode ? 'oe_kanban_color_' + kanban_getcolor(record.color.raw_value) : ''}} oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content" t-attf-class="{{!selection_mode ? 'oe_kanban_bg_color_' + kanban_getcolor(record.color.raw_value) : ''}}">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="state"/>
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+</odoo>

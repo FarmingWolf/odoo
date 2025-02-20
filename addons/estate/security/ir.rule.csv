@@ -2,4 +2,5 @@ id,name,model_id:id,domain_force
 property_company_account_rule,Restrict Properties by Company,model_estate_property,"[('company_id','=',user.company_id.id)]"
 property_offer_company_account_rule,Restrict Properties Offer by Company,model_estate_property_offer,"[('company_id','=',user.company_id.id)]"
 property_tag_company_account_rule,Restrict Properties Tag by Company,model_estate_property_tag,"[('company_id','=',user.company_id.id)]"
+property_state_color_company_account_rule,Restrict Properties State Color by Company,model_estate_property_state_color,"[('company_id','=',user.company_id.id)]"
 property_type_company_account_rule,Restrict Properties Type by Company,model_estate_property_type,"[('company_id','=',user.company_id.id)]"

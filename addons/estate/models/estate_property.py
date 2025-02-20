@@ -264,6 +264,18 @@ class EstateProperty(models.Model):
         selection=[('repairing', '整备中'), ('new', '待租中'), ('offer_received', '洽谈中'), ('offer_accepted', '接受报价'),
                    ('sold', '已租'), ('canceled', '已取消'), ('out_dated', '租约已到期')],
     )
+    state_color = fields.Integer(string='租控图颜色', compute='_compute_state_color')
+
+    @api.depends('state')
+    def _compute_state_color(self):
+        for record in self:
+            # 查找当前用户对当前状态的配置
+            config = self.env['estate.property.state.color'].search([
+                ('company_id', '=', self.company_id.id),
+                ('state', '=', record.state),
+            ], limit=1)
+            # 如果找到配置，使用配置的颜色；否则使用默认颜色（0表示无颜色）
+            record.state_color = config.color if config else 0
 
     # property_offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价")
     property_offer_count = fields.Integer(compute="_compute_property_offer_count", default=0, string="报价条数")
