@@ -74,7 +74,7 @@ class EstateProperty(models.Model):
     buyer_id = fields.Many2one('res.partner', string='购买人', index=True, tracking=True,
                                domain="[('company_id', '=', company_id)]")
     offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价", tracking=True)
-    building_no = fields.Char(string='楼号')
+    building_no = fields.Char(string='楼号', group_expand='_read_group_building_nos')
     floor = fields.Char(default=1, string='楼层')
     room_no = fields.Char(string='房间号')
     description = fields.Text("详细信息")
@@ -265,6 +265,21 @@ class EstateProperty(models.Model):
                    ('sold', '已租'), ('canceled', '已取消'), ('out_dated', '租约已到期')],
     )
     state_color = fields.Integer(string='租控图颜色', compute='_compute_state_color')
+
+    @api.model
+    def _read_group_building_nos(self, stages, domain, order):
+        # 获取当前模型的所有记录的building_no字段值，去除重复并排序
+        records = self.search([('company_id', '=', self.env.user.company_id.id)])
+        building_nos = [' ' if not r.building_no or not r.building_no.strip() else r.building_no for r in records]
+
+        # 去重并排序
+        unique_sorted_building_nos = sorted(set(building_nos))
+
+        # 创建一个字典来存储每个building_no的折叠状态
+        fold_state = {bno: bno == ' ' for bno in unique_sorted_building_nos}
+
+        # 返回两个元素：第一个是分组依据的列表，第二个是折叠状态的字典
+        return fold_state
 
     @api.depends('state')
     def _compute_state_color(self):
