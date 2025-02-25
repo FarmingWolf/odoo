@@ -80,6 +80,9 @@
             <field name="arch" type="xml">
                 <filter name="date_last_stage_update" position="after">
                     <filter string="Deadline" name="date_deadline" date="date_deadline"/>
+                    <separator/>
+                    <filter string="下个月及未来" name="date_payment_next_month"
+                        domain="[('date_deadline', '&gt;=', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
                 </filter>
                 <filter name="last_stage_update" position="after">
                     <filter string="Deadline" name="deadline" context="{'group_by': 'date_deadline'}"/>
