@@ -28,17 +28,45 @@
                     <field name="party_a_unit_invisible" invisible="1"/>
                     <field name="terminated" invisible="1"/>
                     <field name="active" invisible="1"/>
-                    <button name="action_release_contract" type="object" string="发布"
-                            invisible="(not edit_on_hist_page) or (state != 'recording')"/>
-                    <button name="action_cancel_release_contract" type="object" string="取消发布"
-                            invisible="(not edit_on_hist_page) or (state not in ['released', 'to_be_released'])"/>
-                    <button name="action_contract_renewal" type="object" string="续租"
-                            groups="estate_lease_contract.estate_lease_contract_group_manager"
-                            invisible="state not in ['released', 'invalid']"/>
-                    <button name="%(estate_lease_contract_terminate_popup)d" type="action" string="退租/终止"
-                            groups="estate_lease_contract.estate_lease_contract_group_manager"
-                            invisible="(state not in ['to_be_released', 'released']) or terminated or not active"/>
-                    <field name="state" widget="statusbar"/>
+                    <field name="approval_switch" invisible="1"/>
+                    <field name="approval_pipe_end" invisible="1"/>
+                    <field name="stage_id" invisible="1"/>
+                    <field name="stage_sequence" invisible="1"/>
+                    <field name="stage_op_department_id" invisible="1"/>
+                    <div invisible="approval_switch and (not approval_pipe_end)">
+                        <button name="action_release_contract" type="object" string="发布"
+                                invisible="(not edit_on_hist_page) or (state != 'recording')"/>
+                        <button name="action_cancel_release_contract" type="object" string="取消发布"
+                                invisible="(not edit_on_hist_page) or (state not in ['released', 'to_be_released'])"/>
+                        <button name="action_contract_renewal" type="object" string="续租"
+                                groups="estate_lease_contract.estate_lease_contract_group_manager"
+                                invisible="state not in ['released', 'invalid']"/>
+                        <button name="%(estate_lease_contract_terminate_popup)d" type="action" string="退租/终止"
+                                groups="estate_lease_contract.estate_lease_contract_group_manager"
+                                invisible="(state not in ['to_be_released', 'released']) or terminated or not active"/>
+                    </div>
+                    <field name="state" widget="statusbar" invisible="approval_switch and (not approval_pipe_end)"/>
+
+                    <div invisible="(not approval_switch) or approval_pipe_end" groups="estate_lease_contract.estate_lease_contract_approval">
+                        <div invisible="(not stage_op_department_id)">
+                            <div invisible="stage_sequence &lt; 10">
+                                <button name="action_agree" type="object" class="btn btn-success" string="批准"
+                                        title="点击批准该合同"/>
+                                <span>　</span>
+                                <button name="action_reject" type="object" class="btn btn-danger" string="驳回"
+                                        title="点击驳回该合同"/>
+                            </div>
+                            <div invisible="stage_sequence &gt; 0 or not edit_on_hist_page">
+                                <button name="action_agree" type="object" class="btn btn-success" string="提交"
+                                        title="点击提交该合同进入审批流程"/>
+                                <span>　</span>
+                                <button name="action_cancel" type="object" class="btn btn-danger" string="取消"
+                                        title="点击取消该合同"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <field name="stage_id" widget="statusbar" invisible="(not approval_switch) or approval_pipe_end"/>
                 </header>
                 <sheet>
                     <widget name="web_ribbon" title="已归档" bg_color="text-bg-danger" invisible="(not active) or (state != 'invalid' and not terminated)"/>
@@ -587,7 +615,9 @@
                             </sheet>
                         </page>
                     </notebook>
-
+                    <group string="审批情况" invisible="not approval_detail_ids">
+                        <field name="approval_detail_ids" string=""/>
+                    </group>
                 </sheet>
                 <div class="oe_chatter" groups="estate.estate_group_tutorial_research">
                     <field name="message_follower_ids"/>

@@ -4,7 +4,7 @@
         <menuitem id="estate_lease_contract_menu_action" action="estate_lease_contract_action" sequence="23"
                   groups="estate_lease_contract_group_manager" name="查看已生效合同"/>
         <menuitem id="estate_lease_contract_menu_action_recording" groups="estate_lease_contract_group_manager"
-                      action="estate_lease_contract_action_recording" sequence="24" name="新建合同"/>
+                      action="estate_lease_contract_action_recording" sequence="24" name="新建与审批"/>
 
         <menuitem id="estate_lease_contract_menu_settings" groups="estate_lease_contract_group_manager" name="合同基础设置" sequence="30">
             <menuitem id="estate_lease_contract_menu_setting_tag" action="estate_lease_contract_action_tag"/>
@@ -18,6 +18,7 @@
             <menuitem id="estate_lease_contract_menu_setting_party_a_unit" action="estate_lease_contract_party_a_unit_action"/>
             <menuitem id="estate_lease_contract_menu_setting_contract_accounts" action="estate_lease_contract_bank_account_action"/>
             <menuitem id="estate_lease_contract_menu_setting_heat_fee" action="estate_lease_contract_heat_fee_setting_action"/>
+            <menuitem id="estate_lease_contract_menu_setting_approval" action="estate_lease_contract_approval_switch_menu_action"/>
         </menuitem>
         <menuitem id="estate_lease_contract_menu_rental" name="租金明细" sequence="40" action="estate_lease_contract_property_rental_detail_action" groups="estate_lease_contract_group_manager" />
         <menuitem id="estate_lease_contract_menu_rental_reminder" name="租金催缴" sequence="50" action="estate_lease_contract_property_rental_detail_reminder_action" groups="estate_lease_contract_group_user" />

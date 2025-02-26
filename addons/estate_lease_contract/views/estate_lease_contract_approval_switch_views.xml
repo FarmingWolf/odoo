@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="estate_lease_contract_approval_switch_action" model="ir.actions.act_window">
+        <field name="name">资产租赁合同审批流设置</field>
+        <field name="res_model">estate.lease.contract.approval.switch</field>
+        <field name="view_mode">form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                按需设置资产租赁合同审批流。
+            </p>
+        </field>
+    </record>
+    <record id="estate_lease_contract_approval_switch_form" model="ir.ui.view">
+        <field name="name">设置审批流详情</field>
+        <field name="model">estate.lease.contract.approval.switch</field>
+        <field name="arch" type="xml">
+            <form string="设置审批流详情" create="False" edit="True" duplicate="False" delete="False">
+                <header>
+                    <group>
+                        <field name="approval_switch"/>
+                        <button name="action_open_approval_state_set" type="object" class="btn btn-success"
+                                string="设置审批流程步骤" title="点击设置审批流程步骤" invisible="not approval_switch"/>
+                    </group>
+
+                </header>
+            </form>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_approval_switch_menu_action" model="ir.actions.server">
+        <field name="name">资产租赁合同审批流设置</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="estate_lease_contract.model_estate_lease_contract_approval_switch"/>
+        <field name="binding_model_id" ref="estate_lease_contract.model_estate_lease_contract_approval_switch"/>
+        <field name="state">code</field>
+        <field name="code">
+env.context['click_from_menu_approval_switch'] = True
+action = model.init_approval_switch()
+        </field>
+    </record>
+
+</odoo>

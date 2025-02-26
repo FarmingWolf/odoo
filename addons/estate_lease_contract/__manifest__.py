@@ -4,7 +4,7 @@
 {
     'name': "资产租赁合同管理",
     'version': '0.0.2',
-    'depends': ['base', 'web', 'mail', 'utils', 'estate', 'parking', 'estate_registration_addr'],
+    'depends': ['base', 'web', 'mail', 'hr', 'utils', 'estate', 'parking', 'estate_registration_addr'],
     'summary': '资产租赁合同管理',
     'category': 'Real Estate/Lease Contract',
     'website': 'https://www.491tech.com',
@@ -56,6 +56,9 @@
         'security/ir.rule.csv',
 
         'views/estate_lease_contract_property_ini_state_views.xml',
+        'views/estate_lease_contract_approval_stage_views.xml',
+        'views/estate_lease_contract_approval_switch_views.xml',
+        'views/estate_lease_contract_approval_detail_views.xml',
         'views/estate_lease_contract_bank_account_views.xml',
         'views/estate_lease_contract_heat_fee_setting_views.xml',
         'views/estate_lease_contract_party_a_unit_views.xml',

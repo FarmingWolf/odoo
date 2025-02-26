@@ -1221,8 +1221,17 @@ class EstateLeaseContract(models.Model):
                     editable = False
             _logger.info(f"有estate_lease_contract_group_manager权限,so editable={editable}")
 
-        self.edit_on_hist_page = editable
+        # 启用审批流且审批中或审批完成阶段都不可编辑，只有还没提交时可编辑
         for record in self:
+            if record.approval_switch:
+                # 审批中
+                if record.stage_id.sequence > 0:
+                    editable = False
+                # 还没提交
+                if (not record.stage_id) or (record.stage_id.sequence == 0):
+                    editable = True
+
+            self.edit_on_hist_page = editable
             record.edit_on_hist_page = editable
 
         return editable
@@ -1398,7 +1407,7 @@ class EstateLeaseContract(models.Model):
                                    f"请根据实际情况调整或删除租金明细。" \
                                    f"一般情况下应删除掉新生成的本期数据（黑色行），而保留修改过的数据（红色行）。"
 
-    def action_release_contract(self):
+    def action_release_contract(self, only_check=False):
         for record in self:
             if record.terminated:
                 raise UserError(_('该合同已经被终止执行，不能再发布'))
@@ -1430,6 +1439,9 @@ class EstateLeaseContract(models.Model):
 
             # 发布时最终做校验
             self._check_registration_addr_duplicated()
+
+            if only_check:
+                return
 
             record.active = True
             # 根据合同生效日期判断state
@@ -2092,3 +2104,241 @@ class EstateLeaseContract(models.Model):
 
     def print_heat_notice(self):
         return self.env.ref('estate_lease_contract.action_print_heat_fee_notice').report_action(self)
+
+    @api.model
+    def _get_employee(self):
+        # 获取当前登录用户的employee记录
+        user = self.env.user
+        if user.employee_ids:
+            return user.employee_ids[0].id  # 返回第一个employee记录ID
+        else:
+            return False  # 如果没有employee记录，则返回False
+
+    @api.model
+    def _get_employee_nm(self):
+        # 获取当前登录用户的employee记录
+        user = self.env.user
+        if user.employee_ids:
+            return user.employee_ids[0].name  # 返回第一个employee记录ID
+        else:
+            return False  # 如果没有employee记录，则返回False
+
+    @api.model
+    def _get_employee_dp(self):
+        # 获取当前登录用户的employee记录
+        user = self.env.user
+        if user.employee_ids:
+            return user.employee_ids[0].department_id  # 返回第一个employee记录ID
+        else:
+            return False  # 如果没有employee记录，则返回False
+
+    def _check_approval_rights(self, record):
+        record_stage_dep_id = record.stage_id.op_department_id.id
+        _logger.info(f"record.stage_id.op_department_id.id={record_stage_dep_id}")
+        this_employee_dep_id = self._get_employee_dp()
+        _logger.info(f"this.user.employee.department_id={this_employee_dep_id.id}")
+
+        return this_employee_dep_id.id == record_stage_dep_id or self.env.user.id <= 2
+
+    def _create_approval_detail(self, record, approval_or_reject, is_cancel):
+        """ 既然页面已经设置了TZ，那么创建记录时就不应该多此一举，否则页面再选出来时，会多个8小时时差
+        timezone = self._context.get('tz') or self.env.user.partner_id.tz or 'Asia/Shanghai'
+
+        _logger.info(f"timezone:{timezone}")
+        self_tz = self.with_context(tz=timezone)
+        _logger.info(f"self_tz:{self_tz}")
+        """
+
+        _logger.info(f"datetime.now()[{datetime.now()}]")
+        date_time = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y-%m-%d %H:%M:%S')
+        _logger.info(f"date:{date_time}")
+
+        approval_by_usr_id = self._get_employee()
+        approval_by_usr_nm = self._get_employee_nm()
+
+        if approval_or_reject:
+            approval_decision_txt = "同意"
+            approval_comment = "同意"
+        else:
+            approval_decision_txt = "驳回"
+            approval_comment = "驳回"
+
+        if record.stage_id.sequence == 0:
+            rcd_exists = self.env['estate.lease.contract.approval.detail'].browse(
+                record.approval_detail_ids.ids).exists()
+
+            if rcd_exists:
+                approval_comment = "再提交"
+            else:
+                approval_comment = "新建"
+
+        if is_cancel:
+            approval_decision_txt = "取消"
+            approval_comment = "取消"
+        _logger.info(f"创建审批记录approval_or_reject={approval_or_reject}")
+        self.env['estate.lease.contract.approval.detail'].create({
+            'contract_id': f"{record.id}",
+            'approval_stage': f"{record.stage_id.id}",
+            'approval_stage_id': f"{record.stage_id.id}",
+            'approval_stage_nm': f"{record.stage_id.name}",
+            'approved_by_id': f"{approval_by_usr_id}",
+            'approved_by_nm': f"{approval_by_usr_nm}",
+            'approval_comments': f"{approval_comment}",
+            'approval_decision': approval_or_reject,
+            'approval_decision_txt': f"{approval_decision_txt}",
+            'approval_date_time': f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        })
+
+    def action_agree(self):
+        # 批准
+        for record in self:
+            if not self._check_approval_rights(record):
+                raise UserError("当前数据状态超出您的审批权限！")
+
+            self.action_release_contract(only_check=True)
+
+            # 先创建当前阶段的审批记录
+            self._create_approval_detail(record, True, False)
+            all_stages = self.env['estate.lease.contract.approval.stage'].search([
+                ('company_id', '=', self.env.user.company_id.id)])
+            for each_stage in all_stages:
+                # 同意则进入下一阶段
+                if each_stage.sequence > record.stage_id.sequence:
+                    record.stage_sequence = each_stage.sequence
+                    record.stage_id = each_stage
+                    self.write({'stage_id': record.stage_id, 'stage_sequence': record.stage_sequence})
+                    return
+            # 如果当前审批阶段是最后一个阶段，那么审批通过后自动发布。如果从倒数第二阶段进入最后一个阶段则会进入上述逻辑并return，而不会发布。
+            if record.stage_id.pipe_end:
+                self.action_release_contract(only_check=False)
+
+    def action_reject(self):
+        # 驳回
+        for record in self:
+            if not self._check_approval_rights(record):
+                raise UserError("当前数据状态超出您的审批权限！")
+
+            # 先创建当前阶段的驳回记录
+            self._create_approval_detail(record, False, False)
+
+            all_stages = self.env['estate.lease.contract.approval.stage'].search([
+                ('company_id', '=', self.env.user.company_id.id)])
+            for each_stage in all_stages:
+                if each_stage.sequence < record.stage_id.sequence:
+                    tmp_stage = each_stage
+
+                if each_stage.sequence == record.stage_id.sequence:
+                    record.stage_id = tmp_stage
+                    record.stage_sequence = tmp_stage.sequence
+                    self.write({'stage_id': record.stage_id, 'stage_sequence': record.stage_sequence})
+                    return
+
+    def action_cancel(self):
+        for record in self:
+            if not self._check_approval_rights(record):
+                raise UserError("当前数据状态超出您的操作权限！")
+
+            self._create_approval_detail(record, False, True)
+            all_stages = self.env['estate.lease.contract.approval.stage'].search([
+                ('company_id', '=', self.env.user.company_id.id)])
+            for each_stage in all_stages:
+                if each_stage.sequence == 1000:
+                    record.stage_id = each_stage
+                    record.stage_sequence = each_stage.sequence
+                    self.write({'stage_id': record.stage_id, 'stage_sequence': record.stage_sequence})
+                    return
+
+    def _get_default_stage_id(self):
+        _logger.info(f"len(self.env.user.company_ids)={len(self.env.user.company_ids)}")
+        _logger.info(f"self.env.user.company_ids={self.env.user.company_ids}")
+        for each_comp in self.env.user.company_ids:
+            _logger.info(f"self.each_comp={each_comp}")
+
+        return self.env['estate.lease.contract.approval.stage'].search([
+            ('company_id', '=', self.env.user.company_id.id)], limit=1)
+
+    @api.model
+    def _read_group_stage_ids(self, stages, domain, order):
+        return self.env['estate.lease.contract.approval.stage'].search([
+            ('company_id', '=', self.env.user.company_id.id)])
+
+    stage_id = fields.Many2one('estate.lease.contract.approval.stage', ondelete='restrict', copy=False, tracking=True,
+                               default=_get_default_stage_id)
+
+    def _compute_stage_id(self):
+        stage_rcd = self.env['estate.lease.contract.approval.stage'].search([
+            ('company_id', '=', self.env.user.company_id.id)], limit=1)
+        for record in self:
+            if record.approval_switch:
+                if not record.stage_id:
+                    for rcd in stage_rcd:
+                        record.stage_id = rcd.id
+                else:
+                    record.stage_id = record.stage_id
+            else:
+                record.stage_id = record.stage_id
+
+    stage_sequence = fields.Integer(string="状态序号", related="stage_id.sequence")
+    stage_op_department_id = fields.Many2one(string="状态审批部门", related="stage_id.op_department_id")
+    # Kanban fields
+    kanban_state = fields.Selection([('normal', '推进中'), ('done', '已完成'), ('blocked', '任务受阻')], default='normal',
+                                    copy=False, tracking=True)
+
+    @api.depends('stage_id', 'kanban_state')
+    def _compute_kanban_state_label(self):
+        for contrct in self:
+            if contrct.kanban_state == 'normal':
+                contrct.kanban_state_label = contrct.stage_id.legend_normal
+            elif contrct.kanban_state == 'blocked':
+                contrct.kanban_state_label = contrct.stage_id.legend_blocked
+            else:
+                contrct.kanban_state_label = contrct.stage_id.legend_done
+
+    kanban_state_label = fields.Char(
+        string='看板状态', compute='_compute_kanban_state_label',
+        store=True)
+
+    legend_blocked = fields.Char(related='stage_id.legend_blocked', string='任务受阻解释说明', readonly=True)
+    legend_done = fields.Char(related='stage_id.legend_done', string='任务已完成说明', readonly=True)
+    legend_normal = fields.Char(related='stage_id.legend_normal', string='任务推进中说明', readonly=True)
+
+    approval_detail_ids = fields.One2many('estate.lease.contract.approval.detail', 'contract_id', string="审批情况")
+    approval_switch = fields.Boolean('是否已开启审批流', compute="_compute_approval_switch", store=False,
+                                     default="_compute_approval_switch")
+
+    def _compute_approval_switch(self):
+        approval_switch = self.env['estate.lease.contract.approval.switch'].search([
+            ('company_id', '=', self.env.user.company_id.id)], limit=1)
+        is_switch = False
+        for switch_rcd in approval_switch:
+            is_switch = switch_rcd.approval_switch
+
+        for rcd in self:
+            rcd.approval_switch = is_switch
+        _logger.info(f"approval_switch={approval_switch}")
+        return is_switch
+
+    approval_pipe_end = fields.Boolean('是否审批完成', compute="_compute_approval_pipe_end", store=False,
+                                       default="_compute_approval_pipe_end")
+
+    def _compute_approval_pipe_end(self):
+
+        approval_end = False
+        for rcd in self:
+            if not rcd.approval_switch:
+                approval_end = True
+                rcd.approval_pipe_end = approval_end
+            else:
+                approval_end = False
+
+                # 审批流启用之前就已经发布的合同，默认审批完成
+                if rcd.state in ('released', 'to_be_released'):
+                    approval_end = True
+
+                approval_details = self.env['estate.lease.contract.approval.detail'].search([
+                    ('contract_id', '=', rcd.id), ('approval_decision', '=', True)], limit=1, order="id DESC")
+                for detail_rcd in approval_details:
+                    approval_end = detail_rcd.approval_stage.pipe_end
+                rcd.approval_pipe_end = approval_end
+
+        return approval_end

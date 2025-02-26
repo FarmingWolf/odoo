@@ -2,6 +2,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from . import estate_lease_contract_property_ini_state
+from . import estate_lease_contract_approval_stage
+from . import estate_lease_contract_approval_switch
+from . import estate_lease_contract_approval_detail
 from . import estate_lease_contract_party_a_unit
 from . import estate_lease_contract_property_rental_detail_sub
 from . import estate_lease_contract_property_rental_detail
