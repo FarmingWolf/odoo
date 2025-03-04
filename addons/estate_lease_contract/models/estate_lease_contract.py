@@ -419,6 +419,15 @@ class Partner(models.Model):
                 record.contract_party_b_contact_tel = record.phone if record.phone else record.mobile
 
     @api.model
+    def create(self, vals_list):
+        # 设置res.partner的创建人所属company_id
+        if 'company_id' in vals_list:
+            if not vals_list['company_id']:
+                vals_list['company_id'] = self.env.user.company_id.id
+
+        return super().create(vals_list)
+
+    @api.model
     def name_create(self, name):
         """复写此方法为了能把company_id写库"""
 
