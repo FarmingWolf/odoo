@@ -79,11 +79,11 @@ const items = [
     },
     {
         id: "estate_unconventional_area_quantity",
-        description: "林地等总面积（㎡）",
+        description: "林地等总面积（亩）",
         Component: NumberCard,
         props: (data) => ({
-            title: "林地等总面积（㎡）",
-            value: data.unconventional_area,
+            title: "林地等总面积（亩）",
+            value: (data.unconventional_area / 666.667).toFixed(2),
         })
     },
     {
@@ -97,20 +97,20 @@ const items = [
     },
     {
         id: "estate_unconventional_area_lease_quantity",
-        description: "林地等在租面积（㎡）",
+        description: "林地等在租面积（亩）",
         Component: NumberCard,
         props: (data) => ({
-            title: "林地等在租面积（㎡）",
-            value: data.unconventional_area_on_rent,
+            title: "林地等在租面积（亩）",
+            value: (data.unconventional_area_on_rent / 666.667).toFixed(2),
         })
     },
     {
         id: "estate_unconventional_price_avg",
-        description: "在租林地等平均单价（元/天/㎡）",
+        description: "在租林地等平均单价（元/天/亩）",
         Component: NumberCard,
         props: (data) => ({
-            title: "在租林地等平均单价（元/天/㎡）",
-            value: data.unconventional_price_avg,
+            title: "在租林地等平均单价（元/天/亩）",
+            value: (data.unconventional_price_avg * 666.667).toFixed(2),
         })
     },
     {

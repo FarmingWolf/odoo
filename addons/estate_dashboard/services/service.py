@@ -296,7 +296,7 @@ class EstateDashboardService:
         unconventional_cnt = estate_property_quantity - conventional_cnt
         unconventional_area = round(estate_property_area_quantity - conventional_area, 2)
         unconventional_cnt_on_rent = estate_property_lease_quantity - conventional_cnt_on_rent
-        unconventional_area_on_rent = estate_property_area_lease_quantity - conventional_area_on_rent
+        unconventional_area_on_rent = round(estate_property_area_lease_quantity - conventional_area_on_rent, 2)
         unconventional_area_x_price = property_area_x_price - conventional_area_x_price
         if unconventional_cnt != 0:
             ratio_unconventional_cnt = unconventional_cnt_on_rent / unconventional_cnt
