@@ -1,0 +1,14 @@
+.o_estate_kanban_record_top {
+    @extend .o_kanban_record_top;
+    padding-left: 4px; /* 添加新的内边距 */
+}
+
+.o_estate_kanban_record_body {
+    @extend .o_kanban_record_body;
+    padding-left: 4px; /* 添加新的内边距 */
+}
+
+.o_estate_kanban_record_bottom {
+    @extend .o_kanban_record_bottom;
+    padding-left: 4px; /* 添加新的内边距 */
+}

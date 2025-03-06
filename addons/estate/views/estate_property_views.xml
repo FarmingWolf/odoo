@@ -322,7 +322,7 @@ z                                   <div id="baidu-map-container" style="width:1
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click">
                             <div class="o_kanban_card" t-attf-class="{{!selection_mode ? 'oe_kanban_bg_color_' + kanban_getcolor(record.state_color.raw_value) : ''}}">
-                                <div class="o_kanban_record_top">
+                                <div class="o_estate_kanban_record_top">
                                     <div class="o_kanban_record_headings mt4 h-100 d-flex flex-row">
                                         <div class="col-12 col-sm-6 o_kanban_primary_left">
                                             <field name="name"/>
@@ -333,7 +333,7 @@ z                                   <div id="baidu-map-container" style="width:1
                                         </div>
                                     </div>
                                 </div>
-                                <div class="o_kanban_record_body h-100 d-flex flex-column" invisible="state != 'sold'">
+                                <div class="o_estate_kanban_record_body h-100 d-flex flex-column" invisible="state != 'sold'">
                                     <field name="latest_contact_person"/>
                                     <div class="mt4 h-100 d-flex flex-row">
                                         <field name="latest_rent_date_s"/>
@@ -341,7 +341,7 @@ z                                   <div id="baidu-map-container" style="width:1
                                         <field name="latest_rent_date_e"/>
                                     </div>
                                 </div>
-                                <div class="o_kanban_record_bottom col-12 ">
+                                <div class="o_estate_kanban_record_bottom col-12 ">
                                     <div class="oe_kanban_bottom_left">
                                         <div invisible="out_of_rent_days &lt;= 0 or state == 'sold'">
                                             <span>空置</span>

@@ -33,6 +33,7 @@
     'assets': {
         'web.assets_backend': [
             'estate/static/src/css/estate_property.css',
+            'estate/static/src/css/estate_property_kanban.scss',
             'estate/static/src/**/*',
         ],
     },
