@@ -47,9 +47,9 @@
                     </div>
                     <field name="state" widget="statusbar" invisible="approval_switch and (not approval_pipe_end)"/>
 
-                    <div invisible="(not approval_switch) or approval_pipe_end" groups="estate_lease_contract.estate_lease_contract_approval">
+                    <div invisible="(not approval_switch) or approval_pipe_end" groups="estate_lease_contract.estate_lease_contract_approval,estate_lease_contract.estate_lease_contract_group_user">
                         <div invisible="(not stage_op_department_id)">
-                            <div invisible="stage_sequence &lt; 10">
+                            <div invisible="stage_sequence &lt; 10" groups="estate_lease_contract.estate_lease_contract_approval">
                                 <button name="action_agree" type="object" class="btn btn-success" string="批准"
                                         title="点击批准该合同"/>
                                 <span>　</span>

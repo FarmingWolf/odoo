@@ -2146,8 +2146,16 @@ class EstateLeaseContract(models.Model):
         _logger.info(f"record.stage_id.op_department_id.id={record_stage_dep_id}")
         this_employee_dep_id = self._get_employee_dp()
         _logger.info(f"this.user.employee.department_id={this_employee_dep_id.id}")
+        if self.env.user.id <= 2:
+            return True
 
-        return this_employee_dep_id.id == record_stage_dep_id or self.env.user.id <= 2
+        if not self.env.user.has_group('estate_lease_contract.estate_lease_contract_approval'):
+            return False
+
+        if this_employee_dep_id.id == record_stage_dep_id:
+            return True
+        else:
+            return False
 
     def _create_approval_detail(self, record, approval_or_reject, is_cancel):
         """ 既然页面已经设置了TZ，那么创建记录时就不应该多此一举，否则页面再选出来时，会多个8小时时差
@@ -2201,7 +2209,7 @@ class EstateLeaseContract(models.Model):
     def action_agree(self):
         # 批准
         for record in self:
-            if not self._check_approval_rights(record):
+            if record.stage_sequence and (not self._check_approval_rights(record)):
                 raise UserError("当前数据状态超出您的审批权限！")
 
             self.action_release_contract(only_check=True)
@@ -2224,7 +2232,10 @@ class EstateLeaseContract(models.Model):
     def action_reject(self):
         # 驳回
         for record in self:
-            if not self._check_approval_rights(record):
+            if not record.stage_sequence:
+                return
+
+            if record.stage_sequence and (not self._check_approval_rights(record)):
                 raise UserError("当前数据状态超出您的审批权限！")
 
             # 先创建当前阶段的驳回记录
@@ -2244,7 +2255,11 @@ class EstateLeaseContract(models.Model):
 
     def action_cancel(self):
         for record in self:
-            if not self._check_approval_rights(record):
+
+            if not record.stage_sequence:
+                return
+
+            if record.stage_sequence and (not self._check_approval_rights(record)):
                 raise UserError("当前数据状态超出您的操作权限！")
 
             self._create_approval_detail(record, False, True)

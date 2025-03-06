@@ -48,6 +48,10 @@ class EstateLeaseContractApprovalStage(models.Model):
             if idx == 0:
                 if record.sequence != 0:
                     raise ValidationError(f"第一个审批阶段[{record.name}]的阶段序号必须为0")
+            if idx == 1:
+                if record.sequence < 10:
+                    raise ValidationError(f"第二个审批阶段[{record.name}]的阶段序号必须>=10")
+
             if pipe_end_cnt >= 1:
                 not_last_pipe_end = True
             if record.pipe_end:
@@ -60,4 +64,3 @@ class EstateLeaseContractApprovalStage(models.Model):
             msg.remove(last_name)
         if (pipe_end_cnt > 1) or not_last_pipe_end:
             raise ValidationError(f"只能将最后一个审批阶段[{last_name}]标记审批结束标志位。请取消{msg}的审批结束标志位。")
-
