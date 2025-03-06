@@ -2327,9 +2327,6 @@ class EstateLeaseContract(models.Model):
         _logger.info(f"approval_switch={approval_switch}")
         return is_switch
 
-    approval_pipe_end = fields.Boolean('是否审批完成', compute="_compute_approval_pipe_end", store=False,
-                                       default="_compute_approval_pipe_end")
-
     def _compute_approval_pipe_end(self):
 
         approval_end = False
@@ -2351,3 +2348,6 @@ class EstateLeaseContract(models.Model):
                 rcd.approval_pipe_end = approval_end
 
         return approval_end
+
+    approval_pipe_end = fields.Boolean('是否审批完成', compute="_compute_approval_pipe_end", store=False,
+                                       default=lambda self: self._compute_approval_pipe_end if self else False)
