@@ -4,7 +4,7 @@
     <t t-name="web.UserMenu">
         <Dropdown class="'o_user_menu d-none d-md-block pe-0'" togglerClass="'py-1 py-lg-0'">
             <t t-set-slot="toggler">
-                <img class="o_avatar o_user_avatar rounded" t-att-src="source" alt="User"/>
+                <img class="o_avatar o_user_avatar rounded" t-att-title="user.name" t-att-src="source" alt="User"/>
                 <small class="oe_topbar_name d-none ms-2 text-start smaller lh-1 text-truncate"  t-att-class="{'d-lg-inline-block' : env.debug}" style="max-width: 200px">
                     <t t-esc="user.name"/>
                     <mark class="d-block font-monospace text-truncate">
