@@ -798,6 +798,11 @@ msgid "Administrator"
 msgstr "管理员"
 
 #. module: project
+#: model:res.groups,name:project.group_project_monthly_report
+msgid "Monthly Report"
+msgstr "月报查看"
+
+#. module: project
 #. odoo-javascript
 #: code:addons/project/static/src/views/project_task_kanban/project_task_kanban_examples.js:0
 #, python-format
@@ -861,6 +866,12 @@ msgstr "全部"
 #: model:ir.ui.menu,name:project.menu_project_management_all_tasks
 msgid "All Tasks"
 msgstr "所有任务"
+
+#. module: project
+#: model:ir.actions.act_window,name:project.action_view_monthly_report
+#: model:ir.ui.menu,name:project.menu_monthly_report
+msgid "Monthly Report"
+msgstr "月报"
 
 #. module: project
 #: model:ir.model.fields.selection,name:project.selection__project_project__privacy_visibility__employees
@@ -4414,7 +4425,12 @@ msgstr "删除阶段"
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form_base
 msgid "Starred Tasks"
-msgstr "星标任务"
+msgstr "标星任务"
+
+#. module: project
+#: model_terms:ir.ui.view,arch_db:project.view_task_search_form_base
+msgid "Priority Set"
+msgstr "高级别任务"
 
 #. module: project
 #: model:ir.model.fields,field_description:project.field_project_project__date_start

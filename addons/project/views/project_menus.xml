@@ -38,6 +38,10 @@
                 sequence="2"
             />
         </menuitem>
+
+        <menuitem name="Monthly Report" id="menu_monthly_report" sequence="98"
+                  action="action_view_monthly_report" groups="project.group_project_monthly_report"/>
+
         <menuitem
             name="Reporting"
             id="menu_project_report"
