@@ -2223,12 +2223,14 @@ class EstateLeaseContract(models.Model):
                 max_stage_sequence = each_stage.sequence
 
             for each_stage in all_stages:
+                # 从初始阶段到倒数第二个阶段都会进入此逻辑，而最后一个阶段的待审批不进入此逻辑
                 # 同意则进入下一阶段
                 if each_stage.sequence > record.stage_id.sequence:
                     record.stage_sequence = each_stage.sequence
                     record.stage_id = each_stage
                     self.write({'stage_id': record.stage_id, 'stage_sequence': record.stage_sequence})
-                    break
+                    # 这里就应该是return，而不是break
+                    return
 
             # 如果当前审批阶段是最后一个阶段，那么审批通过后自动发布。如果从倒数第二阶段进入最后一个阶段则会进入上述逻辑并return，而不会发布。
             if record.stage_id.pipe_end or (max_stage_sequence == record.stage_sequence):
@@ -2359,8 +2361,6 @@ class EstateLeaseContract(models.Model):
                 approval_end = True
                 rcd.approval_pipe_end = approval_end
             else:
-                approval_end = False
-
                 # 审批流启用之前就已经发布的合同，默认审批完成
                 if rcd.state in ('released', 'to_be_released'):
                     approval_end = True
@@ -2369,6 +2369,13 @@ class EstateLeaseContract(models.Model):
                     ('contract_id', '=', rcd.id), ('approval_decision', '=', True)], limit=1, order="id DESC")
                 for detail_rcd in approval_details:
                     approval_end = detail_rcd.approval_stage.pipe_end
+                    # 如果最后一条审批通过的审批明细，其stage_id是最后一个审批流阶段，那么就认为approval_pipe_end = True
+                    stage_rcds = self.env['estate.lease.contract.approval.stage'].search([
+                        ('company_id', '=', self.env.user.company_id.id)], limit=1, order="sequence DESC")
+                    for stage_rcd in stage_rcds:
+                        if stage_rcd.id == detail_rcd.approval_stage.id:
+                            approval_end = True
+
                 rcd.approval_pipe_end = approval_end
 
         return approval_end

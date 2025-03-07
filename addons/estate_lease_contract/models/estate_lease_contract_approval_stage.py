@@ -8,7 +8,7 @@ from odoo.exceptions import ValidationError
 class EstateLeaseContractApprovalStage(models.Model):
     _name = 'estate.lease.contract.approval.stage'
     _description = '租赁合同审批阶段'
-    _order = 'sequence, name'
+    _order = 'sequence'
 
     name = fields.Char(string='审批阶段名称', required=True, translate=True)
     description = fields.Text(string='审批阶段描述', translate=True)
