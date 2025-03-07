@@ -2218,15 +2218,21 @@ class EstateLeaseContract(models.Model):
             self._create_approval_detail(record, True, False)
             all_stages = self.env['estate.lease.contract.approval.stage'].search([
                 ('company_id', '=', self.env.user.company_id.id)])
+            max_stage_sequence = 0
+            for each_stage in all_stages:
+                max_stage_sequence = each_stage.sequence
+
             for each_stage in all_stages:
                 # 同意则进入下一阶段
                 if each_stage.sequence > record.stage_id.sequence:
                     record.stage_sequence = each_stage.sequence
                     record.stage_id = each_stage
                     self.write({'stage_id': record.stage_id, 'stage_sequence': record.stage_sequence})
-                    return
+                    break
+
             # 如果当前审批阶段是最后一个阶段，那么审批通过后自动发布。如果从倒数第二阶段进入最后一个阶段则会进入上述逻辑并return，而不会发布。
-            if record.stage_id.pipe_end:
+            if record.stage_id.pipe_end or (max_stage_sequence == record.stage_sequence):
+                record.approval_pipe_end = True
                 self.action_release_contract(only_check=False)
 
     def action_reject(self):
@@ -2240,6 +2246,9 @@ class EstateLeaseContract(models.Model):
 
             # 先创建当前阶段的驳回记录
             self._create_approval_detail(record, False, False)
+
+            # 驳回后，应将本条数据的审批结束标志置为False
+            record.approval_pipe_end = False
 
             all_stages = self.env['estate.lease.contract.approval.stage'].search([
                 ('company_id', '=', self.env.user.company_id.id)])
