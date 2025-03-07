@@ -3,6 +3,9 @@
 import { session } from "@web/session";
 
 export async function wechatLogin() {
+    if (window.location.hostname === "localhost") {
+        return;
+    }
     console.log("wechat module entered session.connectionState=" + session.connectionState)
     console.log("redirect_uri=" + window.location.origin + "……")
     if (session.connectionState === undefined) {
