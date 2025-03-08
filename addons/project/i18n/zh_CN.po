@@ -1753,6 +1753,18 @@ msgid "Deadline"
 msgstr "截止日期"
 
 #. module: project
+#. odoo-python
+#: code:addons/project/controllers/portal.py:0
+#: model:ir.model.fields,field_description:project.field_project_milestone__date_deadline_ymd
+#: model:ir.model.fields,field_description:project.field_project_task__date_deadline_ymd
+#: model:ir.model.fields,field_description:project.field_project_task_burndown_chart_report__date_deadline_ymd
+#: model:ir.model.fields,field_description:project.field_report_project_task_user__date_deadline_ymd
+#: model_terms:ir.ui.view,arch_db:project.view_task_search_form_project_base
+#, python-format
+msgid "Deadline YMD"
+msgstr "截止日期"
+
+#. module: project
 #: model_terms:ir.ui.view,arch_db:project.project_message_user_assigned
 msgid "Dear"
 msgstr "尊敬的"
@@ -4426,6 +4438,11 @@ msgstr "删除阶段"
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form_base
 msgid "Starred Tasks"
 msgstr "标星任务"
+
+#. module: project
+#: model_terms:ir.ui.view,arch_db:project.view_task_search_form_base
+msgid "Pre And Next Month"
+msgstr "前后月"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.view_task_search_form_base

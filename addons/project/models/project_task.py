@@ -155,6 +155,15 @@ class Task(models.Model):
     date_assign = fields.Datetime(string='Assigning Date', copy=False, readonly=True,
         help="Date on which this task was last assigned (or unassigned). Based on this, you can get statistics on the time it usually takes to assign tasks.")
     date_deadline = fields.Datetime(string='Deadline', index=True, tracking=True)
+    date_deadline_ymd = fields.Date(string='Deadline YMD', compute='_compute_date_deadline_ymd', store=False)
+
+    @api.depends("date_deadline")
+    def _compute_date_deadline_ymd(self):
+        for record in self:
+            if record.date_deadline:
+                record.date_deadline_ymd = fields.Date.to_date(record.date_deadline)
+            else:
+                record.date_deadline_ymd = False
 
     date_last_stage_update = fields.Datetime(string='Last Stage Update',
         index=True,
