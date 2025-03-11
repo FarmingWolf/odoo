@@ -217,7 +217,7 @@
                                 <group>
                                     <field name="bedrooms" string="卧室数"/>
                                     <field name="living_area"/>
-                                    <field name="facades" string="朝向"/>
+                                    <field name="facades" string="外立面"/>
                                     <field name="garage" string="车库"/>
                                 </group>
                                 <group>
