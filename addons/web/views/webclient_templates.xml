@@ -23,8 +23,8 @@
         <link type="image/x-icon" rel="shortcut icon" t-att-href="x_icon or '/web/static/img/favicon.ico'"/>
         <script id="web.layout.odooscript" type="text/javascript">
             var odoo = {
-                csrf_token: "<t t-nocache="The csrf token must always be up to date." t-esc="request.csrf_token(None)"/>",
-                debug: "<t t-esc="debug"/>",
+                csrf_token: "&lt;t t-nocache='The csrf token must always be up to date.' t-esc='request.csrf_token(None)'/>",
+                debug: "&lt;t t-esc='debug'/>",
             };
         </script>
         <t t-out="head or ''"/>
@@ -45,7 +45,7 @@
       </xpath>
       <xpath expr="//head/script[@id='web.layout.odooscript']" position="after">
         <script t-nocache="Session information should always be up to date." type="text/javascript">
-            odoo.__session_info__ = <t t-out="json.dumps(request.env['ir.http'].get_frontend_session_info())"/>;
+            odoo.__session_info__ = &lt;t t-out="json.dumps(request.env['ir.http'].get_frontend_session_info())"/>;
             if (!/(^|;\s)tz=/.test(document.cookie)) {
                 const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 document.cookie = `tz=${userTZ}; path=/`;
@@ -139,9 +139,8 @@
         <t t-call="web.login_layout">
             <form class="oe_login_form" role="form" t-attf-action="/web/login" method="post" onsubmit="this.action = '/web/login' + location.hash">
                 <div id="div_login">
-                    <t t-if="'localhost' not in request.httprequest.host">
-                        <div class="login_method_switch-button" onclick="toggleLoginMethod()" id="mobile-hide-sw-btn">
-                        </div>
+                    <t t-if="('localhost' not in request.httprequest.host) and not (request.httprequest.host.split(':')[0].replace('.', '').isdigit() and len(request.httprequest.host.split(':')[0].split('.')) == 4)">
+                        <div class="login_method_switch-button" onclick="toggleLoginMethod()" id="mobile-hide-sw-btn"/>
                     </t>
                     <div id="div_uid_pwd">
                         <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
@@ -150,7 +149,7 @@
                             <label for="db" class="col-form-label">Database</label>
                             <div t-attf-class="input-group {{'input-group-sm' if form_small else ''}}">
                                 <input type="text" name="db" t-att-value="request.db" id="db" t-attf-class="form-control #{'form-control-sm' if form_small else ''}" required="required" readonly="readonly"/>
-                                <a role="button" href="/web/database/selector" class="btn btn-secondary">Select <i class="fa fa-database" role="img" aria-label="Database" title="Database"></i></a>
+                                <a role="button" href="/web/database/selector" class="btn btn-secondary">Select <i class="fa fa-database" role="img" aria-label="Database" title="Database"/></a>
                             </div>
                         </div>
 
@@ -262,7 +261,7 @@
                 <script type="text/javascript">
                     // Block to avoid leaking variables in the script scope
                     {
-                        odoo.__session_info__ = <t t-out="json.dumps(session_info)"/>;
+                        odoo.__session_info__ = &lt;t t-out="json.dumps(session_info)"/>;
                         const { user_context,  cache_hashes } = odoo.__session_info__;
                         const lang = new URLSearchParams(document.location.search).get("lang");
                         let menuURL = `/web/webclient/load_menus/${cache_hashes.load_menus}`;
