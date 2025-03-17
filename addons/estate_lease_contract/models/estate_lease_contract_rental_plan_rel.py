@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import logging
 
 from odoo import fields, models, api
+from odoo.exceptions import ValidationError
 
+
+_logger = logging.getLogger(__name__)
 
 class EstateLeaseContractRentalPlanRel(models.Model):
     _name = 'estate.lease.contract.rental.plan.rel'
@@ -137,3 +141,55 @@ class EstateLeaseContractRentalPlanRel(models.Model):
                 "tax_received": received_aft - received_bef,
             }]
             self.env["estate.lease.contract.property.tax"].create(property_tax_detail)
+
+    def _check_date_overlap(self, check_tgt_nm):
+        """检查日期范围是否有重叠
+            不允许部分重叠而允许完全重叠的日期可以理解为多次缴纳
+        """
+        lines = []
+        _logger.info(f"检查页面{check_tgt_nm}的开始结束日期")
+        for record in self:
+            if check_tgt_nm == "水费":
+                lines = record.contract_property_fee_water_ids
+            if check_tgt_nm == "电费":
+                lines = record.contract_property_fee_electricity_ids
+            if check_tgt_nm == "电力维护费":
+                lines = record.contract_property_fee_electricity_maintenance_ids
+            if check_tgt_nm == "物业费":
+                lines = record.contract_property_fee_maintenance_ids
+
+            i = 0
+            for line in lines:
+
+                ii = 0
+                for comp_tgt in lines:
+                    if i != ii:
+                        if comp_tgt.period_d_start < line.period_d_start <= comp_tgt.period_d_end:
+                            raise ValidationError(f"{check_tgt_nm}期间的开始日设置错误：开始日期[{line.period_d_start}]介于"
+                                                  f"[{comp_tgt.period_d_start}]~[{comp_tgt.period_d_end}]")
+
+                        if comp_tgt.period_d_start <= line.period_d_end < comp_tgt.period_d_end:
+                            raise ValidationError(f"{check_tgt_nm}期间的结束日设置错误：结束日期[{line.period_d_end}]介于"
+                                                  f"[{comp_tgt.period_d_start}]~[{comp_tgt.period_d_end}]")
+
+                    ii += 1
+
+                i += 1
+
+    @api.model
+    def create(self, vals):
+        record = super().create(vals)
+        check_tgt = ['水费', '电费', '电力维护费', '物业费']
+        for tgt in check_tgt:
+            record._check_date_overlap(tgt)
+
+        return record
+
+    @api.model
+    def write(self, vals):
+        res = super().write(vals)
+        check_tgt = ['水费', '电费', '电力维护费', '物业费']
+        for tgt in check_tgt:
+            self._check_date_overlap(tgt)
+
+        return res

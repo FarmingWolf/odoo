@@ -58,13 +58,10 @@ class EstateLeaseContractPropertyFeeElectricityMaintenance(models.Model):
         self.electricity_maintenance_arrears = self.electricity_maintenance_receivable - \
                                                self.electricity_maintenance_received
 
-    @api.onchange("period_d_start")
+    @api.onchange("period_d_start", "period_d_end")
     def _onchange_period_d_start(self):
-        self.period_d_end = end_of(self.period_d_start, "month")
-
-    @api.onchange("period_d_end")
-    def _onchange_period_d_end(self):
-        self.period_d_start = start_of(self.period_d_end, "month")
+        if self.period_d_start > self.period_d_end:
+            self.period_d_end = end_of(self.period_d_start, 'month')
 
     def _cal_period_d_start(self):
         context_d = fields.Date.context_today(self)

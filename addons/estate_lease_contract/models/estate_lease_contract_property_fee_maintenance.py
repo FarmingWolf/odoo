@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
-from datetime import timedelta
+from datetime import timedelta, datetime
 from math import ceil, floor
 from typing import Dict, List
 
 from odoo.exceptions import UserError
 from odoo.tools import start_of, end_of
-from . import estate_lease_contract
 from odoo import fields, models, api
-from ...utils.models.utils import Utils
 
 _logger = logging.getLogger(__name__)
 
@@ -55,13 +53,10 @@ class EstateLeaseContractPropertyFeeMaintenance(models.Model):
     def _onchange_maintenance_receivable(self):
         self.maintenance_arrears = self.maintenance_receivable - self.maintenance_received
 
-    @api.onchange("period_d_start")
+    @api.onchange("period_d_start", "period_d_end")
     def _onchange_period_d_start(self):
-        self.period_d_end = end_of(self.period_d_start, "month")
-
-    @api.onchange("period_d_end")
-    def _onchange_period_d_end(self):
-        self.period_d_start = start_of(self.period_d_end, "month")
+        if self.period_d_start > self.period_d_end:
+            self.period_d_end = end_of(self.period_d_start, 'month')
 
     def _cal_period_d_start(self):
         context_d = fields.Date.context_today(self)
@@ -72,6 +67,26 @@ class EstateLeaseContractPropertyFeeMaintenance(models.Model):
         context_d = fields.Date.context_today(self)
         end_d = end_of(context_d, 'month')
         return end_d
+
+    # @api.model_create_multi
+    # def create(self, vals_list):
+    #
+    #     # create时，还没有self
+    #     # _logger.info(f"create contract_id={self.contract_rental_plan_rel_id.contract_id.id};"
+    #     #              f"property_id={self.contract_rental_plan_rel_id.property_id.id}")
+    #     # _logger.info(f"vals_list={vals_list}")
+    #     self._check_multi_date_duplicate(vals_list)
+    #
+    #     return super().create(vals_list)
+    #
+    # @api.model
+    # def write(self, values):
+    #     _logger.info(f"update contract_id={self.contract_rental_plan_rel_id.contract_id.id};"
+    #                  f"property_id={self.contract_rental_plan_rel_id.property_id.id}")
+    #     _logger.info(f"values={values}")
+    #
+    #     self._check_update_date_duplicate(values)
+    #     return super().write(values)
 
     @api.depends("maintenance_received", "maintenance_receivable", "date_received")
     def _compute_received(self):
@@ -93,3 +108,62 @@ class EstateLeaseContractPropertyFeeMaintenance(models.Model):
 
                 if rcd.maintenance_arrears_sum != arrears_sum:
                     rcd.maintenance_arrears_sum = arrears_sum
+
+    # def _check_multi_date_duplicate(self, vals_list):
+    #     i = 0
+    #     for new_vals in vals_list:
+    #         # 先查本行
+    #         if 'period_d_start' in new_vals and 'period_d_end' in new_vals and \
+    #                 new_vals['period_d_start'] > new_vals['period_d_end']:
+    #             raise UserError(f"物业费期间的开始结束日期设置错误："
+    #                             f"[{new_vals['period_d_start']}]~[{new_vals['period_d_end']}]")
+    #
+    #         # 再自查页面数据自身是否有期间交叉
+    #         ii = 0
+    #         for comp_tgt in vals_list:
+    #             if i != ii:
+    #                 if ('period_d_start' in new_vals and 'period_d_start' in comp_tgt and 'period_d_end' in comp_tgt
+    #                         and comp_tgt['period_d_start'] < new_vals['period_d_start'] <= comp_tgt['period_d_end']):
+    #                     raise UserError(f"物业费期间的期间设置重叠错误：开始日期[{new_vals['period_d_start']}]介于"
+    #                                     f"[{comp_tgt['period_d_start']}]~[{comp_tgt['period_d_end']}]")
+    #
+    #                 if ('period_d_end' in new_vals and 'period_d_start' in comp_tgt and 'period_d_end' in comp_tgt
+    #                         and comp_tgt['period_d_start'] <= new_vals['period_d_end'] < comp_tgt['period_d_end']):
+    #                     raise UserError(f"物业费期间的期间设置重叠错误：结束日期[{new_vals['period_d_end']}]介于"
+    #                                     f"[{comp_tgt['period_d_start']}]~[{comp_tgt['period_d_end']}]")
+    #
+    #             ii += 1
+    #
+    #         fees_exist = False
+    #         if not fees_exist:
+    #             _logger.info(f"self.contract_rental_plan_rel_id.id={self.contract_rental_plan_rel_id.id}")
+    #             domain = [('contract_rental_plan_rel_id', '=', self.contract_rental_plan_rel_id.id)]
+    #             fees_exist = self.search(domain)
+    #             _logger.info(f"fees_exist={fees_exist}")
+    #
+    #         # 仅做期间的部分重叠交叉校验，而完全的覆盖重叠不算错误
+    #         # 比如 20250101-20250131与20250102-20250201算错误
+    #         for fee in fees_exist:
+    #             if 'period_d_start' in new_vals:
+    #                 tgt_date = datetime.strptime(new_vals['period_d_start'], '%Y-%m-%d').date()
+    #                 if fee.period_d_start < tgt_date <= fee.period_d_end:
+    #                     raise UserError(f"物业费期间的期间重叠了：开始日期[{new_vals['period_d_start']}]介于"
+    #                                     f"[{fee.period_d_start}]~[{fee.period_d_end}]")
+    #
+    #             if 'period_d_end' in new_vals:
+    #                 tgt_date = datetime.strptime(new_vals['period_d_end'], '%Y-%m-%d').date()
+    #                 if fee.period_d_start <= tgt_date < fee.period_d_end:
+    #                     raise UserError(f"物业费期间的期间重叠了：结束日期[{new_vals['period_d_end']}]介于"
+    #                                     f"[{fee.period_d_start}]~[{fee.period_d_end}]")
+    #
+    #         i += 1
+    #
+    # def _check_update_date_duplicate(self, new_vals):
+    #     if not new_vals or len(new_vals) == 0:
+    #         return
+    #
+    #     if 'period_d_start' not in new_vals and 'period_d_end' not in new_vals:
+    #         return
+    #
+    #     tgt_list = [new_vals]
+    #     self._check_multi_date_duplicate(tgt_list)
