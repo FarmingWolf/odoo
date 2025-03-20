@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="ir_rule_fund_management_manager" model="ir.rule">
+            <field name="name">Manager Fund Management</field>
+            <field name="model_id" ref="model_fund_management"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[
+                (4, ref('account.group_account_user')),
+                (4, ref('fund_management.group_fund_management_user'))]"/>
+        </record>
+        <record id="ir_rule_fund_management_approver" model="ir.rule">
+            <field name="name">Team Approver Fund Management</field>
+            <field name="model_id" ref="model_fund_management"/>
+            <field name="domain_force">['|', '|', '|',
+                ('employee_id.user_id', '=', user.id),
+                ('employee_id.department_id.manager_id.user_id', '=', user.id),
+                ('employee_id.parent_id.user_id', '=', user.id),
+                ('employee_id.fund_management_manager_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('fund_management.group_fund_management_team_approver'))]"/>
+        </record>
+        <record id="ir_rule_fund_management_employee" model="ir.rule">
+            <field name="name">Employee Fund Management</field>
+            <field name="model_id" ref="model_fund_management"/>
+            <field name="domain_force">[('employee_id.user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="fund_management_comp_rule" model="ir.rule">
+            <field name="name">Fund Management multi company rule</field>
+            <field name="model_id" ref="model_fund_management"/>
+            <field eval="True" name="global"/>
+            <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        </record>
+
+</odoo>

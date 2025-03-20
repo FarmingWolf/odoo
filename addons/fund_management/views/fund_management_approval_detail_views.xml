@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="fund_management_approval_detail_action" model="ir.actions.act_window">
+        <field name="name">Fund Management Approval Detail</field>
+        <field name="res_model">fund.management.approval.detail</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Fund Management Approval Detail
+            </p>
+        </field>
+    </record>
+
+    <record id="fund_management_approval_detail_view_tree" model="ir.ui.view">
+        <field name="name">fund.management.approval.detail.tree</field>
+        <field name="model">fund.management.approval.detail</field>
+        <field name="arch" type="xml">
+            <tree string="Fund Management Approval Detail View Tree" create="False" edit="True" delete="False">
+                <field name="company_id" column_invisible="1"/>
+                <field name="approval_decision" column_invisible="1"/>
+                <field name="fund_management_id" column_invisible="1"/>
+                <field name="approval_stage_nm"/>
+                <field name="approval_decision_txt"/>
+                <field name="approved_by_id" column_invisible="1"/>
+                <field name="approved_by_nm"/>
+                <field name="approval_comments"/>
+                <field name="approval_date_time"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="fund_management_approval_detail_view_form" model="ir.ui.view">
+        <field name="name">fund.management.approval.detail.form</field>
+        <field name="model">fund.management.approval.detail</field>
+        <field name="arch" type="xml">
+            <form string="Fund Management Approval Detail View Form" create="false" delete="false" edit="false">
+                <group>
+                    <field name="company_id" invisible="1"/>
+                    <field name="fund_management_id" invisible="1"/>
+                    <field name="approval_decision" invisible="1"/>
+                    <field name="approval_stage_nm"/>
+                    <field name="approval_decision_txt"/>
+                    <field name="approved_by_id" invisible="1"/>
+                    <field name="approved_by_nm"/>
+                    <field name="approval_comments"/>
+                    <field name="approval_date_time"/>
+                </group>
+            </form>
+        </field>
+    </record>
+</odoo>

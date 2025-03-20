@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="fund_management.ListButtons" t-inherit="web.ListView.Buttons" t-inherit-mode="primary">
+
+       <!-- fund.management and fund.management.sheet -->
+        <xpath expr="//div[hasclass('o_list_buttons')]" position="inside">
+            <input type="file" name="ufile" class="d-none" t-ref="fileInput" multiple="1" accept="*" t-on-change="onChangeFileInput"/>
+        </xpath>
+    </t>
+
+    <t t-name="fund_management.ListRenderer" t-inherit="web.ListRenderer" t-inherit-mode="primary">
+        <xpath expr="//div[hasclass('o_list_renderer')]" position="before">
+            <div t-if="dragState.showDragZone" class="o_dropzone">
+                <i class="fa fa-upload fa-10x"/>
+            </div>
+        </xpath>
+        <xpath expr="//div[hasclass('o_list_renderer')]" position="attributes">
+            <attribute name="class">o_list_renderer fund_management h-auto o_forbidden_tooltip_parent</attribute>
+        </xpath>
+    </t>
+
+
+    <t t-name="fund_management.DashboardListRenderer" t-inherit="fund_management.ListRenderer" t-inherit-mode="primary">
+        <xpath expr="//div[hasclass('o_list_renderer')]" position="before">
+            <FundManagementDashboard/>
+        </xpath>
+    </t>
+</templates>

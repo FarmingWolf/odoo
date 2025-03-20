@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_fund_management_category" model="ir.actions.act_window">
+        <field name="name">Fun management approval process category</field>
+        <field name="res_model">fund.management.category</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Flexible fund management process categories can be created according to actual business needs. e.g.<br/>
+                First and mid-term payments for engineering construction projects<br/>
+                Final payment for engineering construction projects<br/>
+                First and mid-term payments for service procurement projects<br/>
+                etc.
+            </p>
+        </field>
+    </record>
+
+    <record id="fund_management_category_view_tree" model="ir.ui.view">
+        <field name="name">fund.management.category.tree</field>
+        <field name="model">fund.management.category</field>
+        <field name="arch" type="xml">
+            <tree string="Fund Management Approval Category">
+                <field name="name"/>
+                <field name="amount_min"/>
+                <field name="amount_max"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="fund_management_category_view_form" model="ir.ui.view">
+        <field name="name">fund.management.category.form</field>
+        <field name="model">fund.management.category</field>
+        <field name="arch" type="xml">
+            <form string="Fund Management Approval Category" create="True" edit="True" duplicate="True" delete="True">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" default_focus="True"
+                                   placeholder="e.g. First and mid-term payments for engineering construction projects, final payments for engineering construction projects, first and mid-term payments for service procurement projects, final payments for service procurement projects, etc"/></h1>
+                    </div>
+
+                    <group>
+                        <label for="amount_min" string="Fund range"/>
+                        <div>
+                            <field name="amount_min" nolabel="True" class="oe_inline o_input_11ch"/>
+                            <span>to</span>
+                            <field name="amount_max" nolabel="True" class="oe_inline o_input_11ch" placeholder="0 means infinity"/>
+                        </div>
+                    </group>
+                    <button name="action_fund_management_approval_setting" type="object" class="btn btn-success"
+                            title="Click to set approval process steps">
+                        <span>To set approval steps</span>
+                    </button>
+                    <notebook>
+                        <page string="Approval Stages" invisible="not approval_stages">
+                            <field name="approval_stages"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="fund_management_category_select_view_tree" model="ir.ui.view">
+        <field name="name">fund.management.category.tree</field>
+        <field name="model">fund.management.category</field>
+        <field name="arch" type="xml">
+            <tree string="Select category to create a new Fund Management" create="False" edit="False" delete="False">
+                <field name="name"/>
+                <field name="amount_min"/>
+                <field name="amount_max"/>
+                <button type="object" name="action_select_category_create_application" string="Create New Application"
+                        context="{'default_category_id': active_id}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_fund_management_actions_create_new" model="ir.actions.act_window">
+        <field name="name">Select category to create a new Fund Management</field>
+        <field name="res_model">fund.management.category</field>
+        <field name="view_mode">tree</field>
+        <field name="views">[False, "tree"]</field>
+        <field name="view_id" ref="fund_management_category_select_view_tree"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Flexible fund management process categories can be created according to actual business needs. e.g.<br/>
+                First and mid-term payments for engineering construction projects<br/>
+                Final payment for engineering construction projects<br/>
+                First and mid-term payments for service procurement projects<br/>
+                etc.
+            </p>
+        </field>
+    </record>
+
+</odoo>
