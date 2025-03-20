@@ -388,7 +388,7 @@
             <field name="name">All Applications</field>
             <field name="res_model">fund.management</field>
             <field name="view_mode">tree,kanban,form,graph,pivot,activity</field>
-            <field name="view_id">view_fund_management_to_be_approved_tree</field>
+            <field name="view_id" ref="view_fund_management_to_be_approved_tree"/>
             <field name="search_view_id" ref="fund_management_view_search"/>
             <field name="context">{'search_default_to_be_approved': 1}</field>
             <field name="help" type="html">
