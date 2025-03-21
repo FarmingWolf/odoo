@@ -789,6 +789,8 @@
                 <field name="date_rent_start"/>
                 <field name="date_rent_end"/>
                 <field name="state"/>
+                <field name="contract_amount"/>
+                <field name="lease_deposit"/>
                 <field name="rent_amount_year"/>
                 <field name="parking_space_count"/>
                 <field name="renter_id"/>
@@ -806,8 +808,9 @@
                                     </div>
                                     <div t-esc="luxon.DateTime.fromISO(record.date_rent_end.raw_value).toFormat('yyyy-MMM-d')" title="计租结束日期"/>
                                     <div>
-                                        <i class="fa fa-cny me-2 o_event_fontsize_09" title="年租金(元)"/>
-                                        <t t-esc="record.rent_amount_year.value"/>
+                                        <i class="fa fa-cny me-2 o_event_fontsize_09" title="年租金及押金(万元)">
+                                            <t t-esc="Math.round((record.contract_amount.raw_value + record.lease_deposit.raw_value)/100)/100"/>
+                                        </i>
                                     </div>
                                     <div>
                                         <t t-if="record.parking_space_count != 0">
