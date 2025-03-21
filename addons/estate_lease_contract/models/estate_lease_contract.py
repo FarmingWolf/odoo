@@ -1322,7 +1322,9 @@ class EstateLeaseContract(models.Model):
     warn_msg = fields.Text(string="提示", default="", store=False, compute="_compute_warn_msg")
 
     # 合同总计收缴状况统计
-    contract_amount = fields.Float(string="合同总额（元）", compute="_compute_contract_amount", readonly=True, store=False)
+    contract_amount = fields.Float(string="合同总租金（元）", compute="_compute_contract_amount", readonly=True, store=False)
+    contract_amount_lease_deposit = fields.Float(string="总租金含押金（元）", compute="_compute_contract_amount_lease_deposit",
+                                                 readonly=True, store=False)
     contract_concessions = fields.Float(string="合同总优惠（元）", readonly=True, store=False,
                                         compute="_compute_contract_amount")
     contract_receivable = fields.Float(string="合同总应收（元）", readonly=True, store=False,
@@ -1345,6 +1347,11 @@ class EstateLeaseContract(models.Model):
                                               compute="_compute_contract_amount")
     contract_arrears_issue = fields.Float(string="本期欠缴（元）", readonly=True, store=False,
                                           compute="_compute_contract_amount")
+
+    @api.depends("rental_details", "contract_amount", "lease_deposit")
+    def _compute_contract_amount_lease_deposit(self):
+        for record in self:
+            record.contract_amount_lease_deposit = record.contract_amount + record.lease_deposit
 
     @api.depends("rental_details")
     def _compute_contract_amount(self):

@@ -103,10 +103,12 @@
                             </group>
                             <group col="2">
                                 <group>
+                                    <field name="contract_amount_lease_deposit"/>
+                                    <field name="contract_amount"/>
                                     <field name="lease_deposit"/>
-                                    <field name="lease_deposit_receivable"/>
                                 </group>
                                 <group>
+                                    <field name="lease_deposit_receivable"/>
                                     <field name="lease_deposit_received"/>
                                     <field name="lease_deposit_arrears" invisible="lease_deposit_arrears &lt; 0.01"/>
                                 </group>
