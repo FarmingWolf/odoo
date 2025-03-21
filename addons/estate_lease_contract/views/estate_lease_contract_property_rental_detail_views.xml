@@ -176,6 +176,8 @@
                                 <field name="days_received_sum" digits="[12, 0]"/>
                                 <field name="days_arrears" digits="[12, 0]"/>
                                 <field name="rental_received_2_date"/>
+                                <field name="rental_receipt"/>
+                                <field name="rental_receipt_evidence" invisible="not rental_receipt" placeholder="可录发票号、粘贴照片等"/>
                             </tree>
                         </field>
                     </group>

@@ -30,6 +30,8 @@
                             <field name="period_date_to"/>
                             <field name="date_payment"/>
                             <field name="contract_amount" digits="[12, 2]"/>
+                            <field name="rental_receipt"/>
+                            <field name="rental_receipt_evidence" invisible="not rental_receipt" placeholder="可录发票号、粘贴照片等"/>
                         </group>
                     </group>
                 </sheet>
@@ -54,6 +56,8 @@
                 <field name="rental_received" string="指定期间实收（元）" digits="[12, 2]" sum="指定期间总计实收（元）"/>
                 <field name="rental_arrears_tgt_period" digits="[12, 2]"/>
                 <field name="date_received"/>
+                <field name="rental_receipt"/>
+                <field name="rental_receipt_evidence" invisible="not rental_receipt" placeholder="可录发票号、粘贴照片等"/>
             </tree>
         </field>
     </record>

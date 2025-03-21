@@ -65,6 +65,8 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
     date_payment = fields.Date(string="本期约定支付日", related="rental_detail_id.date_payment")
     rental_period_no = fields.Integer(string="本期期数", related="rental_detail_id.rental_period_no")
     active = fields.Boolean(related="rental_detail_id.active", store=True)
+    rental_receipt = fields.Boolean(string="发票")
+    rental_receipt_evidence = fields.Html(string="发票信息")
 
     @api.depends("rental_received", "date_received")
     def _compute_received(self):

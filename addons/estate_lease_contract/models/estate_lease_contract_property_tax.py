@@ -50,6 +50,8 @@ class EstateLeaseContractPropertyTax(models.Model):
                                 ondelete="set null")
     contract_amount = fields.Float(string="合同总额（元）", related='contract_id.contract_amount')
     tax_receivable = fields.Float(string="房产税应收（元）", related='contract_rental_plan_rel_id.property_tax_receivable')
+    tax_receipt = fields.Boolean(string="发票")
+    tax_receipt_evidence = fields.Html(string="发票信息")
 
     @api.depends("tax_received", "date_received")
     def _compute_received(self):

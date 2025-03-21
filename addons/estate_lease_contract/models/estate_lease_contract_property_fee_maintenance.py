@@ -48,6 +48,8 @@ class EstateLeaseContractPropertyFeeMaintenance(models.Model):
     date_rent_end = fields.Date(string="计租结束日期", related="contract_id.date_rent_end")
     renter_id = fields.Many2one('res.partner', string="承租人", related='contract_id.renter_id', store=True,
                                 ondelete="set null")
+    maintenance_receipt = fields.Boolean(string="发票")
+    maintenance_receipt_evidence = fields.Html(string="发票信息")
 
     @api.onchange("maintenance_receivable", "maintenance_received")
     def _onchange_maintenance_receivable(self):

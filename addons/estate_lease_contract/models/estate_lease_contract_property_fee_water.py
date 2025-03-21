@@ -50,6 +50,8 @@ class EstateLeaseContractPropertyFeeWater(models.Model):
     date_rent_end = fields.Date(string="计租结束日期", related="contract_id.date_rent_end")
     renter_id = fields.Many2one('res.partner', string="承租人", related='contract_id.renter_id', store=True,
                                 ondelete="set null")
+    water_receipt = fields.Boolean(string="发票")
+    water_receipt_evidence = fields.Html(string="发票信息")
 
     @api.onchange("water_receivable", "water_received")
     def _onchange_water_receivable(self):

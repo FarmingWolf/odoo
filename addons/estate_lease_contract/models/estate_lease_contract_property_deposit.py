@@ -50,6 +50,10 @@ class EstateLeaseContractPropertyDeposit(models.Model):
     contract_amount = fields.Float(string="合同总额（元）", related='contract_id.contract_amount')
     deposit_receivable = fields.Float(string="押金应收（元）",
                                       related='contract_rental_plan_rel_id.contract_deposit_amount')
+    deposit_receipt = fields.Boolean(string="收据")
+    deposit_receipt_evidence = fields.Html(string="收据信息")
+    deposit_receipt_refund = fields.Boolean(string="押金已退")
+    deposit_receipt_refund_evidence = fields.Html(string="押金已退信息")
 
     @api.depends("deposit_received", "date_received")
     def _compute_received(self):

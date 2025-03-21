@@ -221,6 +221,7 @@
                                       decoration-warning="contract_property_state=='canceled'"
                                       decoration-danger="(contract_deposit_amount_arrears &gt; 0.01) or (property_tax_amount_arrears &gt; 0.01)"
                                       create="0" edit="1" delete="0" open_form_view="1">
+                                    <field name="id" context="{'dialog_size': 'large'}" column_invisible="1"/>
                                     <field name="sequence" widget="handle"/>
                                     <field name="contract_property_name"/>
                                     <field name="contract_renter_id"/>

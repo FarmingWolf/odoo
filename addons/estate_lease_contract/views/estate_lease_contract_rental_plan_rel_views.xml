@@ -4,6 +4,7 @@
         <field name="name">资产租赁合同租金方案详情（历史信息）</field>
         <field name="res_model">estate.lease.contract.rental.plan.rel</field>
         <field name="view_mode">tree,form</field>
+        <field name="context">{'dialog_size': 'large'}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 合同发布后，合同-租赁标的（房屋）-租金方案的关联关系的历史信息。
@@ -71,6 +72,10 @@
                                     <field name="deposit_received" digits="[12, 2]"/>
                                     <field name="deposit_received_sum" digits="[12, 2]"/>
                                     <field name="deposit_arrears" digits="[12, 2]"/>
+                                    <field name="deposit_receipt" readonly="deposit_receipt_refund"/>
+                                    <field name="deposit_receipt_evidence" invisible="not deposit_receipt" placeholder="可录押金条号、粘贴照片等" readonly="deposit_receipt_refund"/>
+                                    <field name="deposit_receipt_refund" invisible="not deposit_receipt"/>
+                                    <field name="deposit_receipt_refund_evidence" invisible="(not deposit_receipt_refund) or (not deposit_receipt)" placeholder="押金已退证据：退还收据、照片等"/>
                                 </tree>
                             </field>
                         </page>
@@ -85,6 +90,8 @@
                                     <field name="water_arrears" digits="[12, 2]"/>
                                     <field name="water_received_sum" digits="[12, 2]"/>
                                     <field name="water_arrears_sum" digits="[12, 2]"/>
+                                    <field name="water_receipt"/>
+                                    <field name="water_receipt_evidence" invisible="not water_receipt" placeholder="可录发票号、粘贴照片等"/>
                                 </tree>
                             </field>
                         </page>
@@ -99,6 +106,8 @@
                                     <field name="electricity_arrears" digits="[12, 2]"/>
                                     <field name="electricity_received_sum" digits="[12, 2]"/>
                                     <field name="electricity_arrears_sum" digits="[12, 2]"/>
+                                    <field name="electricity_receipt"/>
+                                    <field name="electricity_receipt_evidence" invisible="not electricity_receipt" placeholder="可录发票号、粘贴照片等"/>
                                 </tree>
                             </field>
                         </page>
@@ -113,6 +122,8 @@
                                     <field name="electricity_maintenance_arrears" digits="[12, 2]"/>
                                     <field name="electricity_maintenance_received_sum" digits="[12, 2]"/>
                                     <field name="electricity_maintenance_arrears_sum" digits="[12, 2]"/>
+                                    <field name="electricity_maintenance_receipt"/>
+                                    <field name="electricity_maintenance_receipt_evidence" invisible="not electricity_maintenance_receipt" placeholder="可录发票号、粘贴照片等"/>
                                 </tree>
                             </field>
                         </page>
@@ -127,6 +138,8 @@
                                     <field name="maintenance_arrears" digits="[12, 2]"/>
                                     <field name="maintenance_received_sum" digits="[12, 2]"/>
                                     <field name="maintenance_arrears_sum" digits="[12, 2]"/>
+                                    <field name="maintenance_receipt"/>
+                                    <field name="maintenance_receipt_evidence" invisible="not maintenance_receipt" placeholder="可录发票号、粘贴照片等"/>
                                 </tree>
                             </field>
                         </page>
@@ -137,6 +150,8 @@
                                     <field name="tax_received" digits="[12, 2]"/>
                                     <field name="tax_received_sum" digits="[12, 2]"/>
                                     <field name="tax_arrears" digits="[12, 2]"/>
+                                    <field name="tax_receipt"/>
+                                    <field name="tax_receipt_evidence" invisible="not tax_receipt" placeholder="可录发票号、粘贴照片等"/>
                                 </tree>
                             </field>
                         </page>
