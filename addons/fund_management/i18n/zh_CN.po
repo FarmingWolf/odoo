@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-16 10:40+0000\n"
-"PO-Revision-Date: 2025-03-16 10:40+0000\n"
+"POT-Creation-Date: 2025-03-21 05:57+0000\n"
+"PO-Revision-Date: 2025-03-21 05:57+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,19 +16,19 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-msgid "<span>%</span>"
-msgstr "<span>%</span>"
-
-#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
-msgid "<span>to</span>"
-msgstr "<span>至</span>"
+msgid "0 means infinity"
+msgstr "0代表无限大"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
 msgid "<span>To set approval steps</span>"
 msgstr "<span>设置审批流程步骤</span>"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
+msgid "<span>to</span>"
+msgstr "<span>至</span>"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_needaction
@@ -61,9 +61,19 @@ msgid "Activity Type Icon"
 msgstr "活动类型图标"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
+msgid "Add Explanation Description"
+msgstr "添加说明描述..."
+
+#. module: fund_management
 #: model:res.groups,name:fund_management.group_fund_management_manager
 msgid "Administrator"
 msgstr "管理者"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Agree"
+msgstr "同意"
 
 #. module: fund_management
 #: model:ir.actions.act_window,name:fund_management.action_fund_management_actions_applications_all
@@ -76,6 +86,11 @@ msgstr "所有申请"
 #: model:res.groups,name:fund_management.group_fund_management_user
 msgid "All Approver"
 msgstr "审批所有资金流程"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "All Stages"
+msgstr "查看流程全部阶段"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
@@ -128,7 +143,7 @@ msgstr "申请日期"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__total_amount_currency
 msgid "Apply In Currency"
-msgstr "申请额"
+msgstr "合计"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__total_amount_currency_percent
@@ -136,14 +151,105 @@ msgid "Apply In Percentage"
 msgstr "申请比例"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approval_comments
+msgid "Approval Comments"
+msgstr "审批备注"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approval_date_time
+msgid "Approval Datetime"
+msgstr "审批时间"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approval_decision_txt
+msgid "Approval Decision"
+msgstr "审批决定"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approval_decision
+msgid "Approval Decision Y/N"
+msgstr "审批决定 Y/N"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__op_department_id
+msgid "Approval Department"
+msgstr "审批部室"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__approval_detail_ids
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Approval Details"
+msgstr "审批详情"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__pipe_end
+msgid "Approval End Flag"
+msgstr "审批结束标志位"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__op_job_id
+msgid "Approval Job Position"
+msgstr "审批职位、岗位或角色"
+
+#. module: fund_management
+#: model:ir.actions.act_window,name:fund_management.fund_management_approval_stage_action
+#: model:ir.actions.act_window,name:fund_management.view_all_stage_by_category_action
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approval_stage
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approval_stage_nm
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_tree
+msgid "Approval Stage"
+msgstr "审批阶段"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__description
+msgid "Approval Stage Description"
+msgstr "审批阶段描述"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approval_stage_id
+msgid "Approval Stage ID"
+msgstr "审批阶段ID"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__name
+msgid "Approval Stage Name"
+msgstr "审批阶段名称"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__sequence
+msgid "Approval Stage Sequence NO."
+msgstr "审批阶段序号"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_category__approval_stages
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
+msgid "Approval Stages"
+msgstr "流程步骤详情"
+
+#. module: fund_management
+#: model:ir.ui.menu,name:fund_management.menu_fund_management_approve
+msgid "Approve"
+msgstr "审批"
+
+#. module: fund_management
 #: model:ir.model.fields.selection,name:fund_management.selection__fund_management__state__approved
 msgid "Approved"
 msgstr "审批中"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approved_by_nm
+msgid "Approver"
+msgstr "审批人"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approved_by_id
+msgid "Approver ID"
+msgstr "审批人ID"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Attach Receipt"
-msgstr "添加发票"
+msgstr "上传附件"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_attachment_count
@@ -175,7 +281,23 @@ msgid "Category Description"
 msgstr "分类描述"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Click to approve"
+msgstr "点击审批同意"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Click to reject"
+msgstr "点击拒绝"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
+msgid "Click to set approval process steps"
+msgstr "点击设置审批流程步骤"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__company_id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__company_id
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
@@ -188,30 +310,51 @@ msgid "Configuration"
 msgstr "配置"
 
 #. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-msgid "Create Fund Application"
-msgstr "创建资金申请"
+#: model:ir.model.fields,help:fund_management.field_fund_management_category__amount_min
+msgid ""
+"Contains lower limit value, not upper limit value. e.g. 0 ≤ X<50000 \n"
+"The upper limit value of 0 represents infinity."
+msgstr ""
+"包含下限值，不包含上限值。如 0 ≤ X < 50000 \n"
+"上限值为0代表无限大"
 
 #. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-msgid "Save(not submit)"
-msgstr "保存(不提交)"
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_no
+msgid "Contract NO."
+msgstr "合同编号"
 
 #. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-msgid "Submit"
-msgstr "提交"
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_name
+msgid "Contract Name"
+msgstr "合同名称"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_amount
+msgid "Contract Total Amount"
+msgstr "合同总额（元）"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_select_view_tree
+msgid "Create New Application"
+msgstr "创建新申请"
 
 #. module: fund_management
 #: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_actions_applications_all
 #: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_actions_my_all
+#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_actions_to_be_approved
 #: model_terms:ir.actions.act_window,help:fund_management.fund_management_actions_all
 msgid ""
 "Create a new fund management application to submit for approval process."
 msgstr "创建一个新的资金申请流程以推进审批"
 
 #. module: fund_management
+#: model_terms:ir.actions.act_window,help:fund_management.fund_management_approval_stage_action
+msgid "Create approval stages"
+msgstr "创建审批阶段"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__create_uid
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__create_uid
 msgid "Created by"
@@ -219,6 +362,7 @@ msgstr "创建人"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__create_date
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__create_date
 msgid "Created on"
@@ -236,6 +380,7 @@ msgstr "描述"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__display_name
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__display_name
 msgid "Display Name"
@@ -257,12 +402,28 @@ msgstr "下载此App"
 #: model:ir.model,name:fund_management.model_hr_employee
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Employee"
-msgstr "人员"
+msgstr "员工"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_hr_employee__filter_for_fund_management
 msgid "Filter For Fund Management"
 msgstr "资金管理检索"
+
+#. module: fund_management
+#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_actions_create_new
+#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_category
+msgid ""
+"Flexible fund management process categories can be created according to actual business needs. e.g.<br>\n"
+"                First and mid-term payments for engineering construction projects<br>\n"
+"                Final payment for engineering construction projects<br>\n"
+"                First and mid-term payments for service procurement projects<br>\n"
+"                etc."
+msgstr ""
+"可按实际业务需求灵活创建资金管理流程大类。例如：<br>\n"
+"                工程建设类项目首款及中期款<br>\n"
+"                工程建设类项目尾款<br>\n"
+"                服务采购类项目首款及中期款<br>\n"
+"                等等……"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_follower_ids
@@ -290,6 +451,11 @@ msgid "Fun Management Categories"
 msgstr "资金管理分类"
 
 #. module: fund_management
+#: model:ir.actions.act_window,name:fund_management.action_fund_management_category
+msgid "Fun management approval process category"
+msgstr "设置资金管理流程大类"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Fund"
 msgstr "资金"
@@ -302,18 +468,58 @@ msgid "Fund Analysis"
 msgstr "资金分析"
 
 #. module: fund_management
+#: model:ir.model,name:fund_management.model_fund_management
 #: model:ir.model.fields,field_description:fund_management.field_hr_employee__fund_management_manager_id
 #: model:ir.model.fields,field_description:fund_management.field_res_users__fund_management_manager_id
 #: model:ir.ui.menu,name:fund_management.menu_fund_management_root
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_activity
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_fund_analysis_tree
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Fund Management"
 msgstr "资金管理"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__fund_management_id
+msgid "Fund Management Approval"
+msgstr "资金管理审批流"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_tree
+msgid "Fund Management Approval Category"
+msgstr "资金管理流程大类"
+
+#. module: fund_management
+#: model:ir.actions.act_window,name:fund_management.fund_management_approval_detail_action
+#: model_terms:ir.actions.act_window,help:fund_management.fund_management_approval_detail_action
+msgid "Fund Management Approval Detail"
+msgstr "资金管理审批流详情"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_detail_view_form
+msgid "Fund Management Approval Detail View Form"
+msgstr "资金流审批详情"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_detail_view_tree
+msgid "Fund Management Approval Detail View Tree"
+msgstr "资金审批流程列表"
+
+#. module: fund_management
+#: model:ir.model,name:fund_management.model_fund_management_category
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_category__name
+msgid "Fund Management Category"
+msgstr "资金管理流程大类"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_hr_employee_public__fund_management_manager_id
 msgid "Fund Management Manager"
 msgstr "资金管理人"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Fund info detail"
+msgstr "资金详情"
 
 #. module: fund_management
 #. odoo-python
@@ -326,22 +532,48 @@ msgstr "资金管理申请已经通过所有审批。"
 #. odoo-python
 #: code:addons/fund_management/models/fund_management.py:0
 #, python-format
+msgid "Fund management application has been approved by some approvers."
+msgstr "资金管理申请已经通过部分审批。"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
 msgid ""
 "Fund management application has been submitted to the approver and is "
 "waiting for approval."
 msgstr "资金管理申请已经提交，待审批。"
 
 #. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "Fund management application that need to be submitted to the approver."
-msgstr "需提交给审批人的资金管理申请"
+#: model:ir.model,name:fund_management.model_fund_management_approval_stage
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
+msgid "Fund management approval stage"
+msgstr "资金管理审批阶段"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
+msgid "Fund range"
+msgstr "资金范围"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_category__amount_min
+msgid "Fund range(From)"
+msgstr "资金范围(自)"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_category__amount_max
+msgid "Fund range(To)"
+msgstr "资金范围(至)"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Future Activities"
 msgstr "未来活动"
+
+#. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__legend_done
+msgid "Green indicates that the next stage can be entered"
+msgstr "标绿表示可进入下阶段"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
@@ -357,19 +589,20 @@ msgstr "有消息"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__total_amt_cur_hist_accu
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Historically Accumulation In Currency"
-msgstr "历史累计申请（含本次）"
+msgstr "历史累计总额"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__total_amt_cur_hist_accu_percent
 msgid "Historically Accumulation In Percentage"
-msgstr "历史累计百分比（含本次）"
+msgstr "历史累计百分比"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__id
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_exception_icon
@@ -400,9 +633,9 @@ msgid "In Progress"
 msgstr "处理中"
 
 #. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__description
-msgid "Notes"
-msgstr "其他信息"
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__input_meeting_minutes
+msgid "Input Meeting Minutes In This Stage"
+msgstr "本阶段录入会议纪要"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__is_editable
@@ -420,7 +653,13 @@ msgid "Is currency_id different from the company_currency_id"
 msgstr "不同于公司货币"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__fold
+msgid "Kanban Folding"
+msgstr "看板折叠"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__write_uid
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__write_uid
 msgid "Last Updated by"
@@ -428,6 +667,7 @@ msgstr "最后更新人"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__write_date
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__write_date
 msgid "Last Updated on"
@@ -442,6 +682,31 @@ msgstr "后期活动"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_main_attachment_id
 msgid "Main Attachment"
 msgstr "主附件"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__legend_done
+msgid "Mark in green"
+msgstr "标绿"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__legend_blocked
+msgid "Mark in red"
+msgstr "标红"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__meeting_minutes
+msgid "Meeting Minutes"
+msgstr "会议纪要"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__meeting_minutes_editable
+msgid "Meeting Minutes Editable"
+msgstr "会议纪要可编辑"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Meeting Minutes..."
+msgstr "会议纪要..."
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_has_error
@@ -493,14 +758,30 @@ msgstr "下一活动类型"
 #. module: fund_management
 #: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_actions_applications_all
 #: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_actions_my_all
+#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_actions_to_be_approved
 #: model_terms:ir.actions.act_window,help:fund_management.fund_management_actions_all
 msgid "No data yet!"
 msgstr "还没有数据哦！"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__legend_normal
+msgid "Normal"
+msgstr "正常"
+
+#. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__legend_normal
+msgid "Normal indicates that this stage is progressing normally"
+msgstr "正常表示本阶段正常推进中"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__description
+msgid "Notes"
+msgstr "备注"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Notes..."
-msgstr "其他信息……"
+msgstr "备注……"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_needaction_counter
@@ -535,14 +816,24 @@ msgid "Numbers computed from your personal applications."
 msgstr "源自您申请的统计数量"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__party_b_id
+msgid "Payee"
+msgstr "收款方"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Please choose"
 msgstr "请选择"
 
 #. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_fund_management_category__name
+msgid "Please do not include spaces in the category name"
+msgstr "类型名称中请勿包含空格"
+
+#. module: fund_management
 #: model:ir.model,name:fund_management.model_hr_employee_public
 msgid "Public Employee"
-msgstr "非内部人员"
+msgstr "公共员工"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__rating_ids
@@ -557,6 +848,11 @@ msgid "Ready for Next Stage"
 msgstr "可进入下一阶段"
 
 #. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__legend_blocked
+msgid "Red indicates obstruction in this stage"
+msgstr "标红表示本阶段受阻"
+
+#. module: fund_management
 #: model:ir.model.fields.selection,name:fund_management.selection__fund_management__state__refused
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Refused"
@@ -566,6 +862,11 @@ msgstr "拒绝"
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Refused Applications"
 msgstr "拒绝的申请"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Reject"
+msgstr "拒绝"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__company_currency_id
@@ -578,9 +879,27 @@ msgid "Responsible User"
 msgstr "责任人"
 
 #. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__op_department_id
+msgid ""
+"Restrict this stage to personnel with approval authority in the department."
+msgstr "限制该阶段只能该部室具有审批权限的人员处理。"
+
+#. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__op_job_id
+msgid ""
+"Restrict this stage to specific job position with approval authority in the "
+"department."
+msgstr "限制该阶段只能该部室中具有审批权限的岗位或职位或角色的人员处理。"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "短信发送错误"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Save(not submit)"
+msgstr "保存(不提交)"
 
 #. module: fund_management
 #. odoo-javascript
@@ -588,6 +907,13 @@ msgstr "短信发送错误"
 #, python-format
 msgid "Scan"
 msgstr "扫描"
+
+#. module: fund_management
+#: model:ir.actions.act_window,name:fund_management.action_fund_management_actions_create_new
+#: model:ir.ui.menu,name:fund_management.menu_fund_management_create_application
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_select_view_tree
+msgid "Select category to create a new Fund Management"
+msgstr "选择资金分类创建审批"
 
 #. module: fund_management
 #: model:ir.model.fields,help:fund_management.field_hr_employee__fund_management_manager_id
@@ -606,6 +932,11 @@ msgstr "显示下一活动截止日期在今日之前的记录"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__stage
 msgid "Stage"
 msgstr "阶段"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
+msgid "Stage description and usage tips"
+msgstr "阶段说明和使用提示"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__state
@@ -627,14 +958,34 @@ msgstr ""
 "计划：未来的活动\n"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Submit"
+msgstr "提交"
+
+#. module: fund_management
 #: model:ir.model.fields.selection,name:fund_management.selection__fund_management__state__submitted
 msgid "Submitted"
-msgstr "待审批"
+msgstr "已提交"
 
 #. module: fund_management
 #: model:res.groups,name:fund_management.group_fund_management_team_approver
 msgid "Team Approver"
-msgstr "团队审批人"
+msgstr "团队审批者"
+
+#. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__sequence
+msgid ""
+"The approval process will progress from small to large according to the "
+"approval sequence number. The initial stage number needs to be set to 0, and"
+" it is recommended to interval the stage numbers in units of 10"
+msgstr "审批流将按照审批序号由小到大推进审批阶段。初始阶段序号需设置为0，建议以10为单位间隔阶段序号"
+
+#. module: fund_management
+#: model_terms:ir.actions.act_window,help:fund_management.fund_management_approval_stage_action
+msgid ""
+"The approval stage is used to track the approval process of fund "
+"applications from input, submission for approval to approval."
+msgstr "审批阶段用于跟踪处理资金申请从录入、提交审批到审批通过的各阶段审批流。"
 
 #. module: fund_management
 #. odoo-python
@@ -642,6 +993,50 @@ msgstr "团队审批人"
 #, python-format
 msgid "The current user has no related employee. Please, create one."
 msgstr "当前用户没有相关的人员设置，请创建当前用户的\"人员\"配置"
+
+#. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__pipe_end
+msgid ""
+"The final stage of the approval process. The application at this stage can "
+"only be issued and become effective. Please set the approval end flag for "
+"the approval stage with the highest serial number."
+msgstr "审批流程的最后阶段。处于此阶段的申请单方可生效。请将最大序号的审批阶段设置审批结束标志。"
+
+#. module: fund_management
+#: model:ir.model.constraint,message:fund_management.constraint_fund_management_approval_stage_name
+msgid "The stage names of the same category of processes cannot be duplicated"
+msgstr "同一大类流程阶段名称不能重复"
+
+#. module: fund_management
+#: model:ir.model.constraint,message:fund_management.constraint_fund_management_approval_stage_sequence
+msgid ""
+"The stage number of the same category of processes cannot be duplicated"
+msgstr "同一大类流程阶段序号不能重复"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
+msgid ""
+"The task at this stage is blocked. Click to change the task stage status."
+msgstr "本阶段任务受阻。点击可更改任务阶段状态。"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
+msgid ""
+"The task for this stage has been completed. Click to change the task stage "
+"status."
+msgstr "本阶段任务已完成。点击可更改任务阶段状态。"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
+msgid ""
+"The task is currently being processed in this stage. Click to change the "
+"task stage status."
+msgstr "本阶段任务处理中。点击可更改任务阶段状态。"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
+msgid "To Be Approved"
+msgstr "待审批"
 
 #. module: fund_management
 #: model:ir.model.fields.selection,name:fund_management.selection__fund_management__state__draft
@@ -661,12 +1056,12 @@ msgstr "总计"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_fund_analysis_tree
 msgid "Total Amount"
-msgstr "总额"
+msgstr "金额总计"
 
 #. module: fund_management
 #: model:ir.model.fields,help:fund_management.field_fund_management__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "本记录的异常活动类型"
+msgstr "记录中异常活动的类型。"
 
 #. module: fund_management
 #. odoo-javascript
@@ -681,28 +1076,47 @@ msgid "User"
 msgstr "用户"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "View All Stages"
+msgstr "查看流程全部阶段"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__website_message_ids
 msgid "Website Messages"
-msgstr "在线消息"
+msgstr "本站在线消息"
 
 #. module: fund_management
 #: model:ir.model.fields,help:fund_management.field_fund_management__website_message_ids
 msgid "Website communication history"
-msgstr "在线沟通记录"
+msgstr "本站在线沟通记录"
 
 #. module: fund_management
 #. odoo-python
 #: code:addons/fund_management/models/fund_management.py:0
 #, python-format
 msgid "You are not authorized to edit this fund management application."
-msgstr "您没有编辑该项资金申请的权限"
+msgstr "您无权编辑这份资金管理流程。"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
+msgid ""
+"You can add a description to help understand the significance and purpose of"
+" this stage."
+msgstr "您也可以添加一个描述来帮助理解这个阶段的意义和目的。"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
+msgid ""
+"You can define approval status labels here as the default labels in the "
+"Kanban view."
+msgstr "您可以在此处定义审批状态标签，作为看板视图中的默认标签。"
 
 #. module: fund_management
 #. odoo-python
 #: code:addons/fund_management/models/fund_management.py:0
 #, python-format
 msgid "You cannot delete a posted or approved fund management application."
-msgstr "您不能删除已发布或已审批的资金申请"
+msgstr "您不能删除已发布或批准的资金管理流程。"
 
 #. module: fund_management
 #. odoo-python
@@ -722,15 +1136,8 @@ msgstr "流程审批已结束"
 #. odoo-python
 #: code:addons/fund_management/models/fund_management.py:0
 #, python-format
-msgid "in approval"
-msgstr "审批中"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "to submit"
-msgstr "待提交"
+msgid "approval process on going"
+msgstr "流程审批进行中"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
@@ -738,833 +1145,33 @@ msgid "e.g. \"drafting\"、 \"Review by department\" etc"
 msgstr "例如：\"录入待审批事项\"、\"部室负责人审核\"等"
 
 #. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-msgid "e.g. The first payment of a construction contract for a certain project"
-msgstr "例如：某工程建设合同首款"
-
-#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
-msgid "e.g. First and mid-term payments for engineering construction projects, final payments for engineering construction projects, first and mid-term payments for service procurement projects, final payments for service procurement projects, etc"
+msgid ""
+"e.g. First and mid-term payments for engineering construction projects, "
+"final payments for engineering construction projects, first and mid-term "
+"payments for service procurement projects, final payments for service "
+"procurement projects, etc"
 msgstr "例：工程建设类项目首款及中期款、工程建设类项目尾款、服务采购类项目首款及中期款、服务采购类项目尾款等"
 
 #. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
-msgid "0 means infinity"
-msgstr "0代表无限大"
-
-#. module: fund_management
-#: model_terms:ir.actions.act_window,help:fund_management.fund_management_approval_stage_action
-msgid "Create approval stages"
-msgstr "创建审批阶段"
-
-#. module: fund_management
-#: model:ir.model.fields,help:fund_management.field_fund_management_category__amount_min
-msgid "Contains lower limit value, not upper limit value. e.g. 0 ≤ X<50000 \n"
-"The upper limit value of 0 represents infinity."
-msgstr "包含下限值，不包含上限值。如 0 ≤ X < 50000 \n"
-"上限值为0代表无限大"
-
-#. module: fund_management
-#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_category
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid ""
-"Flexible fund management process categories can be created according to actual business needs. e.g.<br>\n"
-"                First and mid-term payments for engineering construction projects<br>\n"
-"                Final payment for engineering construction projects<br>\n"
-"                First and mid-term payments for service procurement projects<br>\n"
-"                etc."
-
-msgstr ""
-"可按实际业务需求灵活创建资金管理流程大类。例如：<br>\n"
-"                工程建设类项目首款及中期款<br>\n"
-"                工程建设类项目尾款<br>\n"
-"                服务采购类项目首款及中期款<br>\n"
-"                等等……"
+"e.g. The first payment of a construction contract for a certain project"
+msgstr "例如：某工程建设合同首款"
 
 #. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_name
-msgid "Contract Name"
-msgstr "合同名称"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_amount
-msgid "Contract Total Amount"
-msgstr "合同总额（元）"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_no
-msgid "Contract NO."
-msgstr "合同编号"
-
-#. module: fund_management
-#: model:ir.model.constraint,message:fund_management.constraint_fund_management_approval_stage_name
-msgid "The stage names of the same category of processes cannot be duplicated"
-msgstr "同一大类流程阶段名称不能重复"
-
-#. module: fund_management
-#: model:ir.model.constraint,message:fund_management.constraint_fund_management_approval_stage_sequence
-msgid "The stage number of the same category of processes cannot be duplicated"
-msgstr "同一大类流程阶段序号不能重复"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_tree
-msgid "名称"
-msgstr "Name"
-
-#. module: fund_management
-#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__sequence
-msgid "The approval process will progress from small to large according to the approval sequence number. The initial stage number needs to be set to 0, and it is recommended to interval the stage numbers in units of 10"
-msgstr "审批流将按照审批序号由小到大推进审批阶段。初始阶段序号需设置为0，建议以10为单位间隔阶段序号"
-
-#. module: fund_management
-#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__pipe_end
-msgid "The final stage of the approval process. The application at this stage can only be issued and become effective. Please set the approval end flag for the approval stage with the highest serial number."
-msgstr "审批流程的最后阶段。处于此阶段的申请单方可生效。请将最大序号的审批阶段设置审批结束标志。"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__pipe_end
-msgid "Approval End Flag"
-msgstr "审批结束标志位"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__op_department_id
-msgid "Approval Department"
-msgstr "审批部室"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__op_job_id
-msgid "Approval Job Position"
-msgstr "审批职位、岗位或角色"
-
-#. module: fund_management
-#: model:ir.actions.act_window,name:fund_management.fund_management_approval_stage_action
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_tree
-msgid "Approval Stage"
-msgstr "审批阶段"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__name
-msgid "Approval Stage Name"
-msgstr "审批阶段名称"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__sequence
-msgid "Approval Stage Sequence NO."
-msgstr "审批阶段序号"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__description
-msgid "Approval Stage Description"
-msgstr "审批阶段描述"
-
-#. module: fund_management
-#: model_terms:ir.actions.act_window,help:fund_management.fund_management_approval_stage_action
-msgid "The approval stage is used to track the approval process of fund applications from input, submission for approval to approval."
-msgstr "审批阶段用于跟踪处理资金申请从录入、提交审批到审批通过的各阶段审批流。"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
-msgid "You can add a description to help understand the significance and purpose of this stage."
-msgstr "您也可以添加一个描述来帮助理解这个阶段的意义和目的。"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
-msgid "You can define approval status labels here as the default labels in the Kanban view."
-msgstr "您可以在此处定义审批状态标签，作为看板视图中的默认标签。"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__party_b_id
-msgid "Payee"
-msgstr "收款方"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
-msgid "The task at this stage is blocked. Click to change the task stage status."
-msgstr "本阶段任务受阻。点击可更改任务阶段状态。"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
-msgid "The task is currently being processed in this stage. Click to change the task stage status."
-msgstr "本阶段任务处理中。点击可更改任务阶段状态。"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
-msgid "The task for this stage has been completed. Click to change the task stage status."
-msgstr "本阶段任务已完成。点击可更改任务阶段状态。"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__legend_blocked
-msgid "Mark in red"
-msgstr "标红"
-
-#. module: fund_management
-#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__legend_blocked
-msgid "Red indicates obstruction in this stage"
-msgstr "标红表示本阶段受阻"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__legend_done
-msgid "Mark in green"
-msgstr "标绿"
-
-#. module: fund_management
-#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__legend_done
-msgid "Green indicates that the next stage can be entered"
-msgstr "标绿表示可进入下阶段"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__legend_normal
-msgid "Normal"
-msgstr "正常"
-
-#. module: fund_management
-#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__legend_normal
-msgid "Normal indicates that this stage is progressing normally"
-msgstr "正常表示本阶段正常推进中"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
-msgid "Add Explanation Description"
-msgstr "添加说明描述..."
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
-msgid "Click to set approval steps"
-msgstr "点击设置审批流程步骤"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
-msgid "Click to set approval process steps"
-msgstr "点击设置审批流程步骤"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__fold
-msgid "Kanban Folding"
-msgstr "看板折叠"
-
-#. module: fund_management
-#: model:ir.model.fields,help:fund_management.field_fund_management_category__name
-msgid "Please do not include spaces in the category name"
-msgstr "类型名称中请勿包含空格"
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid "to be approved"
+msgstr "待审批"
 
 #. module: fund_management
 #: model:ir.model,name:fund_management.model_res_partner
 msgid "继承partner"
-msgstr "继承partner"
-
-#. module: fund_management
-#: model:ir.actions.act_window,name:fund_management.action_fund_management_category
-msgid "Fun management approval process category"
-msgstr "设置资金管理流程大类"
-
-#. module: fund_management
-#: model:ir.model,name:fund_management.model_fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_fund_analysis_tree
-msgid "Fund Management"
-msgstr "资金管理"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_category__name
-msgid "Fund Management Category"
-msgstr "资金管理大类"
-
-#. module: fund_management
-#: model:ir.model,name:fund_management.model_fund_management_approval_stage
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
-msgid "Fund management approval stage"
-msgstr "资金管理审批阶段"
-
-#. module: fund_management
-#: model:ir.model,name:fund_management.model_fund_management_category
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_tree
-msgid "Fund Management Approval Category"
-msgstr "资金管理流程大类"
-
-#. module: fund_management
-#: model:ir.model,name:fund_management.model_fund_management_category
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_tree
-msgid "Approval Stages"
-msgstr "流程步骤详情"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
-msgid "Fund range"
-msgstr "资金范围"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_category__amount_min
-msgid "Fund range(From)"
-msgstr "资金范围(自)"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_category__amount_max
-msgid "Fund range(To)"
-msgstr "资金范围(至)"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-msgid "Fund info detail"
-msgstr "资金详情"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
-msgid "Stage description and usage tips"
-msgstr "阶段说明和使用提示"
-
-#. module: fund_management
-#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__op_department_id
-msgid "Restrict this stage to personnel with approval authority in the department."
-msgstr "限制该阶段只能该部室具有审批权限的人员处理。"
-
-#. module: fund_management
-#: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__op_job_id
-msgid "Restrict this stage to specific job position with approval authority in the department."
-msgstr "限制该阶段只能该部室中具有审批权限的岗位或职位或角色的人员处理。"
-
-#. module: fund_management
-#: model:ir.module.category,description:base.module_category_fund_management
-msgid "Helps you manage your fund management."
-msgstr "帮助您管理资金。"
-
-#. module: fund_management
-#: model:res.groups,name:fund_management.group_fund_management_team_approve
-msgid "Team Approver"
-msgstr "团队审批者"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "The current user has no related fund management approver. Please, create one."
-msgstr "当前账号没有关联组织中的资金审批人。请联系管理员创建一个。"
-
-#. module: fund_management
-#. odoo-javascript
-#: code:addons/fund_management/static/src/js/tours/fund_management.js:0
-#, python-format
-msgid "The status of all your current application is visible from here."
-msgstr "从这里可以看到您当前所有申请的状态。"
-
-#. module: fund_management
-#. odoo-javascript
-#: code:addons/fund_management/static/src/js/tours/fund_management.js:0
-#, python-format
-msgid "go go go - fund management in a nutshell!"
-msgstr "开始吧 - 资金管理概述，简而言之，如意！"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:hr_expense.field_fund_management__date
-#: model_terms:ir.ui.view,arch_db:hr_expense.fund_management_view_search
-msgid "Apply Date"
-msgstr "申请日期"
-
-#. module: fund_management
-#: model:ir.model.fields.selection,name:fund_management.selection__fund_management__state__draft
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
-msgid "To Report"
-msgstr "报告"
-
-#. module: fund_management
-#: model:ir.model.fields.selection,name:fund_management.selection__fund_management__state__reported
-#: model:ir.model.fields.selection,name:fund_management.selection__fund_management_sheet__state__draft
-msgid "To Submit"
-msgstr "待提交"
-
-#. module: fund_management
-#: model:ir.model.fields.selection,name:hr_expense.selection__fund_management__state__submitted
-#: model:ir.model.fields.selection,name:hr_expense.selection__fund_management_sheet__approval_state__submit
-#: model:ir.model.fields.selection,name:hr_expense.selection__fund_management_sheet__state__submit
-msgid "Submitted"
-msgstr "待审批"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_sheet_view_search
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
-msgid "Today Activities"
-msgstr "今日活动"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__total_amount
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_sheet__total_amount
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-#: model_terms:ir.ui.view,arch_db:fund_management.report_expense_sheet
-msgid "Total"
-msgstr "总计"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_split_wizard__total_amount_currency
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_expenses_analysis_tree
-#: model_terms:ir.ui.view,arch_db:fund_management.view_fund_management_sheet_tree
-msgid "Total Amount"
-msgstr "金额总计"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__total_amount_currency
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_split__total_amount_currency
-msgid "Total In Currency"
-msgstr "合计"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_expenses_analysis_tree
-msgid "Total Taxes"
-msgstr "税额总计"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__untaxed_amount_currency
-msgid "Total Untaxed Amount In Currency"
-msgstr "以货币计算的未税总额"
-
-#. module: fund_management
-#: model:ir.model.fields,help:fund_management.field_fund_management_split_wizard__total_amount_currency_original
-msgid "Total amount of the original Expense that we are splitting"
-msgstr "我们要拆分的原始费用总额"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_split_wizard__total_amount_currency_original
-msgid "Total amount original"
-msgstr "原始总金额"
-
-#. module: fund_management
-#: model:product.template,name:fund_management.expense_product_travel_accommodation_product_template
-msgid "Travel & Accommodation"
-msgstr "旅游&住宿"
-
-#. module: fund_management
-#: model:ir.model.fields,help:fund_management.field_fund_management__activity_exception_decoration
-#: model:ir.model.fields,help:fund_management.field_fund_management_sheet__activity_exception_decoration
-msgid "Type of the exception activity on record."
-msgstr "记录中异常活动的类型。"
-
-#. module: fund_management
-#. odoo-javascript
-#: code:addons/fund_management/static/src/views/kanban.xml:0
-#, python-format
-msgid "Upload"
-msgstr "上传"
-
-#. module: fund_management
-#: model:ir.model.fields.selection,name:fund_management.selection__fund_management__state__approved
-#: model:ir.model.fields.selection,name:fund_management.selection__fund_management_sheet__approval_state__approve
-#: model:ir.model.fields.selection,name:fund_management.selection__fund_management_sheet__state__approve
-#: model:mail.message.subtype,name:fund_management.mt_expense_approved
-msgid "Approved"
-msgstr "已批准"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__approved_by
-msgid "Approved By"
-msgstr "批准人"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__approved_on
-msgid "Approved On"
-msgstr "已批准"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.product_product_expense_form_view
-msgid "Archived"
-msgstr "已归档"
-
-#. module: fund_management
-#. odoo-javascript
-#: code:addons/fund_management/static/src/js/tours/fund_management.js:0
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-#, python-format
-msgid "Attach Receipt"
-msgstr "上传附件"
-
-#. module: fund_management
-#. odoo-javascript
-#: code:addons/fund_management/static/src/js/tours/fund_management.js:0
-#, python-format
-msgid "Use the breadcrumbs to go back to the list of fund management."
-msgstr "使用痕迹导航返回到资金管理列表。"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "You are not authorized to edit this fund management application."
-msgstr "您无权编辑这份资金管理流程。"
-
-#. module: fund_management
-#: model:ir.model,name:fund_management.model_res_users
-msgid "User"
-msgstr "用户"
-
-#. module: fund_management
-#: model:ir.actions.act_window,name:fund_management.fund_management_approve_duplicate_action
-msgid "Validate Duplicate fund"
-msgstr "验证重复的资金"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.view_fund_management_sheet_form
-msgid "View Attachments"
-msgstr "查看附件"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_template_register
-msgid "View Fund"
-msgstr "查看资金"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-msgid "View Report"
-msgstr "查看报告"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__website_message_ids
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_sheet__website_message_ids
-msgid "Website Messages"
-msgstr "本站在线消息"
-
-#. module: fund_management
-#: model:ir.model.fields,help:fund_management.field_fund_management__website_message_ids
-#: model:ir.model.fields,help:fund_management.field_fund_management_sheet__website_message_ids
-msgid "Website communication history"
-msgstr "本站在线沟通记录"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_split__wizard_id
-msgid "Wizard"
-msgstr "向导"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "You are not authorized to edit this fund management report."
-msgstr "您无权编辑这份资金管理报告。"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "You are not authorized to edit this fund management."
-msgstr "您无权编辑此项资金管理。"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "You can not create report without category."
-msgstr "您不能创建没有类别的报告。"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_template_register
-msgid "You can now submit it to the manager from the following link."
-msgstr "您现在可以通过以下链接将其提交给上级管理者。"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management_sheet.py:0
-#, python-format
-msgid "You can only generate accounting entry for approved fund management(s)."
-msgstr "您只能对已批准的资金制作会计凭证"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management_sheet.py:0
-#, python-format
-msgid "You cannot add fund management of another employee."
-msgstr "您无法为其他人添加资金管理流程。"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management_sheet.py:0
-#, python-format
-msgid ""
-"You cannot approve:\n"
-" %s"
 msgstr ""
-"您不能批准：\n"
-" %s"
 
 #. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "You cannot delete a posted or approved fund management application."
-msgstr "您不能删除已发布或批准的资金管理流程。"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management_sheet.py:0
-#, python-format
-msgid "You cannot delete a posted or paid fund."
-msgstr "您不能删除已公布或者已支付的资金。"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/analytic.py:0
-#, python-format
-msgid "You cannot delete an analytic account that is used in an fund management."
-msgstr "您不能删除资金流程使用中的解析账户。"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/account_move.py:0
-#, python-format
-msgid ""
-"You cannot delete only some entries linked to an fund management report. All entries"
-" must be deleted at the same time."
-msgstr "您不能只删除与资金报告相关联的部分条目。必须同时删除所有条目。"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/account_payment.py:0
-#, python-format
-msgid ""
-"You cannot delete only some payments linked to an fund management report. All "
-"payments must be deleted at the same time."
-msgstr "您不能只删除与资金管理报告相关联的部分付款。必须同时删除所有付款。"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/account_payment.py:0
-#, python-format
-msgid ""
-"You cannot do this modification since the payment is linked to an fund management "
-"report."
-msgstr "由于付款与资金管理报告相关联，因此无法进行此修改。"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management_sheet.py:0
-#, python-format
-msgid ""
-"You cannot refuse:\n"
-" %s"
+#: model:ir.model,name:fund_management.model_fund_management_approval_detail
+msgid "资金管理审批明细"
 msgstr ""
-"您不能拒绝：\n"
-" %s"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "You cannot report fund management for different employees in the same report."
-msgstr "同一报告不能有多个报销人员"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "You cannot report fund management for different companies in the same report."
-msgstr "您不能在同一份报告中报告不同单位的支出。"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "You cannot report the fund management without amount!"
-msgstr "您不能在没有金额的情况下报告资金管理！"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "You cannot report twice the same line!"
-msgstr "同一行您不能报告两次！"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "You have no fund management to report"
-msgstr "您无需报告任何资金管理"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid ""
-"You need to have at least one fund management category in your database"
-" to proceed!"
-msgstr "您需要在您的数据库中至少有一个可以计入资金管理类别，才能继续进行!"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_template_refuse_reason
-msgid "Your fund management Report"
-msgstr "您的资金管理报告"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_template_register
-msgid "Your fund management has been successfully registered."
-msgstr "您的资金管理流程已成功登记"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.product_product_expense_form_view
-msgid "e.g. fund management of an engineering contract"
-msgstr "例如:某个工程类合同的资金申请"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.res_config_settings_view_form
-msgid "e.g. domain.com"
-msgstr "例如：domain.com"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_template_refuse_reason
-msgid "has been refused"
-msgstr "已拒绝"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "approval completed"
-msgstr "审批结束"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "to submit"
-msgstr "待提交"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "in approval"
-msgstr "审批中"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.res_config_settings_view_form
-msgid "use OCR to fill data from a picture of the bill"
-msgstr "使用OCR技术从发票图片中识别并自动录入数据"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-msgid "Agree"
-msgstr "同意"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approval_comments
-msgid "Approval Comments"
-msgstr "审批备注"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approval_date_time
-msgid "Approval Datetime"
-msgstr "审批时间"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approval_decision_txt
-msgid "Approval Decision"
-msgstr "审批决定"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approval_decision
-msgid "Approval Decision Y/N"
-msgstr "审批决定 Y/N"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__approval_detail_ids
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-msgid "Approval Details"
-msgstr "审批详情"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approval_stage_id
-msgid "Approval Stage ID"
-msgstr "审批阶段ID"
-
-#. module: fund_management
-#: model:ir.ui.menu,name:fund_management.menu_fund_management_approve
-msgid "Approve"
-msgstr "审批"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approved_by_nm
-msgid "Approver"
-msgstr "审批人"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approved_by_id
-msgid "Approver ID"
-msgstr "审批人ID"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-msgid "Click to approve"
-msgstr "点击审批同意"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-msgid "Click to reject"
-msgstr "点击拒绝"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_select_view_tree
-msgid "Create New Application"
-msgstr "创建新申请"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__fund_management_id
-msgid "Fund Management Approval"
-msgstr "资金管理审批流"
-
-#. module: fund_management
-#: model:ir.actions.act_window,name:fund_management.fund_management_approval_detail_action
-#: model_terms:ir.actions.act_window,help:fund_management.fund_management_approval_detail_action
-msgid "Fund Management Approval Detail"
-msgstr "资金管理审批流详情"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__id
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__id
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__id
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_category__id
-msgid "ID"
-msgstr "ID"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__input_meeting_minutes
-msgid "Input Meeting Minutes In This Stage"
-msgstr "本阶段录入会议纪要"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__meeting_minutes
-msgid "Meeting Minutes"
-msgstr "会议纪要"
-
-#. module: fund_management
-#: model:ir.model.fields,field_description:fund_management.field_fund_management__meeting_minutes_editable
-msgid "Meeting Minutes Editable"
-msgstr "会议纪要可编辑"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-msgid "Meeting Minutes..."
-msgstr "会议纪要..."
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
-msgid "Reject"
-msgstr "拒绝"
-
-#. module: fund_management
-#: model:ir.actions.act_window,name:fund_management.action_fund_management_actions_create_new
-#: model:ir.ui.menu,name:fund_management.menu_fund_management_create_application
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_select_view_tree
-msgid "Select category to create a new Fund Management"
-msgstr "选择资金分类创建申请"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
-msgid "To Be Approved"
-msgstr "待审批"
-
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_detail_view_form
-msgid "Fund Management Approval Detail View Form"
-msgstr "资金流审批详情"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_detail_view_tree
-msgid "Fund Management Approval Detail View Tree"
-msgstr "资金审批流程列表"

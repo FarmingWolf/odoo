@@ -12,20 +12,20 @@
                     <field name="nb_attachment" column_invisible="True"/>
                     <field name="is_multiple_currency" column_invisible="True"/>
                     <field name="date" optional="show" readonly="not is_editable"/>
-                    <button type="object" name="fund_management_actions_open_form" string="View Detail" context="{'self_rcd_id': active_id}"/>
                     <field name="category_id" optional="show" readonly="not is_editable"/>
                     <field name="name" readonly="not is_editable"/>
                     <field name="employee_id" widget="many2one_avatar_user" readonly="not is_editable"/>
-                    <field name="activity_ids" widget="list_activity" optional="show"/>
+                    <field name="activity_ids" widget="list_activity" optional="hide"/>
                     <field name="company_id" optional="hide" groups="base.group_multi_company" readonly="True"/>
                     <field name="nb_attachment" widget="fund_management_nb_attachment" nolabel="1" readonly="True"/>
                     <field name="total_amount" sum="Total Amount" widget='monetary'
                            readonly="not is_editable"
                            options="{'currency_field': 'company_currency_id'}" decoration-bf="1"/>
                     <field name="currency_id" optional="hide" readonly="True" groups="base.group_multi_currency"/>
-                    <field name="state" optional="show" readonly="True" decoration-info="state in ['draft']"
-                           decoration-success="state in ['approved', 'done']"
-                           decoration-warning="state == 'submitted'" decoration-danger="state == 'refused'" widget="badge"/>
+                    <field name="stage" />
+                    <field name="state" optional="hide" readonly="True" decoration-info="state in ['submitted']"
+                           decoration-success="state == 'done'" decoration-warning="state == 'approved'"
+                           decoration-danger="state == 'refused'" widget="badge"/>
                 </tree>
             </field>
         </record>
@@ -89,15 +89,30 @@
                         <button name="action_reject" type="object" class="btn btn-danger" string="Reject"
                                 title="Click to reject"/>
                     </div>
-                    <field name="state" invisible="1"/>
-                    <field name="stage" widget="statusbar" invisible="not category_id" />
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,done"
+                         invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="submitted,approved,done"
+                         invisible="state not in ['submitted', 'approved', 'done']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="submitted,approved,refused"
+                         invisible="state != 'refused'"/>
+                    <field name="stage" widget="statusbar" invisible="1"/>
                 </header>
                 <sheet>
-                    <div class="oe_title">
-                        <label for="name"/>
-                        <h1>
-                            <field name="name" placeholder="e.g. The first payment of a construction contract for a certain project" readonly="not is_editable"/>
-                        </h1>
+                    <div class="d-flex" style="width: 100%;">
+                        <div class="oe_title flex-grow-1">
+                            <label for="name"/>
+                            <div class="d-flex align-items-center">
+                                <h1 class="flex-grow-1 mb-0">
+                                    <field name="name" placeholder="e.g. The first payment of a construction contract for a certain project" readonly="not is_editable"/>
+                                </h1>
+
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button name="%(fund_management.view_all_stage_by_category_action)d" type="action" string="All Stages" title="View All Stages"
+                                context="{'default_category_id': category_id}" class="btn btn-secondary"/>
+                        </div>
                     </div>
                     <group>
                         <group>

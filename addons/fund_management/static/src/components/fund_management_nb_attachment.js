@@ -7,7 +7,7 @@ class AttachmentNumber extends Component {
 
     setup() {
         super.setup();
-        this.nb_attachment = this.props.record.data.nb_attachment
+        this.fund_management_nb_attachment = this.props.record.data.nb_attachment
     }
     static template = "fund_management.AttachmentNumber"
 }

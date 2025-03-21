@@ -59,6 +59,28 @@
             </field>
         </record>
 
+        <record id="fund_management_approval_stage_by_category_tree" model="ir.ui.view">
+            <field name="name">fund.management.approval.stage.view.tree</field>
+            <field name="model">fund.management.approval.stage</field>
+            <field name="inherit_id" ref="fund_management_approval_stage_view_tree"/>
+            <field name="mode">primary</field>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="attributes">
+                    <!-- Display the tree dashboard view with the header -->
+                    <attribute name="create">False</attribute>
+                    <attribute name="edit">False</attribute>
+                    <attribute name="delete">False</attribute>
+                </xpath>
+                <field name="sequence" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </field>
+                <field name="pipe_end" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </field>
+
+            </field>
+        </record>
+
         <record id="fund_management_approval_stage_action" model="ir.actions.act_window">
             <field name="name">Approval Stage</field>
             <field name="res_model">fund.management.approval.stage</field>
@@ -72,5 +94,13 @@
             </field>
         </record>
 
+        <record id="view_all_stage_by_category_action" model="ir.actions.act_window">
+            <field name="name">Approval Stage</field>
+            <field name="res_model">fund.management.approval.stage</field>
+            <field name="view_mode">tree</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="fund_management_approval_stage_by_category_tree"/>
+            <field name="domain">[('category_id', '=', default_category_id)]</field>
+        </record>
 </data>
 </odoo>

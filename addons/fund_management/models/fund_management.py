@@ -69,6 +69,8 @@ class FundManagement(models.Model):
 
     def _get_default_category(self):
 
+        self._invalidate_cache(['stage'])
+
         default_category_id = self.category_id.id if self.category_id else False
 
         if not default_category_id:
@@ -114,7 +116,7 @@ class FundManagement(models.Model):
     attachment_ids = fields.One2many(
         comodel_name='ir.attachment',
         inverse_name='res_id',
-        domain="[('res_model', '=', 'hr.expense')]",
+        domain="[('res_model', '=', 'fund.management')]",
         string="Attachments", tracking=True
     )
     state = fields.Selection(
@@ -309,13 +311,14 @@ class FundManagement(models.Model):
 
     def _compute_nb_attachment(self):
         attachment_data = self.env['ir.attachment']._read_group(
-            [('res_model', '=', 'hr.expense'), ('res_id', 'in', self.ids)],
+            [('res_model', '=', 'fund.management'), ('res_id', 'in', self.ids)],
             ['res_id'],
             ['__count'],
         )
         attachment = dict(attachment_data)
         for expense in self:
             expense.nb_attachment = attachment.get(expense._origin.id, 0)
+            _logger.info(f"id:{expense._origin.id};.nb_attachment={expense.nb_attachment}")
 
     def attach_document(self, **kwargs):
         """When an attachment is uploaded as a receipt, set it as the main attachment."""
@@ -387,7 +390,7 @@ class FundManagement(models.Model):
         # 批准
         for record in self:
             if record.stage.sequence and (not self._check_approval_rights(record)):
-                raise UserError(f"您不能审批当前阶段:{record.stage.name}")
+                raise UserError(f"您不能审批当前阶段：{record.stage.name}")
 
             next_state = 'submitted' if record.stage.sequence == 0 else 'approved'
             # 先创建当前阶段的审批记录
@@ -419,7 +422,7 @@ class FundManagement(models.Model):
                 return
 
             if record.stage.sequence and (not self._check_approval_rights(record)):
-                raise UserError(f"您不能审批当前阶段:{record.stage.name}")
+                raise UserError(f"您不能审批当前阶段：{record.stage.name}")
 
             # 先创建当前阶段的驳回记录
             self._create_approval_detail(record, False, False)
@@ -443,7 +446,7 @@ class FundManagement(models.Model):
                 return
 
             if record.stage.sequence and (not self._check_approval_rights(record)):
-                raise UserError(f"您不能操作当前阶段:{record.stage.name}")
+                raise UserError(f"您不能操作当前阶段：{record.stage.name}")
 
             self._create_approval_detail(record, False, True)
             all_stages = self.env['fund.management.approval.stage'].search([('company_id', '=', record.company_id.id),
@@ -548,20 +551,26 @@ class FundManagement(models.Model):
     @api.model
     def get_fund_management_dashboard(self):
         expense_state = {
-            'to_submit': {
-                'description': _('to submit'),
-                'amount': 0.0,
-                'tooltip': _("Fund management application that need to be submitted to the approver."),
-                'currency': self.env.company.currency_id.id,
-            },
+            # 'to_submit': {
+            #     'description': _('to submit'),
+            #     'amount': 0.0,
+            #     'tooltip': _("Fund management application that need to be submitted to the approver."),
+            #     'currency': self.env.company.currency_id.id,
+            # },
             'submitted': {
-                'description': _('in approval'),
+                'description': _('to be approved'),
                 'amount': 0.0,
                 'tooltip': _(
                     "Fund management application has been submitted to the approver and is waiting for approval."),
                 'currency': self.env.company.currency_id.id,
             },
             'approved': {
+                'description': _('approval process on going'),
+                'amount': 0.0,
+                'tooltip': _("Fund management application has been approved by some approvers."),
+                'currency': self.env.company.currency_id.id,
+            },
+            'done': {
                 'description': _('approval process completed'),
                 'amount': 0.0,
                 'tooltip': _("Fund management application has been approved by all approvers."),
@@ -574,11 +583,11 @@ class FundManagement(models.Model):
         # Counting the expenses to display in the dashboard:
         expenses = self._read_group(
             [('employee_id', 'in', self.env.user.employee_ids.ids),
-             ('state', 'in', ('draft', 'submitted', 'approved', 'done'))
+             ('state', 'in', ('submitted', 'approved', 'done'))
              ], ['state'], ['total_amount:sum'])
         for state, total_amount_sum in expenses:
-            if state in {'draft'}:  # Fuse the two states into only one "To Submit" state
-                state = 'to_submit'
+            # if state in {'draft'}:  # Fuse the two states into only one "To Submit" state
+            #     state = 'to_submit'
             expense_state[state]['amount'] += total_amount_sum
         return expense_state
 
@@ -620,6 +629,8 @@ class FundManagement(models.Model):
         default_category_id = self_rcd.category_id.id
         request.session["default_category_id"] = default_category_id
         _logger.info(f"self_rcd_id={self_rcd_id};default_category_id={default_category_id}")
+        # 清理缓存
+        self._invalidate_cache(['stage'])
 
         action = {
             "name": f"{self.name}",
@@ -633,3 +644,21 @@ class FundManagement(models.Model):
                 (False, 'form')],
         }
         return action
+
+    def action_view_all_stages(self):
+
+        default_category_id = self.env.context.get("default_category_id")
+        _logger.info(f"default_category_id={default_category_id}")
+        action = {
+            "name": f"{self.name}",
+            "type": "ir.actions.act_window",
+            "view_mode": "tree",
+            "res_model": "fund.management.approval.stage",
+            "context": {"default_category_id": default_category_id},
+            "target": "new",
+            "views": [
+                (self.env.ref('fund_management.fund_management_approval_stage_by_category_tree').id, 'tree')],
+        }
+        return action
+
+        # return self.env["ir.actions.act_window"]._for_xml_id('fund_management.view_all_stage_by_category_action')
