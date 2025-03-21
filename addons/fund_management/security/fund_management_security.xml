@@ -25,6 +25,6 @@
     </record>
 
     <record id="base.default_user" model="res.users">
-        <field name="groups_id" eval="[(4,ref('fund_management.group_fund_management_team_approver'))]"/>
+        <field name="groups_id" eval="[(3,ref('fund_management.group_fund_management_team_approver'))]"/>
     </record>
 </odoo>
