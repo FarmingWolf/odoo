@@ -2861,7 +2861,7 @@ class EstateLeaseContract(models.Model):
                             if property_fee_maintenance.manage_fee_detail_id.id != manage_fee_detail.id:
                                 property_fee_maintenance.manage_fee_detail_id = manage_fee_detail.id
 
-                    if not rcd_found:
+                    if record.manage_fee_details and not rcd_found:
                         err_msg.append(f"本期开始日：{property_fee_maintenance.period_d_start}"
                                        f"本期结束日：{property_fee_maintenance.period_d_end}"
                                        f"实收日期：{property_fee_maintenance.date_received}"
