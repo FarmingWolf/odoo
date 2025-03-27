@@ -3,8 +3,7 @@
 import logging
 
 from odoo import fields, models, api
-from odoo.exceptions import ValidationError
-
+from odoo.exceptions import ValidationError, UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -30,6 +29,8 @@ class EstateLeaseContractRentalPlanRel(models.Model):
                                                           ('out_dated', '租约已到期')],
                                                )
     contract_property_rent_price = fields.Float(related="rental_plan_id.rent_price", string="租金单价（元/天/㎡）")
+    contract_property_including_management_fee = fields.Boolean(related="rental_plan_id.including_management_fee",
+                                                                string="含物业费")
     contract_property_building_area = fields.Float(default=0.0, string="建筑面积(㎡)")  # 可能拆铺合铺
     contract_property_area = fields.Float(default=0.0, string="面积(㎡)")
     contract_rent_amount_monthly = fields.Float(string="月租金(元)", default=0)
@@ -57,6 +58,7 @@ class EstateLeaseContractRentalPlanRel(models.Model):
     contract_property_fee_maintenance_ids = fields.One2many(
         comodel_name="estate.lease.contract.property.fee.maintenance",
         inverse_name="contract_rental_plan_rel_id", string="物业费明细")
+    fee_maintenance_err_msg = fields.Text("物业费错误信息", readonly=True, compute="_compute_fee_maintenance_err_msg")
 
     contract_property_tax_ids = fields.One2many(comodel_name="estate.lease.contract.property.tax",
                                                 inverse_name="contract_rental_plan_rel_id", string="房产税收缴明细")
@@ -73,6 +75,13 @@ class EstateLeaseContractRentalPlanRel(models.Model):
         ('contract_property_rental_plan_unique', 'unique(contract_id, property_id)',
          "同一合同内，同一资产，不能有不同的租金方案"),
     ]
+
+    def _compute_fee_maintenance_err_msg(self):
+        for record in self:
+            record.fee_maintenance_err_msg = None
+            record.contract_id._bind_manage_fee_detail_fee_maintenance()
+            # if record.fee_maintenance_err_msg:
+            #     raise UserError(record.fee_maintenance_err_msg)
 
     @api.depends("contract_property_deposit_ids")
     def _calc_deposit_received(self):
@@ -147,7 +156,6 @@ class EstateLeaseContractRentalPlanRel(models.Model):
             不允许部分重叠而允许完全重叠的日期可以理解为多次缴纳
         """
         lines = []
-        _logger.info(f"检查页面{check_tgt_nm}的开始结束日期")
         for record in self:
             if check_tgt_nm == "水费":
                 lines = record.contract_property_fee_water_ids
@@ -164,6 +172,14 @@ class EstateLeaseContractRentalPlanRel(models.Model):
                 ii = 0
                 for comp_tgt in lines:
                     if i != ii:
+                        # 物业费实缴明细的期间特殊处理 todo 在这里直接修改contract_property_fee_maintenance_ids的字段还是不太好
+                        if check_tgt_nm == "物业费":
+                            if line.manage_fee_detail_id:
+                                if line.period_d_start != line.manage_fee_detail_id.period_date_from:
+                                    line.period_d_start = line.manage_fee_detail_id.period_date_from
+                                if line.period_d_end != line.manage_fee_detail_id.period_date_to:
+                                    line.period_d_end = line.manage_fee_detail_id.period_date_to
+
                         if comp_tgt.period_d_start < line.period_d_start <= comp_tgt.period_d_end:
                             raise ValidationError(f"{check_tgt_nm}期间的开始日设置错误：开始日期[{line.period_d_start}]介于"
                                                   f"[{comp_tgt.period_d_start}]~[{comp_tgt.period_d_end}]")

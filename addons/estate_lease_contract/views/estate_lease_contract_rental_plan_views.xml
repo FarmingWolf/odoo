@@ -34,14 +34,32 @@
         <field name="arch" type="xml">
             <form string="estate_lease_contract_rental_plan_form">
                 <sheet>
-                    <group>
-                        <group>
-                            <field name="name"/>
-                            <field name="business_method_id"/>
-                            <field name="main_category"/>
-                            <field name="billing_method"/>
+                    <group col="2">
+                        <group col="1">
+                            <group>
+                                <field name="name"/>
+                                <field name="business_method_id"/>
+                                <field name="main_category"/>
+                                <field name="billing_method"/>
+                            </group>
+                            <group>
+                                <group col="1">
+                                    <field name="including_management_fee" help="如果选择不包含物业费，那么请完成设置租金方案后前往物业费专区页面设置物业费方案详情"/>
+                                </group>
+<!--                                <group col="1">-->
+<!--                                    <button name="estate_lease_contract.setting_management_fee_plan_action"-->
+<!--                                            type="action" invisible="including_management_fee" string="物业费"-->
+<!--                                            context="{'rent_area_4_management_fee': 0,-->
+<!--                                                    'property_nm_4_management_fee' : '',-->
+<!--                                                    'payment_date_4_management_fee' : payment_date.raw_value,-->
+<!--                                                    'payment_period_4_management_fee' : payment_period.raw_value,-->
+<!--                                                    'default_estate_lease_contract': parent.id.,-->
+<!--                                                    'default_estate_lease_contract_property': parent.id,-->
+<!--                                                    }"/>-->
+<!--                                </group>-->
+                            </group>
                         </group>
-                        <group>
+                        <group col="1">
                             <field name="rent_targets" widget="many2many_tags" readonly="1" />
                             <field name="business_type_id"/>
                             <field name="payment_period"/>

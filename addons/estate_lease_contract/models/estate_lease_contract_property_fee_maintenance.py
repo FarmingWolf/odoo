@@ -19,13 +19,27 @@ class EstateLeaseContractPropertyFeeMaintenance(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     contract_rental_plan_rel_id = fields.Many2one(comodel_name='estate.lease.contract.rental.plan.rel',
-                                                  string='合同-资产关系表ID', required=True, ondelete="cascade")
+                                                  string='合同-资产关系表ID', ondelete="set null")
+    manage_fee_detail_id = fields.Many2one('estate.lease.contract.property.manage.fee.detail', string="物业费明细ID",
+                                           ondelete="set null")
     period_d_start = fields.Date(string="本期开始日", default=lambda self: self._cal_period_d_start(), tracking=True)
     period_d_end = fields.Date(string="本期结束日", default=lambda self: self._cal_period_d_end(), tracking=True)
     maintenance_receivable = fields.Float(default=0.0, string="本期应收(元)", tracking=True, help="账单金额")
     maintenance_received = fields.Float(default=0.0, string="本期实收(元)", tracking=True)
 
+    maintenance_receivable_this = fields.Float(default=0.0, string="本次应收(元)", compute="_compute_received",
+                                               store=True, compute_sudo=True)
+
     date_received = fields.Date(string="实收日期", default=lambda self: fields.Date.context_today(self), tracking=True)
+    maintenance_received_2_date = fields.Date(string="实收至", readonly=True, store=True, compute="_compute_received",
+                                              compute_sudo=True)
+    days_received = fields.Float(string="实收天数", readonly=True, store=True, compute="_compute_received",
+                                 compute_sudo=True)
+    days_received_sum = fields.Float(string="累计实收天数", readonly=True, store=True, compute="_compute_received",
+                                     compute_sudo=True)
+    days_arrears = fields.Float(string="欠缴天数", readonly=True, store=True, compute="_compute_received",
+                                compute_sudo=True)
+
     maintenance_received_sum = fields.Float(default=0.0, string="累计实收(元)", readonly=True, compute="_compute_received",
                                             store=True, compute_sudo=True, help="合同保存后，系统自动计算累计值")
     maintenance_arrears = fields.Float(string="本期欠缴(元)", readonly=True, store=True, compute="_compute_received",
@@ -50,6 +64,7 @@ class EstateLeaseContractPropertyFeeMaintenance(models.Model):
                                 ondelete="set null")
     maintenance_receipt = fields.Boolean(string="发票")
     maintenance_receipt_evidence = fields.Html(string="发票信息")
+    active = fields.Boolean("数据状态", default=True)
 
     @api.onchange("maintenance_receivable", "maintenance_received")
     def _onchange_maintenance_receivable(self):
@@ -57,115 +72,184 @@ class EstateLeaseContractPropertyFeeMaintenance(models.Model):
 
     @api.onchange("period_d_start", "period_d_end")
     def _onchange_period_d_start(self):
-        if self.period_d_start > self.period_d_end:
-            self.period_d_end = end_of(self.period_d_start, 'month')
+        # 若独立核算物业费，那么实收记录的period_d_start和period_d_end必须来自物业费明细
+        manage_fee_details = self._get_manage_fee_details(self.contract_id, self.property_id)
+        if not manage_fee_details:
+            if self.period_d_start > self.period_d_end:
+                self.period_d_end = end_of(self.period_d_start, 'month')
+        else:
+            for detail in manage_fee_details:
+                if detail.period_date_from <= self.period_d_start <= detail.period_date_to:
+                    self.period_d_start = detail.period_date_from
+                    self.period_d_end = detail.period_date_to
+                    self.maintenance_receivable = detail.manage_fee_receivable
+                    return
+
+            if self.period_d_start > self.period_d_end:
+                self.period_d_end = end_of(self.period_d_start, 'month')
 
     def _cal_period_d_start(self):
+        # context_d = fields.Date.context_today(self)
+        # start_d = start_of(context_d, 'month')
+        # return start_d
+        _logger.info(f"contract_rental_plan_rel_id={self.contract_rental_plan_rel_id.id}")
+        _logger.info(f"manage_fee_detail_id={self.manage_fee_detail_id.id}")
+
+        if self.manage_fee_detail_id:
+            _logger.info(f"manage_fee_detail_id.period_date_from={self.manage_fee_detail_id.period_date_from}")
+            return self.manage_fee_detail_id.period_date_from
+
         context_d = fields.Date.context_today(self)
-        start_d = start_of(context_d, 'month')
-        return start_d
+        manage_fee_details = self._get_manage_fee_details(self.contract_id, self.property_id)
+        if not manage_fee_details:
+            return context_d
+
+        for detail in manage_fee_details:
+            if detail.period_date_from <= context_d <= detail.period_date_to:
+                return detail.period_date_from
+
+        return context_d
+
 
     def _cal_period_d_end(self):
-        context_d = fields.Date.context_today(self)
-        end_d = end_of(context_d, 'month')
-        return end_d
+        # context_d = fields.Date.context_today(self)
+        # end_d = end_of(context_d, 'month')
+        # return end_d
+        if self.manage_fee_detail_id:
+            return self.manage_fee_detail_id.period_date_to
 
-    # @api.model_create_multi
-    # def create(self, vals_list):
-    #
-    #     # create时，还没有self
-    #     # _logger.info(f"create contract_id={self.contract_rental_plan_rel_id.contract_id.id};"
-    #     #              f"property_id={self.contract_rental_plan_rel_id.property_id.id}")
-    #     # _logger.info(f"vals_list={vals_list}")
-    #     self._check_multi_date_duplicate(vals_list)
-    #
-    #     return super().create(vals_list)
-    #
-    # @api.model
-    # def write(self, values):
-    #     _logger.info(f"update contract_id={self.contract_rental_plan_rel_id.contract_id.id};"
-    #                  f"property_id={self.contract_rental_plan_rel_id.property_id.id}")
-    #     _logger.info(f"values={values}")
-    #
-    #     self._check_update_date_duplicate(values)
-    #     return super().write(values)
+        context_d = fields.Date.context_today(self)
+        manage_fee_details = self._get_manage_fee_details(self.contract_id, self.property_id)
+        if not manage_fee_details:
+            return context_d
+
+        for detail in manage_fee_details:
+            if detail.period_date_from <= context_d <= detail.period_date_to:
+                return detail.period_date_to
+
+        return context_d
 
     @api.depends("maintenance_received", "maintenance_receivable", "date_received")
     def _compute_received(self):
         for record in self:
-            domain = [('contract_rental_plan_rel_id', '=', record.contract_rental_plan_rel_id.id)]
+            # 从物业费方案生成的物业费明细
+            if record.manage_fee_detail_id:
+                domain = [('manage_fee_detail_id', '=', record.manage_fee_detail_id.id)]
+            else:  # 在已发布合同中手动输入的物业费明细
+                domain = [('contract_rental_plan_rel_id', '=', record.contract_rental_plan_rel_id.id)]
+
             rcds = self.env["estate.lease.contract.property.fee.maintenance"].search(domain)
-            received_sum = 0.0
-            arrears_sum = 0.0
 
-            for rcd in rcds:
-                received_sum += rcd.maintenance_received
-                if rcd.maintenance_received_sum != received_sum:
-                    rcd.maintenance_received_sum = received_sum
+            # 在已发布合同中手动输入物业费明细的计算逻辑（同于水电费的缴费逻辑）：
+            if not record.manage_fee_detail_id:
+                received_sum = 0.0
+                arrears_sum = 0.0
 
-                arrears = rcd.maintenance_receivable - rcd.maintenance_received
-                arrears_sum += arrears
-                if rcd.maintenance_arrears != arrears:
-                    rcd.maintenance_arrears = arrears
+                for rcd in rcds:
+                    received_sum += rcd.maintenance_received
+                    if rcd.maintenance_received_sum != received_sum:
+                        rcd.maintenance_received_sum = received_sum
 
-                if rcd.maintenance_arrears_sum != arrears_sum:
-                    rcd.maintenance_arrears_sum = arrears_sum
+                    arrears = rcd.maintenance_receivable - rcd.maintenance_received
+                    arrears_sum += arrears
+                    if rcd.maintenance_arrears != arrears:
+                        rcd.maintenance_arrears = arrears
 
-    # def _check_multi_date_duplicate(self, vals_list):
-    #     i = 0
-    #     for new_vals in vals_list:
-    #         # 先查本行
-    #         if 'period_d_start' in new_vals and 'period_d_end' in new_vals and \
-    #                 new_vals['period_d_start'] > new_vals['period_d_end']:
-    #             raise UserError(f"物业费期间的开始结束日期设置错误："
-    #                             f"[{new_vals['period_d_start']}]~[{new_vals['period_d_end']}]")
-    #
-    #         # 再自查页面数据自身是否有期间交叉
-    #         ii = 0
-    #         for comp_tgt in vals_list:
-    #             if i != ii:
-    #                 if ('period_d_start' in new_vals and 'period_d_start' in comp_tgt and 'period_d_end' in comp_tgt
-    #                         and comp_tgt['period_d_start'] < new_vals['period_d_start'] <= comp_tgt['period_d_end']):
-    #                     raise UserError(f"物业费期间的期间设置重叠错误：开始日期[{new_vals['period_d_start']}]介于"
-    #                                     f"[{comp_tgt['period_d_start']}]~[{comp_tgt['period_d_end']}]")
-    #
-    #                 if ('period_d_end' in new_vals and 'period_d_start' in comp_tgt and 'period_d_end' in comp_tgt
-    #                         and comp_tgt['period_d_start'] <= new_vals['period_d_end'] < comp_tgt['period_d_end']):
-    #                     raise UserError(f"物业费期间的期间设置重叠错误：结束日期[{new_vals['period_d_end']}]介于"
-    #                                     f"[{comp_tgt['period_d_start']}]~[{comp_tgt['period_d_end']}]")
-    #
-    #             ii += 1
-    #
-    #         fees_exist = False
-    #         if not fees_exist:
-    #             _logger.info(f"self.contract_rental_plan_rel_id.id={self.contract_rental_plan_rel_id.id}")
-    #             domain = [('contract_rental_plan_rel_id', '=', self.contract_rental_plan_rel_id.id)]
-    #             fees_exist = self.search(domain)
-    #             _logger.info(f"fees_exist={fees_exist}")
-    #
-    #         # 仅做期间的部分重叠交叉校验，而完全的覆盖重叠不算错误
-    #         # 比如 20250101-20250131与20250102-20250201算错误
-    #         for fee in fees_exist:
-    #             if 'period_d_start' in new_vals:
-    #                 tgt_date = datetime.strptime(new_vals['period_d_start'], '%Y-%m-%d').date()
-    #                 if fee.period_d_start < tgt_date <= fee.period_d_end:
-    #                     raise UserError(f"物业费期间的期间重叠了：开始日期[{new_vals['period_d_start']}]介于"
-    #                                     f"[{fee.period_d_start}]~[{fee.period_d_end}]")
-    #
-    #             if 'period_d_end' in new_vals:
-    #                 tgt_date = datetime.strptime(new_vals['period_d_end'], '%Y-%m-%d').date()
-    #                 if fee.period_d_start <= tgt_date < fee.period_d_end:
-    #                     raise UserError(f"物业费期间的期间重叠了：结束日期[{new_vals['period_d_end']}]介于"
-    #                                     f"[{fee.period_d_start}]~[{fee.period_d_end}]")
-    #
-    #         i += 1
-    #
-    # def _check_update_date_duplicate(self, new_vals):
-    #     if not new_vals or len(new_vals) == 0:
-    #         return
-    #
-    #     if 'period_d_start' not in new_vals and 'period_d_end' not in new_vals:
-    #         return
-    #
-    #     tgt_list = [new_vals]
-    #     self._check_multi_date_duplicate(tgt_list)
+                    if rcd.maintenance_arrears_sum != arrears_sum:
+                        rcd.maintenance_arrears_sum = arrears_sum
+
+            else:  # 从物业费方案生成的物业费明细，在物业费明细tab页操作逻辑（同与租金明细的多次缴费逻辑）：
+                received_sum = 0.0
+                days_cal_sum = 0.0
+                received_sum_this_time = 0.0
+                days_cal_this_time = 0.0
+                days_cal_sum_this_time = 0.0
+
+                for rcd in rcds:
+                    received_sum += rcd.maintenance_received
+                    if rcd.maintenance_received_sum != received_sum:
+                        rcd.maintenance_received_sum = received_sum
+
+                    if record.manage_fee_detail_id.manage_fee_receivable:
+                        days_cal = rcd.maintenance_received / record.manage_fee_detail_id.manage_fee_receivable * \
+                                   record.manage_fee_detail_id.days_receivable
+                        days_cal_sum += days_cal
+                        if rcd.days_received != days_cal:
+                            rcd.days_received = days_cal
+
+                        if rcd.days_received_sum != days_cal_sum:
+                            rcd.days_received_sum = days_cal_sum
+
+                        if rcd.maintenance_arrears != record.manage_fee_detail_id.manage_fee_receivable - rcd.maintenance_received_sum:
+                            rcd.maintenance_arrears = record.manage_fee_detail_id.manage_fee_receivable - rcd.maintenance_received_sum
+
+                        # 根据本次实收和欠缴反算本次应收（不同于总应收）
+                        if rcd.maintenance_receivable_this != rcd.maintenance_received + rcd.maintenance_arrears:
+                            rcd.maintenance_receivable_this = rcd.maintenance_received + rcd.maintenance_arrears
+
+                        if rcd.days_arrears != record.manage_fee_detail_id.days_receivable - rcd.days_received_sum:
+                            rcd.days_arrears = record.manage_fee_detail_id.days_receivable - rcd.days_received_sum
+
+                        date_2 = record.manage_fee_detail_id.period_date_from + timedelta(days=rcd.days_received_sum)
+                        if rcd.maintenance_received_2_date != date_2:
+                            rcd.maintenance_received_2_date = date_2
+
+                        if rcd.date_received <= record.date_received:
+                            received_sum_this_time = received_sum
+                            days_cal_this_time = days_cal
+                            days_cal_sum_this_time = days_cal_sum
+
+                if record.maintenance_received_sum != received_sum_this_time:
+                    record.maintenance_received_sum = received_sum_this_time
+
+                if record.days_received != days_cal_this_time:
+                    record.days_received = days_cal_this_time
+
+                if record.days_received_sum != days_cal_sum_this_time:
+                    record.days_received_sum = days_cal_sum_this_time
+
+                if record.maintenance_arrears != record.manage_fee_detail_id.manage_fee_receivable - record.maintenance_received_sum:
+                    record.maintenance_arrears = record.manage_fee_detail_id.manage_fee_receivable - record.maintenance_received_sum
+
+                if record.days_arrears != record.manage_fee_detail_id.days_receivable - record.days_received_sum:
+                    record.days_arrears = record.manage_fee_detail_id.days_receivable - record.days_received_sum
+
+                # 计算本次应收（不同于总应收）
+                if record.maintenance_receivable_this != record.maintenance_received + record.maintenance_arrears:
+                    record.maintenance_receivable_this = record.maintenance_received + record.maintenance_arrears
+
+                date_2_this_time = record.manage_fee_detail_id.period_date_from + timedelta(days=record.days_received_sum)
+                if record.maintenance_received_2_date != date_2_this_time:
+                    record.maintenance_received_2_date = date_2_this_time
+
+    def _get_manage_fee_details(self, contract_id, property_id):
+        if not contract_id or not property_id:
+            return []
+
+        tgt_model = 'estate.lease.contract.property.manage.fee.detail'
+        tgt_domain = [('contract_id', '=', contract_id.id), ('property_id', '=', property_id.id)]
+        details = self.env[tgt_model].search(tgt_domain)
+        _logger.info(f"manage_fee_details={details}")
+        return details
+
+    @api.model
+    def create(self, vals_list):
+        context_d = fields.Date.context_today(self)
+        if (self.period_d_start == self.period_d_end and self.period_d_start == context_d) or \
+                (not self.period_d_start) or (not self.period_d_end):
+            self.period_d_start = self._cal_period_d_start()
+            self.period_d_end = self._cal_period_d_end()
+        _logger.info(f"period_d_start={self.period_d_start};self.period_d_end={self.period_d_end}")
+
+        res = super().create(vals_list)
+
+        return res
+
+    @api.model
+    def write(self, vals):
+
+        _logger.info(f"period_d_start={self.period_d_start};self.period_d_end={self.period_d_end}")
+
+        res = super().write(vals)
+
+        return res

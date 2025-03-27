@@ -92,7 +92,8 @@ class EstateLeaseContractPropertyExtend(models.Model):
     property_rental_detail_ids = fields.One2many('estate.lease.contract.property.rental.detail', 'property_id',
                                                  string="租金明细")
     management_fee_plan_id = fields.Many2one('estate.lease.contract.property.management.fee.plan', string="物业费方案")
-
+    property_manage_fee_detail_ids = fields.One2many('estate.lease.contract.property.manage.fee.detail', 'property_id',
+                                                     string="物业费明细")
     business_method_id = fields.Char(string="经营性质", readonly=True, compute="_get_rent_plan_info")
     business_type_id = fields.Char(string="经营业态", readonly=True, compute="_get_rent_plan_info")
     main_category = fields.Char(string="主品类", readonly=True, compute="_get_rent_plan_info")
@@ -155,6 +156,9 @@ class EstateLeaseContractPropertyExtend(models.Model):
     set_rent_plan_rent_amount_monthly_adjust = fields.Float(string="月租金（元）", default=0.0,
                                                             help="=租金单价（元/天/㎡）×计租面积（㎡）×365÷12")
     set_rent_plan_annual_rent = fields.Float(string="年租金（元）", default=0.0)
+    # 该字段仅在租赁标的主页面选择固定金额方案，并设置固定租金时可设置
+    set_rent_plan_including_management_fee = fields.Boolean(string="含物业费", default=True,
+                                                            help="勾选表示租金包含物业费，不勾选则表示租金不包含物业费")
 
     @api.onchange("set_rent_plan_payment_period")
     def _onchange_set_rent_plan_payment_period(self):
@@ -171,6 +175,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
                 record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
                 record._origin.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
+                record._origin.set_rent_plan_including_management_fee = record.set_rent_plan_including_management_fee
             else:
                 record.set_rent_plan_annual_rent = 0
                 record.set_rent_plan_rent_amount_monthly_adjust = 0
@@ -187,6 +192,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
                 record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
                 record._origin.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
+                record._origin.set_rent_plan_including_management_fee = record.set_rent_plan_including_management_fee
             else:
                 record.set_rent_plan_annual_rent = 0
                 record.set_rent_plan_rent_price = 0
@@ -203,6 +209,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
                 record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
                 record._origin.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
+                record._origin.set_rent_plan_including_management_fee = record.set_rent_plan_including_management_fee
             else:
                 record.set_rent_plan_rent_amount_monthly_adjust = 0
                 record.set_rent_plan_rent_price = 0
@@ -219,6 +226,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
         for record in self:
             if record.set_rent_plan_on_this_page:
                 record.rent_price = record.set_rent_plan_rent_price
+                record.including_management_fee = record.set_rent_plan_including_management_fee
                 record.rent_amount_monthly_auto = record.set_rent_plan_rent_amount_monthly_adjust
                 record.rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
                 record.latest_annual_rent = record.set_rent_plan_annual_rent
@@ -242,6 +250,8 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 record.set_rent_plan_on_this_page = False
             else:
                 record.set_rent_plan_on_this_page = True
+                # 如果在本页设置固定租金详情，默认勾选包含物业费，若业务上不包含，则由操作者明确取消勾选
+                record.set_rent_plan_including_management_fee = True
 
     @api.depends("rent_amount_monthly_auto", "rent_amount_monthly_adjust", "deposit_months", "deposit_amount")
     def _cal_deposit(self):
@@ -299,6 +309,10 @@ class EstateLeaseContractPropertyExtend(models.Model):
         self._compute_billing_method_group_invisible()
         self._compute_billing_progress_method_group_invisible()
         self._get_rent_plan_info()
+
+        if request and request.session:
+            request.session['rent_area_4_management_fee'] = self.rent_area
+            request.session['property_nm_4_management_fee'] = self.name
 
     @api.onchange("management_fee_plan_id")
     def _onchange_management_fee_plan_id(self):
@@ -386,6 +400,8 @@ class EstateLeaseContractPropertyExtend(models.Model):
     turnover_percentage_id = fields.Char(string='营业额抽成详情', readonly=True, compute="_get_rent_plan_info")
     payment_period = fields.Char(string="支付周期", readonly=True, compute="_get_rent_plan_info")
     rent_price = fields.Float(string="租金单价（元/天/㎡）", readonly=True, compute="_get_rent_plan_info")
+    including_management_fee = fields.Boolean(string="含物业费", readonly=True, compute="_get_rent_plan_info",
+                                              help="勾选表示租金包含物业费，不勾选则表示租金不包含物业费")
     rent_amount_monthly_auto = fields.Float(string="月租金（元）", readonly=True, compute="_get_rent_plan_info",
                                             help="=租金单价（元/天/㎡）×计租面积（㎡）×365÷12")
     rent_amount_monthly_adjust = fields.Float(string="手调月租金（元）", help="可手动调整此金额。若调整后不为0，则系统以此为准。")
@@ -425,6 +441,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                     record.rent_plan_id.payment_period)
                 record.rent_price = Utils.remove_last_zero(record.rent_plan_id.rent_price)
                 _logger.info(f"record.rent_price={record.rent_price}")
+                record.including_management_fee = record.rent_plan_id.including_management_fee
                 record.rent_amount_monthly_auto = record.rent_plan_id.rent_price * record.rent_area * 365 / 12
                 if record.rent_amount_monthly_adjust:
                     pass
@@ -454,6 +471,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 record.compensation_method = ""
                 record.compensation_period = ""
                 record.latest_payment_method = ""
+                record.including_management_fee = True
 
     @api.model
     def _format_m2m_values(self, records):
@@ -702,6 +720,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 if ('set_rent_plan_rent_price' in vals and vals['set_rent_plan_rent_price']) or \
                         ('set_rent_plan_rent_amount_monthly_adjust' in vals and vals[
                             'set_rent_plan_rent_amount_monthly_adjust']) or \
+                        ('set_rent_plan_including_management_fee' in vals) or \
                         ('set_rent_plan_annual_rent' in vals and vals['set_rent_plan_annual_rent']) or \
                         ('set_rent_plan_business_method_id' in vals and vals['set_rent_plan_business_method_id']) or \
                         ('set_rent_plan_business_type_id' in vals and vals['set_rent_plan_business_type_id']) or \
@@ -787,6 +806,11 @@ class EstateLeaseContractPropertyExtend(models.Model):
         else:
             set_rent_plan_rent_price = self._origin.set_rent_plan_rent_price
 
+        if 'set_rent_plan_including_management_fee' in vals:
+            set_rent_plan_including_management_fee = vals['set_rent_plan_including_management_fee']
+        else:
+            set_rent_plan_including_management_fee = self._origin.set_rent_plan_including_management_fee
+
         rental_plan = {
             "name": plan_name,
             "rent_targets": record_id,
@@ -797,6 +821,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
             "payment_period": set_rent_plan_payment_period,
             "payment_date": set_rent_plan_payment_date,
             "rent_price": set_rent_plan_rent_price,
+            "including_management_fee": set_rent_plan_including_management_fee,
             "company_id": self.env.user.company_id.id,
         }
         _logger.info(f"write 2 db rental_plan={rental_plan}")
@@ -815,5 +840,75 @@ class EstateLeaseContractPropertyExtend(models.Model):
             "context": self.env.context,
             "domain": [('contract_id', '=', self.env.context['CONTRACT_ID']),
                        ('property_id', '=', self.env.context['PROPERTY_ID'])],
+        }
+        return action
+
+    def _get_selection_key(self, selection_name, selection_label):
+        tgt_selection = self._fields[selection_name].selection
+
+        selection_key = None
+        for key, label in tgt_selection:
+            if label == selection_label or key == selection_label:
+                selection_key = key
+                break
+
+        return selection_key
+
+    def setting_management_fee_plan_action(self):
+        _logger.info(f"self.env.context={self.env.context}")
+
+        # 将context中的payment_date_4_management_fee和payment_period_4_management_fee转为key
+        context_payment_date = self._get_selection_key('set_rent_plan_payment_date',
+                                                       self.env.context.get('payment_date_4_management_fee'))
+        context_payment_period = self._get_selection_key('set_rent_plan_payment_period',
+                                                         self.env.context.get('payment_period_4_management_fee'))
+
+        contract_id = self.env.context.get('default_estate_lease_contract')
+        property_id = self.env.context.get('default_estate_lease_contract_property')
+        contract_uuid = self.env.context.get('contract_uuid_4_management_fee')
+
+        tgt_model = 'estate.lease.contract.property.management.fee.plan'
+        tgt_id = False
+
+        # 设置对象不能在已经发布生效的合同里
+        if contract_id:
+            res_id = self.env[tgt_model].search([
+                ('estate_lease_contract', '=', contract_id),
+                ('estate_lease_contract_property', '=', property_id)], limit=1)
+
+            for rcd in res_id:
+                tgt_id = rcd.id
+        else:
+            res_id = self.env[tgt_model].search([
+                ('estate_lease_contract_uuid', '=', contract_uuid),
+                ('estate_lease_contract_property', '=', property_id)], limit=1)
+
+            for rcd in res_id:
+                tgt_id = rcd.id
+
+        action = {
+            "name": "设置物业费",
+            "type": "ir.actions.act_window",
+            "view_mode": "tree",
+            "res_model": "estate.lease.contract.property.management.fee.plan",
+            "views": [
+                (self.env.ref('estate_lease_contract.estate_lease_contract_property_management_fee_plan_form').id,
+                 'form')],
+            "target": "new",
+            "context": {'rent_area_4_management_fee': self.env.context.get('rent_area_4_management_fee'),
+                        'property_nm_4_management_fee': self.env.context.get('property_nm_4_management_fee'),
+                        'payment_date_4_management_fee': context_payment_date,
+                        'payment_period_4_management_fee': context_payment_period,
+                        'default_estate_lease_contract': contract_id,
+                        'default_estate_lease_contract_property': property_id,
+                        'contract_uuid_4_management_fee': contract_uuid,
+                        'contract_date_sign_4_management_fee':
+                            self.env.context.get('contract_date_sign_4_management_fee'),
+                        'contract_date_start_4_management_fee':
+                            self.env.context.get('contract_date_start_4_management_fee'),
+                        'contract_date_rent_start_4_management_fee':
+                            self.env.context.get('contract_date_rent_start_4_management_fee'),
+                        },
+            "res_id": tgt_id,
         }
         return action

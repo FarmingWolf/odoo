@@ -33,6 +33,10 @@
                     <field name="stage_id" invisible="1"/>
                     <field name="stage_sequence" invisible="1"/>
                     <field name="stage_op_department_id" invisible="1"/>
+                    <field name="tmp_ref" invisible="1"/>
+                    <field name="show_management_fee_page" invisible="1"/>
+                    <field name="approval_switch"/>
+                    <field name="approval_pipe_end"/>
                     <div invisible="approval_switch and (not approval_pipe_end)">
                         <button name="action_release_contract" type="object" string="发布"
                                 invisible="(not edit_on_hist_page) or (state != 'recording')"/>
@@ -103,8 +107,9 @@
                             </group>
                             <group col="2">
                                 <group>
-                                    <field name="contract_amount_lease_deposit"/>
+                                    <field name="contract_amount_and_manage_fee"/>
                                     <field name="contract_amount"/>
+                                    <field name="contract_manage_fee" invisible="contract_manage_fee &lt; 0.01"/>
                                     <field name="lease_deposit"/>
                                 </group>
                                 <group>
@@ -123,12 +128,10 @@
                             </group>
                             <group col="2">
                                 <group>
-                                    <field name="properties_tax"/>
-                                    <field name="properties_tax_receivable"/>
+                                    <field name="manage_fee_amount" invisible="manage_fee_amount &lt; 0.01"/>
                                 </group>
                                 <group>
-                                    <field name="properties_tax_received"/>
-                                    <field name="properties_tax_arrears" invisible="properties_tax_arrears &lt; 0.01"/>
+                                    <field name="manage_fee_amount_year" invisible="manage_fee_amount_year &lt; 0.01"/>
                                 </group>
                             </group>
                         </group>
@@ -154,8 +157,8 @@
                                     <field name="date_decorate_end" readonly="not edit_on_hist_page"/>
                                     <field name="days_decorate" readonly="1"/>
                                     <field name="opening_date" readonly="not edit_on_hist_page"/>
-                                    <field name="rent_amount_first_period" readonly="not edit_on_hist_page"/>
-                                    <field name="rent_first_payment_date" readonly="not edit_on_hist_page"/>
+                                    <field name="rent_amount_first_period" readonly="not edit_on_hist_page" invisible="1"/>
+                                    <field name="rent_first_payment_date" readonly="not edit_on_hist_page" invisible="1"/>
                                 </group>
                                 <group>
                                     <field name="date_terminated" readonly="1" invisible="not terminated"/>
@@ -168,6 +171,16 @@
                                 </group>
                                 <group col="1">
                                     <field name="order_by_name"/>
+                                </group>
+                            </group>
+                            <group col="2">
+                                <group>
+                                    <field name="properties_tax"/>
+                                    <field name="properties_tax_receivable"/>
+                                </group>
+                                <group>
+                                    <field name="properties_tax_received"/>
+                                    <field name="properties_tax_arrears" invisible="properties_tax_arrears &lt; 0.01"/>
                                 </group>
                             </group>
                         </group>
@@ -269,7 +282,6 @@
 
                                         </group>
                                         <group string="物业费">
-
                                         </group>
                                     </group>
                                     <field name="rental_details" readonly="(not edit_on_hist_page) or terminated or state == 'invalid'"
@@ -372,6 +384,126 @@
                                 </group>
                             </sheet>
                         </page>
+                        <page string="物业费方案" id="page_management_fee_plan" invisible="not show_management_fee_page">
+                            <button name="action_refresh_management_fee_plan" type="object" string="点击刷新"
+                                    invisible="context.get('contract_read_only') or state == 'invalid' or terminated" class="btn-primary"/>
+                            <field name="property_management_fee_plan_ids"/>
+                        </page>
+                        <page string="物业费明细" id="page_management_fee_detail" invisible="not show_management_fee_page">
+                            <group col="6">
+                                <group col="1" colspan="1" invisible="context.get('contract_read_only') or state == 'invalid' or terminated">
+                                    <button name="action_refresh_all_money" type="object" string="点击刷新"
+                                            class="btn-primary"/>
+                                </group>
+                                <group col="1" colspan="5">
+                                    <field name="manage_fee_detail_warn_msg" string="" readonly="1"/>
+                                </group>
+                            </group>
+                            <sheet readonly="1">
+                                <group>
+                                    <group />
+                                    <field name="manage_fee_details" readonly="(not edit_on_hist_page) or terminated or state == 'invalid'"
+                                           invisible="active and (state == 'invalid' or terminated)">
+                                        <tree string=""
+                                              decoration-info="edited and (manage_fee_received &lt; 0.01) and (date_payment &gt;= (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d'))"
+                                              decoration-muted="manage_fee_amount &lt; 0.01 and manage_fee_receivable &lt; 0.01"
+                                              decoration-danger="((date_payment &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')) and manage_fee_received &lt; 0.01 and manage_fee_amount &gt;= 0.01 and manage_fee_receivable &gt; 0.01) or (manage_fee_received &gt;= 0.01 and manage_fee_receivable - manage_fee_received &gt;= 0.01)"
+                                              decoration-warning="(manage_fee_amount - manage_fee_receivable &gt;= 0.01) or (manage_fee_receivable - manage_fee_amount &gt;= 0.01)"
+                                              decoration-success="manage_fee_received &gt; 0 and (manage_fee_received == manage_fee_receivable or manage_fee_received - manage_fee_receivable &gt;= 0 or manage_fee_receivable - manage_fee_received &lt; 0.01)"
+                                              readonly="not parent.edit_on_hist_page">
+                                            <field name="edited" column_invisible="True"/>
+                                            <field name="button_icon_invisible" column_invisible="1"/>
+                                            <field name="manage_fee_detail_sub_ids_editable" column_invisible="1"/>
+                                            <field name="property_id"/>
+                                            <field name="manage_fee_period_no"/>
+                                            <field name="period_date_from"/>
+                                            <field name="period_date_to"/>
+                                            <field name="period_days" sum="总计天数"/>
+                                            <field name="date_payment"/>
+                                            <field name="manage_fee_amount" digits="[12, 2]" sum="合计物业费：根据资产面积、物业费方案自动计算"/>
+                                            <field name="incentive_amount" digits="[12, 2]" sum="总计优惠"/>
+                                            <field name="incentive_days" digits="[12, 0]" sum="总计优惠天数"/>
+                                            <field name="manage_fee_receivable" digits="[12, 2]"
+                                                   sum="合计应收：请谨慎调整，系统自动记录调整历史"/>
+                                            <button type="object" name="action_show_button_icons" title="切换操作按钮" icon="oi-studio"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'up2hundred', 'method_msg': '上取整至百位'}"
+                                                    title="上取整至百位"
+                                                    icon="fa-angle-double-up" groups="estate_lease_contract.estate_lease_contract_group_manager"
+                                                    column_invisible="button_icon_invisible"
+                                                    help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'round2hundred', 'method_msg': '四舍五入至百位'}"
+                                                    title="四舍五入至百位" icon="fa-angle-double-left" groups="estate_lease_contract.estate_lease_contract_group_manager"
+                                                    column_invisible="button_icon_invisible"
+                                                    help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'down2hundred', 'method_msg': '下取整至百位'}"
+                                                    title="下取整至百位" icon="fa-angle-double-down" groups="estate_lease_contract.estate_lease_contract_group_manager"
+                                                    column_invisible="button_icon_invisible"
+                                                    help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'up2ten', 'method_msg': '上取整至十位'}"
+                                                    title="上取整至十位" icon="fa-chevron-up" groups="estate_lease_contract.estate_lease_contract_group_manager"
+                                                    column_invisible="button_icon_invisible"
+                                                    help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'round2ten', 'method_msg': '四舍五入至十位'}"
+                                                    title="四舍五入至十位" icon="fa-chevron-left" groups="estate_lease_contract.estate_lease_contract_group_manager"
+                                                    column_invisible="button_icon_invisible"
+                                                    help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'down2ten', 'method_msg': '下取整至十位'}"
+                                                    title="下取整至十位" icon="fa-chevron-down" groups="estate_lease_contract.estate_lease_contract_group_manager"
+                                                    column_invisible="button_icon_invisible"
+                                                    help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'up2one', 'method_msg': '上取整至个位'}"
+                                                    title="上取整至个位" icon="fa-arrow-up" groups="estate_lease_contract.estate_lease_contract_group_manager"
+                                                    column_invisible="button_icon_invisible"
+                                                    help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'round2one', 'method_msg': '四舍五入至个位'}"
+                                                    title="四舍五入至个位" icon="fa-arrow-left" groups="estate_lease_contract.estate_lease_contract_group_manager"
+                                                    column_invisible="button_icon_invisible"
+                                                    help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
+                                            <button type="object" name="action_round" context="{'round_method': 'down2one', 'method_msg': '下取整至个位'}"
+                                                    title="下取整至个位" icon="fa-arrow-down" groups="estate_lease_contract.estate_lease_contract_group_manager"
+                                                    column_invisible="button_icon_invisible"
+                                                    help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
+                                            <field name="manage_fee_received" digits="[12, 2]"
+                                                   sum="合计实收：每期租金收款后，请回填，以保证业务数据一致性"/>
+                                            <button type="object" name="action_confirm_received" title="点击确认本期物业费已收齐（等于本期应收）" icon="fa-thumbs-o-up"
+                                                    groups="estate_lease_contract.estate_lease_contract_group_manager"
+                                                    invisible="not manage_fee_detail_sub_ids_editable"
+                                                    help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
+                                            <field name="days_received" digits="[12, 0]" sum="总计实收天数"/>
+                                            <field name="manage_fee_arrears" digits="[12, 2]" sum="总计欠缴金额"/>
+                                            <field name="days_arrears" digits="[12, 0]" sum="总计欠缴天数"/>
+                                        </tree>
+                                    </field>
+                                    <field name="manage_fee_details" readonly="1"
+                                           invisible="not active or (state != 'invalid' and not terminated)">
+                                        <tree string="已归档"
+                                              decoration-info="edited and (manage_fee_received &lt; 0.01) and (date_payment &gt;= (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d'))"
+                                              decoration-muted="manage_fee_amount &lt; 0.01 and manage_fee_receivable &lt; 0.01"
+                                              decoration-danger="((date_payment &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')) and manage_fee_received &lt; 0.01 and manage_fee_amount &gt;= 0.01 and manage_fee_receivable &gt; 0.01) or (manage_fee_received &gt;= 0.01 and manage_fee_receivable - manage_fee_received &gt;= 0.01)"
+                                              decoration-warning="(manage_fee_amount - manage_fee_receivable &gt;= 0.01) or (manage_fee_receivable - manage_fee_amount &gt;= 0.01)"
+                                              decoration-success="manage_fee_received &gt; 0 and (manage_fee_received == manage_fee_receivable or manage_fee_received - manage_fee_receivable &gt;= 0 or manage_fee_receivable - manage_fee_received &lt; 0.01)">
+                                            <field name="edited" column_invisible="True"/>
+                                            <field name="property_id"/>
+                                            <field name="manage_fee_period_no"/>
+                                            <field name="period_date_from"/>
+                                            <field name="period_date_to"/>
+                                            <field name="period_days" sum="总计天数"/>
+                                            <field name="date_payment"/>
+                                            <field name="manage_fee_amount" digits="[12, 2]" sum="合计物业费：根据资产面积、物业费方案自动计算"/>
+                                            <field name="incentive_amount" digits="[12, 2]" sum="总计优惠"/>
+                                            <field name="incentive_days" digits="[12, 0]" sum="总计优惠天数"/>
+                                            <field name="manage_fee_receivable" digits="[12, 2]"
+                                                   sum="合计应收：请谨慎调整，系统自动记录调整历史"/>
+                                            <field name="manage_fee_received" digits="[12, 2]"
+                                                   sum="合计实收：每期物业费收款后，请回填，以保证业务数据一致性"/>
+                                            <field name="days_received" digits="[12, 0]" sum="总计实收天数"/>
+                                            <field name="manage_fee_arrears" digits="[12, 2]" sum="总计欠缴金额"/>
+                                            <field name="days_arrears" digits="[12, 0]" sum="总计欠缴天数"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </sheet>
+                        </page>
                         <page string="停车位">
                             <group>
                                 <field name="parking_space_count"/>
@@ -415,11 +547,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="物业费方案" id="page_management_fee_plan" invisible="1">
-                            <button name="action_refresh_management_fee_plan" type="object" string="点击刷新"
-                                    invisible="not edit_on_hist_page"/>
-                            <field name="property_management_fee_plan_ids"/>
-                        </page>
+
                         <page string="优惠方案" id="page_incentives" invisible="1">
                             <group>
                                 <field name="contract_incentives_ids"/>

@@ -16,7 +16,8 @@
         <field name="arch" type="xml">
             <tree string="estate_lease_contract_property_management_fee_plan_tree">
                 <field name="name"/>
-                <field name="name_description"/>
+                <field name="payment_period"/>
+                <field name="billing_progress_method_id"/>
                 <field name="rent_targets" widget="many2many_tags"/>
             </tree>
         </field>
@@ -28,24 +29,55 @@
         <field name="arch" type="xml">
             <form string="estate_lease_contract_property_management_fee_plan_form">
                 <sheet>
-                    <group>
-                        <group>
+                    <group col="2">
+                        <group col="1">
                             <field name="name"/>
-                            <field name="property_management_fee_price"/>
-                            <field name="billing_progress_method_id"/>
-                            <field name="rent_targets" widget="many2many_tags"  readonly="1" />
+                            <field name="date_start_depending"/>
+                            <field name="payment_period_depending"/>
+                            <field name="property_management_fee_price" help="月费 * 12 ÷ 365 ÷ 面积"/>
+                            <field name="property_management_fee_price_monthly" help="单价 * 面积 * 365 ÷ 12"/>
+                            <field name="rent_targets" widget="many2many_tags" readonly="1" invisible="1"/>
                         </group>
-                        <group invisible="billing_progress_method_id == 'no_progress'">
-                            <field name="billing_progress_info_month_from"/>
-                            <field name="billing_progress_info_month_every"/>
-                            <field name="billing_progress_info_up_percentage"/>
+                        <group col="1">
+                            <group col="1">
+                                <group col="2">
+                                    <group col="1">
+                                        <field name="property_name"/>
+                                    </group>
+                                    <group col="1">
+                                        <field name="rent_target_area"/>
+                                    </group>
+                                </group>
+                                <group col="1">
+                                    <field name="date_start"/>
+                                    <field name="payment_period"/>
+                                    <field name="payment_date"/>
+                                    <field name="billing_progress_method_id"/>
+                                </group>
+                            </group>
                         </group>
                     </group>
-                    <group>
-                        <field name="name_description"/>
+                    <group invisible="billing_progress_method_id == 'no_progress'" col="1">
+                        <group/>
+                        <field name="period_percentage_id"/>
                     </group>
                 </sheet>
             </form>
         </field>
+    </record>
+
+    <record id="pop_management_fee_plan_action" model="ir.actions.act_window">
+        <field name="name">设置物业费方案</field>
+        <field name="res_model">estate.lease.contract.property.management.fee.plan</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'rent_area_4_management_fee': rent_area_4_management_fee,
+            'property_nm_4_management_fee': property_nm_4_management_fee,
+            'payment_date_4_management_fee' : payment_date_4_management_fee,
+            'payment_period_4_management_fee' : payment_period_4_management_fee,
+            'default_estate_lease_contract' : default_estate_lease_contract,
+            'default_estate_lease_contract_property' : default_estate_lease_contract_property,
+            'default_res_id' : default_estate_lease_contract_property.management_fee_plan_id,
+            }</field>
     </record>
 </odoo>

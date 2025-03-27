@@ -89,6 +89,7 @@ class EstateLeaseContractRentalPlan(models.Model):
         selection=[('by_payment_period', '支付周期补差'), ('by_natural_half_year', '自然半年补差'),
                    ('by_natural_year', '自然年补差'), ('by_contract_year', '租约年补差')], )
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+    including_management_fee = fields.Boolean("含物业费", default=True)
 
     _sql_constraints = [
         ('name', 'unique(name, company_id)', '租金方案名不能重复')
@@ -204,7 +205,7 @@ class EstateLeaseContractRentalPlan(models.Model):
             domain = [('rental_plan_id', '=', record.id), ('rental_plan_id', '!=', False)]
             contracts_rel = self.env['estate.lease.contract.rental.plan.rel'].search(domain)
             for contract_rel in contracts_rel:
-                if contract_rel.contract_id.state in ('to_be_released', 'released'):
+                if contract_rel.contract_id.state in ('to_be_released', 'released', 'invalid'):
                     msg_list.append(
                         f"房屋：【 {contract_rel.property_id.name}】合同：【{contract_rel.contract_id.name}】"
                         f"【{contract_rel.contract_id.contract_no}】"

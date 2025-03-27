@@ -28,6 +28,58 @@ def date_equal(param1, param2):
         return False
 
 
+def _cal_manage_fee_detail(manage_fee_detail, in_date, in_fee_info):
+
+    if manage_fee_detail.date_payment == in_date:
+        in_fee_info['property_fee_maintenance_receivable_today'] += manage_fee_detail.manage_fee_receivable
+        # in_fee_info['property_fee_maintenance_received_today'] += manage_fee_detail.manage_fee_received
+
+    if manage_fee_detail.date_payment == add(in_date, days=1):
+        in_fee_info['property_fee_maintenance_receivable_tomorrow'] += manage_fee_detail.manage_fee_receivable
+
+    if manage_fee_detail.date_payment:
+        if end_of(manage_fee_detail.date_payment, 'week') == end_of(in_date, 'week'):
+            in_fee_info['property_fee_maintenance_receivable_week'] += manage_fee_detail.manage_fee_receivable
+        if end_of(manage_fee_detail.date_payment, 'month') == end_of(in_date, 'month'):
+            in_fee_info['property_fee_maintenance_receivable_month'] += manage_fee_detail.manage_fee_receivable
+        if end_of(manage_fee_detail.date_payment, 'quarter') == end_of(in_date, 'quarter'):
+            in_fee_info['property_fee_maintenance_receivable_quarter'] += manage_fee_detail.manage_fee_receivable
+        if end_of(manage_fee_detail.date_payment, 'year') == end_of(in_date, 'year'):
+            in_fee_info['property_fee_maintenance_receivable_year'] += manage_fee_detail.manage_fee_receivable
+
+        if date_equal(start_of(manage_fee_detail.date_payment, 'week'), add(end_of(in_date, 'week'), days=1)):
+            in_fee_info['property_fee_maintenance_receivable_week_next'] += manage_fee_detail.manage_fee_receivable
+        if date_equal(start_of(manage_fee_detail.date_payment, 'month'), add(end_of(in_date, 'month'), days=1)):
+            in_fee_info['property_fee_maintenance_receivable_month_next'] += manage_fee_detail.manage_fee_receivable
+        if date_equal(start_of(manage_fee_detail.date_payment, 'quarter'), add(end_of(in_date, 'quarter'), days=1)):
+            in_fee_info[
+                'property_fee_maintenance_receivable_quarter_next'] += manage_fee_detail.manage_fee_receivable
+        if date_equal(start_of(manage_fee_detail.date_payment, 'year'), add(end_of(in_date, 'year'), days=1)):
+            in_fee_info['property_fee_maintenance_receivable_year_next'] += manage_fee_detail.manage_fee_receivable
+    else:
+        _logger.error(f"manage_fee_detail.date_payment为空，请确认！manage_fee_detail.id={manage_fee_detail.id}")
+
+    # 根据该条物业费明细的实收明细累计物业费实收
+    for fee_maintenance in manage_fee_detail.manage_fee_detail_sub_ids:
+        if fee_maintenance.date_received == in_date:
+            in_fee_info['property_fee_maintenance_received_today'] += fee_maintenance.maintenance_received
+
+        if fee_maintenance.date_received:
+            if end_of(fee_maintenance.date_received, 'week') == end_of(in_date, 'week'):
+                in_fee_info['property_fee_maintenance_received_week'] += fee_maintenance.maintenance_received
+            if end_of(fee_maintenance.date_received, 'month') == end_of(in_date, 'month'):
+                in_fee_info['property_fee_maintenance_received_month'] += fee_maintenance.maintenance_received
+            if end_of(fee_maintenance.date_received, 'quarter') == end_of(in_date, 'quarter'):
+                in_fee_info['property_fee_maintenance_received_quarter'] += fee_maintenance.maintenance_received
+            if end_of(fee_maintenance.date_received, 'year') == end_of(in_date, 'year'):
+                in_fee_info['property_fee_maintenance_received_year'] += fee_maintenance.maintenance_received
+
+        else:
+            _logger.error(f"manage_fee_detail.date_payment为空，请确认！manage_fee_detail.id={fee_maintenance.id}")
+
+    return in_fee_info
+
+
 class EstateLeaseContractPropertyDailyStatus(models.Model):
     _name = "estate.lease.contract.property.daily.status"
     _description = "资产出租每日状态"
@@ -394,8 +446,27 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
         return in_fee_info
 
     # 物业费
-    def calc_fee_maintenance_info(self, in_contract_id, in_property_id, in_date, in_fee_info):
+    def calc_fee_maintenance_info(self, in_contract_id, in_property_id, in_date, in_fee_info, in_contract):
 
+        # 物业费的应收和实收，根据租金方案设置中的是including_management_fee来决定
+        # 到底来自 estate.lease.contract.property.manage.fee.detail 还是来自 estate.lease.contract.property.fee.maintenance
+        # 如果存在物业费明细：in_property_id.manage_fee_details，那说明租金方案 not including_management_fee,那么应收来自这里，
+        # 还要注意合同中每个property的租金方案including_management_fee设置可能不一样
+
+        # manage_fee_details = self.env["estate.lease.contract.property.manage.fee.detail"].search(
+        #     [('contract_id', '=', in_contract_id), ('property_id', '=', in_property_id)])
+        property_in_manage_fee_detail = False
+        for manage_fee_detail in in_contract.manage_fee_details:
+            if manage_fee_detail.property_id.id != in_property_id:
+                continue
+            in_fee_info = _cal_manage_fee_detail(manage_fee_detail, in_date, in_fee_info)
+            property_in_manage_fee_detail = True
+
+        # 如果in_property_id已经在manage_fee_detail了，就不用重复统计其直接在租赁标的-合同-租金方案历史关系弹出页设置的物业费实收了
+        if property_in_manage_fee_detail:
+            return in_fee_info
+
+        # 如果in_property_id没在manage_fee_detail里，就统计如下信息
         maintenance_details = self.env["estate.lease.contract.property.fee.maintenance"].search(
             [('contract_id', '=', in_contract_id), ('property_id', '=', in_property_id)])
 
@@ -658,7 +729,7 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                                 contract.id, each_property.id, record_status_date, fee_electricity_maintenance_info)
                             # 物业费收取情况
                             fee_maintenance_info = self.calc_fee_maintenance_info(
-                                contract.id, each_property.id, record_status_date, fee_maintenance_info)
+                                contract.id, each_property.id, record_status_date, fee_maintenance_info, contract)
 
                     if record_contract_id:
                         record_contract_id_id = record_contract_id.id
@@ -694,7 +765,7 @@ class EstateLeaseContractPropertyDailyStatus(models.Model):
                             contract.id, each_property.id, record_status_date, fee_electricity_maintenance_info)
                         # 无效合同中，在过去尚有效期间的物业费收取情况
                         fee_maintenance_info = self.calc_fee_maintenance_info(
-                            contract.id, each_property.id, record_status_date, fee_maintenance_info)
+                            contract.id, each_property.id, record_status_date, fee_maintenance_info, contract)
 
                     self.env['estate.lease.contract.property.daily.status'].create({
                         'name': record_name,

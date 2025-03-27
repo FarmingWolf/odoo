@@ -1,47 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="estate_lease_contract_property_rental_detail_action" model="ir.actions.act_window">
-        <field name="name">租金明细</field>
-        <field name="res_model">estate.lease.contract.property.rental.detail</field>
-        <field name="view_id" ref="estate_lease_contract_property_rental_detail_view_tree"/>
-        <field name="view_mode">tree,form</field>
-        <field name="context">{
-            }
-        </field>
-        <field name="domain">[('active', '=', True), ('contract_state', 'in', ('released', 'to_be_released'))]</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                这里显示资产租赁合同各期租金明细。
-            </p>
-        </field>
-    </record>
-
-    <record id="estate_lease_contract_property_rental_detail_view_tree" model="ir.ui.view">
-        <field name="name">estate.lease.contract.property.rental.detail.tree</field>
-        <field name="model">estate.lease.contract.property.rental.detail</field>
+    <record id="estate_lease_contract_property_manage_fee_detail_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.manage.fee.detail.tree</field>
+        <field name="model">estate.lease.contract.property.manage.fee.detail</field>
         <field name="arch" type="xml">
-            <tree string="estate_lease_contract_property_rental_detail_view_tree"
+            <tree string="estate_lease_contract_property_manage_fee_detail_view_tree"
                   create="context.get('contract_read_only')" delete="context.get('contract_read_only')"
                   edit="context.get('contract_read_only')"
-                  decoration-info="edited and (rental_received &lt; 0.01) and (date_payment &gt;= (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d'))"
-                  decoration-muted="rental_amount &lt; 0.01 and rental_receivable &lt; 0.01"
-                  decoration-danger="((date_payment &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')) and rental_received &lt; 0.01 and rental_amount &gt;= 0.01 and rental_receivable &gt; 0.01) or (rental_received &gt;= 0.01 and rental_receivable - rental_received &gt;= 0.01)"
-                  decoration-warning="(rental_amount - rental_receivable &gt;= 0.01) or (rental_receivable - rental_amount &gt;= 0.01)"
-                  decoration-success="rental_received &gt; 0 and (rental_received == rental_receivable or rental_received - rental_receivable &gt;= 0 or rental_receivable - rental_received &lt; 0.01)">
+                  decoration-info="edited and (manage_fee_received &lt; 0.01) and (date_payment &gt;= (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d'))"
+                  decoration-muted="manage_fee_amount &lt; 0.01 and manage_fee_receivable &lt; 0.01"
+                  decoration-danger="((date_payment &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')) and manage_fee_received &lt; 0.01 and manage_fee_amount &gt;= 0.01 and manage_fee_receivable &gt; 0.01) or (manage_fee_received &gt;= 0.01 and manage_fee_receivable - manage_fee_received &gt;= 0.01)"
+                  decoration-warning="(manage_fee_amount - manage_fee_receivable &gt;= 0.01) or (manage_fee_receivable - manage_fee_amount &gt;= 0.01)"
+                  decoration-success="manage_fee_received &gt; 0 and (manage_fee_received == manage_fee_receivable or manage_fee_received - manage_fee_receivable &gt;= 0 or manage_fee_receivable - manage_fee_received &lt; 0.01)">
                 <field name="edited" column_invisible="1"/>
                 <field name="contract_id" column_invisible="1"/>
                 <field name="button_icon_invisible" column_invisible="1"/>
                 <field name="property_id"/>
                 <field name="renter_id"/>
-                <field name="rental_period_no"/>
+                <field name="manage_fee_period_no"/>
                 <field name="period_date_from"/>
                 <field name="period_date_to"/>
                 <field name="period_days" sum="总计天数"/>
                 <field name="date_payment"/>
-                <field name="rental_amount" digits="[12, 2]" sum="总计租金"/>
+                <field name="manage_fee_amount" digits="[12, 2]" sum="总计租金"/>
                 <field name="incentive_amount" digits="[12, 2]" sum="总计优惠"/>
                 <field name="incentive_days" digits="[12, 0]" sum="总计优惠天数"/>
-                <field name="rental_receivable" digits="[12, 2]" sum="总计应收"/>
+                <field name="manage_fee_receivable" digits="[12, 2]" sum="总计应收"/>
                 <field name="days_receivable" digits="[12, 0]" sum="总计应收天数"/>
                 <button type="object" name="action_show_button_icons" title="切换操作按钮" icon="oi-studio"/>
                 <button type="object" name="action_round" context="{'round_method': 'up2hundred', 'method_msg': '上取整至百位'}"
@@ -80,25 +64,26 @@
                         title="下取整至个位" icon="fa-arrow-down" groups="estate_lease_contract.estate_lease_contract_group_manager"
                         column_invisible="button_icon_invisible"
                         help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
-                <field name="rental_received" digits="[12, 2]" sum="总计实收"/>
+                <field name="manage_fee_received" digits="[12, 2]" sum="总计实收"/>
                 <button type="object" name="action_confirm_received" title="点击确认本期租金已收齐（等于本期应收）" icon="fa-thumbs-o-up"
                         groups="estate_lease_contract.estate_lease_contract_group_manager" help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
-                <field name="rental_received_2_date"/>
+                <field name="manage_fee_received_2_date"/>
                 <field name="days_received" digits="[12, 0]" sum="总计实收天数"/>
-                <field name="rental_arrears" digits="[12, 2]" sum="总计欠缴金额"/>
+                <field name="manage_fee_arrears" digits="[12, 2]" sum="总计欠缴金额"/>
                 <field name="days_arrears" digits="[12, 0]" sum="总计欠缴天数"/>
                 <field name="description"/>
             </tree>
         </field>
     </record>
 
-    <record id="estate_lease_contract_property_rental_detail_view_form" model="ir.ui.view">
-        <field name="name">estate.lease.contract.property.rental.detail.form</field>
-        <field name="model">estate.lease.contract.property.rental.detail</field>
+    <record id="estate_lease_contract_property_manage_fee_detail_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.manage.fee.detail.form</field>
+        <field name="model">estate.lease.contract.property.manage.fee.detail</field>
         <field name="arch" type="xml">
-            <form string="estate_lease_contract_property_rental_detail_view_form"
+            <form string="estate_lease_contract_property_manage_fee_detail_view_form"
                   create="context.get('contract_read_only')" delete="context.get('contract_read_only')"
                   edit="context.get('contract_read_only')">
+                <field name="manage_fee_detail_sub_ids_editable" invisible="1"/>
                 <sheet>
                     <group col="4">
                         <group>
@@ -108,7 +93,7 @@
                             <field name="property_id" readonly="1"/>
                         </group>
                         <group>
-                            <field name="rental_period_no"/>
+                            <field name="manage_fee_period_no"/>
                         </group>
                         <group>
                             <field name="edited_display" readonly="1" string=""/>
@@ -130,10 +115,10 @@
                     </group>
                     <group col="2">
                         <group>
-                            <field name="rental_amount" digits="[12, 2]"/>
+                            <field name="manage_fee_amount" digits="[12, 2]"/>
                         </group>
                         <group>
-                            <field name="rental_amount_zh" readonly="1"/>
+                            <field name="manage_fee_amount_zh" readonly="1"/>
                         </group>
                     </group>
                     <group col="2">
@@ -146,7 +131,7 @@
                     </group>
                     <group col="2">
                         <group>
-                            <field name="rental_receivable" digits="[12, 2]"/>
+                            <field name="manage_fee_receivable" digits="[12, 2]"/>
                         </group>
                         <group>
                             <field name="days_receivable" digits="[12, 0]"/>
@@ -154,37 +139,40 @@
                     </group>
                     <group col="2">
                         <group>
-                            <field name="rental_received" digits="[12, 2]"/>
+                            <field name="manage_fee_received" digits="[12, 2]"/>
                         </group>
                         <group>
                             <group>
                                 <field name="days_received" digits="[12, 0]"/>
                             </group>
                             <group>
-                                <field name="rental_received_2_date"/>
+                                <field name="manage_fee_received_2_date"/>
                             </group>
                         </group>
                     </group>
                     <group>
                         <group/>
-                        <field name="rental_detail_sub_ids">
+                        <field name="manage_fee_detail_sub_ids" readonly="not manage_fee_detail_sub_ids_editable">
                             <tree string="分次缴费明细" create="1" delete="1" edit="1" import="0" editable="bottom">
                                 <field name="date_received"/>
-                                <field name="rental_received" digits="[12, 2]"/>
-                                <field name="rental_received_sum" digits="[12, 2]"/>
-                                <field name="rental_arrears" digits="[12, 2]"/>
+                                <field name="maintenance_received" digits="[12, 2]"/>
+                                <field name="maintenance_received_sum" digits="[12, 2]"/>
+                                <field name="maintenance_arrears" digits="[12, 2]"/>
                                 <field name="days_received" digits="[12, 0]"/>
                                 <field name="days_received_sum" digits="[12, 0]"/>
                                 <field name="days_arrears" digits="[12, 0]"/>
-                                <field name="rental_received_2_date"/>
-                                <field name="rental_receipt"/>
-                                <field name="rental_receipt_evidence" invisible="not rental_receipt" placeholder="可录发票号、粘贴照片等"/>
+                                <field name="maintenance_received_2_date"/>
+                                <field name="maintenance_receipt"/>
+                                <field name="maintenance_receipt_evidence" invisible="not maintenance_receipt" placeholder="可录发票号、粘贴照片等"/>
                             </tree>
                         </field>
+                        <div invisible="manage_fee_detail_sub_ids_editable" class="alert alert-warning" role="alert">
+                            <span>在合同发布生效之后方可录入物业费实收数据</span>
+                        </div>
                     </group>
                     <group col="2">
                         <group>
-                            <field name="rental_arrears" digits="[12, 2]" readonly="1"/>
+                            <field name="manage_fee_arrears" digits="[12, 2]" readonly="1"/>
                         </group>
                         <group>
                             <field name="days_arrears" digits="[12, 0]"/>
@@ -209,18 +197,18 @@
         </field>
     </record>
 
-    <record id="estate_lease_contract_property_rental_detail_reminder_tree" model="ir.ui.view">
-        <field name="name">租金催缴明细</field>
-        <field name="model">estate.lease.contract.property.rental.detail</field>
+    <record id="estate_lease_contract_property_manage_fee_detail_reminder_tree" model="ir.ui.view">
+        <field name="name">物业费催缴明细</field>
+        <field name="model">estate.lease.contract.property.manage.fee.detail</field>
         <field name="arch" type="xml">
-            <tree string="租金催缴明细"
+            <tree string="物业费催缴明细"
                   create="False" delete="False"
                   edit="context.get('contract_read_only')"
-                  decoration-info="edited and (rental_received &lt; 0.01) and (date_payment &gt;= (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d'))"
-                  decoration-muted="rental_amount &lt; 0.01 and rental_receivable &lt; 0.01"
-                  decoration-danger="((date_payment &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')) and rental_received &lt; 0.01 and rental_amount &gt;= 0.01 and rental_receivable &gt; 0.01) or (rental_received &gt;= 0.01 and rental_receivable - rental_received &gt;= 0.01)"
-                  decoration-warning="(rental_amount - rental_receivable &gt;= 0.01) or (rental_receivable - rental_amount &gt;= 0.01)"
-                  decoration-success="rental_received &gt; 0 and (rental_received == rental_receivable or rental_received - rental_receivable &gt;= 0 or rental_receivable - rental_received &lt; 0.01)">
+                  decoration-info="edited and (manage_fee_received &lt; 0.01) and (date_payment &gt;= (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d'))"
+                  decoration-muted="manage_fee_amount &lt; 0.01 and manage_fee_receivable &lt; 0.01"
+                  decoration-danger="((date_payment &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')) and manage_fee_received &lt; 0.01 and manage_fee_amount &gt;= 0.01 and manage_fee_receivable &gt; 0.01) or (manage_fee_received &gt;= 0.01 and manage_fee_receivable - manage_fee_received &gt;= 0.01)"
+                  decoration-warning="(manage_fee_amount - manage_fee_receivable &gt;= 0.01) or (manage_fee_receivable - manage_fee_amount &gt;= 0.01)"
+                  decoration-success="manage_fee_received &gt; 0 and (manage_fee_received == manage_fee_receivable or manage_fee_received - manage_fee_receivable &gt;= 0 or manage_fee_receivable - manage_fee_received &lt; 0.01)">
                 <field name="edited" column_invisible="1"/>
                 <field name="contract_state" column_invisible="1"/>
                 <field name="button_icon_invisible" column_invisible="1"/>
@@ -228,15 +216,15 @@
                 <field name="renter_id"/>
                 <field name="renter_id_phone"/>
                 <field name="renter_id_mobile"/>
-                <field name="rental_period_no"/>
+                <field name="manage_fee_period_no"/>
                 <field name="period_date_from"/>
                 <field name="period_date_to"/>
                 <field name="period_days" sum="总计天数"/>
                 <field name="date_payment"/>
-                <field name="rental_amount" digits="[12, 2]" sum="总计租金"/>
+                <field name="manage_fee_amount" digits="[12, 2]" sum="总计物业费"/>
                 <field name="incentive_amount" digits="[12, 2]" sum="总计优惠"/>
                 <field name="incentive_days" digits="[12, 0]" sum="优惠天数"/>
-                <field name="rental_receivable" digits="[12, 2]" sum="总计应收"/>
+                <field name="manage_fee_receivable" digits="[12, 2]" sum="总计应收"/>
                 <field name="days_receivable" digits="[12, 0]" sum="总计应收天数"/>
                 <button type="object" name="action_show_button_icons" title="切换操作按钮" icon="oi-studio"/>
                 <button type="object" name="action_round" context="{'round_method': 'up2hundred', 'method_msg': '上取整至百位'}"
@@ -275,43 +263,43 @@
                         title="下取整至个位" icon="fa-arrow-down" groups="estate_lease_contract.estate_lease_contract_group_manager"
                         column_invisible="button_icon_invisible"
                         help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
-                <field name="rental_received" digits="[12, 2]" sum="总计实收"/>
-                <button type="object" name="action_confirm_received" title="点击确认本期租金已收齐（等于本期应收）" icon="fa-thumbs-o-up"
+                <field name="manage_fee_received" digits="[12, 2]" sum="总计实收"/>
+                <button type="object" name="action_confirm_received" title="点击确认本期物业费已收齐（等于本期应收）" icon="fa-thumbs-o-up"
                         groups="estate_lease_contract.estate_lease_contract_group_manager"
                         help="点击后，如需撤销，请进入详情页面根据修改备注将相应字段修改回原值并保存"/>
-                <field name="rental_received_2_date"/>
+                <field name="manage_fee_received_2_date"/>
                 <field name="days_received" digits="[12, 0]" sum="总计实收天数"/>
-                <field name="rental_arrears" digits="[12, 2]" sum="总计欠缴金额"/>
+                <field name="manage_fee_arrears" digits="[12, 2]" sum="总计欠缴金额"/>
                 <field name="days_arrears" digits="[12, 0]" sum="总计欠缴天数"/>
             </tree>
         </field>
     </record>
 
-    <record id="estate_lease_contract_property_rental_detail_reminder_action" model="ir.actions.act_window">
-        <field name="name">租金催缴</field>
-        <field name="res_model">estate.lease.contract.property.rental.detail</field>
+    <record id="estate_lease_contract_property_manage_fee_detail_reminder_action" model="ir.actions.act_window">
+        <field name="name">物业费催缴</field>
+        <field name="res_model">estate.lease.contract.property.manage.fee.detail</field>
         <field name="views">[False, "tree"]</field>
-        <field name="view_id" ref="estate_lease_contract_property_rental_detail_reminder_tree"/>
+        <field name="view_id" ref="estate_lease_contract_property_manage_fee_detail_reminder_tree"/>
         <field name="view_mode">tree,form,kanban</field>
         <field name="context">{
             'search_default_date_payment_2_this_month': True,
-            'search_default_is_rental_arrears': True,
+            'search_default_is_manage_fee_arrears': True,
             }
         </field>
         <field name="domain">[('active', '=', True), ('contract_state', '=', 'released')]
         </field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                近期代缴费租金明细
+                近期代缴费物业费明细
             </p>
         </field>
     </record>
 
-    <record id="estate_lease_contract_property_rental_detail_view_search" model="ir.ui.view">
-        <field name="name">estate.lease.contract.property.rental.detail.view.search</field>
-        <field name="model">estate.lease.contract.property.rental.detail</field>
+    <record id="estate_lease_contract_property_manage_fee_detail_view_search" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.manage.fee.detail.view.search</field>
+        <field name="model">estate.lease.contract.property.manage.fee.detail</field>
         <field name="arch" type="xml">
-            <search string="租金检索">
+            <search string="物业费检索">
                 <filter string="支付月份" name="date_payment_month" date="date_payment"/>
                 <separator/>
                 <filter string="截至本日" name="date_payment_2_today"
@@ -331,14 +319,29 @@
                         domain="[('date_payment', '&gt;=', (context_today() + relativedelta(months=2, day=1)).strftime('%Y-%m-%d')),
                         ('date_payment', '&lt;', (context_today() + relativedelta(months=3, day=1)).strftime('%Y-%m-%d'))]"/>
                 <separator/>
-                <filter string="有欠缴" name="is_rental_arrears" domain="[('rental_arrears', '&gt;=', 0.01)]"/>
-                <filter string="无欠缴" name="no_rental_arrears" domain="[('rental_arrears', '&lt;', 0.01)]"/>
+                <filter string="有欠缴" name="is_manage_fee_arrears" domain="[('manage_fee_arrears', '&gt;=', 0.01)]"/>
+                <filter string="无欠缴" name="no_manage_fee_arrears" domain="[('manage_fee_arrears', '&lt;', 0.01)]"/>
                 <separator/>
                 <field string='租赁标的名称' name="property_id"/>
                 <searchpanel>
                     <field string='承租人文件夹' name="renter_id" context="{'group_by': 'property_id'}"/>
                 </searchpanel>
             </search>
+        </field>
+    </record>
+    <record id="estate_lease_contract_property_manage_fee_detail_action" model="ir.actions.act_window">
+        <field name="name">物业费明细</field>
+        <field name="res_model">estate.lease.contract.property.manage.fee.detail</field>
+        <field name="view_id" ref="estate_lease_contract_property_manage_fee_detail_view_tree"/>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{
+            }
+        </field>
+        <field name="domain">[('active', '=', True), ('contract_state', 'in', ('released', 'to_be_released'))]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                这里显示资产租赁合同各期物业费明细。
+            </p>
         </field>
     </record>
 

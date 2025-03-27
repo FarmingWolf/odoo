@@ -142,6 +142,7 @@
                                     <field name="maintenance_receipt_evidence" invisible="not maintenance_receipt" placeholder="可录发票号、粘贴照片等"/>
                                 </tree>
                             </field>
+                            <field name="fee_maintenance_err_msg" invisible="not fee_maintenance_err_msg" nolabel="1" class="alert alert-warning" role="alert"/>
                         </page>
                         <page string="房产税">
                             <field name="contract_property_tax_ids" nolabel="1">

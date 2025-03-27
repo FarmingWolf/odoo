@@ -18,7 +18,9 @@ from . import estate_lease_contract_rental_business_type
 from . import estate_lease_contract_rental_main_category
 from . import estate_lease_contract_rental_turnover_percentage
 from . import estate_lease_contract_rental_period_percentage
+from . import estate_lease_contract_management_fee_period_percentage
 from . import estate_lease_contract_property_management_fee_plan
+from . import estate_lease_contract_property_manage_fee_detail
 from . import estate_lease_contract_rental_plan
 from . import estate_lease_contract_property_deposit
 from . import estate_lease_contract_property_tax

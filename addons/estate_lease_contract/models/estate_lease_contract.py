@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import io
 import logging
+import uuid
 import zipfile
 from datetime import timedelta, datetime, date
 import random
@@ -124,6 +125,27 @@ def _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property
     return rental_amount
 
 
+def _cal_manage_fee_amount(month_cnt, current_s, current_e, date_s, date_e, property_id, manage_fee_price_adapt,
+                           manage_fee_amount_monthly_adapt):
+    """
+    物业费计算方法：先计算年物业费，再计算每月物业费和每期物业费
+    年物业费=物业费单价×计租面积×365
+    月物业费=年物业费÷12
+    两个月物业费=月物业费×2
+    三个月物业费=月物业费×3
+    以此类推
+    """
+    manage_fee_amount_month = manage_fee_amount_monthly_adapt
+
+    if date_e > current_e:
+        manage_fee_amount = manage_fee_amount_month * month_cnt
+    else:  # 最后一期物业费
+        manage_fee_amount = _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, property_id,
+                                                    manage_fee_price_adapt, manage_fee_amount_monthly_adapt)
+
+    return manage_fee_amount
+
+
 def _get_current_e(current_tmp):
     if current_tmp.day == 1:  # 本月1号至月末
         current_e = (current_tmp.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)
@@ -147,6 +169,18 @@ def _cal_rent_price_and_amount_monthly_val(current_s, rent_price_period_lst):
                 f"适配单价{rent_price_period.get('rent_price_adapt')}")
             return rent_price_period.get('rent_amount_adapt'), rent_price_period.get('rent_price_adapt')
     raise UserWarning(f'租金适配期间出错：当前日期：{current_s}，租金适配表{rent_price_period_lst}')
+
+
+def _cal_management_fee_price_and_amount_monthly_val(current_s, manage_fee_price_period_lst):
+    for manage_fee_price_period in manage_fee_price_period_lst:
+        if manage_fee_price_period.get('period_from') <= current_s <= manage_fee_price_period.get('period_to'):
+            _logger.info(
+                f"当前日期：{current_s}，"
+                f"租金适配{manage_fee_price_period.get('manage_fee_amount_adapt')}, "
+                f"适配单价{manage_fee_price_period.get('manage_fee_price_adapt')}")
+            return manage_fee_price_period.get(
+                'manage_fee_amount_adapt'), manage_fee_price_period.get('manage_fee_price_adapt')
+    raise UserWarning(f'物业费适配期间出错：当前日期：{current_s}，物业费适配表{manage_fee_price_period_lst}')
 
 
 def _prepare_rent_price_period_lst(property_id, rent_amount_monthly_val, rental_plan, record_self):
@@ -220,7 +254,7 @@ def _prepare_rent_price_period_lst(property_id, rent_amount_monthly_val, rental_
                                                       record_self.date_rent_end) + timedelta(days=1)
                     next_date_s_or_total_end = min(record_self.date_rent_end, next_date_s)
 
-                while temp_date_s < next_date_s_or_total_end:
+                while temp_date_s <= next_date_s_or_total_end:
                     # 本条规则的结束日的最大值
                     this_period_e_max = min(record_self.date_rent_end, next_date_s - timedelta(days=1))
 
@@ -247,6 +281,114 @@ def _prepare_rent_price_period_lst(property_id, rent_amount_monthly_val, rental_
 
                     rtn_lst.append(period_data)
                     temp_date_s = temp_date_e + timedelta(days=1)
+
+        return rtn_lst  # todo 非期间段递增的情况，也按照固定金额走
+
+    else:  # todo 其他情况暂且按照固定金额走
+        return rtn_lst
+
+
+def _prepare_manage_fee_price_period_lst(property_id, manage_fee_amount_monthly_val, management_fee_plan, record_self):
+    """
+    根据物业费方案、计租开始日、计租结束日计算各期间的适配物业费
+    [
+        {资产ID, 基础月费, 基础单价, 计费方式, 递进方式, 从第N月起, 每X个月, 递增百分比,
+        适配后月费, 适配后单价, 期间开始日期, 期间结束日期}
+    ]
+    """
+    # 默认固定金额的方式
+    rtn_lst = [{'property_id': property_id,
+                'manage_fee_amount_monthly_val': manage_fee_amount_monthly_val,
+                'manage_fee_price_val': management_fee_plan.property_management_fee_price,
+                'billing_method': "固定" if management_fee_plan.billing_progress_method_id == "no_progress" else "有递增",
+                'progress_method': False, 'from_n_month': False, 'every_x_month': False, 'up_percentage': 0,
+                'manage_fee_amount_adapt': manage_fee_amount_monthly_val,
+                'manage_fee_price_adapt': management_fee_plan.property_management_fee_price,
+                'period_from': management_fee_plan.date_start,
+                'period_to': record_self.date_rent_end}]
+    _logger.info(f'先设置默认的固定金额模式={rtn_lst}')
+
+    if management_fee_plan.billing_progress_method_id == 'no_progress':
+        return rtn_lst
+    elif management_fee_plan.billing_progress_method_id == 'by_period':
+        if not management_fee_plan.period_percentage_id:
+            return rtn_lst
+
+        rtn_lst = []
+
+        for i in range(len(management_fee_plan.period_percentage_id)):
+            period_percentage = management_fee_plan.period_percentage_id[i]
+
+            if i == 0:
+                # 从开始日到”第N月“之间，还是初始利率
+
+                temp_date_e = _get_period_total_e(management_fee_plan.date_start,
+                                                  period_percentage.billing_progress_info_month_from - 1,
+                                                  record_self.date_rent_end)
+                period_data = {
+                    'property_id': property_id,
+                    'manage_fee_amount_monthly_val': manage_fee_amount_monthly_val,
+                    'manage_fee_price_val': management_fee_plan.property_management_fee_price,
+                    'billing_method': "固定金额"
+                    if management_fee_plan.billing_progress_method_id == "no_progress" else "有递增",
+                    'progress_method': management_fee_plan.billing_progress_method_id,
+                    'from_n_month': period_percentage.billing_progress_info_month_from,
+                    'every_x_month': period_percentage.billing_progress_info_month_every,
+                    'up_percentage': period_percentage.billing_progress_info_up_percentage,
+                    'manage_fee_amount_adapt': manage_fee_amount_monthly_val,
+                    'manage_fee_price_adapt': management_fee_plan.property_management_fee_price,
+                    'period_from': management_fee_plan.date_start,
+                    'period_to': temp_date_e}
+                _logger.info(f"第一个无增期间={period_data}")
+                rtn_lst.append(period_data)
+                _logger.info(f"第一个无增期间lst={rtn_lst}")
+                if temp_date_e >= record_self.date_rent_end:
+                    return rtn_lst
+
+            # 这才开始进入第一条递增期间
+            temp_date_s = temp_date_e + timedelta(days=1)
+
+            next_date_s_or_total_end = record_self.date_rent_end
+
+            next_date_s = next_date_s_or_total_end + timedelta(days=1)  # 这只是虚拟值，最后一行才用得上
+            # 看看有没有下一条递增率规则
+            if i < len(management_fee_plan.period_percentage_id) - 1:
+                next_period_percentage = management_fee_plan.period_percentage_id[i + 1]
+                # 下一条规则的开始日
+                next_date_s = _get_period_total_e(management_fee_plan.date_start,
+                                                  next_period_percentage.billing_progress_info_month_from - 1,
+                                                  record_self.date_rent_end) + timedelta(days=1)
+                next_date_s_or_total_end = min(record_self.date_rent_end, next_date_s)
+
+            while temp_date_s <= next_date_s_or_total_end:
+                # 本条规则的结束日的最大值
+                this_period_e_max = min(record_self.date_rent_end, next_date_s - timedelta(days=1))
+
+                temp_date_e = _get_period_total_e(temp_date_s,
+                                                  period_percentage.billing_progress_info_month_every,
+                                                  this_period_e_max)
+                # 上一条的适配后租金是本条的基础租金
+                base_manage_fee_amount_monthly_val = rtn_lst[len(rtn_lst) - 1].get('manage_fee_amount_adapt')
+                base_manage_fee_price = rtn_lst[len(rtn_lst) - 1].get('manage_fee_price_adapt')
+                period_data = {'property_id': property_id,
+                               'manage_fee_amount_monthly_val': base_manage_fee_amount_monthly_val,
+                               'manage_fee_price_val': base_manage_fee_price,
+                               'billing_method':
+                                   "固定金额" if management_fee_plan.billing_progress_method_id == "no_progress"
+                                   else "有递增",
+                               'progress_method': management_fee_plan.billing_progress_method_id,
+                               'from_n_month': period_percentage.billing_progress_info_month_from,
+                               'every_x_month': period_percentage.billing_progress_info_month_every,
+                               'up_percentage': period_percentage.billing_progress_info_up_percentage,
+                               'manage_fee_amount_adapt': base_manage_fee_amount_monthly_val * (
+                                       1 + (period_percentage.billing_progress_info_up_percentage / 100)),
+                               'manage_fee_price_adapt': base_manage_fee_price * (
+                                       1 + (period_percentage.billing_progress_info_up_percentage / 100)),
+                               'period_from': temp_date_s,
+                               'period_to': temp_date_e}
+
+                rtn_lst.append(period_data)
+                temp_date_s = temp_date_e + timedelta(days=1)
 
         return rtn_lst  # todo 非期间段递增的情况，也按照固定金额走
 
@@ -370,6 +512,88 @@ def _generate_details_from_rent_plan(record_self):
     record_self.lease_deposit = temp_deposit_amount
 
     return rental_periods_details
+
+
+def _generate_details_from_management_fee_plan_plan(record_self):
+    """
+    一个租赁标的最多有一个物业费方案（当租金方案中选择了包含物业费，则该租赁标的无物业费方案），
+    一个物业费方案生成多条物业费明细
+    租赁期间→支付周期→支付日类型→支付日期→期数→计费方式（固定？抽成？递增？取高？）→每期支付金额
+    """
+    # 前边已经判断过，这里不用重复判断self
+    # 根据租赁期间、支付周期、支付日期类型生成支付期
+    manage_fee_periods_details = []
+
+    date_e = fields.Date.from_string(record_self.date_rent_end)
+    # 根据property去找manage_fee_plan
+    temp_manage_fee_amount = 0.0
+    temp_manage_fee_amount_year = 0.0
+    # 必须从contract→property→物业费方案→明细的顺序
+    for property_id in record_self.property_ids:
+        if property_id.management_fee_plan_id:
+            management_fee_plan = property_id.management_fee_plan_id
+        else:
+            continue
+
+        date_s = fields.Date.from_string(management_fee_plan.date_start)
+
+        month_cnt = int(management_fee_plan.payment_period) if management_fee_plan.payment_period else 1
+
+        manage_fee_amount_monthly_val = management_fee_plan.property_management_fee_price_monthly
+        # 预备出当前资产的物业费方案的物业费适配期间
+        manage_fee_price_period_lst = _prepare_manage_fee_price_period_lst(property_id, manage_fee_amount_monthly_val,
+                                                                           management_fee_plan, record_self)
+        _logger.info(f"manage_fee_price_period_lst={manage_fee_price_period_lst}")
+
+        current_s = date_s
+        period_no = 1
+        while current_s <= date_e:
+            # 计算本期结束日
+            current_e = _get_period_total_e(current_s, month_cnt, date_e)
+
+            manage_fee_amount_monthly_adapt, manage_fee_price_adapt = \
+                _cal_management_fee_price_and_amount_monthly_val(current_s, manage_fee_price_period_lst)
+            _logger.info(f"{period_no}期-月租={manage_fee_amount_monthly_adapt}，单价={manage_fee_price_adapt}")
+            # 计算支付日期
+            date_payment = _cal_date_payment(current_s, current_e, management_fee_plan, date_e)
+            billing_method_str = "固定" if management_fee_plan.billing_progress_method_id == "no_progress" else "有递增"
+            payment_date_str = dict(management_fee_plan._fields[
+                                        'payment_date'].selection).get(management_fee_plan.payment_date)
+            manage_fee_amount = _cal_manage_fee_amount(month_cnt, current_s, current_e, date_s, date_e, property_id,
+                                                       manage_fee_price_adapt, manage_fee_amount_monthly_adapt)
+            manage_fee_amount_zh = Utils.arabic_to_chinese(round(manage_fee_amount, 2))
+
+            manage_fee_periods_details.append({
+                'contract_id': f"{record_self.id}",
+                'property_id': f"{property_id.id}",
+                'period_date_from': f"{current_s.strftime('%Y-%m-%d')}",
+                'period_date_to': f"{current_e.strftime('%Y-%m-%d')}",
+                'date_payment': date_payment,
+                'manage_fee_amount': f"{manage_fee_amount}",
+                'manage_fee_receivable': f"{manage_fee_amount}",  # 创建时，应收=租金计算值
+                'manage_fee_amount_zh': f"{manage_fee_amount_zh}",
+                'manage_fee_period_no': f"{period_no}",
+                'description': f"{management_fee_plan.name}-{billing_method_str}-{property_id.latest_payment_method}-"
+                               f"{payment_date_str}",
+                'active': True,
+                'edited': False,
+            })
+
+            # 下期开始日
+            current_s = current_e + timedelta(days=1)
+            period_no += 1
+
+        temp_manage_fee_amount += manage_fee_amount_monthly_val  # 这里还是显示基础月租
+        temp_manage_fee_amount_year += manage_fee_amount_monthly_val * 12
+
+        _logger.info(f"{management_fee_plan.name}.manage_fee_periods={manage_fee_periods_details}")
+        _logger.info(f"temp_rent_amount={temp_manage_fee_amount}")
+        _logger.info(f"temp_rent_amount_year={temp_manage_fee_amount_year}")
+
+    record_self.manage_fee_amount = temp_manage_fee_amount
+    record_self.manage_fee_amount_year = temp_manage_fee_amount_year
+
+    return manage_fee_periods_details
 
 
 class Partner(models.Model):
@@ -514,6 +738,7 @@ class EstateLeaseContract(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _mail_post_access = 'read'
 
+    tmp_ref = fields.Char(string='Temporary Reference', copy=False, default=lambda self: self._get_contract_uuid())
     name = fields.Char('合同名称', required=True, translate=True, copy=True,
                        default=lambda self: self._get_default_name())
     party_a_unit_id = fields.Many2one(comodel_name="estate.lease.contract.party.a.unit", string="甲方",
@@ -549,6 +774,9 @@ class EstateLeaseContract(models.Model):
         if self.date_sign > self.date_start:
             self.date_start = self.date_sign
 
+        if request and request.session:
+            request.session['contract_date_sign_4_management_fee'] = self.date_sign
+
     @api.onchange("date_start")
     def _onchange_date_start(self):
         if self.date_start < self.date_sign:
@@ -556,12 +784,18 @@ class EstateLeaseContract(models.Model):
         if self.date_start > self.date_rent_start:
             self.date_rent_start = self.date_start
 
+        if request and request.session:
+            request.session['contract_date_start_4_management_fee'] = self.date_start
+
     @api.onchange("date_rent_start")
     def _onchange_date_rent_start(self):
         if self.date_rent_start < self.date_start:
             self.date_start = self.date_rent_start
         if self.date_rent_start > self.date_rent_end:
             self.date_rent_end = self.date_rent_start
+
+        if request and request.session:
+            request.session['contract_date_rent_start_4_management_fee'] = self.date_rent_start
 
     @api.onchange("date_rent_end")
     def _onchange_date_rent_end(self):
@@ -619,20 +853,17 @@ class EstateLeaseContract(models.Model):
                 self._context = dict(self.env.context, default_contract_id=record._id, default_contract_exist=True)
             else:
                 self._context = dict(self.env.context, default_contract_id=None, default_contract_exist=False)
-
-    @api.model
-    def default_get(self, fields_list):
-        print(f"合同管理模型：default_get self._id=【{self._id}】")
-        res = super(EstateLeaseContract, self).default_get(fields_list)
-        for record in self:
-            _logger.info(f"合同管理模型：default_get record._id=【{record._id}】")
-            if self._context.get('active_id'):
-                # 当active_id存在时设置context
-                res['context'] = dict(self.env.context, default_contract_id=record._id, default_contract_exist=True)
-            else:
-                res['context'] = dict(self.env.context, default_contract_id=None, default_contract_exist=False)
-        return res
     """
+
+    # @api.model
+    # def default_get(self, fields_list):
+    #     tmp_uuid = str(uuid.uuid4())
+    #     _logger.info(f"合同管理模型:self.id={self.id};tmp_uuid={tmp_uuid}")
+    #     res = super().default_get(fields_list)
+    #     res['tmp_ref'] = tmp_uuid
+    #     return res
+    def _get_contract_uuid(self):
+        return str(uuid.uuid4())
 
     def _get_party_a_unit_id(self):
         return self.env['estate.lease.contract.party.a.unit'].search([('company_id', '=',
@@ -759,14 +990,51 @@ class EstateLeaseContract(models.Model):
 
     property_management_fee_plan_ids = fields.One2many("estate.lease.contract.property.management.fee.plan",
                                                        compute='_compute_property_management_fee_plan_ids',
+                                                       inverse_name='estate_lease_contract',
                                                        string="物业费方案", copy=True, tracking=True)
+    show_management_fee_page = fields.Boolean(string="显示物业费明细Tab页", default=False,
+                                              compute="_compute_show_management_fee_page")
 
-    @api.depends('property_ids')
+    @api.depends('property_ids', "date_sign", 'date_start', "date_rent_start")
     def _compute_property_management_fee_plan_ids(self):
         for record in self:
             management_fee_plans = self.env['estate.property'].search([('id', 'in', record.property_ids.ids)]).mapped(
                 'management_fee_plan_id')
             record.property_management_fee_plan_ids = management_fee_plans
+
+            # 排除页面上做了删除动作的租赁标的
+            _logger.debug(f"record.property_ids.ids={record.property_ids.ids}")
+            for manage_fee_plan in record.property_management_fee_plan_ids:
+                # 可能在合同页面修改了合同签订日期、合同开始日期、计租开始日期、计租结束日期
+                if manage_fee_plan.date_start_depending == "date_sign":
+                    if manage_fee_plan.date_start != record.date_sign:
+                        manage_fee_plan.date_start = record.date_sign
+                elif manage_fee_plan.date_start_depending == "date_start":
+                    if manage_fee_plan.date_start != record.date_start:
+                        manage_fee_plan.date_start = record.date_start
+                elif manage_fee_plan.date_start_depending == "date_rent_start":
+                    if manage_fee_plan.date_start != record.date_rent_start:
+                        manage_fee_plan.date_start = record.date_rent_start
+
+                _logger.debug(f"开始清理{manage_fee_plan.name}manage_fee_plan.rent_targets={manage_fee_plan.rent_targets.ids}")
+                tgt_keep = []
+                for rent_tgt in manage_fee_plan.rent_targets:
+                    _logger.debug(f"rent_tgt.id={rent_tgt.id}")
+                    tgt_id = rent_tgt._origin.id if isinstance(rent_tgt.id, models.NewId) else rent_tgt.id
+                    if tgt_id in record.property_ids.ids:
+                        tgt_keep.append(tgt_id)
+                _logger.debug(f"tgt_keep={tgt_keep}")
+                manage_fee_plan.rent_targets = tgt_keep
+
+    @api.depends('rental_plan_ids')
+    def _compute_show_management_fee_page(self):
+        is_show = False
+        for record in self:
+            for rental_plan in record.rental_plan_ids:
+                if not rental_plan.including_management_fee:
+                    is_show = True
+                    break
+            record.show_management_fee_page = is_show
 
     property_management_fee_account = fields.Many2one("estate.lease.contract.bank.account", string='物业费收缴账户名')
     property_management_fee_account_bank_name = fields.Char(
@@ -980,6 +1248,19 @@ class EstateLeaseContract(models.Model):
             record.lease_deposit_received = deposit_received_total
             record.lease_deposit_arrears = deposit_arrears_total
 
+    @api.depends("property_ids", "property_management_fee_plan_ids")
+    def _calc_manage_fee_total_info(self):
+        for record in self:
+            manage_fee_amount_total = 0
+            manage_fee_amount_year_total = 0
+
+            for management_fee_plan in record.property_management_fee_plan_ids:
+                manage_fee_amount_total += management_fee_plan.property_management_fee_price_monthly
+                manage_fee_amount_year_total += 12 * manage_fee_amount_total
+
+            record.manage_fee_amount = manage_fee_amount_total
+            record.manage_fee_amount_year = manage_fee_amount_year_total
+
     @api.depends("property_ids")
     def _calc_rent_tax_info(self):
         for record in self:
@@ -1013,6 +1294,11 @@ class EstateLeaseContract(models.Model):
     rent_first_period_from = fields.Date(string="首期租金期间（开始日）")
     rent_first_period_to = fields.Date(string="首期租金期间（结束日）")
     rent_first_payment_date = fields.Date(string="首期租金缴纳日")
+
+    manage_fee_amount = fields.Float(default=0.0, string="总物业费（元/月）", compute="_calc_manage_fee_total_info",
+                                     readonly=True)
+    manage_fee_amount_year = fields.Float(default=0.0, string="总年物业费（元/年）", compute="_calc_manage_fee_total_info",
+                                          readonly=True)
 
     contract_incentives_ids = fields.Many2one('estate.lease.contract.incentives', string='优惠方案', copy=False)
     date_incentives_start = fields.Char(string="优惠政策开始日期", readonly=True, compute="_get_incentives_info")
@@ -1127,6 +1413,10 @@ class EstateLeaseContract(models.Model):
     rental_details_archived = fields.One2many(comodel_name='estate.lease.contract.property.rental.detail',
                                               inverse_name='contract_id',
                                               string="租金明细(已归档)")
+
+    manage_fee_details = fields.One2many(comodel_name='estate.lease.contract.property.manage.fee.detail',
+                                         inverse_name='contract_id', store=True, compute='_compute_manage_fee_details',
+                                         string="物业费明细", readonly=False, copy=False)
 
     property_ini_img_ids = fields.One2many(comodel_name='estate.lease.contract.property.ini.state',
                                            inverse_name='contract_id', string="资产初始状态图",
@@ -1260,12 +1550,28 @@ class EstateLeaseContract(models.Model):
             _logger.info(f"searched rental_details={len(rent_details)}条")
             record.rental_details = rent_details
 
+    @api.depends("property_ids", "manage_fee_details")
+    def _compute_manage_fee_details(self):
+        # 把计算结果付回给manage_fee_details
+        for record in self:
+            tgt_id = record._origin.id if isinstance(record.id, models.NewId) else record.id
+            _logger.info(f"_compute_manage_fee_details called property_ids={record.property_ids.ids};contract={tgt_id}")
+            manage_fee_details = self.env['estate.lease.contract.property.manage.fee.detail'].search(
+                [('contract_id', '=', tgt_id), ('property_id', 'in', record.property_ids.ids)]).mapped('id')
+            _logger.info(f"searched manage_fee_details={len(manage_fee_details)}条")
+            record.manage_fee_details = manage_fee_details
+
     # 合同页面金额汇总标签页的刷新按钮动作
     def action_refresh_all_money(self):
         _logger.info(f"action_refresh_all_money called")
         self._compute_property_rental_detail_ids()
         self._compute_rental_details()
         self._compute_warn_msg()
+
+        self._compute_property_manage_fee_detail_ids()
+        self._compute_manage_fee_details()
+        self._compute_manage_fee_detail_warn_msg()
+
         self._compute_property_ini_img_ids()
 
     # 刷新租金方案
@@ -1277,6 +1583,7 @@ class EstateLeaseContract(models.Model):
     # 刷新物业费方案
     def action_refresh_management_fee_plan(self):
         self._compute_property_management_fee_plan_ids()
+        self.action_refresh_all_money()
 
     # 根据租期和租金方案计算租金明细
     @api.depends("property_ids", "date_rent_start", "date_rent_end", "rental_plan_ids")
@@ -1305,6 +1612,33 @@ class EstateLeaseContract(models.Model):
                         'edited': rental_detail['edited'],
                     })
 
+    # 根据租期和物业费方案计算物业费明细
+    @api.depends("property_ids", "date_rent_start", "date_rent_end", "property_management_fee_plan_ids")
+    def _compute_property_manage_fee_detail_ids(self):
+        for record in self:
+            if record.date_rent_start and record.date_rent_end and record.property_ids and record.property_management_fee_plan_ids:
+                generated_manage_fee_details = _generate_details_from_management_fee_plan_plan(record)
+                # 先删除旧纪录
+                _logger.info(f"删掉estate.lease.contract.property.manage.fee.detail中contract_id={record.id}的not edit记录")
+                self.env['estate.lease.contract.property.manage.fee.detail'].search(
+                    [('contract_id', '=', record.id), ('edited', '=', False)]).write({'active': False})
+                # 根据物业费方案生成的租金明细，逐条生成model：estate.lease.contract.property.manage.fee.detail
+                for manage_fee_detail in generated_manage_fee_details:
+                    self.env['estate.lease.contract.property.manage.fee.detail'].create({
+                        'contract_id': manage_fee_detail['contract_id'],
+                        'property_id': manage_fee_detail['property_id'],
+                        'manage_fee_amount': manage_fee_detail['manage_fee_amount'],
+                        'manage_fee_amount_zh': manage_fee_detail['manage_fee_amount_zh'],
+                        'manage_fee_receivable': manage_fee_detail['manage_fee_amount'],  # 创建按时，应收=物业费值
+                        'manage_fee_period_no': manage_fee_detail['manage_fee_period_no'],
+                        'period_date_from': manage_fee_detail['period_date_from'],
+                        'period_date_to': manage_fee_detail['period_date_to'],
+                        'date_payment': manage_fee_detail['date_payment'],
+                        'description': manage_fee_detail['description'],
+                        'active': manage_fee_detail['active'],
+                        'edited': manage_fee_detail['edited'],
+                    })
+
     # 合同新建时默认不生效，需要手动修改
     active = fields.Boolean(default=False, copy=False, string="录入完成")
     # 合同状态
@@ -1320,11 +1654,17 @@ class EstateLeaseContract(models.Model):
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
     # 因租金明细修改后的警告提示信息
     warn_msg = fields.Text(string="提示", default="", store=False, compute="_compute_warn_msg")
+    # 因物业费明细修改后的警告提示信息
+    manage_fee_detail_warn_msg = fields.Text(string="提示", default="", store=False,
+                                             compute="_compute_manage_fee_detail_warn_msg")
 
     # 合同总计收缴状况统计
     contract_amount = fields.Float(string="合同总租金（元）", compute="_compute_contract_amount", readonly=True, store=False)
-    contract_amount_lease_deposit = fields.Float(string="总租金含押金（元）", compute="_compute_contract_amount_lease_deposit",
-                                                 readonly=True, store=False)
+    contract_amount_and_manage_fee = fields.Float(string="总租金含物业费（元）",
+                                                  compute="_compute_contract_amount_and_manage_fee",
+                                                  readonly=True, store=False)
+    contract_manage_fee = fields.Float(string="合同总物业费（元）", compute="_compute_contract_amount_and_manage_fee",
+                                       readonly=True, store=False)
     contract_concessions = fields.Float(string="合同总优惠（元）", readonly=True, store=False,
                                         compute="_compute_contract_amount")
     contract_receivable = fields.Float(string="合同总应收（元）", readonly=True, store=False,
@@ -1348,10 +1688,14 @@ class EstateLeaseContract(models.Model):
     contract_arrears_issue = fields.Float(string="本期欠缴（元）", readonly=True, store=False,
                                           compute="_compute_contract_amount")
 
-    @api.depends("rental_details", "contract_amount", "lease_deposit")
-    def _compute_contract_amount_lease_deposit(self):
+    @api.depends("rental_details", "contract_amount", "manage_fee_details")
+    def _compute_contract_amount_and_manage_fee(self):
         for record in self:
-            record.contract_amount_lease_deposit = record.contract_amount + record.lease_deposit
+            manage_fee_sum = 0.0
+            for manage_fee_detail in record.manage_fee_details:
+                manage_fee_sum += manage_fee_detail.manage_fee_receivable
+            record.contract_manage_fee = manage_fee_sum
+            record.contract_amount_and_manage_fee = record.contract_amount + manage_fee_sum
 
     @api.depends("rental_details")
     def _compute_contract_amount(self):
@@ -1422,6 +1766,29 @@ class EstateLeaseContract(models.Model):
                 record.warn_msg += f"这种情况一般是由于修改了租金明细数据后重新生成租金明细数据而造成的。" \
                                    f"请根据实际情况调整或删除租金明细。" \
                                    f"一般情况下应删除掉新生成的本期数据（黑色行），而保留修改过的数据（红色行）。"
+
+    @api.depends("property_ids", "property_management_fee_plan_ids", "manage_fee_details")
+    def _compute_manage_fee_detail_warn_msg(self):
+        for record in self:
+            record.manage_fee_detail_warn_msg = ""
+            # 是否有重复明细数据
+            combination_counts = {}
+            for detail in record.manage_fee_details:
+                combination = (detail.property_id.name,
+                               f"开始：{detail.period_date_from}", f"结束：{detail.period_date_to}")
+                if combination in combination_counts:
+                    combination_counts[combination] += 1
+                else:
+                    combination_counts[combination] = 1
+
+            duplicates = {k: v for k, v in combination_counts.items() if v > 1}
+            if duplicates:
+                for combi, cnt in duplicates.items():
+                    record.manage_fee_detail_warn_msg += f"{combi}出现{cnt}次；"
+
+                record.manage_fee_detail_warn_msg += f"这种情况一般是由于修改了物业费明细数据后重新生成物业费明细数据而造成的。" \
+                                                     f"请根据实际情况调整或删除物业费明细。" \
+                                                     f"一般情况下应删除掉新生成的本期数据（黑色行），而保留修改过的数据（红色行）。"
 
     def action_release_contract(self, only_check=False):
         for record in self:
@@ -1534,7 +1901,6 @@ class EstateLeaseContract(models.Model):
 
     def _insert_contract_property_rental_plan_rel(self, records):
         _logger.info(f"进入 _insert_contract_property_rental_plan_rel 方法")
-        create_new = False
         if records:
             rgt_rcd = records
             create_new = True
@@ -1602,6 +1968,51 @@ class EstateLeaseContract(models.Model):
                     _logger.info(f"删除old_rcd={old_rcd}")
                     old_rcd.unlink()
 
+    def _clear_management_fee(self):
+        # 新建合同时，尚无合同ID的前提下，可能会先创建物业费方案，而此时的物业费方案中没有contract_id，只有contract_uuid
+        for record in self:
+            for management_fee_plan in record.property_management_fee_plan_ids:
+
+                if record.tmp_ref == management_fee_plan.estate_lease_contract_uuid:
+                    if not management_fee_plan.estate_lease_contract or \
+                            management_fee_plan.estate_lease_contract.id != record.id:
+                        _logger.info(f"根据contract_uuid回写合同的物业费方案数据行的合同ID：{record.id}")
+                        management_fee_plan.write({"estate_lease_contract": record.id})
+
+            # 界面上操作过物业费的租赁标的之后，又被删除掉了
+            tgt_model = "estate.lease.contract.property.management.fee.plan"
+
+            if record.tmp_ref:
+                tgt_domain = [('estate_lease_contract_uuid', '=', record.tmp_ref)]
+            else:
+                tgt_domain = [('estate_lease_contract', '=', record.id)]
+
+            tgt_rcds = self.env[tgt_model].search(tgt_domain)
+            for old_rcd in tgt_rcds:
+                _logger.info(f"old_rcd.id={old_rcd.id};name={old_rcd.name};"
+                             f"property={old_rcd.estate_lease_contract_property.name}")
+                old_rcd_exist = False
+                for new_rcd in record.property_ids:
+                    _logger.info(f"new_rcd.id={new_rcd.id};name={new_rcd.name};")
+                    if old_rcd.estate_lease_contract_property.id == new_rcd.id:
+                        # 增加约束条件：租金方案设置不包含物业费的才保留物业费明细，此外，已发布的合同也保留、不轻易删除
+                        if (not new_rcd.default_rental_plan.including_management_fee) or record.state != 'recording':
+                            old_rcd_exist = True
+                            continue
+                if not old_rcd_exist:
+                    # 连方案都可以删除了，那么该方案的明细也删除
+                    manage_fee_model = 'estate.lease.contract.property.manage.fee.detail'
+                    # 如果在新建合同界面record.id = null，这种情况的数据没意义，删除也没问题
+                    del_domain = [('contract_id', '=', record.id),
+                                  ('property_id', '=', old_rcd.estate_lease_contract_property.id)]
+                    tgt_fee_detail = self.env[manage_fee_model].search(del_domain)
+                    _logger.info(f"先归档物业费明细的实缴记录{tgt_fee_detail}")
+                    tgt_fee_detail.manage_fee_detail_sub_ids.write({'active': False})
+                    _logger.info(f"再归档其物业费明细{tgt_fee_detail}")
+                    tgt_fee_detail.write({'active': False})
+                    _logger.info(f"删除物业费old_rcd={old_rcd}")
+                    old_rcd.unlink()
+
     @api.model
     def create(self, vals):
         # 将contract_id,property_id,rental_plan_id 写进 estate.lease.contract.rental.plan.rel 表
@@ -1610,10 +2021,17 @@ class EstateLeaseContract(models.Model):
             vals['date_start'] = vals['date_rent_start']
             # raise UserError("合同开始日期不能晚于计租开始日期！")
 
+        # 因为限制了只能在合同发布生效后录入物业费实收数据，所以在create时，没有物业费实收记录
+        # 创建物业费明细与物业费实收明细之间的关联关系
+        # self._bind_manage_fee_detail_fee_maintenance()
+
         records = super().create(vals)
 
         self._insert_contract_property_rental_plan_rel(records)
         self._insert_contract_registration_addr_rel(records)
+
+        # 物业费方案处理
+        records._clear_management_fee()
 
         return records
 
@@ -1666,7 +2084,13 @@ class EstateLeaseContract(models.Model):
         res = super().write(vals)
         _logger.info(f"write2 vals=：{vals}")
         for record in self:
-            _logger.info(f"write2 record=个数：{len(record.rental_details)}-{record.rental_details}")
+            _logger.info(f"write2 management fee record=个数："
+                         f"{len(record.property_management_fee_plan_ids)}-{record.property_management_fee_plan_ids}")
+
+            # 创建物业费明细与物业费实收明细之间的关联关系
+            record._bind_manage_fee_detail_fee_maintenance()
+            # 物业费方案处理
+            record._clear_management_fee()
 
         # 避免手调sequence时，大量日志输出
         if "sequence" in vals and len(vals) == 1:
@@ -2357,7 +2781,7 @@ class EstateLeaseContract(models.Model):
 
         for rcd in self:
             rcd.approval_switch = is_switch
-        _logger.info(f"approval_switch={approval_switch}")
+        _logger.info(f"approval_switch={is_switch}")
         return is_switch
 
     def _compute_approval_pipe_end(self):
@@ -2389,3 +2813,52 @@ class EstateLeaseContract(models.Model):
 
     approval_pipe_end = fields.Boolean('是否审批完成', compute="_compute_approval_pipe_end", store=False,
                                        default=lambda self: self._compute_approval_pipe_end if self else False)
+
+    def _bind_manage_fee_detail_fee_maintenance(self):
+        for record in self:
+
+            if record.manage_fee_details and record.manage_fee_details.manage_fee_detail_sub_ids:
+                if not record.contract_hist:  # 有了物业费明细，且录入了物业费实收明细，但是还没有contract_hist，说明合同还没发布
+                    raise UserError("必须在合同发布生效之后才能录入物业费实收数据。请进入物业费明细页，删除已经录入的物业费实收数据。"
+                                    "注意：不是删除物业费明细数据哦！")
+
+            for contract_property_hist in record.contract_hist:
+                # 循环设置物业费明细→物业费实收记录中“合同-资产-租金方案”为空的记录
+                for manage_fee_detail in record.manage_fee_details:
+                    if contract_property_hist.contract_id != manage_fee_detail.contract_id or \
+                            contract_property_hist.property_id != manage_fee_detail.property_id:
+                        continue
+
+                    for fee_maintenance in manage_fee_detail.manage_fee_detail_sub_ids:
+                        if fee_maintenance.contract_rental_plan_rel_id.id != contract_property_hist.id:
+                            fee_maintenance.contract_rental_plan_rel_id = contract_property_hist.id
+
+                # 循环设置租赁标的→物业费实收中，物业费明细实收ID为空的记录
+                err_msg = []
+                for property_fee_maintenance in contract_property_hist.contract_property_fee_maintenance_ids:
+
+                    rcd_found = False
+                    for manage_fee_detail in record.manage_fee_details:
+                        if manage_fee_detail.contract_id != property_fee_maintenance.contract_id or \
+                                manage_fee_detail.property_id != property_fee_maintenance.property_id:
+                            continue
+                        # 从物业费实收明细反过来绑定物业费明细时，需要判断该实收的期间是否同于物业费明细的期间
+                        if property_fee_maintenance.period_d_start == manage_fee_detail.period_date_from and \
+                                property_fee_maintenance.period_d_end == manage_fee_detail.period_date_to:
+                            rcd_found = True
+                            if property_fee_maintenance.manage_fee_detail_id.id != manage_fee_detail.id:
+                                property_fee_maintenance.manage_fee_detail_id = manage_fee_detail.id
+
+                    if not rcd_found:
+                        err_msg.append(f"本期开始日：{property_fee_maintenance.period_d_start}"
+                                       f"本期结束日：{property_fee_maintenance.period_d_end}"
+                                       f"实收日期：{property_fee_maintenance.date_received}"
+                                       f"实收金额：{property_fee_maintenance.maintenance_received}")
+
+                if err_msg:
+                    err_msg.append("以上物业费实收记录的期间开始日和期间结束日与物业费明细期间对不上，"
+                                   "请按物业费明细期间设置物业费实收的期间开始日和结束日！"
+                                   "此外，不建议点击【租赁标的】直接输入物业费实收数据。"
+                                   "建议：从合同主页面选择【物业费明细】，"
+                                   "点击根据物业费方案做成的物业费明细，录入物业费实收数据！")
+                    contract_property_hist.fee_maintenance_err_msg = err_msg
