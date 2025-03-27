@@ -168,17 +168,16 @@ class EstateLeaseContractRentalPlanRel(models.Model):
 
             i = 0
             for line in lines:
+                # 物业费实缴明细的期间特殊处理，由于物业费实收明细可以在两个页面编辑创建数据，
+                # 如果是在物业费明细页面创建的数据，页面并无期间设置，理论上开始日终了日不应该出现问题，
+                # 如果是在租赁标的页面创建的实收数据，原则上应该在租赁标的页面修改（那里有错误信息提示），如果在这里强行校验，
+                # 会出现一旦修改了物业费计费周期的情况，页面被校验卡住无法修改也无法删除
+                if check_tgt_nm == "物业费":
+                    break
 
                 ii = 0
                 for comp_tgt in lines:
                     if i != ii:
-                        # 物业费实缴明细的期间特殊处理 todo 在这里直接修改contract_property_fee_maintenance_ids的字段还是不太好
-                        if check_tgt_nm == "物业费":
-                            if line.manage_fee_detail_id:
-                                if line.period_d_start != line.manage_fee_detail_id.period_date_from:
-                                    line.period_d_start = line.manage_fee_detail_id.period_date_from
-                                if line.period_d_end != line.manage_fee_detail_id.period_date_to:
-                                    line.period_d_end = line.manage_fee_detail_id.period_date_to
 
                         if comp_tgt.period_d_start < line.period_d_start <= comp_tgt.period_d_end:
                             raise ValidationError(f"{check_tgt_nm}期间的开始日设置错误：开始日期[{line.period_d_start}]介于"
@@ -203,6 +202,7 @@ class EstateLeaseContractRentalPlanRel(models.Model):
 
     @api.model
     def write(self, vals):
+
         res = super().write(vals)
         check_tgt = ['水费', '电费', '电力维护费', '物业费']
         for tgt in check_tgt:

@@ -530,9 +530,14 @@ def _generate_details_from_management_fee_plan_plan(record_self):
     temp_manage_fee_amount_year = 0.0
     # 必须从contract→property→物业费方案→明细的顺序
     for property_id in record_self.property_ids:
-        if property_id.management_fee_plan_id:
-            management_fee_plan = property_id.management_fee_plan_id
-        else:
+        management_fee_plan = None
+        for each_management_fee_plan in property_id.management_fee_plan_id:
+            if (each_management_fee_plan.estate_lease_contract.id == record_self.id) or \
+                    (each_management_fee_plan.estate_lease_contract_uuid == record_self.tmp_ref):
+                management_fee_plan = each_management_fee_plan
+                break
+
+        if not management_fee_plan:
             continue
 
         date_s = fields.Date.from_string(management_fee_plan.date_start)
@@ -998,8 +1003,15 @@ class EstateLeaseContract(models.Model):
     @api.depends('property_ids', "date_sign", 'date_start', "date_rent_start")
     def _compute_property_management_fee_plan_ids(self):
         for record in self:
-            management_fee_plans = self.env['estate.property'].search([('id', 'in', record.property_ids.ids)]).mapped(
-                'management_fee_plan_id')
+            management_fee_plans = self.env['estate.lease.contract.property.management.fee.plan'].search(
+                ['&', '|', ('estate_lease_contract_property', 'in', record.property_ids.ids),
+                 ('estate_lease_contract', '=', record.id), ('estate_lease_contract_uuid', '=', record.tmp_ref)])
+            # this_contract_management_fee_plans = []
+            # for management_fee_plan in management_fee_plans:
+            #     if management_fee_plan.estate_lease_contract.id == record.id or \
+            #             management_fee_plan.estate_lease_contract_uuid == record.tmp_ref:
+            #         this_contract_management_fee_plans.append(management_fee_plan)
+
             record.property_management_fee_plan_ids = management_fee_plans
 
             # 排除页面上做了删除动作的租赁标的
@@ -1016,15 +1028,15 @@ class EstateLeaseContract(models.Model):
                     if manage_fee_plan.date_start != record.date_rent_start:
                         manage_fee_plan.date_start = record.date_rent_start
 
-                _logger.debug(f"开始清理{manage_fee_plan.name}manage_fee_plan.rent_targets={manage_fee_plan.rent_targets.ids}")
-                tgt_keep = []
-                for rent_tgt in manage_fee_plan.rent_targets:
-                    _logger.debug(f"rent_tgt.id={rent_tgt.id}")
-                    tgt_id = rent_tgt._origin.id if isinstance(rent_tgt.id, models.NewId) else rent_tgt.id
-                    if tgt_id in record.property_ids.ids:
-                        tgt_keep.append(tgt_id)
-                _logger.debug(f"tgt_keep={tgt_keep}")
-                manage_fee_plan.rent_targets = tgt_keep
+                # _logger.debug(f"清理{manage_fee_plan.name}manage_fee_plan.rent_targets={manage_fee_plan.rent_targets}")
+                # tgt_keep = []
+                # for rent_tgt in manage_fee_plan.rent_targets:
+                #     _logger.debug(f"rent_tgt.id={rent_tgt.id}")
+                #     tgt_id = rent_tgt._origin.id if isinstance(rent_tgt.id, models.NewId) else rent_tgt.id
+                #     if tgt_id in record.property_ids.ids:
+                #         tgt_keep.append(tgt_id)
+                # _logger.debug(f"tgt_keep={tgt_keep}")
+                # manage_fee_plan.rent_targets = tgt_keep
 
     @api.depends('rental_plan_ids')
     def _compute_show_management_fee_page(self):
@@ -2770,7 +2782,7 @@ class EstateLeaseContract(models.Model):
 
     approval_detail_ids = fields.One2many('estate.lease.contract.approval.detail', 'contract_id', string="审批情况")
     approval_switch = fields.Boolean('是否已开启审批流', compute="_compute_approval_switch", store=False,
-                                     default="_compute_approval_switch")
+                                     default=lambda self: self._compute_approval_switch())
 
     def _compute_approval_switch(self):
         approval_switch = self.env['estate.lease.contract.approval.switch'].search([

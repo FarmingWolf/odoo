@@ -35,8 +35,6 @@
                     <field name="stage_op_department_id" invisible="1"/>
                     <field name="tmp_ref" invisible="1"/>
                     <field name="show_management_fee_page" invisible="1"/>
-                    <field name="approval_switch"/>
-                    <field name="approval_pipe_end"/>
                     <div invisible="approval_switch and (not approval_pipe_end)">
                         <button name="action_release_contract" type="object" string="发布"
                                 invisible="(not edit_on_hist_page) or (state != 'recording')"/>

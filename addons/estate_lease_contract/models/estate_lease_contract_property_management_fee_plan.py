@@ -69,7 +69,7 @@ class EstateLeaseContractPropertyManagementFeePlan(models.Model):
 
     # 按时间段递增的情况下：
     name_description = fields.Char(string="方案描述", compute="_get_name_description")
-    rent_targets = fields.One2many("estate.property", "management_fee_plan_id", string='对应标的')
+    rent_targets = fields.Many2one("estate.property", string='对应标的', related="estate_lease_contract_property")
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     def _get_estate_lease_contract(self):
@@ -253,10 +253,10 @@ class EstateLeaseContractPropertyManagementFeePlan(models.Model):
     def create(self, vals):
         record = super().create(vals)
 
-        if record.estate_lease_contract_property:
-            if not record.estate_lease_contract_property.management_fee_plan_id or \
-                    record.id != record.estate_lease_contract_property.management_fee_plan_id.id:
-                record.estate_lease_contract_property.write({'management_fee_plan_id': record.id})
+        # if record.estate_lease_contract_property:
+        #     if not record.estate_lease_contract_property.management_fee_plan_id or \
+        #             record.id != record.estate_lease_contract_property.management_fee_plan_id.id:
+        #         record.estate_lease_contract_property.write({'management_fee_plan_id': record.id})
 
         return record
 
@@ -264,8 +264,8 @@ class EstateLeaseContractPropertyManagementFeePlan(models.Model):
 
         res = super().write(vals)
 
-        if not self.estate_lease_contract_property.management_fee_plan_id or \
-                self.id != self.estate_lease_contract_property.management_fee_plan_id.id:
-            self.estate_lease_contract_property.write({'management_fee_plan_id': self.id})
+        # if not self.estate_lease_contract_property.management_fee_plan_id or \
+        #         self.id != self.estate_lease_contract_property.management_fee_plan_id.id:
+        #     self.estate_lease_contract_property.write({'management_fee_plan_id': self.id})
 
         return res

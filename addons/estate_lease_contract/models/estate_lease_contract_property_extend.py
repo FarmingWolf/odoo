@@ -91,7 +91,9 @@ class EstateLeaseContractPropertyExtend(models.Model):
                                    default=lambda self: self._get_default_rent_plan())
     property_rental_detail_ids = fields.One2many('estate.lease.contract.property.rental.detail', 'property_id',
                                                  string="租金明细")
-    management_fee_plan_id = fields.Many2one('estate.lease.contract.property.management.fee.plan', string="物业费方案")
+    management_fee_plan_id = fields.One2many(comodel_name='estate.lease.contract.property.management.fee.plan',
+                                             inverse_name="estate_lease_contract_property",
+                                             string="物业费方案")
     property_manage_fee_detail_ids = fields.One2many('estate.lease.contract.property.manage.fee.detail', 'property_id',
                                                      string="物业费明细")
     business_method_id = fields.Char(string="经营性质", readonly=True, compute="_get_rent_plan_info")
@@ -318,12 +320,32 @@ class EstateLeaseContractPropertyExtend(models.Model):
     def _onchange_management_fee_plan_id(self):
         self._get_property_management_fee_info()
 
+    def _get_default_contract(self):
+        session_contract_id = None
+        from_menu_root = None
+        if request and request.session:
+            if 'session_contract_id' in request.session:
+                session_contract_id = request.session.get('session_contract_id')
+            _logger.info(f"资产管理模型：session_contract_id=[{session_contract_id}]")
+            if 'menu_root' in request.session:
+                from_menu_root = request.session.get('menu_root')
+        return session_contract_id, from_menu_root
+
     @api.depends("management_fee_plan_id")
     def _get_property_management_fee_info(self):
+        session_contract_id, from_menu_root = self._get_default_contract()
         for record in self:
-            if record.management_fee_plan_id:
-                record.management_fee_name_description = record.management_fee_plan_id.name_description
+            if not session_contract_id:
+                record.management_fee_name_description = ""
             else:
+                for management_fee_plan in record.management_fee_plan_id:
+                    _logger.info(f"estate_lease_contract={management_fee_plan.estate_lease_contract}")
+                    _logger.info(f"contract_uuid={management_fee_plan.estate_lease_contract_uuid}")
+
+                    if management_fee_plan.estate_lease_contract.id == session_contract_id:
+                        record.management_fee_name_description = management_fee_plan.name_description
+                        break
+
                 record.management_fee_name_description = ""
 
     @api.depends("rent_plan_id")
@@ -868,7 +890,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
         contract_uuid = self.env.context.get('contract_uuid_4_management_fee')
 
         tgt_model = 'estate.lease.contract.property.management.fee.plan'
-        tgt_id = False
+        tgt_id = None
 
         # 设置对象不能在已经发布生效的合同里
         if contract_id:

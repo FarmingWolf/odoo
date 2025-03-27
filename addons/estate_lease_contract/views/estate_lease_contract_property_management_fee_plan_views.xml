@@ -18,7 +18,7 @@
                 <field name="name"/>
                 <field name="payment_period"/>
                 <field name="billing_progress_method_id"/>
-                <field name="rent_targets" widget="many2many_tags"/>
+                <field name="rent_targets"/>
             </tree>
         </field>
     </record>
@@ -66,18 +66,4 @@
         </field>
     </record>
 
-    <record id="pop_management_fee_plan_action" model="ir.actions.act_window">
-        <field name="name">设置物业费方案</field>
-        <field name="res_model">estate.lease.contract.property.management.fee.plan</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-        <field name="context">{'rent_area_4_management_fee': rent_area_4_management_fee,
-            'property_nm_4_management_fee': property_nm_4_management_fee,
-            'payment_date_4_management_fee' : payment_date_4_management_fee,
-            'payment_period_4_management_fee' : payment_period_4_management_fee,
-            'default_estate_lease_contract' : default_estate_lease_contract,
-            'default_estate_lease_contract_property' : default_estate_lease_contract_property,
-            'default_res_id' : default_estate_lease_contract_property.management_fee_plan_id,
-            }</field>
-    </record>
 </odoo>

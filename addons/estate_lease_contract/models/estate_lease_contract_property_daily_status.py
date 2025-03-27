@@ -32,7 +32,6 @@ def _cal_manage_fee_detail(manage_fee_detail, in_date, in_fee_info):
 
     if manage_fee_detail.date_payment == in_date:
         in_fee_info['property_fee_maintenance_receivable_today'] += manage_fee_detail.manage_fee_receivable
-        # in_fee_info['property_fee_maintenance_received_today'] += manage_fee_detail.manage_fee_received
 
     if manage_fee_detail.date_payment == add(in_date, days=1):
         in_fee_info['property_fee_maintenance_receivable_tomorrow'] += manage_fee_detail.manage_fee_receivable
