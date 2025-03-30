@@ -13,6 +13,7 @@ import {FundManagementDocumentDropZone, FundManagementDocumentUpload} from "../m
 import {ExpenseDocumentDropZone} from "../../../../hr_expense/static/src/mixins/document_upload";
 import {ExpenseMobileQRCode} from "../../../../hr_expense/static/src/mixins/qrcode";
 import {FundManagementMobileQRCode} from "../mixins/qrcode";
+import {ApprovalProcess} from "../components/approval_process";
 
 export class FundManagementListController extends FundManagementDocumentUpload(ListController) {
     setup() {
@@ -22,6 +23,12 @@ export class FundManagementListController extends FundManagementDocumentUpload(L
         this.rpc = useService("rpc");
         this.user = useService("user");
         this.isExpenseSheet = this.model.config.resModel === "fund.management.sheet";
+
+        this.env.config.context = {
+            ...this.env.config.context,
+            default_category_id: this.props.context?.default_category_id,
+            default_fund_management_id: this.props.context?.default_fund_management_id,
+        };
 
         onWillStart(async () => {
             this.userIsExpenseTeamApprover = await this.user.hasGroup("fund_management.group_fund_management_team_approver");
@@ -88,6 +95,16 @@ export class FundManagementDashboardListRenderer extends FundManagementListRende
 FundManagementDashboardListRenderer.components = { ...FundManagementDashboardListRenderer.components, FundManagementDashboard};
 FundManagementDashboardListRenderer.template = 'fund_management.DashboardListRenderer';
 
+export class FundManagementStageListRenderer extends FundManagementListRenderer {
+    setup() {
+        super.setup();
+        this.default_category_id = this.props.context?.default_category_id || this.env.config.context?.default_category_id;
+    }
+}
+
+FundManagementStageListRenderer.components = { ...FundManagementStageListRenderer.components, ApprovalProcess};
+FundManagementStageListRenderer.template = 'fund_management.StageListRenderer';
+
 registry.category('views').add('fund_management_tree', {
     ...listView,
     buttonTemplate: 'fund_management.ListButtons',
@@ -100,4 +117,11 @@ registry.category('views').add('fund_management_dashboard_tree', {
     buttonTemplate: 'fund_management.ListButtons',
     Controller: FundManagementListController,
     Renderer: FundManagementDashboardListRenderer,
+});
+
+registry.category('views').add('fund_management_stage_tree', {
+    ...listView,
+    buttonTemplate: 'fund_management.ListButtons',
+    Controller: FundManagementListController,
+    Renderer: FundManagementStageListRenderer,
 });

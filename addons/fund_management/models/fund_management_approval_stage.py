@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 class FundManagementApprovalStage(models.Model):
     _name = 'fund.management.approval.stage'
     _description = 'Fund management approval stage'
-    _order = 'sequence'
+    _order = 'sequence, description'
 
     name = fields.Char(string='Approval Stage Name', required=True, translate=True)
     description = fields.Text(string='Approval Stage Description', translate=True)
@@ -66,10 +66,8 @@ class FundManagementApprovalStage(models.Model):
                                   default=lambda self: self._get_default_category, store=True)
 
     _sql_constraints = [
-        ('name', 'unique(name, company_id, category_id)',
-         'The stage names of the same category of processes cannot be duplicated'),
-        ('sequence', 'unique(sequence, company_id, category_id)',
-         'The stage number of the same category of processes cannot be duplicated'),
+        ('sequence', 'unique(name, sequence, company_id, category_id)',
+         'Name and stage number can not be duplicated in the category!'),
     ]
 
     @api.constrains('sequence', 'pipe_end')

@@ -16,9 +16,7 @@ class FundManagementApprovalDetail(models.Model):
     approved_by_id = fields.Many2one('hr.employee', string='Approver ID', default=lambda self: self._get_employee(),
                                      domain="[('company_id', '=', company_id)]")
     approved_by_nm = fields.Char(string='Approver')
-    approval_stage = fields.Many2one('fund.management.approval.stage', string="Approval Stage",
-                                     domain=lambda self: ["('company_id', '=', company_id), "
-                                                          "('category_id', '=', category_id)"])
+    approval_stage = fields.Many2one('fund.management.approval.stage', string="Approval Stage")
     approval_stage_id = fields.Integer(string="Approval Stage ID")
     approval_stage_nm = fields.Char(string="Approval Stage")
     approval_comments = fields.Char(string="Approval Comments")

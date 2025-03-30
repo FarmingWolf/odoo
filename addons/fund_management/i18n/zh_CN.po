@@ -288,7 +288,7 @@ msgstr "点击审批同意"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Click to reject"
-msgstr "点击拒绝"
+msgstr "点击驳回"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
@@ -866,7 +866,7 @@ msgstr "拒绝的申请"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Reject"
-msgstr "拒绝"
+msgstr "驳回"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__company_currency_id
@@ -1004,8 +1004,8 @@ msgstr "审批流程的最后阶段。处于此阶段的申请单方可生效。
 
 #. module: fund_management
 #: model:ir.model.constraint,message:fund_management.constraint_fund_management_approval_stage_name
-msgid "The stage names of the same category of processes cannot be duplicated"
-msgstr "同一大类流程阶段名称不能重复"
+msgid "Name and stage number can not be duplicated in the category!"
+msgstr "相同序号下阶段名称重复了！"
 
 #. module: fund_management
 #: model:ir.model.constraint,message:fund_management.constraint_fund_management_approval_stage_sequence
@@ -1102,7 +1102,7 @@ msgstr "您无权编辑这份资金管理流程。"
 msgid ""
 "You can add a description to help understand the significance and purpose of"
 " this stage."
-msgstr "您也可以添加一个描述来帮助理解这个阶段的意义和目的。"
+msgstr "您可以添加一个描述来帮助理解这个阶段的意义和目的。当阶段序号相同时，可以通过描述文字确定阶段的左右位置。"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form

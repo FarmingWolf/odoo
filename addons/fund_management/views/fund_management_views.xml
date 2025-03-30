@@ -76,18 +76,22 @@
             <field name="name">fund.management.view.form</field>
             <field name="model">fund.management</field>
             <field name="arch" type="xml">
-                <form string="Fund info detail" js_class="fund_management_form_view">
+                <form string="Fund info detail" js_class="fund_management_form_view" create="False">
                 <header>
-                    <widget name="attach_document" string="Attach Receipt" action="attach_document" highlight="1" invisible="(not is_editable) and (not meeting_minutes_editable)"/>
-                    <button name="action_save_fund_management" string="Save(not submit)" type="object" class="o_expense_submit" data-hotkey="v" invisible="state != 'draft'"/>
-                    <button name="action_submit_fund_management" string="Submit" type="object" class="o_expense_submit" data-hotkey="s" invisible="state != 'draft'"/>
+                    <field name="stage_sequence" invisible="1"/>
+                    <widget name="attach_document" string="Attach Receipt" action="attach_document" highlight="1"
+                            invisible="(not is_editable) and (not meeting_minutes_editable)"/>
+                    <button name="action_save_fund_management" string="Save(not submit)" type="object" class="o_expense_submit" data-hotkey="v"
+                            invisible="(state != 'draft') and (stage_sequence != 0)"/>
+                    <button name="action_submit_fund_management" string="Submit" type="object" class="o_expense_submit" data-hotkey="s"
+                            invisible="(state != 'draft') and (stage_sequence != 0)"/>
 
                     <div invisible="state in ('draft', 'done')">
                         <button name="action_agree" type="object" class="btn btn-success" string="Agree"
-                                title="Click to approve"/>
+                                title="Click to approve" invisible="state == 'refused'"/>
                         <span>　</span>
                         <button name="action_reject" type="object" class="btn btn-danger" string="Reject"
-                                title="Click to reject"/>
+                                title="Click to reject" invisible="stage_sequence == 0"/>
                     </div>
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,done"
@@ -111,7 +115,7 @@
                         </div>
                         <div class="d-flex justify-content-end">
                             <button name="%(fund_management.view_all_stage_by_category_action)d" type="action" string="All Stages" title="View All Stages"
-                                context="{'default_category_id': category_id}" class="btn btn-secondary"/>
+                                context="{'default_category_id': category_id, 'default_fund_management_id': id}" class="btn btn-secondary"/>
                         </div>
                     </div>
                     <group>
@@ -123,6 +127,7 @@
                             <field name="company_currency_id" invisible="1"/>
                             <field name="nb_attachment" invisible="1"/>
                             <field name="total_amount" invisible="1"/>
+                            <field name="id" invisible="1"/>
 
                             <label for="category_id"/>
                             <div>

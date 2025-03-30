@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="fund_management.ApprovalProcess">
+        <div class="o_expense_container position-sticky start-0 o_form_statusbar">
+            <t t-foreach="state.process_stages" t-as="stage_group" t-key="stage_group_index">
+                <t t-debug=""/>
+                <t t-if="stage_group.length == 1">
+                    <div class="d-flex flex-column align-items-center border-bottom mb-3">
+                        <div t-attf-class="rounded-3 p-3 border #{(stage_group[0].approval_decision == true or stage_group[0].pipe_end) ? 'bg-success' : 'bg-light border-primary'}"
+                             t-att-data-tooltip="stage_group[0].op_department + '\n' + stage_group[0].op_job">
+                            <span t-out="stage_group[0].name" class="h4 m-0 #{stage_group[0].approval_decision == true ? 'text-white' : 'text-primary'}"/>
+                        </div>
+                        <t t-if="!stage_group[0].pipe_end">
+                            <t t-debug=""/>
+                            <i t-attf-class="fa #{stage_group[0].approval_decision == true ? 'fa-angle-down text-success' : stage_group[0].approval_decision == false ? 'fa-times text-danger' : 'fa-angle-down text-primary'} fa-3x"/>
+                        </t>
+                    </div>
+                </t>
+                <t t-if="stage_group.length > 1">
+                    <div class="d-flex justify-content-around mb-3 border-bottom">
+                        <t t-foreach="stage_group" t-as="stage" t-key="stage_index">
+                            <div class="d-flex flex-column align-items-center mx-2">
+                                <div t-attf-class="rounded-3 p-3 border #{stage.approval_decision == true ? 'bg-success' : 'bg-light border-primary'}"
+                                     t-att-data-tooltip="stage.op_department + '\n' + stage.op_job">
+                                    <span t-out="stage.name" class="h4 m-0 #{stage.approval_decision == true ? 'text-white' : 'text-primary'}"/>
+                                </div>
+                                <t t-if="!stage.pipe_end">
+                                    <i t-attf-class="fa #{stage.approval_decision == true ? 'fa-angle-down text-success' : stage.approval_decision == false ? 'fa-times text-danger' : 'fa-angle-down text-primary'} fa-3x mt-2"/>
+                                </t>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </div>
+    </t>
+</templates>
