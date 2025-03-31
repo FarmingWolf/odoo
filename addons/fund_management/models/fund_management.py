@@ -385,6 +385,7 @@ class FundManagement(models.Model):
         return
 
     def action_submit_fund_management(self):
+        self.action_save_fund_management()
         self.action_agree(from_action_submit=True)
 
     def action_agree(self, from_action_submit=False):
@@ -415,7 +416,8 @@ class FundManagement(models.Model):
             # 如果本阶段有多个同级别的审批节点，那么所有节点都通过后才可进入下一阶段
             same_level_approval_result = self._check_same_level_approval_result(record, tgt_stage)
             if not same_level_approval_result:
-                _logger.info("因同级别审批节点尚未完全通过，所以暂不推进本审批流的阶段")
+                _logger.info("状态审批中，但是因同级别审批节点尚未完全通过，所以暂不推进本审批流的阶段")
+                self.write({'state': next_state})
                 return
 
             all_stages = self.env['fund.management.approval.stage'].search([('company_id', '=', record.company_id.id),
@@ -500,14 +502,34 @@ class FundManagement(models.Model):
                     return
 
     def _check_approval_rights(self, record):
-        record_stage_dep_id = record.stage.op_department_id.id
-        record_stage_job_id = record.stage.op_job_id.id
 
         this_employee_dep_id = self._get_employee().department_id.id
         this_employee_job_id = self._get_employee().job_id.id
 
         if not self.env.user.has_group('fund_management.group_fund_management_team_approver'):
             return False, record.stage
+
+        # 由于在stage创建时，对非起始stage（sequence!=0）时的部门和职位角色不为空做了强制要求，所以这部分逻辑仅对起始stage有效
+        if not record.stage.op_department_id:
+            if not record.stage.op_job_id:
+                _logger.info(f"record.stage={record.stage.name}不要求部门和职位角色")
+                return True, record.stage
+            else:
+                if this_employee_job_id == record.stage.op_job_id.id or \
+                        self._get_employee().job_id.name == record.stage.op_job_id.name:
+                    _logger.info(f"record.stage={record.stage.name}不要求部门，只要求职位角色")
+                    return True, record.stage
+                else:
+                    return False, record.stage
+        else:
+            if not record.stage.op_job_id:
+                if record.stage.op_department_id == this_employee_dep_id:
+                    return True, record.stage
+                else:
+                    return False, record.stage
+
+        record_stage_dep_id = record.stage.op_department_id.id
+        record_stage_job_id = record.stage.op_job_id.id
 
         if this_employee_dep_id == record_stage_dep_id and record_stage_job_id == this_employee_job_id:
             return True, record.stage
@@ -629,8 +651,7 @@ class FundManagement(models.Model):
         target_currency = self.env.company.currency_id
         # Counting the expenses to display in the dashboard:
         expenses = self._read_group(
-            [('employee_id', 'in', self.env.user.employee_ids.ids),
-             ('state', 'in', ('submitted', 'approved', 'done'))
+            [('state', 'in', ('submitted', 'approved', 'done'))
              ], ['state'], ['total_amount:sum'])
         for state, total_amount_sum in expenses:
             # if state in {'draft'}:  # Fuse the two states into only one "To Submit" state
@@ -673,14 +694,26 @@ class FundManagement(models.Model):
 
             all_stages.append(stage_data)
 
+        # 如果流程全部结束，那么为了设置最后一个阶段颜色，需要将最后一个阶段的approval_decision = True
+        stage_len = len(all_stages)
+        if stage_len > 1:
+            all_stages[stage_len - 1]['approval_decision'] = all_stages[stage_len - 2]['approval_decision']
+
         # 在被驳回的流程中，从第二个阶段驳回到第一个阶段时，第一个阶段本是已提交状态，但是应该是编辑中待提交状态更合理
-        if len(all_stages) > 1:
+        if stage_len > 1:
             if all_stages[1]['approval_decision'] is not None and not all_stages[1]['approval_decision']:
                 all_stages[0]['approval_decision'] = None
+            # 也有可能从第二个阶段开始就有平行级别节点
+            else:
+                for each_stage in all_stages:
+                    if all_stages[1]['sequence'] == each_stage['sequence']:
+                        if each_stage['approval_decision'] is not None and not each_stage['approval_decision']:
+                            all_stages[0]['approval_decision'] = None
+                            break
 
         current_group = [all_stages[0]]  # 初始化第一个分组
 
-        for i in range(1, len(all_stages)):
+        for i in range(1, stage_len):
             if all_stages[i]['sequence'] == current_group[0]['sequence']:
                 current_group.append(all_stages[i])  # sequence 相同，加入当前分组
             else:

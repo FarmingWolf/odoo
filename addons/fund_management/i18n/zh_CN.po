@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-21 05:57+0000\n"
-"PO-Revision-Date: 2025-03-21 05:57+0000\n"
+"POT-Creation-Date: 2025-03-31 11:03+0000\n"
+"PO-Revision-Date: 2025-03-31 11:03+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -216,9 +216,15 @@ msgid "Approval Stage Name"
 msgstr "审批阶段名称"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__stage_sequence
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__sequence
 msgid "Approval Stage Sequence NO."
 msgstr "审批阶段序号"
+
+#. module: fund_management
+#: model:ir.actions.act_window,name:fund_management.view_all_stage_status_by_category_action
+msgid "Approval Stage Status Chart"
+msgstr "审批流节点状态图"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__approval_stages
@@ -288,7 +294,7 @@ msgstr "点击审批同意"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Click to reject"
-msgstr "点击驳回"
+msgstr "点击拒绝"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
@@ -551,6 +557,11 @@ msgid "Fund management approval stage"
 msgstr "资金管理审批阶段"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_status_view_form
+msgid "Fund management approval stage Status"
+msgstr "资金管理审批流阶段状态"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
 msgid "Fund range"
 msgstr "资金范围"
@@ -736,6 +747,11 @@ msgid "My Team"
 msgstr "我的团队"
 
 #. module: fund_management
+#: model:ir.model.constraint,message:fund_management.constraint_fund_management_approval_stage_sequence
+msgid "Name and sequence number can not be duplicated in the category!"
+msgstr "同一大类流程阶段序号不能重复"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
 msgstr "下一活动日历"
@@ -831,6 +847,14 @@ msgid "Please do not include spaces in the category name"
 msgstr "类型名称中请勿包含空格"
 
 #. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management_approval_stage.py:0
+#: code:addons/fund_management/models/fund_management_approval_stage.py:0
+#, python-format
+msgid "Please set Approval Department and Approval Job Position"
+msgstr "请设置【审批部室】和【审批职位、岗位或角色】"
+
+#. module: fund_management
 #: model:ir.model,name:fund_management.model_hr_employee_public
 msgid "Public Employee"
 msgstr "公共员工"
@@ -866,7 +890,7 @@ msgstr "拒绝的申请"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Reject"
-msgstr "驳回"
+msgstr "拒绝"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__company_currency_id
@@ -973,6 +997,7 @@ msgid "Team Approver"
 msgstr "团队审批者"
 
 #. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_fund_management__stage_sequence
 #: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__sequence
 msgid ""
 "The approval process will progress from small to large according to the "
@@ -1001,17 +1026,6 @@ msgid ""
 "only be issued and become effective. Please set the approval end flag for "
 "the approval stage with the highest serial number."
 msgstr "审批流程的最后阶段。处于此阶段的申请单方可生效。请将最大序号的审批阶段设置审批结束标志。"
-
-#. module: fund_management
-#: model:ir.model.constraint,message:fund_management.constraint_fund_management_approval_stage_name
-msgid "Name and sequence number can not be duplicated in the category!"
-msgstr "相同序号下阶段名称重复了！"
-
-#. module: fund_management
-#: model:ir.model.constraint,message:fund_management.constraint_fund_management_approval_stage_sequence
-msgid ""
-"The stage number of the same category of processes cannot be duplicated"
-msgstr "同一大类流程阶段序号不能重复"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
@@ -1102,7 +1116,7 @@ msgstr "您无权编辑这份资金管理流程。"
 msgid ""
 "You can add a description to help understand the significance and purpose of"
 " this stage."
-msgstr "您可以添加一个描述来帮助理解这个阶段的意义和目的。当阶段序号相同时，可以通过描述文字确定阶段的左右位置。"
+msgstr "您也可以添加一个描述来帮助理解这个阶段的意义和目的。"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
@@ -1169,9 +1183,9 @@ msgstr "待审批"
 #. module: fund_management
 #: model:ir.model,name:fund_management.model_res_partner
 msgid "继承partner"
-msgstr ""
+msgstr "联系人"
 
 #. module: fund_management
 #: model:ir.model,name:fund_management.model_fund_management_approval_detail
-msgid "资金管理审批明细"
-msgstr ""
+msgid "Fund Management Approval Detail"
+msgstr "资金管理审批明细"

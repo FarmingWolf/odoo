@@ -14,7 +14,7 @@ class FundManagementApprovalStage(models.Model):
 
     name = fields.Char(string='Approval Stage Name', required=True, translate=True)
     description = fields.Text(string='Approval Stage Description', translate=True)
-    sequence = fields.Integer('Approval Stage Sequence NO.', default=0,
+    sequence = fields.Integer('Approval Stage Sequence NO.', default=0, required=True,
                               help="The approval process will progress from small to large according to the approval sequence number. The initial stage number needs to be set to 0, and it is recommended to interval the stage numbers in units of 10")
     fold = fields.Boolean(string='Kanban Folding', default=False)
     pipe_end = fields.Boolean(
@@ -47,7 +47,7 @@ class FundManagementApprovalStage(models.Model):
         if active_id:
             defaults['category_id'] = active_id
 
-        default_category = self.env.context.get('default_category')
+        default_category = self.env.context.get('default_category_id')
 
         if default_category:
             defaults['category_id'] = default_category
@@ -57,7 +57,7 @@ class FundManagementApprovalStage(models.Model):
         return defaults
 
     def _get_default_category(self):
-        default_category_id = self.env.context.get('default_category')
+        default_category_id = self.env.context.get('default_category_id')
         active_category_id = self.env.context.get('active_id')
         _logger.info(f"default_category_id={default_category_id};active_category_id={active_category_id}")
         return default_category_id
@@ -110,3 +110,27 @@ class FundManagementApprovalStage(models.Model):
             'sequence': self.sequence + 10
         })
         return super().copy(default)
+
+    @api.model
+    def create(self, vals_list):
+        if 'sequence' in vals_list:
+            if vals_list['sequence'] > 0:
+                if ('pipe_end' in vals_list) and (vals_list['pipe_end']):
+                    if ('op_department_id' or 'op_job_id') not in vals_list:
+                        raise ValidationError(_("Please set Approval Department and Approval Job Position"))
+
+        record = super().create(vals_list)
+        self._check_pipe_end()
+        return record
+
+    @api.model
+    def write(self, vals):
+        res = super().write(vals)
+        for record in self:
+            record._check_pipe_end()
+            if record.sequence > 0:
+                if not record.pipe_end:
+                    if (not record.op_department_id) or (not record.op_job_id):
+                        raise ValidationError(_("Please set Approval Department and Approval Job Position"))
+
+        return res

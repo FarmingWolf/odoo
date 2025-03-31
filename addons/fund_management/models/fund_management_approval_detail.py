@@ -9,7 +9,7 @@ _logger = logging.getLogger(__name__)
 
 class FundManagementApprovalDetail(models.Model):
     _name = "fund.management.approval.detail"
-    _description = "资金管理审批明细"
+    _description = "Fund Management Approval Detail"
     _order = "id DESC"
 
     fund_management_id = fields.Many2one('fund.management', string="Fund Management Approval", ondelete="restrict")

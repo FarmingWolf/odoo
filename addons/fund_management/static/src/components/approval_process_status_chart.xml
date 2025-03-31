@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="fund_management.StageStatusChartRenderer">
+        <ApprovalProcess default_category_id="default_category_id" default_fund_management_id="default_fund_management_id"/>
+    </t>
+</templates>

@@ -22,23 +22,43 @@
                             </group>
                         </group>
                         <group string="Stage description and usage tips">
-                            <p class="text-muted" colspan="2">
-                                You can define approval status labels here as the default labels in the Kanban view.
-                            </p>
-                            <label for="legend_normal" string=" " class="o_status " title="The task is currently being processed in this stage. Click to change the task stage status."
-                                   aria-label="The task is currently being processed in this stage. Click to change the task stage status." role="img"/>
-                            <field name="legend_normal" nolabel="1"/>
-                            <label for="legend_blocked" string=" " class="o_status o_status_red" title="The task at this stage is blocked. Click to change the task stage status."
-                                   aria-label="The task at this stage is blocked. Click to change the task stage status." role="img"/>
-                            <field name="legend_blocked" nolabel="1"/>
-                            <label for="legend_done" string=" " class="o_status o_status_green" title="The task for this stage has been completed. Click to change the task stage status."
-                                   aria-label="The task for this stage has been completed. Click to change the task stage status." role="img"/>
-                            <field name="legend_done" nolabel="1"/>
+                            <div invisible="1">
+                                <p class="text-muted" colspan="2">
+                                    You can define approval status labels here as the default labels in the Kanban view.
+                                </p>
+                                <label for="legend_normal" string=" " class="o_status " title="The task is currently being processed in this stage. Click to change the task stage status."
+                                       aria-label="The task is currently being processed in this stage. Click to change the task stage status." role="img"/>
+                                <field name="legend_normal" nolabel="1"/>
+                                <label for="legend_blocked" string=" " class="o_status o_status_red" title="The task at this stage is blocked. Click to change the task stage status."
+                                       aria-label="The task at this stage is blocked. Click to change the task stage status." role="img"/>
+                                <field name="legend_blocked" nolabel="1"/>
+                                <label for="legend_done" string=" " class="o_status o_status_green" title="The task for this stage has been completed. Click to change the task stage status."
+                                       aria-label="The task for this stage has been completed. Click to change the task stage status." role="img"/>
+                                <field name="legend_done" nolabel="1"/>
 
-                            <p class="text-muted" colspan="2">
-                                You can add a description to help understand the significance and purpose of this stage.
-                            </p>
+                                <p class="text-muted" colspan="2">
+                                    You can add a description to help understand the significance and purpose of this stage.
+                                </p>
+                            </div>
                             <field name="description" placeholder="Add Explanation Description" nolabel="1" colspan="2"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="fund_management_approval_stage_status_view_form" model="ir.ui.view">
+            <field name="name">fund.management.approval.stage.view.form</field>
+            <field name="model">fund.management.approval.stage</field>
+            <field name="arch" type="xml">
+                <form string="Fund management approval stage Status" js_class="fund_management_stage_status_chart"
+                      create="False" edit="False" duplicate="False" delete="False">
+                    <header>
+                        <field name="category_id"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <div/>
                         </group>
                     </sheet>
                 </form>
@@ -112,6 +132,19 @@
             <field name="search_view_id" eval="False"/>
             <field name="target">new</field>
             <field name="view_id" ref="fund_management_approval_stage_by_category_tree"/>
+            <field name="domain">[('category_id', '=', default_category_id)]</field>
+            <field name="context">{
+                'default_category_id': default_category_id,
+                'default_fund_management_id': default_fund_management_id,
+                }</field>
+        </record>
+
+        <record id="view_all_stage_status_by_category_action" model="ir.actions.act_window">
+            <field name="name">Approval Stage Status Chart</field>
+            <field name="res_model">fund.management.approval.stage</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="fund_management_approval_stage_status_view_form"/>
             <field name="domain">[('category_id', '=', default_category_id)]</field>
             <field name="context">{
                 'default_category_id': default_category_id,
