@@ -133,7 +133,7 @@ class FundManagement(models.Model):
         copy=False,
         default='draft',
     )
-    meeting_minutes = fields.Html(string="Meeting Minutes", tracking=True)
+    meeting_minutes = fields.Html(string="Meeting Minutes")
     meeting_minutes_editable = fields.Boolean("Meeting Minutes Editable", related="stage.input_meeting_minutes")
 
     @api.model
