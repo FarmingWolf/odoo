@@ -1004,7 +1004,7 @@ msgstr "审批流程的最后阶段。处于此阶段的申请单方可生效。
 
 #. module: fund_management
 #: model:ir.model.constraint,message:fund_management.constraint_fund_management_approval_stage_name
-msgid "Name and stage number can not be duplicated in the category!"
+msgid "Name and sequence number can not be duplicated in the category!"
 msgstr "相同序号下阶段名称重复了！"
 
 #. module: fund_management

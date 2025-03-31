@@ -67,7 +67,7 @@ class FundManagementApprovalStage(models.Model):
 
     _sql_constraints = [
         ('sequence', 'unique(name, sequence, company_id, category_id)',
-         'Name and stage number can not be duplicated in the category!'),
+         'Name and sequence number can not be duplicated in the category!'),
     ]
 
     @api.constrains('sequence', 'pipe_end')
