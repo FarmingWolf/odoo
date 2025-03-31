@@ -6,7 +6,7 @@
                 <t t-debug=""/>
                 <t t-if="stage_group.length == 1">
                     <div class="d-flex flex-column align-items-center border-bottom mb-3">
-                        <div t-attf-class="rounded-3 p-3 border #{(stage_group[0].approval_decision == true or stage_group[0].pipe_end) ? 'bg-success' : 'bg-light border-primary'}"
+                        <div t-attf-class="rounded-3 p-3 border #{(stage_group[0].approval_decision == true or (stage_group[0].pipe_end and stage_group[0].approval_decision == true)) ? 'bg-success' : 'bg-light border-primary'}"
                              t-att-data-tooltip="stage_group[0].op_department + '\n' + stage_group[0].op_job">
                             <span t-out="stage_group[0].name" class="h4 m-0 #{stage_group[0].approval_decision == true ? 'text-white' : 'text-primary'}"/>
                         </div>
