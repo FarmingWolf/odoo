@@ -156,7 +156,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
     set_rent_plan_rent_price = fields.Float(default=0.0, string="单价（元/天/㎡）",
                                             help="可设置精确到小数点后若干位，以确保月租金、年租金符合期望值")
     set_rent_plan_rent_amount_monthly_adjust = fields.Float(string="月租金（元）", default=0.0,
-                                                            help="=租金单价（元/天/㎡）×计租面积（㎡）×365÷12")
+                                                            help="=租金单价（元/天/㎡）×计租面积（㎡）×一年天数÷12")
     set_rent_plan_annual_rent = fields.Float(string="年租金（元）", default=0.0)
     # 该字段仅在租赁标的主页面选择固定金额方案，并设置固定租金时可设置
     set_rent_plan_including_management_fee = fields.Boolean(string="含物业费", default=True,
@@ -171,7 +171,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
     def _onchange_set_rent_plan_rent_price(self):
         for record in self:
             if record.set_rent_plan_rent_price:
-                record.set_rent_plan_annual_rent = record.set_rent_plan_rent_price * 365 * record.rent_area
+                record.set_rent_plan_annual_rent = record.set_rent_plan_rent_price * self._get_one_year_days() * record.rent_area
                 record.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_annual_rent / 12
 
                 record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
@@ -186,10 +186,11 @@ class EstateLeaseContractPropertyExtend(models.Model):
 
     @api.onchange("set_rent_plan_rent_amount_monthly_adjust")
     def _onchange_set_rent_plan_rent_amount_monthly_adjust(self):
+        one_year_days = self._get_one_year_days()
         for record in self:
             if record.set_rent_plan_rent_amount_monthly_adjust:
                 record.set_rent_plan_annual_rent = record.set_rent_plan_rent_amount_monthly_adjust * 12
-                record.set_rent_plan_rent_price = record.set_rent_plan_annual_rent / 365 / record.rent_area
+                record.set_rent_plan_rent_price = record.set_rent_plan_annual_rent / one_year_days / record.rent_area
 
                 record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
                 record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
@@ -203,10 +204,11 @@ class EstateLeaseContractPropertyExtend(models.Model):
 
     @api.onchange("set_rent_plan_annual_rent")
     def _onchange_set_rent_plan_annual_rent(self):
+        one_year_days = self._get_one_year_days()
         for record in self:
             if record.set_rent_plan_annual_rent:
                 record.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_annual_rent / 12
-                record.set_rent_plan_rent_price = record.set_rent_plan_annual_rent / 365 / record.rent_area
+                record.set_rent_plan_rent_price = record.set_rent_plan_annual_rent / one_year_days / record.rent_area
 
                 record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
                 record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
@@ -425,7 +427,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
     including_management_fee = fields.Boolean(string="含物业费", readonly=True, compute="_get_rent_plan_info",
                                               help="勾选表示租金包含物业费，不勾选则表示租金不包含物业费")
     rent_amount_monthly_auto = fields.Float(string="月租金（元）", readonly=True, compute="_get_rent_plan_info",
-                                            help="=租金单价（元/天/㎡）×计租面积（㎡）×365÷12")
+                                            help="=租金单价（元/天/㎡）×计租面积（㎡）×一年天数÷12")
     rent_amount_monthly_adjust = fields.Float(string="手调月租金（元）", help="可手动调整此金额。若调整后不为0，则系统以此为准。")
     rent_amount_yearly_adjust = fields.Float(string="手调年租金（元）", help="请通过点击后方单选框明确本字段用于系统计算或仅显示。",
                                              default=lambda self: self.rent_amount_yearly_adjust * 12)
@@ -439,6 +441,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
 
     @api.depends("rent_plan_id")
     def _get_rent_plan_info(self):
+        one_year_days = self._get_one_year_days()
         for record in self:
 
             if record.rent_plan_id:
@@ -464,11 +467,11 @@ class EstateLeaseContractPropertyExtend(models.Model):
                 record.rent_price = Utils.remove_last_zero(record.rent_plan_id.rent_price)
                 _logger.info(f"record.rent_price={record.rent_price}")
                 record.including_management_fee = record.rent_plan_id.including_management_fee
-                record.rent_amount_monthly_auto = record.rent_plan_id.rent_price * record.rent_area * 365 / 12
+                record.rent_amount_monthly_auto = record.rent_plan_id.rent_price * record.rent_area * one_year_days / 12
                 if record.rent_amount_monthly_adjust:
                     pass
                 else:
-                    record.rent_amount_monthly_adjust = record.rent_plan_id.rent_price * record.rent_area * 365 / 12
+                    record.rent_amount_monthly_adjust = record.rent_plan_id.rent_price * record.rent_area * one_year_days / 12
 
                 record.payment_date = dict(record.rent_plan_id._fields['payment_date'].selection).get(
                     record.rent_plan_id.payment_date)
@@ -934,3 +937,7 @@ class EstateLeaseContractPropertyExtend(models.Model):
             "res_id": tgt_id,
         }
         return action
+
+    def _get_one_year_days(self):
+        one_year_days = self.env.user.company_id.one_year_days if self.env.user.company_id.one_year_days else 365
+        return one_year_days

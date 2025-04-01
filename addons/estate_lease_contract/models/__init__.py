@@ -33,3 +33,4 @@ from . import estate_lease_contract_registration_addr_rel
 from . import estate_lease_contract
 from . import estate_lease_contract_property_daily_status
 from . import estate_lease_contract_turnover_amt_received
+from . import res_company

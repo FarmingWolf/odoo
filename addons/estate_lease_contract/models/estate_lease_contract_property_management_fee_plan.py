@@ -214,19 +214,21 @@ class EstateLeaseContractPropertyManagementFeePlan(models.Model):
 
     @api.onchange('property_management_fee_price')
     def _onchange_property_management_fee_price(self):
+        one_year_days = self._get_one_year_days()
         if self.rent_target_area and self.rent_target_area > 0:
             if self.property_management_fee_price_monthly != \
-                    self.property_management_fee_price * self.rent_target_area * 365 / 12:
+                    self.property_management_fee_price * self.rent_target_area * one_year_days / 12:
                 self.property_management_fee_price_monthly = \
-                    self.property_management_fee_price * self.rent_target_area * 365 / 12
+                    self.property_management_fee_price * self.rent_target_area * one_year_days / 12
 
     @api.onchange('property_management_fee_price_monthly')
     def _onchange_property_management_fee_price_monthly(self):
+        one_year_days = self._get_one_year_days()
         if self.rent_target_area and self.rent_target_area > 0:
             if self.property_management_fee_price != \
-                    self.property_management_fee_price_monthly * 12 / 365 / self.rent_target_area:
+                    self.property_management_fee_price_monthly * 12 / one_year_days / self.rent_target_area:
                 self.property_management_fee_price = \
-                    self.property_management_fee_price_monthly * 12 / 365 / self.rent_target_area
+                    self.property_management_fee_price_monthly * 12 / one_year_days / self.rent_target_area
 
     @api.depends("name", "property_management_fee_price", "property_management_fee_price_monthly",
                  "payment_date", "payment_period", "billing_progress_method_id", "period_percentage_id")
@@ -269,3 +271,7 @@ class EstateLeaseContractPropertyManagementFeePlan(models.Model):
         #     self.estate_lease_contract_property.write({'management_fee_plan_id': self.id})
 
         return res
+
+    def _get_one_year_days(self):
+        one_year_days = self.env.user.company_id.one_year_days if self.env.user.company_id.one_year_days else 365
+        return one_year_days

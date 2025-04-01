@@ -34,8 +34,8 @@
                             <field name="name"/>
                             <field name="date_start_depending"/>
                             <field name="payment_period_depending"/>
-                            <field name="property_management_fee_price" help="月费 * 12 ÷ 365 ÷ 面积"/>
-                            <field name="property_management_fee_price_monthly" help="单价 * 面积 * 365 ÷ 12"/>
+                            <field name="property_management_fee_price" help="月费 * 12 ÷ 一年天数 ÷ 面积"/>
+                            <field name="property_management_fee_price_monthly" help="单价 * 面积 * 一年天数 ÷ 12"/>
                             <field name="rent_targets" widget="many2many_tags" readonly="1" invisible="1"/>
                         </group>
                         <group col="1">

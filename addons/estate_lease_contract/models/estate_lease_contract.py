@@ -57,13 +57,13 @@ def _cal_date_payment(current_s, current_e, rental_plan, date_e):
 
 # 最后一期有可能不是一整期
 def _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, property_id, rent_price_adapt,
-                            rent_amount_monthly_adapt):
+                            rent_amount_monthly_adapt, one_year_days):
     last_period_rental = 0.0
     current_tmp = _get_current_e(current_s)
 
     # 以手调月租为准
     if property_id.rent_amount_monthly_adjust:
-        rent_price_adapt = rent_amount_monthly_adapt * 12 / 365 / property_id.rent_area
+        rent_price_adapt = rent_amount_monthly_adapt * 12 / one_year_days / property_id.rent_area
 
     # 最后一期不足一个月，则按天算
     if current_e < current_tmp:
@@ -76,7 +76,7 @@ def _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, pro
         if property_id.rent_amount_monthly_adjust:
             last_period_rental += rent_amount_monthly_adapt
         else:
-            last_period_rental += property_id.rent_area * rent_price_adapt * 365 / 12
+            last_period_rental += property_id.rent_area * rent_price_adapt * one_year_days / 12
         current_s = current_tmp + timedelta(days=1)
         current_tmp = _get_current_e(current_s)
 
@@ -86,7 +86,7 @@ def _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, pro
             if property_id.rent_amount_monthly_adjust:
                 last_period_rental += rent_amount_monthly_adapt
             else:
-                last_period_rental += property_id.rent_area * rent_price_adapt * 365 / 12
+                last_period_rental += property_id.rent_area * rent_price_adapt * one_year_days / 12
         else:
             period_days = current_e - current_s
             last_period_rental += property_id.rent_area * rent_price_adapt * (period_days.days + 1)
@@ -94,22 +94,22 @@ def _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, pro
         if property_id.rent_amount_monthly_adjust:
             last_period_rental += rent_amount_monthly_adapt
         else:
-            last_period_rental += property_id.rent_area * rent_price_adapt * 365 / 12
+            last_period_rental += property_id.rent_area * rent_price_adapt * one_year_days / 12
 
     return last_period_rental
 
 
 def _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property_id, rent_price_adapt,
-                       rent_amount_monthly_adapt):
+                       rent_amount_monthly_adapt, one_year_days):
     """
     租金计算方法：先计算年租金，再计算每月租金或每期租金
-    年租金=租金单价×计租面积×365
+    年租金=租金单价×计租面积×一年天数
     月租金=年租金÷12
     两个月租金=月租金×2
     三个月租金=月租金×3
     以此类推
     """
-    # rental_amount_year = property_id.rent_area * rent_price_val * 365
+    # rental_amount_year = property_id.rent_area * rent_price_val * one_year_days
     # rental_amount_month = rental_amount_year / 12
 
     # if property_id.rent_amount_monthly_adjust:
@@ -120,16 +120,16 @@ def _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property
         rental_amount = rental_amount_month * month_cnt
     else:  # 最后一期租金
         rental_amount = _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, property_id,
-                                                rent_price_adapt, rent_amount_monthly_adapt)
+                                                rent_price_adapt, rent_amount_monthly_adapt, one_year_days)
 
     return rental_amount
 
 
 def _cal_manage_fee_amount(month_cnt, current_s, current_e, date_s, date_e, property_id, manage_fee_price_adapt,
-                           manage_fee_amount_monthly_adapt):
+                           manage_fee_amount_monthly_adapt, one_year_days):
     """
     物业费计算方法：先计算年物业费，再计算每月物业费和每期物业费
-    年物业费=物业费单价×计租面积×365
+    年物业费=物业费单价×计租面积×一年天数
     月物业费=年物业费÷12
     两个月物业费=月物业费×2
     三个月物业费=月物业费×3
@@ -141,7 +141,8 @@ def _cal_manage_fee_amount(month_cnt, current_s, current_e, date_s, date_e, prop
         manage_fee_amount = manage_fee_amount_month * month_cnt
     else:  # 最后一期物业费
         manage_fee_amount = _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, property_id,
-                                                    manage_fee_price_adapt, manage_fee_amount_monthly_adapt)
+                                                    manage_fee_price_adapt, manage_fee_amount_monthly_adapt,
+                                                    one_year_days)
 
     return manage_fee_amount
 
@@ -419,7 +420,7 @@ def _get_period_total_e(current_s, month_cnt, date_e):
     return current_e
 
 
-def _generate_details_from_rent_plan(record_self):
+def _generate_details_from_rent_plan(record_self, one_year_days):
     """
     一个租赁标的有一个租金方案，
     一个租金方案生成多条租金明细
@@ -446,7 +447,7 @@ def _generate_details_from_rent_plan(record_self):
         if property_id.rent_amount_monthly_adjust:
             rent_amount_monthly_val = property_id.rent_amount_monthly_adjust
         else:
-            rent_amount_monthly_val = rental_plan.rent_price * property_id.rent_area * 365 / 12
+            rent_amount_monthly_val = rental_plan.rent_price * property_id.rent_area * one_year_days / 12
         # ↑↑↑不能在这里四舍五入
 
         temp_deposit_amount += property_id.deposit_amount if property_id.deposit_amount else 0
@@ -472,7 +473,7 @@ def _generate_details_from_rent_plan(record_self):
             billing_method_str = dict(rental_plan._fields['billing_method'].selection).get(rental_plan.billing_method)
             payment_date_str = dict(rental_plan._fields['payment_date'].selection).get(rental_plan.payment_date)
             rental_amount = _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property_id,
-                                               rent_price_adapt, rent_amount_monthly_adapt)
+                                               rent_price_adapt, rent_amount_monthly_adapt, one_year_days)
             rental_amount_zh = Utils.arabic_to_chinese(round(rental_amount, 2))
 
             rental_periods_details.append({
@@ -514,7 +515,7 @@ def _generate_details_from_rent_plan(record_self):
     return rental_periods_details
 
 
-def _generate_details_from_management_fee_plan_plan(record_self):
+def _generate_details_from_management_fee_plan_plan(record_self, one_year_days):
     """
     一个租赁标的最多有一个物业费方案（当租金方案中选择了包含物业费，则该租赁标的无物业费方案），
     一个物业费方案生成多条物业费明细
@@ -565,7 +566,8 @@ def _generate_details_from_management_fee_plan_plan(record_self):
             payment_date_str = dict(management_fee_plan._fields[
                                         'payment_date'].selection).get(management_fee_plan.payment_date)
             manage_fee_amount = _cal_manage_fee_amount(month_cnt, current_s, current_e, date_s, date_e, property_id,
-                                                       manage_fee_price_adapt, manage_fee_amount_monthly_adapt)
+                                                       manage_fee_price_adapt, manage_fee_amount_monthly_adapt,
+                                                       one_year_days)
             manage_fee_amount_zh = Utils.arabic_to_chinese(round(manage_fee_amount, 2))
 
             manage_fee_periods_details.append({
@@ -921,6 +923,7 @@ class EstateLeaseContract(models.Model):
 
     @api.depends("date_rent_start", "date_rent_end", "days_free")
     def _calc_days_rent_total(self):
+        one_year_days = self._get_one_year_days()
         for record in self:
             if record.date_rent_start and record.date_rent_end:
                 if record.date_rent_start > record.date_rent_end:
@@ -929,7 +932,7 @@ class EstateLeaseContract(models.Model):
                 date_s = fields.Date.from_string(record.date_rent_start)
                 date_e = fields.Date.from_string(record.date_rent_end)
                 delta = date_e - date_s
-                year_delta = (delta.days + 1) / 365
+                year_delta = (delta.days + 1) / one_year_days
                 record.days_rent_total = "{0}年（{1}天）".format(round(year_delta, 2), delta.days + 1)
             else:
                 record.days_rent_total = ""
@@ -1602,9 +1605,10 @@ class EstateLeaseContract(models.Model):
     # 根据租期和租金方案计算租金明细
     @api.depends("property_ids", "date_rent_start", "date_rent_end", "rental_plan_ids")
     def _compute_property_rental_detail_ids(self):
+        one_year_days = self._get_one_year_days()
         for record in self:
             if record.date_rent_start and record.date_rent_end and record.property_ids and record.rental_plan_ids:
-                generated_rental_details = _generate_details_from_rent_plan(record)
+                generated_rental_details = _generate_details_from_rent_plan(record, one_year_days)
                 # 先删除旧纪录
                 _logger.info(f"删掉estate.lease.contract.property.rental.detail中contract_id={record.id}的not edit记录")
                 self.env['estate.lease.contract.property.rental.detail'].search(
@@ -1626,12 +1630,17 @@ class EstateLeaseContract(models.Model):
                         'edited': rental_detail['edited'],
                     })
 
+    def _get_one_year_days(self):
+        one_year_days = self.env.user.company_id.one_year_days if self.env.user.company_id.one_year_days else 365
+        return one_year_days
+
     # 根据租期和物业费方案计算物业费明细
     @api.depends("property_ids", "date_rent_start", "date_rent_end", "property_management_fee_plan_ids")
     def _compute_property_manage_fee_detail_ids(self):
+        one_year_days = self._get_one_year_days()
         for record in self:
             if record.date_rent_start and record.date_rent_end and record.property_ids and record.property_management_fee_plan_ids:
-                generated_manage_fee_details = _generate_details_from_management_fee_plan_plan(record)
+                generated_manage_fee_details = _generate_details_from_management_fee_plan_plan(record, one_year_days)
                 # 先删除旧纪录
                 _logger.info(f"删掉estate.lease.contract.property.manage.fee.detail中contract_id={record.id}的not edit记录")
                 self.env['estate.lease.contract.property.manage.fee.detail'].search(

@@ -15,9 +15,13 @@ class EstatePropertyOffer(models.Model):
     _order = "price desc"
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
+    def _get_one_year_days(self):
+        one_year_days = self.env.user.company_id.one_year_days if self.env.user.company_id.one_year_days else 365
+        return one_year_days
+
     price = fields.Float('报价（元/天/㎡）', required=True, tracking=True)
-    rental_monthly = fields.Float('月租（元）', help="=单价×面积×365÷12", tracking=True)
-    rental_yearly = fields.Float('年租（元）', help="=单价×面积×365", tracking=True)
+    rental_monthly = fields.Float('月租（元）', help="=单价×面积×一年天数÷12", tracking=True)
+    rental_yearly = fields.Float('年租（元）', help="=单价×面积×一年天数", tracking=True)
     status = fields.Selection(
         string='报价状态',
         selection=[('bargaining', '商谈中'), ('accepted', '已接受'), ('refused', '已拒绝')],
@@ -42,8 +46,8 @@ class EstatePropertyOffer(models.Model):
 
     @api.onchange('price')
     def _onchange_price(self):
-        if self.rental_yearly != self.price * self.rent_area * 365:
-            self.rental_yearly = self.price * self.rent_area * 365
+        if self.rental_yearly != self.price * self.rent_area * self._get_one_year_days():
+            self.rental_yearly = self.price * self.rent_area * self._get_one_year_days()
 
         if self.rental_monthly != self.rental_yearly / 12:
             self.rental_monthly = self.rental_yearly / 12
@@ -53,16 +57,16 @@ class EstatePropertyOffer(models.Model):
         if self.rental_yearly != self.rental_monthly * 12:
             self.rental_yearly = self.rental_monthly * 12
 
-        if self.price != self.rental_yearly / 365 / self.rent_area:
-            self.price = self.rental_yearly / 365 / self.rent_area
+        if self.price != self.rental_yearly / self._get_one_year_days() / self.rent_area:
+            self.price = self.rental_yearly / self._get_one_year_days() / self.rent_area
 
     @api.onchange('rental_yearly')
     def _onchange_rental_yearly(self):
         if self.rental_monthly != self.rental_yearly / 12:
             self.rental_monthly = self.rental_yearly / 12
 
-        if self.price != self.rental_yearly / 365 / self.rent_area:
-            self.price = self.rental_yearly / 365 / self.rent_area
+        if self.price != self.rental_yearly / self._get_one_year_days() / self.rent_area:
+            self.price = self.rental_yearly / self._get_one_year_days() / self.rent_area
 
     @api.depends("validity")
     def _compute_date_deadline(self):

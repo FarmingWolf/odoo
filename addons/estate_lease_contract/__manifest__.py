@@ -55,6 +55,7 @@
         'security/estate.lease.contract.rental.main.category.csv',
         'security/ir.rule.csv',
 
+        'views/res_company_views.xml',
         'views/estate_lease_contract_property_ini_state_views.xml',
         'views/estate_lease_contract_approval_stage_views.xml',
         'views/estate_lease_contract_approval_switch_views.xml',
