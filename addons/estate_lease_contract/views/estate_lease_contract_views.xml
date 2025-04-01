@@ -150,7 +150,7 @@
                                 <group>
                                     <field name="days_rent_total" readonly="1"/>
                                     <field name="days_free" readonly="not edit_on_hist_page"
-                                           help="目前仅用于记录合同中约定的免租期天数，系统暂不据此计算租金"/>
+                                           help="默认等于【计租开始日-合同开始日】，也可以手动输入其他值。目前仅用于记录合同中约定的免租期天数，系统暂不据此计算租金。"/>
                                     <field name="date_decorate_start" readonly="not edit_on_hist_page"/>
                                     <field name="date_decorate_end" readonly="not edit_on_hist_page"/>
                                     <field name="days_decorate" readonly="1"/>
@@ -777,7 +777,8 @@
                 <field name="date_start"/>
                 <field name="date_rent_start"/>
                 <field name="date_rent_end"/>
-                <field name="state"/>
+                <field name="days_free"/>
+                <field name="state" optional="hide"/>
                 <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}"/>
                 <field name="renter_id"/>
                 <field name="renter_company_id" column_invisible="1"/>

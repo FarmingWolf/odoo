@@ -789,6 +789,9 @@ class EstateLeaseContract(models.Model):
         if self.date_start > self.date_rent_start:
             self.date_rent_start = self.date_start
 
+        if self.days_free != self.date_rent_start - self.date_start:
+            self.days_free = self.date_rent_start - self.date_start
+
         if request and request.session:
             request.session['contract_date_start_4_management_fee'] = self.date_start
 
@@ -798,6 +801,9 @@ class EstateLeaseContract(models.Model):
             self.date_start = self.date_rent_start
         if self.date_rent_start > self.date_rent_end:
             self.date_rent_end = self.date_rent_start
+
+        if self.days_free != self.date_rent_start - self.date_start:
+            self.days_free = self.date_rent_start - self.date_start
 
         if request and request.session:
             request.session['contract_date_rent_start_4_management_fee'] = self.date_rent_start
@@ -1365,7 +1371,7 @@ class EstateLeaseContract(models.Model):
             else:
                 record.date_incentives_start = ""
                 record.date_incentives_end = ""
-                record.days_free = ""
+                record.days_free = record.date_rent_start - record.date_start
                 record.business_discount_days = ""
                 record.business_discount_amount = ""
                 record.decoration_discount_days = ""
