@@ -789,8 +789,8 @@ class EstateLeaseContract(models.Model):
         if self.date_start > self.date_rent_start:
             self.date_rent_start = self.date_start
 
-        if self.days_free != self.date_rent_start - self.date_start:
-            self.days_free = self.date_rent_start - self.date_start
+        if self.days_free != (self.date_rent_start - self.date_start).days:
+            self.days_free = (self.date_rent_start - self.date_start).days
 
         if request and request.session:
             request.session['contract_date_start_4_management_fee'] = self.date_start
@@ -802,8 +802,8 @@ class EstateLeaseContract(models.Model):
         if self.date_rent_start > self.date_rent_end:
             self.date_rent_end = self.date_rent_start
 
-        if self.days_free != self.date_rent_start - self.date_start:
-            self.days_free = self.date_rent_start - self.date_start
+        if self.days_free != (self.date_rent_start - self.date_start).days:
+            self.days_free = (self.date_rent_start - self.date_start).days
 
         if request and request.session:
             request.session['contract_date_rent_start_4_management_fee'] = self.date_rent_start
@@ -929,15 +929,6 @@ class EstateLeaseContract(models.Model):
                 date_s = fields.Date.from_string(record.date_rent_start)
                 date_e = fields.Date.from_string(record.date_rent_end)
                 delta = date_e - date_s
-                if record.days_free:
-                    if int(record.days_free) > delta.days:
-                        raise exceptions.UserError("免租期天数{0}不能大于租赁天数共{3}天[{1}至{2}]！如果不能打开合同界面，"
-                                                   "说明您在合同数据保存之后，优惠方案受到调整。那么"
-                                                   "请前往优惠方案页面调整免租期天数".format(record.days_free,
-                                                                             record.date_rent_start,
-                                                                             record.date_rent_end,
-                                                                             delta.days))
-
                 year_delta = (delta.days + 1) / 365
                 record.days_rent_total = "{0}年（{1}天）".format(round(year_delta, 2), delta.days + 1)
             else:
@@ -1371,7 +1362,10 @@ class EstateLeaseContract(models.Model):
             else:
                 record.date_incentives_start = ""
                 record.date_incentives_end = ""
-                record.days_free = record.date_rent_start - record.date_start
+                if not record.days_free:
+                    record.days_free = (record.date_rent_start - record.date_start).days
+                else:
+                    record.days_free = record.days_free
                 record.business_discount_days = ""
                 record.business_discount_amount = ""
                 record.decoration_discount_days = ""
