@@ -1595,7 +1595,9 @@ class EstateLeaseContract(models.Model):
     # 刷新物业费方案
     def action_refresh_management_fee_plan(self):
         self._compute_property_management_fee_plan_ids()
-        self.action_refresh_all_money()
+        self._compute_property_manage_fee_detail_ids()
+        self._compute_manage_fee_details()
+        self._compute_manage_fee_detail_warn_msg()
 
     # 根据租期和租金方案计算租金明细
     @api.depends("property_ids", "date_rent_start", "date_rent_end", "rental_plan_ids")

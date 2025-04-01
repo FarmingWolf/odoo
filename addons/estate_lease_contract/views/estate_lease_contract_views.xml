@@ -383,14 +383,14 @@
                             </sheet>
                         </page>
                         <page string="物业费方案" id="page_management_fee_plan" invisible="not show_management_fee_page">
-                            <button name="action_refresh_management_fee_plan" type="object" string="点击刷新"
+                            <button name="action_refresh_management_fee_plan" type="object" string="刷新物业费"
                                     invisible="context.get('contract_read_only') or state == 'invalid' or terminated" class="btn-primary"/>
                             <field name="property_management_fee_plan_ids"/>
                         </page>
                         <page string="物业费明细" id="page_management_fee_detail" invisible="not show_management_fee_page">
                             <group col="6">
                                 <group col="1" colspan="1" invisible="context.get('contract_read_only') or state == 'invalid' or terminated">
-                                    <button name="action_refresh_all_money" type="object" string="点击刷新"
+                                    <button name="action_refresh_management_fee_plan" type="object" string="刷新物业费"
                                             class="btn-primary"/>
                                 </group>
                                 <group col="1" colspan="5">
