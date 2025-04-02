@@ -294,7 +294,7 @@ msgstr "点击审批同意"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Click to reject"
-msgstr "点击拒绝"
+msgstr "点击驳回"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
@@ -890,7 +890,7 @@ msgstr "拒绝的申请"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Reject"
-msgstr "拒绝"
+msgstr "驳回"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__company_currency_id
