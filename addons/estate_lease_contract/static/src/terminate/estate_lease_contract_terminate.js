@@ -4,6 +4,7 @@ import {Component, useState} from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import {useService} from "@web/core/utils/hooks";
 import {TodoItem} from "./todo_item";
+import {Dialog} from "@web/core/dialog/dialog";
 
 let todo_list = [
     '已完成租赁房屋回收/验收',
@@ -13,7 +14,7 @@ let todo_list = [
 
 export class EstateLeaseContractTerminate extends Component {
     static template = "estate_lease_contract.ContractTerminateAction";
-    static components = { TodoItem };
+    static components = { Dialog, TodoItem };
 
     setup() {
         this.action = useService("action");
@@ -27,6 +28,7 @@ export class EstateLeaseContractTerminate extends Component {
             });
             i++;
         }
+        this.dialog = useService("dialog");
     }
     toggleTodo(todoId) {
         const todo = this.terminate_todo_list.find((todo) => todo.id === todoId);
