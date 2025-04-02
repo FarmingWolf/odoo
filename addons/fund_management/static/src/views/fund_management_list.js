@@ -10,8 +10,6 @@ import { ListController } from "@web/views/list/list_controller";
 import { ListRenderer } from "@web/views/list/list_renderer";
 import { onWillStart } from "@odoo/owl";
 import {FundManagementDocumentDropZone, FundManagementDocumentUpload} from "../mixins/document_upload";
-import {ExpenseDocumentDropZone} from "../../../../hr_expense/static/src/mixins/document_upload";
-import {ExpenseMobileQRCode} from "../../../../hr_expense/static/src/mixins/qrcode";
 import {FundManagementMobileQRCode} from "../mixins/qrcode";
 import {ApprovalProcess} from "../components/approval_process";
 

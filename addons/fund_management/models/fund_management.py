@@ -87,7 +87,7 @@ class FundManagement(models.Model):
             return default_category_id
 
         for record in self:
-            _logger.info(f"record={record}")
+            _logger.debug(f"record={record}")
 
             if not default_category_id:
                 default_category_id = record.category_id.id
@@ -140,7 +140,7 @@ class FundManagement(models.Model):
     def _get_view(self, view_id=None, view_type='form', **options):
         default_category_id = self._get_default_category()
 
-        _logger.info(f"进入_get_view default_category_id={default_category_id}")
+        _logger.debug(f"进入_get_view default_category_id={default_category_id}")
 
         arch, view = super()._get_view(view_id=view_id, view_type=view_type, **options)
         if view_type == 'form':
@@ -154,11 +154,11 @@ class FundManagement(models.Model):
     def _get_stage_domain(self):
 
         default_category_id = self._get_default_category()
-        _logger.info(f"default_category_id={default_category_id}")
-        _logger.info(f"active_id={self.env.context.get('active_id')}")
+        _logger.debug(f"default_category_id={default_category_id}")
+        _logger.debug(f"active_id={self.env.context.get('active_id')}")
         stage_domain = [('company_id', '=', self.env.user.company_id.id), ('category_id', '=', default_category_id)]
 
-        _logger.info(f"stage_domain={stage_domain}")
+        _logger.debug(f"stage_domain={stage_domain}")
         self._get_view()
         return stage_domain
 
@@ -251,7 +251,7 @@ class FundManagement(models.Model):
                                                                        ('category_id', '=', self.category_id.id)],
                                                                       limit=1)
 
-        _logger.info(f"stage_ids={stage_ids}")
+        _logger.debug(f"stage_ids={stage_ids}")
         if stage_ids:
             self.stage = stage_ids[0]
 
@@ -363,7 +363,7 @@ class FundManagement(models.Model):
         return res
 
     def _get_default_stage_id(self):
-        _logger.info(f"self.env.context={self.env.context}")
+        _logger.debug(f"self.env.context={self.env.context}")
         stage_ids = self.env['fund.management.approval.stage']. \
             search([('company_id', '=', self.env.user.company_id.id),
                     ('category_id', '=', self.env.context.get('default_category_id'))], limit=1)
@@ -392,22 +392,38 @@ class FundManagement(models.Model):
         # 批准
         for record in self:
             check_right, tgt_stage = self._check_approval_rights(record)
+            _logger.debug(f"tgt_stage={tgt_stage.name};tgt_stage.seq={tgt_stage.sequence}")
             if not check_right:
                 raise UserError(f"您不能审批当前阶段：{record.stage.name}")
 
             # 先检查本节点是否已经审批通过，若已通过则不用再次创建审批记录
-            stage_approved, approval_decision, next_stage, next_stage_result = \
+            stage_approved, approval_decision, next_stage_lst = \
                 self._check_multi_stage_approved(record, tgt_stage)
 
-            # 下节点通过的情况下，由于权限问题，原则上到不了这里；如果下节点驳回的情况下，由于按钮不显示也到不了这里；
-            # 如果下节点还没操作，则正常检查
-            if next_stage_result is not None:
-                if not next_stage_result:
-                    if not from_action_submit:
-                        raise UserError(f"本流程在【{next_stage}】已被驳回，请继续驳回本流程！")
+            for next_stage in next_stage_lst:
+                _logger.debug(f"next_stage={next_stage['stage'].name};result={next_stage['stage_result']}")
 
+            # 下节点通过的情况下，由于权限问题，原则上到不了这里；
+            # 如果下节点驳回的情况下，由于按钮不显示也到不了这里；但是如果本节点要求上传附件，则即使下节点驳回，这里可能上传附件再提交
+            for next_stage in next_stage_lst:
+                if next_stage["stage_result"] is not None:
+                    if not next_stage["stage_result"]:
+                        if not from_action_submit:
+                            if not record.stage.input_meeting_minutes:
+                                raise UserError(f"本流程在【{next_stage['stage'].name}】已被驳回，请继续驳回本流程！")
+
+            can_approve_again = False
             if stage_approved:
-                raise UserError(f"您已审批{'通过' if approval_decision else '拒绝'}，不能再【同意】")
+                # 如果来自下个节点的驳回，而且本节点允许上传附件，那么可以继续提交
+                for next_stage in next_stage_lst:
+                    if next_stage["stage_result"] is not None:
+                        if not next_stage["stage_result"]:
+                            if record.stage.input_meeting_minutes:
+                                can_approve_again = True
+                                break
+
+            if stage_approved and not can_approve_again:
+                raise UserError(f"您已审批{'通过' if approval_decision else '驳回'}，不能再【同意】")
 
             next_state = 'submitted' if record.stage.sequence == 0 else 'approved'
             # 先创建当前阶段的审批记录
@@ -416,7 +432,7 @@ class FundManagement(models.Model):
             # 如果本阶段有多个同级别的审批节点，那么所有节点都通过后才可进入下一阶段
             same_level_approval_result = self._check_same_level_approval_result(record, tgt_stage)
             if not same_level_approval_result:
-                _logger.info("状态审批中，但是因同级别审批节点尚未完全通过，所以暂不推进本审批流的阶段")
+                _logger.debug("状态审批中，但是因同级别审批节点尚未完全通过，所以暂不推进本审批流的阶段")
                 self.write({'state': next_state})
                 return
 
@@ -452,12 +468,21 @@ class FundManagement(models.Model):
                 raise UserError(f"您不能审批当前阶段：{record.stage.name}")
 
             # 先检查一下本节点是否已经审批通过，若已通过则不用再次创建审批记录
-            stage_approved, approval_decision, next_stage, next_stage_result = \
+            stage_approved, approval_decision, next_stage_lst = \
                 self._check_multi_stage_approved(record, tgt_stage)
 
-            # 下节点通过的情况下，由于权限问题，原则上到不了这里；如果下节点驳回的情况下，这里应该继续驳回
-            if stage_approved and (next_stage_result is None):
-                raise UserError(f"您已审批{'通过' if approval_decision else '拒绝'}，不能再【驳回】")
+            # 下节点全部通过的情况下，由于权限问题，原则上到不了这里；
+            # 如果下阶段平行节点有驳回的情况下，这里可以继续驳回；而下阶段的平行节点中没有驳回则不能操作
+            can_approve_again = False
+            if stage_approved:
+                for next_stage in next_stage_lst:
+                    if next_stage["stage_result"] is not None:
+                        if not next_stage["stage_result"]:
+                            can_approve_again = True
+                            break
+
+            if stage_approved and not can_approve_again:
+                raise UserError(f"您已审批{'通过' if approval_decision else '驳回'}，不能再【驳回】")
 
             # 先创建当前阶段的驳回记录
             self._create_approval_detail(record, False, False, tgt_stage)
@@ -485,11 +510,11 @@ class FundManagement(models.Model):
                 raise UserError(f"您不能操作当前阶段：{record.stage.name}")
 
             # 先检查一下本节点是否已经审批通过，若已通过则不用再次创建审批记录
-            stage_approved, approval_decision, next_stage, next_stage_result = \
+            stage_approved, approval_decision, next_stage_lst = \
                 self._check_multi_stage_approved(record, tgt_stage)
 
             if stage_approved:
-                raise UserError(f"您已审批{'通过' if approval_decision else '拒绝'}，不能再【取消】")
+                raise UserError(f"您已审批{'通过' if approval_decision else '驳回'}，不能再【取消】")
 
             self._create_approval_detail(record, False, True, tgt_stage)
             all_stages = self.env['fund.management.approval.stage'].search([('company_id', '=', record.company_id.id),
@@ -512,12 +537,12 @@ class FundManagement(models.Model):
         # 由于在stage创建时，对非起始stage（sequence!=0）时的部门和职位角色不为空做了强制要求，所以这部分逻辑仅对起始stage有效
         if not record.stage.op_department_id:
             if not record.stage.op_job_id:
-                _logger.info(f"record.stage={record.stage.name}不要求部门和职位角色")
+                _logger.debug(f"record.stage={record.stage.name}不要求部门和职位角色")
                 return True, record.stage
             else:
                 if this_employee_job_id == record.stage.op_job_id.id or \
                         self._get_employee().job_id.name == record.stage.op_job_id.name:
-                    _logger.info(f"record.stage={record.stage.name}不要求部门，只要求职位角色")
+                    _logger.debug(f"record.stage={record.stage.name}不要求部门，只要求职位角色")
                     return True, record.stage
                 else:
                     return False, record.stage
@@ -534,7 +559,7 @@ class FundManagement(models.Model):
         if this_employee_dep_id == record_stage_dep_id and record_stage_job_id == this_employee_job_id:
             return True, record.stage
         else:
-            # 有可能是同级别中的平行节点
+            # 有可能是同级别中的平行节点，直到找到本用户对应的节点
             for same_level_stage in record.category_id.approval_stages:
                 if same_level_stage.sequence == record.stage.sequence:
                     if same_level_stage.op_department_id.id == this_employee_dep_id and \
@@ -544,9 +569,9 @@ class FundManagement(models.Model):
 
     def _create_approval_detail(self, record, approval_or_reject, is_cancel, tgt_stage):
 
-        _logger.info(f"datetime.now()[{datetime.now()}]")
+        _logger.debug(f"datetime.now()[{datetime.now()}]")
         date_time = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y-%m-%d %H:%M:%S')
-        _logger.info(f"date:{date_time}")
+        _logger.debug(f"date:{date_time}")
 
         this_user = self._get_employee()
         approval_by_usr_id = this_user.id
@@ -572,7 +597,7 @@ class FundManagement(models.Model):
             approval_decision_txt = "取消"
             approval_comment = "取消"
 
-        _logger.info(f"创建审批记录approval_or_reject={approval_or_reject}")
+        _logger.debug(f"创建审批记录approval_or_reject={approval_or_reject}")
         self.env['fund.management.approval.detail'].create({
             'fund_management_id': f"{record.id}",
             'approval_stage': f"{tgt_stage.id}",
@@ -668,7 +693,7 @@ class FundManagement(models.Model):
         stage_domain = [('category_id', '=', default_category_id)]
         meta_stages = self.env['fund.management.approval.stage'].search(stage_domain)
         detail_domain = [('fund_management_id', '=', default_fund_management_id)]
-        approval_details = self.env['fund.management.approval.detail'].search(detail_domain)
+        approval_details = self.env['fund.management.approval.detail'].search(detail_domain, order="id DESC")
 
         all_stages = []
         for stage in meta_stages:
@@ -691,6 +716,12 @@ class FundManagement(models.Model):
                 # 若流程曾经被驳回，那么只看到最新提交之后的
                 if detail.approval_stage.sequence == 0:
                     break
+
+                # 若流程被驳回，又在添加其他信息阶段再提交了，那么只看到这个再提交
+                if stage.sequence > detail.approval_stage.sequence:
+                    if detail.approval_stage.input_meeting_minutes:
+                        if detail.approval_decision:
+                            break
 
             all_stages.append(stage_data)
 
@@ -761,7 +792,7 @@ class FundManagement(models.Model):
         self_rcd = self.browse(self_rcd_id)
         default_category_id = self_rcd.category_id.id
         request.session["default_category_id"] = default_category_id
-        _logger.info(f"self_rcd_id={self_rcd_id};default_category_id={default_category_id}")
+        _logger.debug(f"self_rcd_id={self_rcd_id};default_category_id={default_category_id}")
         # 清理缓存
         self._invalidate_cache(['stage'])
 
@@ -781,7 +812,7 @@ class FundManagement(models.Model):
     def action_view_all_stages(self):
 
         default_category_id = self.env.context.get("default_category_id")
-        _logger.info(f"default_category_id={default_category_id}")
+        _logger.debug(f"default_category_id={default_category_id}")
         action = {
             "name": f"{self.name}",
             "type": "ir.actions.act_window",
@@ -796,37 +827,61 @@ class FundManagement(models.Model):
 
     def _check_same_level_approval_result(self, record, tgt_stage):
 
-        approval_details = self.env['fund.management.approval.detail'].search([('fund_management_id', '=', record.id)])
+        approval_details = self.env['fund.management.approval.detail'].search([('fund_management_id', '=', record.id)],
+                                                                              order="id DESC")
         rst = []
         # 仅找最新提交以来的
         for stage in record.category_id.approval_stages:
+            # 本节点的审批记录数据，由于刚插入，现在取出来还有若干字段值为空，那么，既然来自action_agree的调用，所以直接跳过本节点
+            if stage.id == tgt_stage.id:
+                _logger.debug(f"tgt_stage={tgt_stage.name}；添加{stage.name}并强制设result为true")
+                rst.append([stage, True])
+                continue
+
+            _logger.debug(f"stage={stage.name};sequence={stage.sequence}=record.stage.sequence?{record.stage.sequence == stage.sequence}")
+            # 其他和本stage相同sequence的平行节点
             if stage.sequence == record.stage.sequence:
                 approved = False
                 for rcd in approval_details:
-                    # 本节点的审批记录数据，由于刚插入，现在取出来还有若干字段值为空，跳过
-                    if rcd.approval_stage_id == tgt_stage.id:
-                        approved = True
+                    _logger.debug(f"rcd.id={rcd.id}approval_stage_nm={rcd.approval_stage_nm};stage={rcd.approval_stage};stage.id={rcd.approval_stage.id};stage.nm={rcd.approval_stage.name}")
+                    if rcd.approval_stage_nm != rcd.approval_stage.name:
+                        # 经确认，刚创建的detail记录中部分字段为空
                         continue
 
+                    # 驳回到头再提交之前的不看
+                    if rcd.approval_stage.sequence == 0:
+                        _logger.debug(f"到头了")
+                        approved = False
+                        break
+
+                    # 已经找到了【添加附件节点已通过】表示修改了附件或其他信息再提交了，就不能再往前找该stage的驳回记录了
+                    if stage.sequence > rcd.approval_stage.sequence:
+                        if rcd.approval_stage.input_meeting_minutes:
+                            if rcd.approval_decision:
+                                _logger.debug(f"stage={stage.name}强制设result为False")
+                                approved = False
+                                break
+
                     if stage.id == rcd.approval_stage_id:
+                        _logger.debug(f"stage={stage.name}设result为{rcd.approval_decision}")
                         rst.append([stage, rcd.approval_decision])
                         approved = True
                         break
 
-                    if rcd.approval_stage.sequence == 0:
-                        approved = False
-                        break
                 if not approved:
+                    _logger.debug(f"stage={stage.name}被迫设result为False")
                     rst.append([stage, False])
             else:
                 continue
 
         # 如果同级别的节点，任意一个没有审批通过，则视为本级别未通过
         for each_stage in rst:
+            _logger.debug(f"rst.each_stage={each_stage[0].name};result={each_stage[1]}")
             if not each_stage[1]:
+                # 来自action_agree，所以本级别认为已通过
                 if each_stage[0].id == tgt_stage.id:
                     continue
-                _logger.info(f"stage{each_stage[0].name}尚未审批通过")
+                _logger.debug(f"stage{each_stage[0].name}尚未审批通过")
                 return False
 
         return True
@@ -835,33 +890,55 @@ class FundManagement(models.Model):
         """
         第一个返回值：最新一轮审批中是否存在本节点的审批记录
         第二个返回值：最新一轮审批中本节点的审批记录的审批结果
-        第三个返回值：最新一轮审批中本节点的下一个节点
-        第四个返回值：最新一轮审批中本节点的下一个节点（领导节点）的审批结果是否驳回
+        第三个返回值：最新一轮审批中本节点的下一个节点，即领导节点的[(节点，审批结果)]，可能是平行多节点
         """
         approval_exists = None
         approval_result = None
-        next_stage_result = None
-        next_stage = None
+        next_stage_lst = []
 
         for each_stage in record.category_id.approval_stages:
             if each_stage.sequence > tgt_stage.sequence:
                 next_stage = each_stage
-                break
+                if next_stage_lst:
+                    if next_stage_lst[0]['stage'].sequence == next_stage.sequence:
+                        next_stage_lst.append({'stage': next_stage, 'stage_result': None})
+                else:
+                    next_stage_lst.append({'stage': next_stage, 'stage_result': None})
 
         tgt_model = 'fund.management.approval.detail'
         domain = [('fund_management_id', '=', record.id)]
-        rcds = self.env[tgt_model].search(domain)
+        rcds = self.env[tgt_model].search(domain, order="id DESC")
         for rcd in rcds:
+            _logger.debug(f"rcd.id={rcd.id}approval_stage_nm={rcd.approval_stage_nm};stage={rcd.approval_stage};stage.id={rcd.approval_stage.id};stage.nm={rcd.approval_stage.name}")
             # 仅检查最新一轮提交
             if rcd.approval_stage.sequence == 0:
                 break
 
-            if rcd.approval_stage_id == next_stage.id:
-                next_stage_result = rcd.approval_decision
+            # 如果找到了驳回后的补充信息再提交阶段，也不继续往前找了
+            if tgt_stage.sequence > rcd.approval_stage.sequence:
+                if rcd.approval_stage.input_meeting_minutes:
+                    if rcd.approval_decision:
+                        break
 
             if rcd.approval_stage_id == tgt_stage.id:
                 approval_exists = True
                 approval_result = rcd.approval_decision
                 break
 
-        return approval_exists, approval_result, next_stage, next_stage_result
+        for next_stage in next_stage_lst:
+            # 如果当前stage.sequence比可补充信息的stage.sequence大，且可补充信息的stage已经存在“通过”的日志，那么当前stage只检查到此为止
+            for rcd in rcds:
+                if rcd.approval_stage.sequence == 0:
+                    break
+
+                if next_stage['stage'].sequence > rcd.approval_stage.sequence:
+                    if rcd.approval_stage.input_meeting_minutes:
+                        if rcd.approval_decision:
+                            break
+
+                if rcd.approval_stage_id == next_stage['stage'].id:
+                    _logger.debug(f"next_stage={next_stage['stage'].name}的result设置为{rcd.approval_decision}rcd.id={rcd.id}")
+                    next_stage['stage_result'] = rcd.approval_decision
+                    break
+
+        return approval_exists, approval_result, next_stage_lst

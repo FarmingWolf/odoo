@@ -88,7 +88,7 @@
 
                     <div invisible="state in ('draft', 'done')">
                         <button name="action_agree" type="object" class="btn btn-success" string="Agree"
-                                title="Click to approve" invisible="state == 'refused'"/>
+                                title="Click to approve" invisible="(state == 'refused') and (not meeting_minutes_editable)"/>
                         <span>　</span>
                         <button name="action_reject" type="object" class="btn btn-danger" string="Reject"
                                 title="Click to reject" invisible="stage_sequence == 0"/>
