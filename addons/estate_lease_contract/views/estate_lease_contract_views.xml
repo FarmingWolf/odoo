@@ -105,14 +105,20 @@
                             </group>
                             <group col="2">
                                 <group>
-                                    <field name="contract_amount_and_manage_fee"/>
-                                    <field name="contract_amount"/>
-                                    <field name="contract_manage_fee" invisible="contract_manage_fee &lt; 0.01"/>
-                                    <field name="lease_deposit"/>
+                                    <field name="contract_receivable_and_manage_fee" invisible="contract_manage_fee &lt; 0.01"/>
+                                    <field name="contract_receivable"/>
+                                    <field name="contract_manage_fee_receivable" invisible="contract_manage_fee &lt; 0.01"/>
+                                    <field name="contract_concessions" invisible="contract_concessions &lt; 0.01"/>
+                                    <field name="contract_manage_fee_concessions" invisible="contract_manage_fee_concessions &lt; 0.01"/>
+
                                 </group>
                                 <group>
-                                    <field name="lease_deposit_receivable"/>
-                                    <field name="lease_deposit_received"/>
+                                    <field name="contract_amount_and_manage_fee" invisible="contract_manage_fee &lt; 0.01"/>
+                                    <field name="contract_amount" invisible="contract_concessions &lt; 0.01"/>
+                                    <field name="contract_manage_fee" invisible="(contract_manage_fee &lt; 0.01) or (contract_manage_fee_concessions &lt; 0.01)"/>
+                                    <field name="lease_deposit"/>
+                                    <field name="lease_deposit_receivable" invisible="((lease_deposit - lease_deposit_receivable) &lt; 0.01) or ((lease_deposit_receivable - lease_deposit) &lt; 0.01)"/>
+                                    <field name="lease_deposit_received" invisible="lease_deposit_received &lt; 0.01"/>
                                     <field name="lease_deposit_arrears" invisible="lease_deposit_arrears &lt; 0.01"/>
                                 </group>
                             </group>

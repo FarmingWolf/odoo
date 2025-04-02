@@ -1688,10 +1688,18 @@ class EstateLeaseContract(models.Model):
                                                   readonly=True, store=False)
     contract_manage_fee = fields.Float(string="合同总物业费（元）", compute="_compute_contract_amount_and_manage_fee",
                                        readonly=True, store=False)
-    contract_concessions = fields.Float(string="合同总优惠（元）", readonly=True, store=False,
+    contract_concessions = fields.Float(string="合同租金优惠（元）", readonly=True, store=False,
                                         compute="_compute_contract_amount")
-    contract_receivable = fields.Float(string="合同总应收（元）", readonly=True, store=False,
+    contract_manage_fee_concessions = fields.Float(string="合同物业费优惠（元）", readonly=True, store=False,
+                                                   compute="_compute_contract_receivable_and_manage_fee")
+    contract_receivable = fields.Float(string="合同总租金应收（元）", readonly=True, store=False,
                                        compute="_compute_contract_amount")
+    contract_manage_fee_receivable = fields.Float(string="总物业费应收（元）",
+                                                  compute="_compute_contract_receivable_and_manage_fee",
+                                                  readonly=True, store=False)
+    contract_receivable_and_manage_fee = fields.Float(string="租金物业费应收（元）",
+                                                      compute="_compute_contract_receivable_and_manage_fee",
+                                                      readonly=True, store=False)
     contract_received = fields.Float(string="合同总实收（元）", readonly=True, store=False,
                                      compute="_compute_contract_amount")
     contract_remain = fields.Float(string="剩余总应收（元）", readonly=True, store=False,
@@ -1716,9 +1724,21 @@ class EstateLeaseContract(models.Model):
         for record in self:
             manage_fee_sum = 0.0
             for manage_fee_detail in record.manage_fee_details:
-                manage_fee_sum += manage_fee_detail.manage_fee_receivable
+                manage_fee_sum += manage_fee_detail.manage_fee_amount
             record.contract_manage_fee = manage_fee_sum
             record.contract_amount_and_manage_fee = record.contract_amount + manage_fee_sum
+
+    @api.depends("rental_details", "contract_amount", "manage_fee_details")
+    def _compute_contract_receivable_and_manage_fee(self):
+        for record in self:
+            manage_fee_sum = 0.0
+            manage_fee_incentive_sum = 0.0
+            for manage_fee_detail in record.manage_fee_details:
+                manage_fee_sum += manage_fee_detail.manage_fee_receivable
+                manage_fee_incentive_sum += manage_fee_detail.incentive_amount
+            record.contract_manage_fee_receivable = manage_fee_sum
+            record.contract_receivable_and_manage_fee = record.contract_receivable + manage_fee_sum
+            record.contract_manage_fee_concessions = manage_fee_incentive_sum
 
     @api.depends("rental_details")
     def _compute_contract_amount(self):
