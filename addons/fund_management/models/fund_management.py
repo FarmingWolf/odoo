@@ -386,9 +386,16 @@ class FundManagement(models.Model):
 
     def action_submit_fund_management(self):
         self.action_save_fund_management()
-        self.action_agree(from_action_submit=True)
+        self.action_agree('新建', from_action_submit=True)
 
-    def action_agree(self, from_action_submit=False):
+    def action_agree_confirm(self, context):
+        _logger.info(f"context={context}")
+        res_id = context.get('active_id')
+        comment = context.get('comment')
+        self_rcd = self.search([('id', '=', res_id)])
+        self_rcd.action_agree(comment)
+
+    def action_agree(self, comment, from_action_submit=False):
         # 批准
         for record in self:
             check_right, tgt_stage = self._check_approval_rights(record)
@@ -427,7 +434,7 @@ class FundManagement(models.Model):
 
             next_state = 'submitted' if record.stage.sequence == 0 else 'approved'
             # 先创建当前阶段的审批记录
-            self._create_approval_detail(record, True, False, tgt_stage)
+            self._create_approval_detail(record, True, False, tgt_stage, comment)
 
             # 如果本阶段有多个同级别的审批节点，那么所有节点都通过后才可进入下一阶段
             same_level_approval_result = self._check_same_level_approval_result(record, tgt_stage)
@@ -457,7 +464,14 @@ class FundManagement(models.Model):
                     # 这里就应该是return，而不是break
                     return
 
-    def action_reject(self):
+    def action_reject_confirm(self, context):
+        _logger.info(f"context={context}")
+        res_id = context.get('active_id')
+        comment = context.get('comment')
+        self_rcd = self.search([('id', '=', res_id)])
+        self_rcd.action_reject(comment)
+
+    def action_reject(self, comment):
         # 驳回
         for record in self:
             if not record.stage.sequence:
@@ -485,7 +499,7 @@ class FundManagement(models.Model):
                 raise UserError(f"您已审批{'通过' if approval_decision else '驳回'}，不能再【驳回】")
 
             # 先创建当前阶段的驳回记录
-            self._create_approval_detail(record, False, False, tgt_stage)
+            self._create_approval_detail(record, False, False, tgt_stage, comment)
 
             all_stages = self.env['fund.management.approval.stage'].search([('company_id', '=', record.company_id.id),
                                                                             (
@@ -516,7 +530,7 @@ class FundManagement(models.Model):
             if stage_approved:
                 raise UserError(f"您已审批{'通过' if approval_decision else '驳回'}，不能再【取消】")
 
-            self._create_approval_detail(record, False, True, tgt_stage)
+            self._create_approval_detail(record, False, True, tgt_stage, comment=None)
             all_stages = self.env['fund.management.approval.stage'].search([('company_id', '=', record.company_id.id),
                                                                             (
                                                                             'category_id', '=', record.category_id.id)])
@@ -567,7 +581,7 @@ class FundManagement(models.Model):
                         return True, same_level_stage
             return False, record.stage
 
-    def _create_approval_detail(self, record, approval_or_reject, is_cancel, tgt_stage):
+    def _create_approval_detail(self, record, approval_or_reject, is_cancel, tgt_stage, comment):
 
         _logger.debug(f"datetime.now()[{datetime.now()}]")
         date_time = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y-%m-%d %H:%M:%S')
@@ -579,23 +593,23 @@ class FundManagement(models.Model):
 
         if approval_or_reject:
             approval_decision_txt = "同意"
-            approval_comment = "同意"
+            approval_comment = comment if comment else "同意"
         else:
             approval_decision_txt = "驳回"
-            approval_comment = "驳回"
+            approval_comment = comment if comment else "驳回"
 
         if record.stage.sequence == 0:
             rcd_exists = self.env['fund.management.approval.detail'].browse(
                 record.approval_detail_ids.ids).exists()
 
             if rcd_exists:
-                approval_comment = "再提交"
+                approval_comment = comment if comment else "再提交"
             else:
-                approval_comment = "新建"
+                approval_comment = comment if comment else "新建"
 
         if is_cancel:
             approval_decision_txt = "取消"
-            approval_comment = "取消"
+            approval_comment = comment if comment else "取消"
 
         _logger.debug(f"创建审批记录approval_or_reject={approval_or_reject}")
         self.env['fund.management.approval.detail'].create({

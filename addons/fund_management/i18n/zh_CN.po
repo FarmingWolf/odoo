@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-31 11:03+0000\n"
-"PO-Revision-Date: 2025-03-31 11:03+0000\n"
+"POT-Creation-Date: 2025-04-03 14:47+0000\n"
+"PO-Revision-Date: 2025-04-03 14:47+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -294,7 +294,7 @@ msgstr "点击审批同意"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Click to reject"
-msgstr "点击驳回"
+msgstr "点击拒绝"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
@@ -497,6 +497,7 @@ msgstr "资金管理流程大类"
 
 #. module: fund_management
 #: model:ir.actions.act_window,name:fund_management.fund_management_approval_detail_action
+#: model:ir.model,name:fund_management.model_fund_management_approval_detail
 #: model_terms:ir.actions.act_window,help:fund_management.fund_management_approval_detail_action
 msgid "Fund Management Approval Detail"
 msgstr "资金管理审批流详情"
@@ -890,7 +891,7 @@ msgstr "拒绝的申请"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Reject"
-msgstr "驳回"
+msgstr "拒绝"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__company_currency_id
@@ -1181,11 +1182,35 @@ msgid "to be approved"
 msgstr "待审批"
 
 #. module: fund_management
+#: model:ir.actions.server,name:fund_management.action_agree_svr_action
+msgid "Approval Agree"
+msgstr "审批同意"
+
+#. module: fund_management
+#. odoo-javascript
+#: code:addons/fund_management/static/src/components/approval_comment.xml:0
+#, python-format
+msgid "Approval Comment:"
+msgstr "审批备注："
+
+#. module: fund_management
+#: model:ir.actions.server,name:fund_management.action_reject_svr_action
+msgid "Approval Reject"
+msgstr "审批驳回"
+
+#. module: fund_management
 #: model:ir.model,name:fund_management.model_res_partner
 msgid "继承partner"
 msgstr "联系人"
 
 #. module: fund_management
-#: model:ir.model,name:fund_management.model_fund_management_approval_detail
-msgid "Fund Management Approval Detail"
-msgstr "资金管理审批明细"
+#. odoo-javascript
+#: code:addons/fund_management/static/src/components/approval_comment.xml:0
+#, python-format
+msgid "Please input approval comment..."
+msgstr "请输入审批意见..."
+
+#. module: fund_management
+#: model:ir.actions.client,name:fund_management.fund_management_approval_dialog
+msgid "Input approval comment"
+msgstr "输入审批备注"
