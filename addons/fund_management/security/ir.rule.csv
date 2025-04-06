@@ -1,5 +1,7 @@
 id,name,model_id:id,domain_force
 fund_management_company_rule,Restrict Fund Management by Company,model_fund_management,"[('company_id','=',user.company_id.id)]"
 fund_management_category_company_rule,Restrict Fund Management Category by Company,model_fund_management_category,"[('company_id','=',user.company_id.id)]"
+fund_management_meeting_minutes_type_company_rule,Restrict Fund Management Meeting Minutes Type by Company,model_fund_management_meeting_minutes_type,"[('company_id','=',user.company_id.id)]"
+fund_management_meeting_minutes_company_rule,Restrict Fund Management Meeting Minutes by Company,model_fund_management_meeting_minutes,"[('company_id','=',user.company_id.id)]"
 fund_management_approval_stage_company_rule,Restrict Fund Management Approval Stage by Company,model_fund_management_approval_stage,"[('company_id','=',user.company_id.id)]"
 fund_management_approval_detail_company_rule,Restrict Fund Management Approval detail by Company,model_fund_management_approval_detail,"[('company_id','=',user.company_id.id)]"

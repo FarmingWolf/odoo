@@ -19,6 +19,9 @@
                                 <field name="fold"/>
                                 <field name="sequence"/>
                                 <field name="pipe_end"/>
+                                <field name="meeting_minute_types_by_category" invisible="1"/>
+                                <field name="meeting_minute_types" widget="many2many_tags" options="{'color_field': 'color', 'no_create': True}"
+                                       invisible="not input_meeting_minutes" domain="[('id', 'in', meeting_minute_types_by_category)]"/>
                             </group>
                         </group>
                         <group string="Stage description and usage tips">
@@ -75,6 +78,8 @@
                     <field name="op_department_id"/>
                     <field name="op_job_id"/>
                     <field name="pipe_end"/>
+                    <field name="input_meeting_minutes"/>
+                    <field name="meeting_minute_types" widget="many2many_tags" options="{'color_field': 'color'}"/>
                 </tree>
             </field>
         </record>

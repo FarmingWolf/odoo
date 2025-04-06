@@ -24,6 +24,7 @@
                 <field name="name"/>
                 <field name="amount_min"/>
                 <field name="amount_max"/>
+                <field name="meeting_minute_types" widget="many2many_tags" options="{'color_field': 'color'}" />
             </tree>
         </field>
     </record>
@@ -47,6 +48,9 @@
                             <span>to</span>
                             <field name="amount_max" nolabel="True" class="oe_inline o_input_11ch" placeholder="0 means infinity"/>
                         </div>
+                    </group>
+                    <group>
+                        <field name="meeting_minute_types" widget="many2many_tags" options="{'color_field': 'color'}" />
                     </group>
                     <button name="action_fund_management_approval_setting" type="object" class="btn btn-success"
                             title="Click to set approval process steps">

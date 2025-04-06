@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="fund_management_meeting_minutes_type" model="ir.actions.act_window">
+        <field name="name">meeting.minutes.type</field>
+        <field name="res_model">fund.management.meeting.minutes.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Meeting minutes types used in Fund Management Category。
+            </p>
+        </field>
+    </record>
+
+    <record id="fund_management_meeting_minutes_type_view_tree" model="ir.ui.view">
+        <field name="name">meeting.minutes.type.tree</field>
+        <field name="model">fund.management.meeting.minutes.type</field>
+        <field name="arch" type="xml">
+            <tree string="meeting_minutes_type_tree">
+                <field name="sequence" widget="handle"/>
+                <field name="name" string="Meeting minutes type name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="fund_management_meeting_minutes_type_view_form" model="ir.ui.view">
+        <field name="name">meeting.minutes.type.tree</field>
+        <field name="model">fund.management.meeting.minutes.type</field>
+        <field name="arch" type="xml">
+            <form string="fund_management_meeting_minutes_type_form" create="True" edit="True" duplicate="True" delete="True">
+                <sheet>
+                    <group>
+                        <field name="name" default_focus="True"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

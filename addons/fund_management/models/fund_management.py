@@ -133,8 +133,12 @@ class FundManagement(models.Model):
         copy=False,
         default='draft',
     )
-    meeting_minutes = fields.Html(string="Meeting Minutes")
+
     meeting_minutes_editable = fields.Boolean("Meeting Minutes Editable", related="stage.input_meeting_minutes")
+    meeting_minute_types = fields.Many2many(string="Meeting Minute Types", related="category_id.meeting_minute_types")
+
+    meeting_minutes_attach = fields.One2many(string="Meeting minutes attachment", inverse_name="fund_management_id",
+                                             comodel_name="fund.management.meeting.minutes")
 
     @api.model
     def _get_view(self, view_id=None, view_type='form', **options):
@@ -266,7 +270,10 @@ class FundManagement(models.Model):
             if record.state == "draft":
                 record.is_editable = True
             else:
-                record.is_editable = False
+                if record.stage and record.stage.input_meeting_minutes:
+                    record.is_editable = True
+                else:
+                    record.is_editable = False
 
     @api.depends_context('lang')
     @api.depends('category_id')
@@ -310,16 +317,13 @@ class FundManagement(models.Model):
             for expense in self:
                 expense.employee_id = self.env.user.with_company(expense.company_id).employee_id
 
+    @api.depends('meeting_minutes_attach')
     def _compute_nb_attachment(self):
-        attachment_data = self.env['ir.attachment']._read_group(
-            [('res_model', '=', 'fund.management'), ('res_id', 'in', self.ids)],
-            ['res_id'],
-            ['__count'],
-        )
-        attachment = dict(attachment_data)
-        for expense in self:
-            expense.nb_attachment = attachment.get(expense._origin.id, 0)
-            _logger.info(f"id:{expense._origin.id};.nb_attachment={expense.nb_attachment}")
+        for record in self:
+            tmp_cnt = 0
+            for meeting_minutes in record.meeting_minutes_attach:
+                tmp_cnt += meeting_minutes.nb_attachment
+            record.nb_attachment = tmp_cnt
 
     def attach_document(self, **kwargs):
         """When an attachment is uploaded as a receipt, set it as the main attachment."""
@@ -335,6 +339,7 @@ class FundManagement(models.Model):
             if expense.state in {'done', 'approved'}:
                 raise UserError(_('You cannot delete a posted or approved fund management application.'))
 
+    @api.model
     def write(self, vals):
         if 'tax_ids' in vals:
             if any(not expense.is_editable for expense in self):
@@ -382,6 +387,19 @@ class FundManagement(models.Model):
                 default_stage = record._get_default_stage_id()
                 record.stage = default_stage
 
+            # 根据category中的meeting_minutes_type生成meeting_minutes的预备list
+            for meeting_minutes_type in record.meeting_minute_types:
+                type_exists = False
+                for meeting_minutes_created in record.meeting_minutes_attach:
+                    if meeting_minutes_type == meeting_minutes_created.type:
+                        type_exists = True
+                        break
+                if not type_exists:
+                    meeting_minutes = {
+                        "fund_management_id": record.id,
+                        "type": meeting_minutes_type.id,
+                    }
+                    self.env["fund.management.meeting.minutes"].create(meeting_minutes)
         return
 
     def action_submit_fund_management(self):

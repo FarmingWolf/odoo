@@ -108,7 +108,7 @@ action = model.action_reject_confirm(env.context)
                 <header>
                     <field name="stage_sequence" invisible="1"/>
                     <widget name="attach_document" string="Attach Receipt" action="attach_document" highlight="1"
-                            invisible="(not is_editable) and (not meeting_minutes_editable)"/>
+                            invisible="1"/>
                     <button name="action_save_fund_management" string="Save(not submit)" type="object" class="o_expense_submit" data-hotkey="v"
                             invisible="(state != 'draft') and (stage_sequence != 0)"/>
                     <button name="action_submit_fund_management" string="Submit" type="object" class="o_expense_submit" data-hotkey="s"
@@ -208,14 +208,33 @@ action = model.action_reject_confirm(env.context)
                     <div>
                         <field name="description" placeholder="Notes..." readonly="not is_editable"/>
                         <field name="meeting_minutes_editable" invisible="1"/>
-                        <field name="meeting_minutes" placeholder="Meeting Minutes..." readonly="not meeting_minutes_editable"/>
                     </div>
+                    <notebook invisible="(nb_attachment == 0) and (not meeting_minutes_editable)">
+                        <page string="Meeting Minutes" readonly="(not is_editable) and (not meeting_minutes_editable)">
+                            <field name="meeting_minutes_attach" mode="tree,form">
+                                <tree delete="False" create="False" edit="True">
+                                    <field name="type"/>
+                                    <field name="attachment_ids" widget="many2many_binary"/>
+                                </tree>
+                                <form delete="False" create="False" edit="True">
+                                    <group>
+                                        <field name="name" invisible="1"/>
+                                        <field name="type_domain" invisible="1"/>
+                                        <field name="type" domain="[('id', 'in', type_domain)]" options="{'no_create': True, 'no_open': True}" readonly="1"/>
+                                        <field name="attachment_ids" widget="many2many_binary" options="{'no_create': True}" readonly="not parent.meeting_minutes_editable"/>
+                                    </group>
+                                </form>
+                            </field>
+
+                        </page>
+
+                    </notebook>
                     <group string="Approval Details" name="approval_details_info" invisible="not approval_detail_ids">
                         <field name="approval_detail_ids" string=""/>
                     </group>
                 </sheet>
-                <div class="o_attachment_preview o_center_attachment"/>
-                <div class="oe_chatter">
+                <div class="o_attachment_preview o_center_attachment" groups="fund_management.group_fund_management_manager"/>
+                <div class="oe_chatter" groups="fund_management.group_fund_management_manager">
                     <field name="message_follower_ids"/>
                     <field name="activity_ids"/>
                     <field name="message_ids"/>
@@ -409,6 +428,8 @@ action = model.action_reject_confirm(env.context)
             <field name="res_model">fund.management</field>
             <field name="view_mode">tree,kanban,form,graph,pivot,activity</field>
             <field name="search_view_id" ref="fund_management_view_search"/>
+            <field name="view_id" ref="view_my_fund_management_tree"/>
+            <field name="domain">[('employee_id.user_id', '=', uid)]</field>
             <field name="context">{'search_default_my_fund_management': 1}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_expense_receipt">
@@ -489,13 +510,15 @@ action = model.action_reject_confirm(env.context)
                   action="action_fund_management_actions_to_be_approved"
                   groups="fund_management.group_fund_management_user" sequence="10"/>
 
-        <menuitem id="menu_fund_management_applications" name="Applications" sequence="20" parent="menu_fund_management_root" groups="base.group_user"/>
+        <menuitem id="menu_fund_management_applications" name="Applications" sequence="20" parent="menu_fund_management_root"
+                  groups="fund_management.group_fund_management_team_approver"/>
         <menuitem id="menu_fund_management_create_application" sequence="1" parent="menu_fund_management_applications"
-                  action="action_fund_management_actions_create_new" groups="base.group_user"/>
+                  action="action_fund_management_actions_create_new" groups="fund_management.group_fund_management_team_approver"/>
         <menuitem id="menu_fund_management_my_applications" sequence="2" parent="menu_fund_management_applications"
-                  action="action_fund_management_actions_my_all" groups="base.group_user"/>
-        <menuitem id="menu_fund_management_all_applications" sequence="3" parent="menu_fund_management_applications"
-                  action="action_fund_management_actions_applications_all" groups="base.group_user"/>
+                  action="action_fund_management_actions_my_all" groups="fund_management.group_fund_management_team_approver"/>
+        <menuitem id="menu_fund_management_all_applications_all" parent="menu_fund_management_applications"
+                  action="action_fund_management_actions_applications_all"
+                  groups="fund_management.group_fund_management_user" sequence="30"/>
 
         <menuitem id="menu_fund_management_configuration" name="Configuration" parent="menu_fund_management_root"
                   groups="fund_management.group_fund_management_manager" sequence="100"/>

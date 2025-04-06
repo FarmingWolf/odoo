@@ -21,6 +21,7 @@
         'security/ir.model.access.csv',
         'security/ir_rule.xml',
         'security/ir.rule.csv',
+        'views/fund_management_meeting_minutes_type_views.xml',
         'views/fund_management_approval_detail_views.xml',
         'views/fund_management_approval_stage_views.xml',
         'views/fund_management_category_views.xml',
