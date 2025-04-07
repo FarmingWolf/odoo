@@ -77,13 +77,15 @@ class FundManagementApprovalStage(models.Model):
          'Name and sequence number can not be duplicated in the category!'),
     ]
 
-    @api.constrains('sequence', 'pipe_end')
-    def _check_pipe_end(self):
+    def _check_pipe_end(self, from_method):
+        _logger.info(f"{from_method},{self.ids}")
         records = self.search([('company_id', '=', self.env.user.company_id.id),
-                               ('category_id', '=', self.category_id.id)])
+                               ('category_id', '=', self.category_id.id)], order="sequence, description")
         pipe_end_cnt = 0
         msg = []
         last_name = ""
+        end_flag_name = ""
+        end_flag_sequence = 0
         last_sequence = 0
         idx = 0
         for record in records:
@@ -92,24 +94,32 @@ class FundManagementApprovalStage(models.Model):
                     raise ValidationError(f"第一个审批阶段[{record.name}]的阶段序号必须为0")
             if idx == 1:
                 if record.sequence < 10:
-                    raise ValidationError(f"第二个审批阶段[{record.name}]的阶段序号必须>=10")
+                    raise ValidationError(f"第二个及更靠后的审批阶段[{record.name}]的阶段序号必须>=10")
+
+            if pipe_end_cnt >= 1:
+                raise ValidationError(f"非最后阶段不能设置结束标志位：{end_flag_name}(序号：{end_flag_sequence})")
 
             if record.pipe_end:
                 pipe_end_cnt += 1
+                end_flag_name = record.name
+                end_flag_sequence = record.sequence
                 msg.append(record.name)
 
             last_name = record.name
             last_sequence = record.sequence
             idx += 1
 
+        _logger.info(f"len(records)={idx}")
         if last_name in msg:
             msg.remove(last_name)
 
         if pipe_end_cnt > 1:
             raise ValidationError(f"只能将最后一个审批阶段[{last_name}]标记审批结束标志位。请取消{msg}的审批结束标志位。")
 
-        if pipe_end_cnt == 0:
-            raise ValidationError(f"最后阶段必须设置结束标志位：{last_name}, 序号={last_sequence}")
+        # ↓↓↓这个校验会使得创建阶段过程中频繁出发提示，灰常门道库萨伊
+        # if pipe_end_cnt == 0 and idx > 1:
+        #     if not self.pipe_end:  # 貌似来自write的时候，self.search并没有找到刚添加的数据
+        #         raise ValidationError(f"最后阶段必须设置结束标志位：{last_name}(序号:{last_sequence})")
 
     def copy(self, default=None):
 
@@ -129,31 +139,32 @@ class FundManagementApprovalStage(models.Model):
                 if ('pipe_end' in vals_list) and (vals_list['pipe_end']):
                     if (('op_department_id' or 'op_job_id') in vals_list) and \
                             (vals_list['op_department_id'] or vals_list['op_job_id']):
-                        raise ValidationError(f"请勿设置最后结束阶段的审批部门与角色职位。"
-                                              f"阶段:{vals_list['name']}，序号={vals_list['sequence']}")
+                        raise ValidationError(f"请勿同时设置阶段的结束标志和审批部门与角色职位。"
+                                              f"阶段:{vals_list['name']}(序号:{vals_list['sequence']})")
                 elif ('pipe_end' in vals_list) and (not vals_list['pipe_end']):
                     if (('op_department_id' or 'op_job_id') not in vals_list) or \
                             (not vals_list['op_department_id'] or not vals_list['op_job_id']):
                         raise ValidationError(f"请设置非结束阶段的审批部门与角色职位。"
-                                              f"阶段：{vals_list['name']}，序号={vals_list['sequence']}")
+                                              f"阶段：{vals_list['name']}(序号:{vals_list['sequence']})")
 
         record = super().create(vals_list)
-        self._check_pipe_end()
+        record._check_pipe_end("from_create")
         return record
 
     @api.model
     def write(self, vals):
         res = super().write(vals)
+        self._check_pipe_end("from_write")
+
         for record in self:
-            record._check_pipe_end()
             if record.sequence > 0:
                 if not record.pipe_end:
                     if (not record.op_department_id) or (not record.op_job_id):
                         raise ValidationError(f"请设置非结束阶段的审批部门与角色职位。"
-                                              f"阶段：{record.name},序号={record.sequence}")
+                                              f"阶段：{record.name}(序号:{record.sequence})")
                 else:
                     if record.op_department_id or record.op_job_id:
-                        raise ValidationError(f"请勿设置最后结束阶段的审批部门与角色职位。"
-                                              f"阶段:{record.name},序号={record.sequence}")
+                        raise ValidationError(f"请勿同时设置阶段的结束标志位和审批部门与角色职位信息。"
+                                              f"阶段:{record.name}(序号:{record.sequence})")
 
         return res
