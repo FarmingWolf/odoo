@@ -2,8 +2,9 @@
 <templates>
     <t t-name="fund_management.AttachmentNumber">
         <div>
-            <span class="fa fa-paperclip pe-1 align-middle"/>
-            <t t-if="fund_management_nb_attachment > 0" class="text-center" t-out="fund_management_nb_attachment"/>
+            <t t-if="fund_management_nb_attachment > 0" class="text-center" t-out="fund_management_nb_attachment">
+                <span class="fa fa-paperclip pe-1 align-middle"/>
+            </t>
         </div>
     </t>
 </templates>
