@@ -21,6 +21,7 @@
         <field name="model">fund.management.category</field>
         <field name="arch" type="xml">
             <tree string="Fund Management Approval Category">
+                <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="amount_min"/>
                 <field name="amount_max"/>

@@ -82,9 +82,9 @@ class FundManagementApprovalStage(models.Model):
         records = self.search([('company_id', '=', self.env.user.company_id.id),
                                ('category_id', '=', self.category_id.id)])
         pipe_end_cnt = 0
-        not_last_pipe_end = False
         msg = []
         last_name = ""
+        last_sequence = 0
         idx = 0
         for record in records:
             if idx == 0:
@@ -94,18 +94,22 @@ class FundManagementApprovalStage(models.Model):
                 if record.sequence < 10:
                     raise ValidationError(f"第二个审批阶段[{record.name}]的阶段序号必须>=10")
 
-            if pipe_end_cnt >= 1:
-                not_last_pipe_end = True
             if record.pipe_end:
                 pipe_end_cnt += 1
                 msg.append(record.name)
+
             last_name = record.name
+            last_sequence = record.sequence
             idx += 1
 
         if last_name in msg:
             msg.remove(last_name)
-        if (pipe_end_cnt > 1) or not_last_pipe_end:
+
+        if pipe_end_cnt > 1:
             raise ValidationError(f"只能将最后一个审批阶段[{last_name}]标记审批结束标志位。请取消{msg}的审批结束标志位。")
+
+        if pipe_end_cnt == 0:
+            raise ValidationError(f"最后阶段必须设置结束标志位：{last_name}, 序号={last_sequence}")
 
     def copy(self, default=None):
 
@@ -123,8 +127,15 @@ class FundManagementApprovalStage(models.Model):
         if 'sequence' in vals_list:
             if vals_list['sequence'] > 0:
                 if ('pipe_end' in vals_list) and (vals_list['pipe_end']):
-                    if ('op_department_id' or 'op_job_id') not in vals_list:
-                        raise ValidationError(_("Please set Approval Department and Approval Job Position"))
+                    if (('op_department_id' or 'op_job_id') in vals_list) and \
+                            (vals_list['op_department_id'] or vals_list['op_job_id']):
+                        raise ValidationError(f"请勿设置最后结束阶段的审批部门与角色职位。"
+                                              f"阶段:{vals_list['name']}，序号={vals_list['sequence']}")
+                elif ('pipe_end' in vals_list) and (not vals_list['pipe_end']):
+                    if (('op_department_id' or 'op_job_id') not in vals_list) or \
+                            (not vals_list['op_department_id'] or not vals_list['op_job_id']):
+                        raise ValidationError(f"请设置非结束阶段的审批部门与角色职位。"
+                                              f"阶段：{vals_list['name']}，序号={vals_list['sequence']}")
 
         record = super().create(vals_list)
         self._check_pipe_end()
@@ -138,6 +149,11 @@ class FundManagementApprovalStage(models.Model):
             if record.sequence > 0:
                 if not record.pipe_end:
                     if (not record.op_department_id) or (not record.op_job_id):
-                        raise ValidationError(_("Please set Approval Department and Approval Job Position"))
+                        raise ValidationError(f"请设置非结束阶段的审批部门与角色职位。"
+                                              f"阶段：{record.name},序号={record.sequence}")
+                else:
+                    if record.op_department_id or record.op_job_id:
+                        raise ValidationError(f"请勿设置最后结束阶段的审批部门与角色职位。"
+                                              f"阶段:{record.name},序号={record.sequence}")
 
         return res

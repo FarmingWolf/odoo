@@ -369,13 +369,28 @@ class FundManagement(models.Model):
 
     def _get_default_stage_id(self):
         _logger.debug(f"self.env.context={self.env.context}")
-        stage_ids = self.env['fund.management.approval.stage']. \
-            search([('company_id', '=', self.env.user.company_id.id),
-                    ('category_id', '=', self.env.context.get('default_category_id'))], limit=1)
+        default_category_id = None
+        if "default_category_id" in self.env.context:
+            default_category_id = self.env.context.get('default_category_id')
 
+        if not default_category_id:
+            for record in self:
+                default_category_id = record.category_id.id
+
+        if not default_category_id:
+            default_category_id = self.category_id.id
+            _logger.debug(f"self.category_id={default_category_id}")
+
+        if not default_category_id:
+            _logger.error("default_category_id is None!!!")
+
+        stage_ids = self.env['fund.management.approval.stage'].search([('company_id', '=', self.env.user.company_id.id),
+                                                                       ('category_id', '=', default_category_id)],
+                                                                      limit=1)
         if stage_ids:
             return stage_ids[0]
         else:
+            _logger.error("can't get default stage!!!")
             return False
 
     def action_save_fund_management(self):
@@ -562,6 +577,11 @@ class FundManagement(models.Model):
 
         this_employee_dep_id = self._get_employee().department_id.id
         this_employee_job_id = self._get_employee().job_id.id
+
+        if not record.stage:
+            default_stage = record._get_default_stage_id()
+            record.stage = default_stage
+            _logger.error(f"record.stage is None, set it as {default_stage}")
 
         if not self.env.user.has_group('fund_management.group_fund_management_team_approver'):
             return False, record.stage

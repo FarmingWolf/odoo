@@ -12,7 +12,7 @@ class FundManagementCategory(models.Model):
 
     _name = "fund.management.category"
     _description = "Fund Management Category"
-    _order = "name, amount_min ASC"
+    _order = "sequence, name, amount_min ASC"
 
     name = fields.Char(string='Fund Management Category', required=True,
                        help="Please do not include spaces in the category name")
@@ -31,6 +31,7 @@ class FundManagementCategory(models.Model):
                                             relation="category_meeting_minutes_type_rel",
                                             column1="category_id", column2="meeting_minutes_type_id",
                                             string="Meeting Minutes Type")
+    sequence = fields.Integer(string="sequence", default=0)
 
     @api.model
     def create(self, vals):
