@@ -66,8 +66,8 @@
     <record id="real_estate_unsold_action" model="ir.actions.act_window">
         <field name="name">空置资产</field>
         <field name="res_model">estate.property</field>
-        <field name="view_mode">tree,form,kanban</field>
-        <field name="views">[False, "tree"]</field>
+        <field name="view_mode">tree,form</field>
+        <field name="views">[%(real_estate_property_unsold_view_tree)d, "tree"]</field>
         <field name="view_id" ref="real_estate_property_unsold_view_tree"/>
         <field name="context">{
             'contract_read_only': True,
