@@ -157,6 +157,15 @@ def get_deepseek_base():
     return config_json
 
 
+def _get_business_self(msc_content, to_user):
+    """
+    todo
+    判断提问者是否具有系统权限后，根据问题匹配系统可接受的问题，如果没有匹配上，那么返回用户标准问题列表，引导用户输入标准问题序号，
+    然后根据用户的标准问题序号，处理并返回答案
+    """
+    return "功能持续开发中，敬请期待！"
+
+
 class WechatHandle(Home):
 
     @http.route('/wechat/handle', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
@@ -212,9 +221,11 @@ class WechatHandle(Home):
 
                             if rec_msg.MsgType == 'text':
                                 _logger.info(f"rec_msg.Content={rec_msg.Content}")
-                                _logger.info(f"rec_msg.Content.decode={rec_msg.Content.decode('utf-8')}")
+                                msc_content = rec_msg.Content.decode('utf-8')
+                                _logger.info(f"rec_msg.Content.decode={msc_content}")
+                                """ 对接deepseek
                                 deepseek_config_json = get_deepseek_base()
-                                ret_deepseek = deepseek_chat(rec_msg.Content.decode('utf-8'),
+                                ret_deepseek = deepseek_chat(msc_content,
                                                              deepseek_config_json["in_base_url"],
                                                              deepseek_config_json["tgt_model"],
                                                              deepseek_config_json["in_api_key"])
@@ -227,8 +238,10 @@ class WechatHandle(Home):
                                 ret_deepseek = ret_deepseek.replace("- ", "")
                                 ret_deepseek = ret_deepseek[0: 800]
                                 _logger.info(f"处理后的返回值={ret_deepseek}")
-
                                 reply_msg = reply.TextMsg(to_user, from_user, ret_deepseek)
+                                """
+                                ret_business_self = _get_business_self(msc_content, to_user)
+                                reply_msg = reply.TextMsg(to_user, from_user, ret_business_self)
                                 return reply_msg.send()
                             elif rec_msg.MsgType == 'voice':
                                 # 语音转文字

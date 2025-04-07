@@ -24,7 +24,7 @@ _logger = logging.getLogger(__name__)
 def deepseek_chat(txt_content,
                   in_base_url="https://api.deepseek.com",
                   tgt_model="deepseek-chat",
-                  in_api_key="sk-5197f0c2e4e6490291b2bb950d139c08"):
+                  in_api_key=None):
     try:
         _logger.info(f"in_base_url={in_base_url};tgt_model={tgt_model};in_api_key=?")
         client = OpenAI(api_key=in_api_key, base_url=in_base_url)
