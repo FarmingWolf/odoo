@@ -184,7 +184,6 @@ class FundManagement(models.Model):
     )
     total_amount_currency_percent = fields.Float(
         string="Apply In Percentage",
-        currency_field='currency_id',
         compute='_compute_total_amount_currency_percent', store=True, readonly=True,
         tracking=False
     )
@@ -206,7 +205,6 @@ class FundManagement(models.Model):
 
     total_amt_cur_hist_accu_percent = fields.Float(
         string="Historically Accumulation In Percentage",
-        currency_field='currency_id',
         compute='_compute_total_amt_cur_hist_accu_per', store=True, readonly=True,
         tracking=False
     )
