@@ -32,7 +32,7 @@ class FundManagementMeetingMinutes(models.Model):
     type = fields.Many2one(string="Meeting Minutes Type", comodel_name="fund.management.meeting.minutes.type")
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
     nb_attachment = fields.Integer(string="Number of Attachments", compute='_compute_nb_attachment')
-    attachment_ids = fields.Many2many('ir.attachment', string="Attachment", copy=False, tracking=True)
+    attachment_ids = fields.Many2many('ir.attachment', string="Attachment", copy=False)
 
     @api.onchange("type")
     def _onchange_type(self):
