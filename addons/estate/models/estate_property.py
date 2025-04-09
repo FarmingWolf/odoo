@@ -339,12 +339,32 @@ class EstateProperty(models.Model):
 
             record.state = 'offer_received'
 
+            return {
+                'effect': {
+                    'fadeout': 'slow',
+                    'message': "恭喜你！资产进入洽谈中！祝早日签约租赁合同！",
+                    'img_url': f'/web/image?model=res.users&field=avatar_128&id={self.env.user.id}'
+                               if self.env.user.image_1024 else '/web/static/img/smile.svg',
+                    'type': 'rainbow_man',
+                }
+            }
+
     def action_change_state_offer_accepted(self):
         for record in self:
             if _check_current_contract_valid(record):
                 raise ValidationError(_("当前资产已在租，不能更改资产状态。"))
 
             record.state = 'offer_accepted'
+
+            return {
+                'effect': {
+                    'fadeout': 'slow',
+                    'message': "恭喜你！资产已接受报价！租赁业务蒸蒸日上！",
+                    'img_url': f'/web/image?model=res.users&field=avatar_128&id={self.env.user.id}'
+                               if self.env.user.image_1024 else '/web/static/img/smile.svg',
+                    'type': 'rainbow_man',
+                }
+            }
 
     # 取消该条记录
     def action_cancel_property(self):

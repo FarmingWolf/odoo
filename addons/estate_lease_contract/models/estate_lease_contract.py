@@ -1900,6 +1900,16 @@ class EstateLeaseContract(models.Model):
                         each_property.state = "out_dated"
                 record.state = 'invalid'
 
+            return {
+                'effect': {
+                    'fadeout': 'slow',
+                    'message': "恭喜你！合同已发布！一大波租金正向您走来！",
+                    'img_url': f'/web/image?model=res.users&field=avatar_128&id={self.env.user.id}'
+                               if self.env.user.image_1024 else '/web/static/img/smile.svg',
+                    'type': 'rainbow_man',
+                }
+            }
+
     # 取消发布合同
     def action_cancel_release_contract(self):
         for record in self:
