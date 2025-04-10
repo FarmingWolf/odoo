@@ -11,7 +11,7 @@
     """,
 
     'author': "北京491科技",
-    'website': "https://www.odoo.com/",
+    'website': "http://www.491tech.com/",
     'category': 'Real Estate/Estate Dashboard',
     'version': '0.2',
     'application': True,
