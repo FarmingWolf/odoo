@@ -230,7 +230,7 @@ action = model.action_reject_confirm(env.context)
 
                     </notebook>
                     <group string="Approval Details" name="approval_details_info" invisible="not approval_detail_ids">
-                        <field name="approval_detail_ids" string=""/>
+                        <field name="approval_detail_ids" string="" readonly="1"/>
                     </group>
                 </sheet>
                 <div class="o_attachment_preview o_center_attachment" groups="fund_management.group_fund_management_manager"/>
