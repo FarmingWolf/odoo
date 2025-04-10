@@ -751,7 +751,7 @@
                         </page>
                     </notebook>
                     <group string="审批情况" invisible="not approval_detail_ids">
-                        <field name="approval_detail_ids" string=""/>
+                        <field name="approval_detail_ids" string="" readonly="1"/>
                     </group>
                 </sheet>
                 <div class="oe_chatter" groups="estate.estate_group_tutorial_research">
