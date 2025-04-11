@@ -121,13 +121,32 @@
                             </group>
                         </group>
                     </group>
-                    <group>
-                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
+                    <group col="2">
+                        <group col="1">
+                            <group col="3">
+                                <group>
+                                    <field name="building_no" help="请正确设置，可能影响资产租控图排序"/>
+                                </group>
+                                <group>
+                                    <field name="floor" help="请正确设置，可能影响资产租控图排序"/>
+                                </group>
+                                <group>
+                                    <field name="room_no" help="请正确设置，可能影响资产租控图排序"/>
+                                </group>
+                            </group>
+                        </group>
+                        <group col="1">
+                            <field name="property_type_id" options="{'no_create': true, 'no_open': true}" help="请正确设置，可能影响计租面积统计"/>
+                        </group>
                     </group>
-                    <group>
-                        <field name="rent_area" string="面积（㎡）"/>
+                    <group col="2">
+                        <group>
+                            <field name="rent_area" string="面积（㎡）"/>
+                        </group>
+                        <group>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
+                        </group>
                     </group>
-
                     <group col="2" name="not_under_lease" invisible="state in ('offer_received', 'offer_accepted', 'sold')">
                         <group>
                             <field name="date_availability"/>
@@ -175,23 +194,6 @@
                     </group>
                     <sheet invisible="not more_info_invisible">
                         <group col="2" name="more_info">
-                            <group col="1">
-                                <group col="3">
-                                    <group>
-                                        <field name="building_no"/>
-                                    </group>
-                                    <group>
-                                        <field name="floor"/>
-                                    </group>
-                                    <group>
-                                        <field name="room_no"/>
-                                    </group>
-                                </group>
-                            </group>
-                            <group col="1">
-                                <field name="property_type_id" options="{'no_create': true, 'no_open': true}"/>
-                            </group>
-
                             <group col="1">
                                 <field name="total_area"/>
                                 <field name="building_area"/>
@@ -296,6 +298,7 @@ z                                   <div id="baidu-map-container" style="width:1
                 <filter name="unsold" string="未租" domain="[('state','!=','sold')]"/>
                 <field name="name" string="资产名称" operator="like"/>
                 <field name="property_type_id" string="资产类型" operator="like"/>
+                <field name="tag_ids" string="资产标签" operator="like"/>
                 <separator/>
                 <field name="rent_area" string="面积>=" filter_domain="[('rent_area', '>=', self)]"/>
                 <separator/>
