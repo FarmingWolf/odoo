@@ -230,7 +230,19 @@ action = model.action_reject_confirm(env.context)
 
                     </notebook>
                     <group string="Approval Details" name="approval_details_info" invisible="not approval_detail_ids">
-                        <field name="approval_detail_ids" string="" readonly="1"/>
+                        <field name="approval_detail_ids" string="" readonly="1">
+                            <tree string="" create="False" edit="True" delete="False">
+                                <field name="company_id" column_invisible="1"/>
+                                <field name="approval_decision" column_invisible="1"/>
+                                <field name="fund_management_id" column_invisible="1"/>
+                                <field name="approval_stage_nm"/>
+                                <field name="approval_decision_txt"/>
+                                <field name="approved_by_id" column_invisible="1"/>
+                                <field name="approved_by_nm"/>
+                                <field name="approval_comments"/>
+                                <field name="approval_date_time"/>
+                            </tree>
+                        </field>
                     </group>
                 </sheet>
                 <div class="o_attachment_preview o_center_attachment" groups="fund_management.group_fund_management_manager"/>

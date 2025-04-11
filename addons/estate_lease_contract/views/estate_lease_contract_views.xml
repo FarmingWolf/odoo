@@ -751,7 +751,19 @@
                         </page>
                     </notebook>
                     <group string="审批情况" invisible="not approval_detail_ids">
-                        <field name="approval_detail_ids" string="" readonly="1"/>
+                        <field name="approval_detail_ids" string="" readonly="1">
+                            <tree string="" create="False" edit="False" delete="False">
+                                <field name="company_id" column_invisible="1"/>
+                                <field name="approval_decision" column_invisible="1"/>
+                                <field name="contract_id" column_invisible="1"/>
+                                <field name="approval_stage_nm"/>
+                                <field name="approval_decision_txt"/>
+                                <field name="approved_by_id" column_invisible="1"/>
+                                <field name="approved_by_nm"/>
+                                <field name="approval_comments"/>
+                                <field name="approval_date_time"/>
+                            </tree>
+                        </field>
                     </group>
                 </sheet>
                 <div class="oe_chatter" groups="estate.estate_group_tutorial_research">
