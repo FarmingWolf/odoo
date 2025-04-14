@@ -4,6 +4,7 @@ access_estate_type_read,access.estate.type.read,model_estate_property_type,estat
 access_estate_tag_read,access.estate.tag.read,model_estate_property_tag,estate_group_user,1,0,0,0
 access_estate_state_color_read,access.estate.state.color.read,model_estate_property_state_color,estate_group_user,1,0,0,0
 access_estate_offer_full,access.estate.offer.full,model_estate_property_offer,estate_group_user,1,1,1,1
+access_estate_area_report_read,access.estate.area.report.read,model_estate_area_report,estate_group_user,1,0,0,0
 access_estate_property_ads_img_full,access.estate.property.ads.img.full,model_estate_property_ads_img,estate_group_user,1,1,1,1
 access_estate_property_ads_img_read,access.estate.property.ads.img.read,model_estate_property_ads_img,base.group_user,1,0,0,0
 access_estate_property_ads_img_portal,access.estate.property.ads.img.portal,model_estate_property_ads_img,base.group_portal,1,0,0,0

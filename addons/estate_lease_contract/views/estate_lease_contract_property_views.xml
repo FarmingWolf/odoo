@@ -92,7 +92,7 @@
                                             <field name="including_management_fee"/>
                                         </group>
                                         <group col="1">
-                                            <button name="setting_management_fee_plan_action"
+                                            <button name="setting_management_fee_plan_action" class="btn-primary"
                                                     type="object" invisible="including_management_fee or context.get('contract_read_only') or context.get('menu_root') !='estate.lease.contract'" string="物业费"
                                                     context="{'rent_area_4_management_fee': rent_area,
                                                     'property_nm_4_management_fee' : name,
@@ -134,7 +134,7 @@
                                     <group col="1">
                                         <group col="1" colspan="2">
                                             <button name="action_refresh_rent_plan" type="object"
-                                                    string="刷新"
+                                                    string="刷新租金方案"
                                                     invisible="context.get('contract_read_only') or context.get('menu_root') == 'estate.property'"/>
                                         </group>
                                     </group>
@@ -153,7 +153,7 @@
                                             <field name="including_management_fee"/>
                                         </group>
                                         <group col="1">
-                                            <button name="setting_management_fee_plan_action"
+                                            <button name="setting_management_fee_plan_action" class="btn-primary"
                                                     type="object" invisible="including_management_fee or context.get('contract_read_only') or context.get('menu_root') !='estate.lease.contract'" string="物业费"
                                                     context="{'rent_area_4_management_fee': rent_area,
                                                     'property_nm_4_management_fee' : name,
@@ -197,7 +197,7 @@
                                         <field name="set_rent_plan_including_management_fee" help="如果选择不包含物业费，那么请完成设置租金方案后前往物业费专区页面设置物业费方案详情"/>
                                     </group>
                                     <group col="1">
-                                        <button name="setting_management_fee_plan_action"
+                                        <button name="setting_management_fee_plan_action" class="btn-primary"
                                                 type="object" invisible="set_rent_plan_including_management_fee or context.get('contract_read_only') or context.get('menu_root') !='estate.lease.contract'"
                                                 string="物业费"
                                                 context="{'rent_area_4_management_fee': rent_area,

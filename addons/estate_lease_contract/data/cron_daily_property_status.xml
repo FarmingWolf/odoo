@@ -6,8 +6,8 @@
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field> <!-- -1 表示无限次执行 -->
-        <!-- 执行时间14：35，实际上是东八区的22:35，生成当日数据 先执行estate_lease_property_daily_cron，再执行本任务-->
-        <field name="nextcall" eval="(DateTime.now().replace(hour=14, minute=35)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <!-- 执行时间16：08，实际上是东八区的24:08，生成当日数据（系统日期前一日） 先执行estate_lease_property_daily_cron，再执行本任务-->
+        <field name="nextcall" eval="(DateTime.now().replace(hour=16, minute=8)).strftime('%Y-%m-%d %H:%M:%S')" />
         <field name="doall" eval="True"/> <!-- True表示即使服务器关闭期间错过执行也会补执行 -->
         <field name="code">model.automatic_daily_calc_status()</field>
         <field name="user_id" eval="2"/><!--admin-->
@@ -20,8 +20,8 @@
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field> <!-- -1 表示无限次执行 -->
-        <!-- 执行时间14：30，实际上是东八区的22:30，生成当日数据 先执行本任务，再执行estate_lease_contract_daily_cron -->
-        <field name="nextcall" eval="(DateTime.now().replace(hour=14, minute=30)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <!-- 执行时间16：05，实际上是东八区的24:05，生成当日数据（系统日期前一日） 先执行本任务，再执行estate_lease_contract_daily_cron -->
+        <field name="nextcall" eval="(DateTime.now().replace(hour=16, minute=5)).strftime('%Y-%m-%d %H:%M:%S')" />
         <field name="doall" eval="True"/> <!-- True表示即使服务器关闭期间错过执行也会补执行 -->
         <field name="code">model.automatic_daily_calc_property_status()</field>
         <field name="user_id" eval="2"/><!--admin-->
@@ -47,8 +47,8 @@
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field> <!-- -1 表示无限次执行 -->
-        <!-- 执行时间15：00，实际上是东八区的23:00，生成当日数据 -->
-        <field name="nextcall" eval="(DateTime.now().replace(hour=15, minute=00)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <!-- 执行时间16：11，实际上是东八区的24:11，生成当日数据（系统日期前一日）  -->
+        <field name="nextcall" eval="(DateTime.now().replace(hour=16, minute=11)).strftime('%Y-%m-%d %H:%M:%S')" />
         <field name="doall" eval="True"/> <!-- True表示即使服务器关闭期间错过执行也会补执行 -->
         <field name="code">model.automatic_daily_pick_turnover_amount_received()</field>
         <field name="user_id" eval="2"/><!--admin-->

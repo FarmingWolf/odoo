@@ -4,3 +4,4 @@ property_offer_company_account_rule,Restrict Properties Offer by Company,model_e
 property_tag_company_account_rule,Restrict Properties Tag by Company,model_estate_property_tag,"[('company_id','=',user.company_id.id)]"
 property_state_color_company_account_rule,Restrict Properties State Color by Company,model_estate_property_state_color,"[('company_id','=',user.company_id.id)]"
 property_type_company_account_rule,Restrict Properties Type by Company,model_estate_property_type,"[('company_id','=',user.company_id.id)]"
+property_area_company_account_rule,Restrict Properties Area by Company,model_estate_area_report,"[('company_id','=',user.company_id.id)]"

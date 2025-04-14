@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="estate_area_report_view_tree" model="ir.ui.view">
+            <field name="name">estate.area.report.tree</field>
+            <field name="model">estate.area.report</field>
+            <field name="arch" type="xml">
+                <tree string="资产清单">
+                    <field name="property_id"/>
+                    <field name="property_rent_area"/>
+                    <field name="property_state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="estate_area_report_view_graph" model="ir.ui.view">
+            <field name="name">estate.area.report.graph</field>
+            <field name="model">estate.area.report</field>
+            <field name="arch" type="xml">
+                <graph string="出租空置比" sample="1">
+                    <field name="property_rent_area" type="measure"/>
+                    <field name="property_state"/>
+                </graph>
+            </field>
+        </record>
+
+       <record id="estate_area_report_action" model="ir.actions.act_window">
+           <field name="name">出租空置比</field>
+           <field name="res_model">estate.area.report</field>
+           <field name="view_mode">graph</field>
+           <field name="context">{
+                'graph_mode': 'pie',
+                'graph_groupbys': ['property_state'],
+            }</field>
+            <field name="domain">[]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                   还没有数据哦!
+                </p><p>
+                    抓紧创建资产、录入租赁合同吧！
+                </p>
+            </field>
+       </record>
+
+</odoo>

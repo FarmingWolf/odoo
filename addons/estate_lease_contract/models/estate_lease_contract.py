@@ -769,7 +769,8 @@ class EstateLeaseContract(models.Model):
     date_rent_end = fields.Date("计租结束日期", required=True, copy=False, tracking=True,
                                 default=lambda self: self._get_default_date_rent_end())
 
-    days_rent_total = fields.Char(string="租赁期限", compute="_calc_days_rent_total")
+    days_rent_total = fields.Char(string="租金计算期限", compute="_calc_days_rent_total")
+    days_contract_total = fields.Char(string="合同期限", compute="_calc_days_contract_total")
 
     # 相当于合同历史信息：资产名称、计租面积、押金月数、押金金额，其他信息还是从资产和租赁方案中取（资产和租赁方案修改保存时，做覆盖和影响的提示）
     # *********在查看界面（也就是说只要合同发布），那么就应该显示历史数据，录入中的则显示关联master property和rental plan的信息*********
@@ -936,6 +937,22 @@ class EstateLeaseContract(models.Model):
                 record.days_rent_total = "{0}年（{1}天）".format(round(year_delta, 2), delta.days + 1)
             else:
                 record.days_rent_total = ""
+
+    @api.depends("date_start", "date_rent_end")
+    def _calc_days_contract_total(self):
+        one_year_days = self._get_one_year_days()
+        for record in self:
+            if record.date_start and record.date_rent_end:
+                if record.date_start > record.date_rent_end:
+                    raise exceptions.UserError("计租结束日期不能小于合同开始日期")
+
+                date_s = fields.Date.from_string(record.date_start)
+                date_e = fields.Date.from_string(record.date_rent_end)
+                delta = date_e - date_s
+                year_delta = (delta.days + 1) / one_year_days
+                record.days_contract_total = "{0}年（{1}天）".format(round(year_delta, 2), delta.days + 1)
+            else:
+                record.days_contract_total = ""
 
     date_deliver = fields.Date("计划交付日期")
     deliver_condition = fields.Char("交付前提条件")
