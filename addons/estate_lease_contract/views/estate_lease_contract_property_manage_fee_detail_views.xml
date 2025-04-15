@@ -153,7 +153,9 @@
                     <group>
                         <group/>
                         <field name="manage_fee_detail_sub_ids" readonly="not manage_fee_detail_sub_ids_editable">
-                            <tree string="分次缴费明细" create="1" delete="1" edit="1" import="0" editable="bottom">
+                            <tree string="分次缴费明细" create="1" delete="1" edit="1" import="0" editable="bottom" open_form_view="True">
+                                <field name="receipt_type_editable" column_invisible="1"/>
+                                <field name="maintenance_receipt_editable" column_invisible="1"/>
                                 <field name="date_received"/>
                                 <field name="maintenance_received" digits="[12, 2]"/>
                                 <field name="maintenance_received_sum" digits="[12, 2]"/>
@@ -162,7 +164,12 @@
                                 <field name="days_received_sum" digits="[12, 0]"/>
                                 <field name="days_arrears" digits="[12, 0]"/>
                                 <field name="maintenance_received_2_date"/>
-                                <field name="maintenance_receipt"/>
+                                <button type="object" name="action_apply_maintenance_invoice" title="申请开具本笔实收金额发票"
+                                        invisible="(receipt_status == 'applied' or receipt_status == 'done') or maintenance_receipt" icon="fa-stack-overflow"
+                                        groups="estate.estate_group_business"/>
+                                <field name="receipt_type" readonly="not receipt_type_editable" invisible="not receipt_status"/>
+                                <field name="receipt_status" readonly="1"/>
+                                <field name="maintenance_receipt" readonly="not maintenance_receipt_editable"/>
                                 <field name="maintenance_receipt_evidence" invisible="not maintenance_receipt" placeholder="可录发票号、粘贴照片等"/>
                             </tree>
                         </field>
@@ -287,7 +294,7 @@
         </field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                近期代缴费物业费明细
+                近期待缴费物业费明细
             </p>
         </field>
     </record>

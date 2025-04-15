@@ -1,45 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="estate_lease_contract_property_rental_detail_sub_view_form" model="ir.ui.view">
-        <field name="name">estate.lease.contract.property.rental.detail.sub.form</field>
-        <field name="model">estate.lease.contract.property.rental.detail.sub</field>
+    <record id="estate_lease_contract_property_deposit_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.deposit.form</field>
+        <field name="model">estate.lease.contract.property.deposit</field>
         <field name="arch" type="xml">
-            <form string="estate_lease_contract_property_rental_detail_sub_view_form"
+            <form string="estate_lease_contract_property_deposit_view_form"
                   create="False" delete="False" edit="True">
                 <sheet>
                     <group cols="2">
-                        <group>
+                        <group cols="1">
                             <field name="party_a_unit_invisible" invisible="1"/>
                             <field name="property_id"/>
                             <field name="party_a_unit_id" invisible="party_a_unit_invisible"/>
+                            <field name="date_start"/>
                             <field name="date_rent_start"/>
                             <field name="date_rent_end"/>
                             <field name="date_received"/>
-                            <field name="rental_received" digits="[12, 2]"/>
-                            <field name="rental_received_tgt_period" digits="[12, 2]"/>
-                            <field name="rental_receivable_tgt_period" digits="[12, 2]" />
-                            <field name="rental_arrears_tgt_period" digits="[12, 2]"/>
-                            <field name="receipt_type_editable" invisible="1"/>
-                            <field name="rental_receipt_editable" invisible="1"/>
+                            <field name="deposit_received" digits="[12, 2]"/>
+                            <field name="deposit_receivable" digits="[12, 2]"/>
+                            <field name="deposit_received_sum" digits="[12, 2]"/>
+                            <field name="deposit_arrears" digits="[12, 2]"/>
+                            <field name="deposit_receipt_editable" invisible="1"/>
                             <field name="receipt_status"/>
-                            <field name="receipt_type" readonly="not receipt_type_editable"/>
                             <field name="receipt_apply_uid" invisible="not receipt_status" readonly="1"/>
                             <field name="receipt_apply_date" invisible="not receipt_status" readonly="1"/>
                         </group>
-                        <group>
+                        <group cols="1">
                             <field name="contract_id"/>
                             <field name="renter_id"/>
-                            <field name="rental_detail_id"/>
-                            <field name="rental_period_no"/>
-                            <field name="period_date_from"/>
-                            <field name="period_date_to"/>
-                            <field name="date_payment"/>
-                            <field name="contract_amount" digits="[12, 2]"/>
-                            <field name="rental_receipt" readonly="not rental_receipt_editable"/>
-                            <field name="rental_receipt_evidence" invisible="not rental_receipt" placeholder="可录发票号、粘贴照片等" readonly="not rental_receipt_editable"/>
-                            <field name="receipt_done_by_uid" invisible="not rental_receipt" readonly="1"/>
-                            <field name="receipt_done_date" invisible="not rental_receipt" readonly="1"/>
+                            <field name="contract_rental_plan_rel_id" invisible="not contract_rental_plan_rel_id"/>
+                            <field name="deposit_receipt" readonly="not deposit_receipt_editable"/>
+                            <field name="deposit_receipt_evidence" invisible="not deposit_receipt" placeholder="可录发票号、粘贴照片等" readonly="not deposit_receipt_editable"/>
+                            <field name="receipt_done_by_uid" invisible="not deposit_receipt" readonly="1"/>
+                            <field name="receipt_done_date" invisible="not deposit_receipt" readonly="1"/>
+                            <field name="deposit_receipt_refund" invisible="not deposit_receipt"/>
+                            <field name="deposit_receipt_refund_evidence" invisible="not deposit_receipt"/>
                         </group>
                     </group>
                 </sheet>
@@ -52,36 +48,33 @@
         </field>
     </record>
 
-    <record id="estate_lease_contract_property_rental_detail_sub_view_tree" model="ir.ui.view">
-        <field name="name">estate.lease.contract.property.rental.detail.sub.tree</field>
-        <field name="model">estate.lease.contract.property.rental.detail.sub</field>
+    <record id="estate_lease_contract_property_deposit_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.deposit.tree</field>
+        <field name="model">estate.lease.contract.property.deposit</field>
         <field name="arch" type="xml">
-            <tree string="estate_lease_contract_property_rental_detail_sub_view_tree" create="False" delete="False" edit="False" import="False" open_form_view="False">
-
+            <tree string="estate_lease_contract_property_deposit_view_tree" create="False" delete="False" edit="False" import="False" open_form_view="False">
                 <field name="party_a_unit_invisible" column_invisible="1"/>
                 <field name="property_id"/>
                 <field name="party_a_unit_id" invisible="party_a_unit_invisible" string=""/>
+                <field name="date_start"/>
                 <field name="date_rent_start"/>
                 <field name="date_rent_end"/>
                 <field name="renter_id"/>
-                <field name="contract_amount" digits="[12, 2]" />
-                <field name="rental_receivable_tgt_period" digits="[12, 2]" />
-                <field name="rental_received" string="指定期间实收（元）" digits="[12, 2]" sum="指定期间总计实收（元）"/>
-                <field name="rental_arrears_tgt_period" digits="[12, 2]"/>
+                <field name="deposit_receivable" digits="[12, 2]" />
+                <field name="deposit_received" string="指定期间实收（元）" digits="[12, 2]" sum="指定期间总计实收（元）"/>
                 <field name="date_received"/>
                 <field name="receipt_status"/>
-                <field name="receipt_type"/>
-                <field name="rental_receipt"/>
-                <field name="rental_receipt_evidence" invisible="not rental_receipt" placeholder="可录发票号、粘贴照片等"/>
+                <field name="deposit_receipt"/>
+                <field name="deposit_receipt_evidence" invisible="not deposit_receipt" placeholder="可录发票号、粘贴照片等"/>
             </tree>
         </field>
     </record>
 
-    <record id="estate_lease_contract_property_rental_detail_sub_view_search" model="ir.ui.view">
-        <field name="name">estate.lease.contract.property.rental.detail.sub.view.search</field>
-        <field name="model">estate.lease.contract.property.rental.detail.sub</field>
+    <record id="estate_lease_contract_property_deposit_view_search" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.deposit.view.search</field>
+        <field name="model">estate.lease.contract.property.deposit</field>
         <field name="arch" type="xml">
-            <search string="实收租金检索">
+            <search string="实收押金检索">
                 <filter string="实收月份" name="filter_date_received" date="date_received" default_period="last_month"/>
                 <separator/>
                 <filter string="截至本日" name="date_received_2_today"
@@ -104,10 +97,10 @@
         </field>
     </record>
 
-    <record id="estate_lease_contract_property_rental_detail_sub_action" model="ir.actions.act_window">
-        <field name="name">实收租金流水明细</field>
-        <field name="res_model">estate.lease.contract.property.rental.detail.sub</field>
-        <field name="view_id" ref="estate_lease_contract_property_rental_detail_sub_view_tree"/>
+    <record id="estate_lease_contract_property_deposit_action" model="ir.actions.act_window">
+        <field name="name">实收押金流水明细</field>
+        <field name="res_model">estate.lease.contract.property.deposit</field>
+        <field name="view_id" ref="estate_lease_contract_property_deposit_view_tree"/>
         <field name="view_mode">tree,form</field>
         <field name="context">{
             'search_default_filter_date_received': True,
@@ -115,7 +108,7 @@
         </field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                这里显示资产租赁合同各期租金明细的实际收缴明细。
+                这里显示资产租赁合同各期押金明细的实际收缴明细。
             </p>
         </field>
     </record>

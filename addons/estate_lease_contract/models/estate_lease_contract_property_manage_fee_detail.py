@@ -20,7 +20,7 @@ def _get_manage_fee_received_2_date_from_rcd(record):
             record.days_received = record.manage_fee_received / record.manage_fee_receivable * record.days_receivable
 
         record.days_arrears = record.days_receivable - record.days_received
-        record.manage_fee_received_2_date = record.period_date_from + timedelta(days=record.days_received)
+        record.manage_fee_received_2_date = record.period_date_from + timedelta(days=record.days_received - 1)
         if record.manage_fee_received_2_date > record.period_date_to:
             if record.manage_fee_received <= record.manage_fee_amount:
                 record.manage_fee_received_2_date = record.period_date_to
@@ -33,10 +33,10 @@ class EstateLeaseContractPropertyManageFeeDetail(models.Model):
     _order = "property_id, period_date_from, manage_fee_period_no"
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string="物业费明细", compute="_compute_detail_name")
-    contract_id = fields.Many2one('estate.lease.contract', string="合同", ondelete="cascade")
+    name = fields.Char(string="物业费明细", compute="_compute_detail_name", readonly=True)
+    contract_id = fields.Many2one('estate.lease.contract', string="合同", ondelete="cascade", readonly=True)
     contract_state = fields.Selection(string="合同状态", related="contract_id.state")
-    property_id = fields.Many2one('estate.property', string="租赁标的", ondelete="cascade")
+    property_id = fields.Many2one('estate.property', string="租赁标的", ondelete="cascade", readonly=True)
     manage_fee_amount = fields.Float(default=0.0, string="本期物业费(元)", readonly=True)
     manage_fee_amount_zh = fields.Char(string="本期物业费(元)大写", compute="_cal_manage_fee_amount_zh", store=True, readonly=True)
     manage_fee_receivable = fields.Float(default=0.0, string="本期应收(元)", compute="_get_default_manage_fee_receivable",

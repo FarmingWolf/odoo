@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="estate_lease_contract_property_fee_maintenance_view_form" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.fee.maintenance.form</field>
+        <field name="model">estate.lease.contract.property.fee.maintenance</field>
+        <field name="arch" type="xml">
+            <form string="estate_lease_contract_property_fee_maintenance_view_form"
+                  create="False" delete="False" edit="True">
+                <sheet>
+                    <group cols="2">
+                        <group cols="1">
+                            <field name="party_a_unit_invisible" invisible="1"/>
+                            <field name="property_id"/>
+                            <field name="party_a_unit_id" invisible="party_a_unit_invisible"/>
+                            <field name="date_start"/>
+                            <field name="date_rent_start"/>
+                            <field name="date_rent_end"/>
+                            <field name="date_received"/>
+                            <field name="maintenance_received" digits="[12, 2]"/>
+                            <field name="maintenance_receivable" digits="[12, 2]"/>
+                            <field name="maintenance_receivable_this" digits="[12, 2]" />
+                            <field name="maintenance_received_sum" digits="[12, 2]"/>
+                            <field name="maintenance_arrears" digits="[12, 2]"/>
+                            <field name="maintenance_arrears_sum" digits="[12, 2]"/>
+                            <field name="receipt_type_editable" invisible="1"/>
+                            <field name="maintenance_receipt_editable" invisible="1"/>
+                            <field name="receipt_status"/>
+                            <field name="receipt_type" readonly="not receipt_type_editable"/>
+                            <field name="receipt_apply_uid" invisible="not receipt_status" readonly="1"/>
+                            <field name="receipt_apply_date" invisible="not receipt_status" readonly="1"/>
+                        </group>
+                        <group cols="1">
+                            <field name="contract_id"/>
+                            <field name="renter_id"/>
+                            <field name="manage_fee_detail_id" invisible="not manage_fee_detail_id"/>
+                            <field name="contract_rental_plan_rel_id" invisible="not contract_rental_plan_rel_id"/>
+                            <field name="manage_fee_period_no" invisible="not manage_fee_period_no"/>
+                            <field name="period_d_start"/>
+                            <field name="period_d_end"/>
+                            <field name="date_payment" invisible="not date_payment"/>
+                            <field name="manage_fee_amount" digits="[12, 2]" invisible="not manage_fee_amount"/>
+                            <field name="incentive_amount" digits="[12, 2]" invisible="not incentive_amount"/>
+
+                            <field name="maintenance_receipt" readonly="not maintenance_receipt_editable"/>
+                            <field name="maintenance_receipt_evidence" invisible="not maintenance_receipt" placeholder="可录发票号、粘贴照片等" readonly="not maintenance_receipt_editable"/>
+                            <field name="receipt_done_by_uid" invisible="not maintenance_receipt" readonly="1"/>
+                            <field name="receipt_done_date" invisible="not maintenance_receipt" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter" groups="estate.estate_group_tutorial_research,estate.estate_group_business,estate_lease_contract.estate_lease_contract_group_manager">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_property_fee_maintenance_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.fee.maintenance.tree</field>
+        <field name="model">estate.lease.contract.property.fee.maintenance</field>
+        <field name="arch" type="xml">
+            <tree string="estate_lease_contract_property_fee_maintenance_view_tree" create="False" delete="False" edit="False" import="False" open_form_view="False">
+
+                <field name="party_a_unit_invisible" column_invisible="1"/>
+                <field name="property_id"/>
+                <field name="party_a_unit_id" invisible="party_a_unit_invisible" string=""/>
+                <field name="date_start"/>
+                <field name="date_rent_start"/>
+                <field name="date_rent_end"/>
+                <field name="renter_id"/>
+                <field name="manage_fee_amount" digits="[12, 2]" />
+                <field name="incentive_amount" digits="[12, 2]" />
+                <field name="maintenance_receivable" digits="[12, 2]" />
+                <field name="maintenance_received" string="指定期间实收（元）" digits="[12, 2]" sum="指定期间总计实收（元）"/>
+                <field name="maintenance_receivable_this" digits="[12, 2]"/>
+                <field name="date_received"/>
+                <field name="receipt_status"/>
+                <field name="receipt_type"/>
+                <field name="maintenance_receipt"/>
+                <field name="maintenance_receipt_evidence" invisible="not maintenance_receipt" placeholder="可录发票号、粘贴照片等"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_property_fee_maintenance_view_search" model="ir.ui.view">
+        <field name="name">estate.lease.contract.property.fee.maintenance.view.search</field>
+        <field name="model">estate.lease.contract.property.fee.maintenance</field>
+        <field name="arch" type="xml">
+            <search string="实收物业费检索">
+                <filter string="实收月份" name="filter_date_received" date="date_received" default_period="last_month"/>
+                <separator/>
+                <filter string="截至本日" name="date_received_2_today"
+                        domain="[('date_received', '&lt;=', context_today())]"/>
+                <separator/>
+                <filter string="截至本月" name="date_received_2_this_m"
+                        domain="[('date_received', '&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="截至本年" name="date_received_2_this_y"
+                        domain="[('date_received', '&lt;', (context_today() + relativedelta(years=1, month=1, day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="已申请，未开票" name="filter_receipt_status_applied" domain="[('receipt_status', '=', 'applied')]"/>
+                <filter string="已开票" name="filter_receipt_status_done" domain="[('receipt_status', '=', 'done')]"/>
+                <filter string="未申请，未开票" name="filter_receipt_status_none" domain="[('receipt_status', '=', False)]"/>
+                <field string='租赁资产名称' name="property_id" operator="like"/>
+                <searchpanel>
+                    <field string='承租人' name="renter_id" context="{'group_by': 'renter_id'}"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_property_fee_maintenance_action" model="ir.actions.act_window">
+        <field name="name">实收物业费流水明细</field>
+        <field name="res_model">estate.lease.contract.property.fee.maintenance</field>
+        <field name="view_id" ref="estate_lease_contract_property_fee_maintenance_view_tree"/>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{
+            'search_default_filter_date_received': True,
+            }
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                这里显示资产租赁合同各期物业费明细的实际收缴明细。
+            </p>
+        </field>
+    </record>
+
+</odoo>

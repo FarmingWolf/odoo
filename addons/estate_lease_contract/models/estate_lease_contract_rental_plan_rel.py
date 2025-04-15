@@ -14,6 +14,7 @@ class EstateLeaseContractRentalPlanRel(models.Model):
 
     sequence = fields.Integer("排序", default=1)
 
+    name = fields.Char(string="资产租赁详情", default="资产租赁详情")
     contract_id = fields.Many2one('estate.lease.contract', string='合同', required=True, ondelete='cascade')
     property_id = fields.Many2one('estate.property', string='资产', required=True)
     rental_plan_id = fields.Many2one('estate.lease.contract.rental.plan', string='租金方案')

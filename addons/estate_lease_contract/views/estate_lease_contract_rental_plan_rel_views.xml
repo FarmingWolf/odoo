@@ -67,11 +67,16 @@
                     <notebook>
                         <page string="押金" >
                             <field name="contract_property_deposit_ids" nolabel="1">
-                                <tree create="1" delete="1" edit="1" import="0" editable="bottom">
+                                <tree create="1" delete="1" edit="1" import="0" editable="bottom" open_form_view="True">
+                                    <field name="deposit_receipt_editable" column_invisible="1"/>
                                     <field name="date_received"/>
                                     <field name="deposit_received" digits="[12, 2]"/>
                                     <field name="deposit_received_sum" digits="[12, 2]"/>
                                     <field name="deposit_arrears" digits="[12, 2]"/>
+                                    <button type="object" name="action_apply_deposit_invoice" title="申请开具本笔实收金额收据"
+                                        invisible="(receipt_status == 'applied' or receipt_status == 'done') or deposit_receipt" icon="fa-stack-overflow"
+                                        groups="estate.estate_group_business"/>
+                                    <field name="receipt_status" readonly="1"/>
                                     <field name="deposit_receipt" readonly="deposit_receipt_refund"/>
                                     <field name="deposit_receipt_evidence" invisible="not deposit_receipt" placeholder="可录押金条号、粘贴照片等" readonly="deposit_receipt_refund"/>
                                     <field name="deposit_receipt_refund" invisible="not deposit_receipt"/>
@@ -81,7 +86,9 @@
                         </page>
                         <page string="水费">
                             <field name="contract_property_fee_water_ids" nolabel="1">
-                                <tree create="1" delete="1" edit="1" import="0" editable="bottom">
+                                <tree create="1" delete="1" edit="1" import="0" editable="bottom" open_form_view="True">
+                                    <field name="receipt_type_editable" column_invisible="1"/>
+                                    <field name="water_receipt_editable" column_invisible="1"/>
                                     <field name="period_d_start"/>
                                     <field name="period_d_end"/>
                                     <field name="date_received"/>
@@ -90,6 +97,11 @@
                                     <field name="water_arrears" digits="[12, 2]"/>
                                     <field name="water_received_sum" digits="[12, 2]"/>
                                     <field name="water_arrears_sum" digits="[12, 2]"/>
+                                    <button type="object" name="action_apply_water_invoice" title="申请开具本笔实收金额发票"
+                                        invisible="(receipt_status == 'applied' or receipt_status == 'done') or water_receipt" icon="fa-stack-overflow"
+                                        groups="estate.estate_group_business"/>
+                                    <field name="receipt_type" readonly="not receipt_type_editable" invisible="not receipt_status"/>
+                                    <field name="receipt_status" readonly="1"/>
                                     <field name="water_receipt"/>
                                     <field name="water_receipt_evidence" invisible="not water_receipt" placeholder="可录发票号、粘贴照片等"/>
                                 </tree>
@@ -97,7 +109,9 @@
                         </page>
                         <page string="电费">
                             <field name="contract_property_fee_electricity_ids" nolabel="1">
-                                <tree create="1" delete="1" edit="1" import="0" editable="bottom">
+                                <tree create="1" delete="1" edit="1" import="0" editable="bottom" open_form_view="True">
+                                    <field name="receipt_type_editable" column_invisible="1"/>
+                                    <field name="electricity_receipt_editable" column_invisible="1"/>
                                     <field name="period_d_start"/>
                                     <field name="period_d_end"/>
                                     <field name="date_received"/>
@@ -106,6 +120,11 @@
                                     <field name="electricity_arrears" digits="[12, 2]"/>
                                     <field name="electricity_received_sum" digits="[12, 2]"/>
                                     <field name="electricity_arrears_sum" digits="[12, 2]"/>
+                                    <button type="object" name="action_apply_electricity_invoice" title="申请开具本笔实收金额发票"
+                                        invisible="(receipt_status == 'applied' or receipt_status == 'done') or electricity_receipt" icon="fa-stack-overflow"
+                                        groups="estate.estate_group_business"/>
+                                    <field name="receipt_type" readonly="not receipt_type_editable" invisible="not receipt_status"/>
+                                    <field name="receipt_status" readonly="1"/>
                                     <field name="electricity_receipt"/>
                                     <field name="electricity_receipt_evidence" invisible="not electricity_receipt" placeholder="可录发票号、粘贴照片等"/>
                                 </tree>
@@ -113,7 +132,9 @@
                         </page>
                         <page string="电力维护费">
                             <field name="contract_property_fee_electricity_maintenance_ids" nolabel="1">
-                                <tree create="1" delete="1" edit="1" import="0" editable="bottom">
+                                <tree create="1" delete="1" edit="1" import="0" editable="bottom" open_form_view="True">
+                                    <field name="receipt_type_editable" column_invisible="1"/>
+                                    <field name="electricity_maintenance_receipt_editable" column_invisible="1"/>
                                     <field name="period_d_start"/>
                                     <field name="period_d_end"/>
                                     <field name="date_received"/>
@@ -122,6 +143,11 @@
                                     <field name="electricity_maintenance_arrears" digits="[12, 2]"/>
                                     <field name="electricity_maintenance_received_sum" digits="[12, 2]"/>
                                     <field name="electricity_maintenance_arrears_sum" digits="[12, 2]"/>
+                                    <button type="object" name="action_apply_electricity_maintenance_invoice" title="申请开具本笔实收金额发票"
+                                        invisible="(receipt_status == 'applied' or receipt_status == 'done') or electricity_maintenance_receipt" icon="fa-stack-overflow"
+                                        groups="estate.estate_group_business"/>
+                                    <field name="receipt_type" readonly="not receipt_type_editable" invisible="not receipt_status"/>
+                                    <field name="receipt_status" readonly="1"/>
                                     <field name="electricity_maintenance_receipt"/>
                                     <field name="electricity_maintenance_receipt_evidence" invisible="not electricity_maintenance_receipt" placeholder="可录发票号、粘贴照片等"/>
                                 </tree>
@@ -129,7 +155,9 @@
                         </page>
                         <page string="物业费">
                             <field name="contract_property_fee_maintenance_ids" nolabel="1">
-                                <tree create="1" delete="1" edit="1" import="0" editable="bottom">
+                                <tree create="1" delete="1" edit="1" import="0" editable="bottom" open_form_view="True">
+                                    <field name="receipt_type_editable" column_invisible="1"/>
+                                    <field name="maintenance_receipt_editable" column_invisible="1"/>
                                     <field name="period_d_start"/>
                                     <field name="period_d_end"/>
                                     <field name="date_received"/>
@@ -138,6 +166,11 @@
                                     <field name="maintenance_arrears" digits="[12, 2]"/>
                                     <field name="maintenance_received_sum" digits="[12, 2]"/>
                                     <field name="maintenance_arrears_sum" digits="[12, 2]"/>
+                                    <button type="object" name="action_apply_maintenance_invoice" title="申请开具本笔实收金额发票"
+                                        invisible="(receipt_status == 'applied' or receipt_status == 'done') or maintenance_receipt" icon="fa-stack-overflow"
+                                        groups="estate.estate_group_business"/>
+                                    <field name="receipt_type" readonly="not receipt_type_editable" invisible="not receipt_status"/>
+                                    <field name="receipt_status" readonly="1"/>
                                     <field name="maintenance_receipt"/>
                                     <field name="maintenance_receipt_evidence" invisible="not maintenance_receipt" placeholder="可录发票号、粘贴照片等"/>
                                 </tree>
@@ -146,11 +179,18 @@
                         </page>
                         <page string="房产税">
                             <field name="contract_property_tax_ids" nolabel="1">
-                                <tree create="1" delete="1" edit="1" import="0" editable="bottom">
+                                <tree create="1" delete="1" edit="1" import="0" editable="bottom" open_form_view="True">
+                                    <field name="receipt_type_editable" column_invisible="1"/>
+                                    <field name="tax_receipt_editable" column_invisible="1"/>
                                     <field name="date_received"/>
                                     <field name="tax_received" digits="[12, 2]"/>
                                     <field name="tax_received_sum" digits="[12, 2]"/>
                                     <field name="tax_arrears" digits="[12, 2]"/>
+                                    <button type="object" name="action_apply_tax_invoice" title="申请开具本笔实收金额发票"
+                                        invisible="(receipt_status == 'applied' or receipt_status == 'done') or tax_receipt" icon="fa-stack-overflow"
+                                        groups="estate.estate_group_business"/>
+                                    <field name="receipt_type" readonly="not receipt_type_editable" invisible="not receipt_status"/>
+                                    <field name="receipt_status" readonly="1"/>
                                     <field name="tax_receipt"/>
                                     <field name="tax_receipt_evidence" invisible="not tax_receipt" placeholder="可录发票号、粘贴照片等"/>
                                 </tree>

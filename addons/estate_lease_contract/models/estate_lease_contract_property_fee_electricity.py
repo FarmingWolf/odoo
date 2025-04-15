@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
-from datetime import timedelta
+from datetime import timedelta, date
 from math import ceil, floor
 from typing import Dict, List
 
@@ -20,7 +20,8 @@ class EstateLeaseContractPropertyFeeElectricity(models.Model):
     _order = "date_received"
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    contract_rental_plan_rel_id = fields.Many2one(comodel_name='estate.lease.contract.rental.plan.rel',
+    name = fields.Char(string="电费实缴详情", default="电费实缴详情")
+    contract_rental_plan_rel_id = fields.Many2one(comodel_name='estate.lease.contract.rental.plan.rel', readonly=True,
                                                   string='合同-资产关系表ID', required=True, ondelete="cascade")
     period_d_start = fields.Date(string="本期开始日", default=lambda self: self._cal_period_d_start(), tracking=True)
     period_d_end = fields.Date(string="本期结束日", default=lambda self: self._cal_period_d_end(), tracking=True)
@@ -51,8 +52,36 @@ class EstateLeaseContractPropertyFeeElectricity(models.Model):
     date_rent_end = fields.Date(string="计租结束日期", related="contract_id.date_rent_end")
     renter_id = fields.Many2one('res.partner', string="承租人", related='contract_id.renter_id', store=True,
                                 ondelete="set null")
+    receipt_status = fields.Selection(string="发票状态", selection=[('applied', '已申请，未开票'), ('done', '已开票')],
+                                      default=None, tracking=True, compute="_compute_receipt_status", store=True)
+    receipt_type = fields.Selection(string="发票类型", selection=[('zp', '专票'), ('pp', '普票')],
+                                    default=None, tracking=True, store=True)
+    receipt_type_editable = fields.Boolean(string="发票类型可编辑",
+                                           compute="_compute_receipt_type_editable")
+    receipt_apply_uid = fields.Many2one(string="发票申请人", comodel_name="res.users", tracking=True)
+    receipt_apply_date = fields.Date(string="发票申请时间", tracking=True)
     electricity_receipt = fields.Boolean(string="发票")
     electricity_receipt_evidence = fields.Html(string="发票信息")
+    electricity_receipt_editable = fields.Boolean(string="发票信息可编辑",
+                                            compute="_compute_electricity_receipt_editable")
+    receipt_done_by_uid = fields.Many2one(string="发票开具人", comodel_name="res.users", tracking=True)
+    receipt_done_date = fields.Date(string="发票开具时间", tracking=True)
+
+    def _compute_electricity_receipt_editable(self):
+        for record in self:
+            record.electricity_receipt_editable = \
+                self.env.user.has_group('estate_lease_contract.contract_brokerage_invoice_manage')
+
+    def _compute_receipt_type_editable(self):
+        is_editable = self.env.user.has_group('estate.estate_group_business')
+        for record in self:
+            if not is_editable:
+                record.receipt_type_editable = False
+            else:
+                if record.electricity_receipt:
+                    record.receipt_type_editable = False
+                else:
+                    record.receipt_type_editable = True
 
     @api.onchange("electricity_receivable", "electricity_received")
     def _onchange_electricity_receivable(self):
@@ -93,3 +122,52 @@ class EstateLeaseContractPropertyFeeElectricity(models.Model):
 
                 if rcd.electricity_arrears_sum != arrears_sum:
                     rcd.electricity_arrears_sum = arrears_sum
+
+    def action_apply_electricity_invoice(self):
+        for record in self:
+            if record.electricity_received < 0.01:
+                raise UserError("开票金额有误！")
+            if record.receipt_status != 'applied':
+                record.receipt_status = 'applied'
+                record.receipt_apply_uid = self.env.user.id
+                record.receipt_apply_date = date.today()
+                record._set_default_electricity_receipt_evidence()
+
+            if not record.receipt_type:
+                record.receipt_type = 'zp'
+
+    @api.onchange("electricity_receipt")
+    def _onchange_electricity_receipt(self):
+        if self.electricity_receipt:
+            self.receipt_done_by_uid = self.env.user.id
+            self.receipt_done_date = date.today()
+            self._set_default_electricity_receipt_evidence()
+
+    @api.depends("electricity_receipt", "electricity_receipt_evidence")
+    def _compute_receipt_status(self):
+        for record in self:
+            if record.electricity_receipt and record.electricity_receipt_evidence:
+                if record.receipt_status != 'done':
+                    record.receipt_status = 'done'
+                    record.receipt_done_by_uid = self.env.user.id
+                    record.receipt_done_date = date.today()
+            else:
+                if record.receipt_status == 'done':
+                    record.receipt_status = 'applied'
+
+    def _set_default_electricity_receipt_evidence(self):
+        if not self.electricity_receipt_evidence:
+            tmp_str = []
+            if self.renter_id:
+                if self.renter_id.is_company:
+                    tmp_str.append(f"企业统一信用代码:{str(self.renter_id.vat)}")
+                    tmp_str.append(f"开票名称：{str(self.renter_id.name)}")
+                else:
+                    tmp_str.append(f"开票对象：个人")
+                    tmp_str.append(f"开票名称：{str(self.renter_id.name)}")
+
+            if self.receipt_apply_uid:
+                tmp_str.append(f"申请人：{self.receipt_apply_uid.name}")
+                tmp_str.append(f"申请时间：{self.receipt_apply_date}")
+
+            self.electricity_receipt_evidence = tmp_str

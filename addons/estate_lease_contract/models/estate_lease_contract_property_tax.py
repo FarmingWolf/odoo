@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
-from datetime import timedelta
+from datetime import timedelta, date
 from math import ceil, floor
 from typing import Dict, List
 
@@ -20,7 +20,8 @@ class EstateLeaseContractPropertyTax(models.Model):
     _order = "date_received"
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    contract_rental_plan_rel_id = fields.Many2one(comodel_name='estate.lease.contract.rental.plan.rel',
+    name = fields.Char(string="房产税实缴详情", default="房产税实缴详情")
+    contract_rental_plan_rel_id = fields.Many2one(comodel_name='estate.lease.contract.rental.plan.rel', readonly=True,
                                                   string='合同-资产关系表ID', required=True, ondelete="cascade")
     tax_receivable_this = fields.Float(default=0.0, string="本次应收(元)", compute="_compute_received",
                                        store=True, compute_sudo=True)
@@ -50,8 +51,36 @@ class EstateLeaseContractPropertyTax(models.Model):
                                 ondelete="set null")
     contract_amount = fields.Float(string="合同总额（元）", related='contract_id.contract_amount')
     tax_receivable = fields.Float(string="房产税应收（元）", related='contract_rental_plan_rel_id.property_tax_receivable')
+    receipt_status = fields.Selection(string="发票状态", selection=[('applied', '已申请，未开票'), ('done', '已开票')],
+                                      default=None, tracking=True, compute="_compute_receipt_status", store=True)
+    receipt_type = fields.Selection(string="发票类型", selection=[('zp', '专票'), ('pp', '普票')],
+                                    default=None, tracking=True, store=True)
+    receipt_type_editable = fields.Boolean(string="发票类型可编辑",
+                                           compute="_compute_receipt_type_editable")
+    receipt_apply_uid = fields.Many2one(string="发票申请人", comodel_name="res.users", tracking=True)
+    receipt_apply_date = fields.Date(string="发票申请时间", tracking=True)
     tax_receipt = fields.Boolean(string="发票")
     tax_receipt_evidence = fields.Html(string="发票信息")
+    tax_receipt_editable = fields.Boolean(string="发票信息可编辑",
+                                          compute="_compute_tax_receipt_editable")
+    receipt_done_by_uid = fields.Many2one(string="发票开具人", comodel_name="res.users", tracking=True)
+    receipt_done_date = fields.Date(string="发票开具时间", tracking=True)
+
+    def _compute_tax_receipt_editable(self):
+        for record in self:
+            record.tax_receipt_editable = \
+                self.env.user.has_group('estate_lease_contract.contract_brokerage_invoice_manage')
+
+    def _compute_receipt_type_editable(self):
+        is_editable = self.env.user.has_group('estate.estate_group_business')
+        for record in self:
+            if not is_editable:
+                record.receipt_type_editable = False
+            else:
+                if record.tax_receipt:
+                    record.receipt_type_editable = False
+                else:
+                    record.receipt_type_editable = True
 
     @api.depends("tax_received", "date_received")
     def _compute_received(self):
@@ -85,3 +114,52 @@ class EstateLeaseContractPropertyTax(models.Model):
             record.contract_rental_plan_rel_id.property_tax_amount_received = received_sum
             record.contract_rental_plan_rel_id.property_tax_amount_arrears = \
                 record.contract_rental_plan_rel_id.property_tax_receivable - received_sum
+
+    def action_apply_tax_invoice(self):
+        for record in self:
+            if record.tax_received < 0.01:
+                raise UserError("开票金额有误！")
+            if record.receipt_status != 'applied':
+                record.receipt_status = 'applied'
+                record.receipt_apply_uid = self.env.user.id
+                record.receipt_apply_date = date.today()
+                record._set_default_tax_receipt_evidence()
+
+            if not record.receipt_type:
+                record.receipt_type = 'zp'
+
+    @api.onchange("tax_receipt")
+    def _onchange_tax_receipt(self):
+        if self.tax_receipt:
+            self.receipt_done_by_uid = self.env.user.id
+            self.receipt_done_date = date.today()
+            self._set_default_tax_receipt_evidence()
+
+    @api.depends("tax_receipt", "tax_receipt_evidence")
+    def _compute_receipt_status(self):
+        for record in self:
+            if record.tax_receipt and record.tax_receipt_evidence:
+                if record.receipt_status != 'done':
+                    record.receipt_status = 'done'
+                    record.receipt_done_by_uid = self.env.user.id
+                    record.receipt_done_date = date.today()
+            else:
+                if record.receipt_status == 'done':
+                    record.receipt_status = 'applied'
+
+    def _set_default_tax_receipt_evidence(self):
+        if not self.tax_receipt_evidence:
+            tmp_str = []
+            if self.renter_id:
+                if self.renter_id.is_company:
+                    tmp_str.append(f"企业统一信用代码:{str(self.renter_id.vat)}")
+                    tmp_str.append(f"开票名称：{str(self.renter_id.name)}")
+                else:
+                    tmp_str.append(f"开票对象：个人")
+                    tmp_str.append(f"开票名称：{str(self.renter_id.name)}")
+
+            if self.receipt_apply_uid:
+                tmp_str.append(f"申请人：{self.receipt_apply_uid.name}")
+                tmp_str.append(f"申请时间：{self.receipt_apply_date}")
+
+            self.tax_receipt_evidence = tmp_str

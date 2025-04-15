@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
-from datetime import timedelta
-from math import ceil, floor
-from typing import Dict, List
-
-from odoo.exceptions import UserError
-from . import estate_lease_contract
+from datetime import timedelta, date
 from odoo import fields, models, api
-from ...utils.models.utils import Utils
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -19,8 +14,9 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
     _order = "date_received"
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
+    name = fields.Char(string="租金分次缴费详情", default="租金分次缴费详情")
     rental_detail_id = fields.Many2one('estate.lease.contract.property.rental.detail', string="租金明细ID",
-                                       ondelete="cascade")
+                                       ondelete="cascade", readonly=True)
 
     rental_receivable_this = fields.Float(default=0.0, string="本次应收(元)", compute="_compute_received",
                                           store=True, compute_sudo=True)
@@ -65,8 +61,36 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
     date_payment = fields.Date(string="本期约定支付日", related="rental_detail_id.date_payment")
     rental_period_no = fields.Integer(string="本期期数", related="rental_detail_id.rental_period_no")
     active = fields.Boolean(related="rental_detail_id.active", store=True)
-    rental_receipt = fields.Boolean(string="发票")
-    rental_receipt_evidence = fields.Html(string="发票信息")
+    receipt_status = fields.Selection(string="发票状态", selection=[('applied', '已申请，未开票'), ('done', '已开票')],
+                                      default=None, tracking=True, compute="_compute_receipt_status", store=True)
+    receipt_type = fields.Selection(string="发票类型", selection=[('zp', '专票'), ('pp', '普票')],
+                                    default=None, tracking=True, store=True)
+    receipt_type_editable = fields.Boolean(string="发票类型可编辑",
+                                           compute="_compute_receipt_type_editable")
+    receipt_apply_uid = fields.Many2one(string="发票申请人", comodel_name="res.users", tracking=True)
+    receipt_apply_date = fields.Date(string="发票申请时间", tracking=True)
+    rental_receipt = fields.Boolean(string="发票", tracking=True)
+    rental_receipt_evidence = fields.Html(string="发票信息", store=True)
+    rental_receipt_editable = fields.Boolean(string="发票信息可编辑",
+                                             compute="_compute_rental_receipt_editable")
+    receipt_done_by_uid = fields.Many2one(string="发票开具人", comodel_name="res.users", tracking=True)
+    receipt_done_date = fields.Date(string="发票开具时间", tracking=True)
+
+    def _compute_rental_receipt_editable(self):
+        for record in self:
+            record.rental_receipt_editable = \
+                self.env.user.has_group('estate_lease_contract.contract_brokerage_invoice_manage')
+
+    def _compute_receipt_type_editable(self):
+        is_editable = self.env.user.has_group('estate.estate_group_business')
+        for record in self:
+            if not is_editable:
+                record.receipt_type_editable = False
+            else:
+                if record.rental_receipt:
+                    record.receipt_type_editable = False
+                else:
+                    record.receipt_type_editable = True
 
     @api.depends("rental_received", "date_received")
     def _compute_received(self):
@@ -125,7 +149,7 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
                 if rcd.days_arrears != in_rcd.rental_detail_id.days_receivable - rcd.days_received_sum:
                     rcd.days_arrears = in_rcd.rental_detail_id.days_receivable - rcd.days_received_sum
 
-                date_2 = in_rcd.rental_detail_id.period_date_from + timedelta(days=rcd.days_received_sum)
+                date_2 = in_rcd.rental_detail_id.period_date_from + timedelta(days=rcd.days_received_sum - 1)
                 if rcd.rental_received_2_date != date_2:
                     rcd.rental_received_2_date = date_2
 
@@ -153,6 +177,56 @@ class EstateLeaseContractPropertyRentalDetailSub(models.Model):
         if in_rcd.rental_receivable_this != in_rcd.rental_received + in_rcd.rental_arrears:
             in_rcd.rental_receivable_this = in_rcd.rental_received + in_rcd.rental_arrears
 
-        date_2_this_time = in_rcd.rental_detail_id.period_date_from + timedelta(days=in_rcd.days_received_sum)
+        date_2_this_time = in_rcd.rental_detail_id.period_date_from + timedelta(days=in_rcd.days_received_sum - 1)
         if in_rcd.rental_received_2_date != date_2_this_time:
             in_rcd.rental_received_2_date = date_2_this_time
+
+    def action_apply_rental_invoice(self):
+        for record in self:
+            if record.rental_received < 0.01:
+                raise UserError("开票金额有误！")
+            if record.receipt_status != 'applied':
+                record.receipt_status = 'applied'
+                record.receipt_apply_uid = self.env.user.id
+                record.receipt_apply_date = date.today()
+                record._set_default_rental_receipt_evidence()
+
+            if not record.receipt_type:
+                record.receipt_type = 'zp'
+
+    @api.onchange("rental_receipt")
+    def _onchange_rental_receipt(self):
+        if self.rental_receipt:
+            self.receipt_done_by_uid = self.env.user.id
+            self.receipt_done_date = date.today()
+            self._set_default_rental_receipt_evidence()
+
+
+    @api.depends("rental_receipt", "rental_receipt_evidence")
+    def _compute_receipt_status(self):
+        for record in self:
+            if record.rental_receipt and record.rental_receipt_evidence:
+                if record.receipt_status != 'done':
+                    record.receipt_status = 'done'
+                    record.receipt_done_by_uid = self.env.user.id
+                    record.receipt_done_date = date.today()
+            else:
+                if record.receipt_status == 'done':
+                    record.receipt_status = 'applied'
+
+    def _set_default_rental_receipt_evidence(self):
+        if not self.rental_receipt_evidence:
+            tmp_str = []
+            if self.renter_id:
+                if self.renter_id.is_company:
+                    tmp_str.append(f"企业统一信用代码:{str(self.renter_id.vat)}")
+                    tmp_str.append(f"开票名称：{str(self.renter_id.name)}")
+                else:
+                    tmp_str.append(f"开票对象：个人")
+                    tmp_str.append(f"开票名称：{str(self.renter_id.name)}")
+
+            if self.receipt_apply_uid:
+                tmp_str.append(f"申请人：{self.receipt_apply_uid.name}")
+                tmp_str.append(f"申请时间：{self.receipt_apply_date}")
+
+            self.rental_receipt_evidence = tmp_str

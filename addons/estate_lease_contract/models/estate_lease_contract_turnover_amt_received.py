@@ -20,21 +20,22 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
     _description = "资产租赁合同实收流水"
     _order = "company_id, date_received DESC"
 
+    name = fields.Char(string="实收流水详情", default="流水详情")
     rental_detail_sub_ids = fields.Many2one(comodel_name='estate.lease.contract.property.rental.detail.sub',
-                                            string='合同租金明细', ondelete="cascade")
+                                            string='合同租金明细', ondelete="cascade", readonly=True)
     deposit_detail_ids = fields.Many2one(comodel_name='estate.lease.contract.property.deposit', string='合同押金明细',
-                                         ondelete="cascade")
+                                         ondelete="cascade", readonly=True)
     water_detail_ids = fields.Many2one(comodel_name='estate.lease.contract.property.fee.water', string='水费明细',
-                                       ondelete="cascade")
+                                       ondelete="cascade", readonly=True)
     electricity_detail_ids = fields.Many2one(comodel_name='estate.lease.contract.property.fee.electricity',
-                                             string='电费明细', ondelete="cascade")
+                                             string='电费明细', ondelete="cascade", readonly=True)
     electricity_maintenance_detail_ids = fields.Many2one(
         comodel_name='estate.lease.contract.property.fee.electricity.maintenance', string='电力维护费明细',
-        ondelete="cascade")
+        ondelete="cascade", readonly=True)
     maintenance_detail_ids = fields.Many2one(comodel_name='estate.lease.contract.property.fee.maintenance',
-                                             string='物业费明细', ondelete="cascade")
+                                             string='物业费明细', ondelete="cascade", readonly=True)
     property_tax_detail_ids = fields.Many2one(comodel_name='estate.lease.contract.property.tax',
-                                              string='房产税明细', ondelete="cascade")
+                                              string='房产税明细', ondelete="cascade", readonly=True)
 
     amount_type = fields.Selection(string="实收类别", compute="_compute_received", store=True,
                                    selection=[('contract_rental', '合同租金'), ('contract_deposit', '合同押金'),
@@ -71,12 +72,25 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
     renter_id = fields.Many2one('res.partner', string="承租人", related='contract_id.renter_id', store=True,
                                 ondelete="set null")
 
+    invoice_status = fields.Selection(string="发票状态", selection=[('applied', '已申请，未开票'), ('done', '已开票')],
+                                      compute="_compute_received", store=True)
+    invoice_type = fields.Selection(string='发票类型', selection=[('zp', '专票'), ('pp', '普票')],
+                                    compute="_compute_received", store=True)
+    invoice_apply_uid = fields.Many2one(string='发票申请人', compute="_compute_received", store=True,
+                                        comodel_name="res.users")
+    invoice_apply_date = fields.Date(string='发票申请时间', compute="_compute_received", store=True)
+    invoice_is = fields.Boolean(string='发票开具', compute="_compute_received", store=True)
+    invoice_evidence = fields.Html(string='发票信息', compute="_compute_received", store=True)
+    invoice_done_by_uid = fields.Many2one(string='发票开具人', compute="_compute_received", store=True,
+                                          comodel_name="res.users")
+    invoice_done_date = fields.Date(string='发票开具日期', compute="_compute_received", store=True)
+
     @api.depends("rental_detail_sub_ids", "deposit_detail_ids", "water_detail_ids", "electricity_detail_ids",
                  "electricity_maintenance_detail_ids", "maintenance_detail_ids", "amount_received", "date_received",
                  "amount_receivable", "property_tax_detail_ids")
     def _compute_received(self):
         for record in self:
-            record.amount_type = 'contract_rental'
+            record.amount_type = None
 
             if record.rental_detail_sub_ids:
                 record.amount_type = 'contract_rental'
@@ -87,6 +101,14 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 record.contract_id = record.rental_detail_sub_ids.contract_id
                 record.period_d_start = record.rental_detail_sub_ids.period_date_from
                 record.period_d_end = record.rental_detail_sub_ids.period_date_to
+                record.invoice_status = record.rental_detail_sub_ids.receipt_status
+                record.invoice_type = record.rental_detail_sub_ids.receipt_type
+                record.invoice_apply_uid = record.rental_detail_sub_ids.receipt_apply_uid
+                record.invoice_apply_date = record.rental_detail_sub_ids.receipt_apply_date
+                record.invoice_is = record.rental_detail_sub_ids.rental_receipt
+                record.invoice_evidence = record.rental_detail_sub_ids.rental_receipt_evidence
+                record.invoice_done_by_uid = record.rental_detail_sub_ids.receipt_done_by_uid
+                record.invoice_done_date = record.rental_detail_sub_ids.receipt_done_date
 
             if record.deposit_detail_ids:
                 record.amount_type = 'contract_deposit'
@@ -97,6 +119,14 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 record.contract_id = record.deposit_detail_ids.contract_id
                 record.period_d_start = record.deposit_detail_ids.date_rent_start
                 record.period_d_end = record.deposit_detail_ids.date_rent_end
+                record.invoice_status = record.deposit_detail_ids.receipt_status
+                record.invoice_type = record.deposit_detail_ids.receipt_type
+                record.invoice_apply_uid = record.deposit_detail_ids.receipt_apply_uid
+                record.invoice_apply_date = record.deposit_detail_ids.receipt_apply_date
+                record.invoice_is = record.deposit_detail_ids.deposit_receipt
+                record.invoice_evidence = record.deposit_detail_ids.deposit_receipt_evidence
+                record.invoice_done_by_uid = record.deposit_detail_ids.receipt_done_by_uid
+                record.invoice_done_date = record.deposit_detail_ids.receipt_done_date
 
             if record.water_detail_ids:
                 record.amount_type = 'contract_fee_water'
@@ -107,6 +137,14 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 record.contract_id = record.water_detail_ids.contract_id
                 record.period_d_start = record.water_detail_ids.period_d_start
                 record.period_d_end = record.water_detail_ids.period_d_end
+                record.invoice_status = record.water_detail_ids.receipt_status
+                record.invoice_type = record.water_detail_ids.receipt_type
+                record.invoice_apply_uid = record.water_detail_ids.receipt_apply_uid
+                record.invoice_apply_date = record.water_detail_ids.receipt_apply_date
+                record.invoice_is = record.water_detail_ids.water_receipt
+                record.invoice_evidence = record.water_detail_ids.water_receipt_evidence
+                record.invoice_done_by_uid = record.water_detail_ids.receipt_done_by_uid
+                record.invoice_done_date = record.water_detail_ids.receipt_done_date
 
             if record.electricity_detail_ids:
                 record.amount_type = 'contract_fee_electricity'
@@ -117,6 +155,14 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 record.contract_id = record.electricity_detail_ids.contract_id
                 record.period_d_start = record.electricity_detail_ids.period_d_start
                 record.period_d_end = record.electricity_detail_ids.period_d_end
+                record.invoice_status = record.electricity_detail_ids.receipt_status
+                record.invoice_type = record.electricity_detail_ids.receipt_type
+                record.invoice_apply_uid = record.electricity_detail_ids.receipt_apply_uid
+                record.invoice_apply_date = record.electricity_detail_ids.receipt_apply_date
+                record.invoice_is = record.electricity_detail_ids.electricity_receipt
+                record.invoice_evidence = record.electricity_detail_ids.electricity_receipt_evidence
+                record.invoice_done_by_uid = record.electricity_detail_ids.receipt_done_by_uid
+                record.invoice_done_date = record.electricity_detail_ids.receipt_done_date
 
             if record.electricity_maintenance_detail_ids:
                 record.amount_type = 'contract_fee_electricity_maintenance'
@@ -127,6 +173,14 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 record.contract_id = record.electricity_maintenance_detail_ids.contract_id
                 record.period_d_start = record.electricity_maintenance_detail_ids.period_d_start
                 record.period_d_end = record.electricity_maintenance_detail_ids.period_d_end
+                record.invoice_status = record.electricity_maintenance_detail_ids.receipt_status
+                record.invoice_type = record.electricity_maintenance_detail_ids.receipt_type
+                record.invoice_apply_uid = record.electricity_maintenance_detail_ids.receipt_apply_uid
+                record.invoice_apply_date = record.electricity_maintenance_detail_ids.receipt_apply_date
+                record.invoice_is = record.electricity_maintenance_detail_ids.electricity_maintenance_receipt
+                record.invoice_evidence = record.electricity_maintenance_detail_ids.electricity_maintenance_receipt_evidence
+                record.invoice_done_by_uid = record.electricity_maintenance_detail_ids.receipt_done_by_uid
+                record.invoice_done_date = record.electricity_maintenance_detail_ids.receipt_done_date
 
             if record.maintenance_detail_ids:
                 record.amount_type = 'contract_fee_maintenance'
@@ -137,6 +191,14 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 record.contract_id = record.maintenance_detail_ids.contract_id
                 record.period_d_start = record.maintenance_detail_ids.period_d_start
                 record.period_d_end = record.maintenance_detail_ids.period_d_end
+                record.invoice_status = record.maintenance_detail_ids.receipt_status
+                record.invoice_type = record.maintenance_detail_ids.receipt_type
+                record.invoice_apply_uid = record.maintenance_detail_ids.receipt_apply_uid
+                record.invoice_apply_date = record.maintenance_detail_ids.receipt_apply_date
+                record.invoice_is = record.maintenance_detail_ids.maintenance_receipt
+                record.invoice_evidence = record.maintenance_detail_ids.maintenance_receipt_evidence
+                record.invoice_done_by_uid = record.maintenance_detail_ids.receipt_done_by_uid
+                record.invoice_done_date = record.maintenance_detail_ids.receipt_done_date
 
             if record.property_tax_detail_ids:
                 record.amount_type = 'contract_property_tax'
@@ -147,6 +209,17 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 record.contract_id = record.property_tax_detail_ids.contract_id
                 record.period_d_start = record.property_tax_detail_ids.date_rent_start
                 record.period_d_end = record.property_tax_detail_ids.date_rent_end
+                record.invoice_status = record.property_tax_detail_ids.receipt_status
+                record.invoice_type = record.property_tax_detail_ids.receipt_type
+                record.invoice_apply_uid = record.property_tax_detail_ids.receipt_apply_uid
+                record.invoice_apply_date = record.property_tax_detail_ids.receipt_apply_date
+                record.invoice_is = record.property_tax_detail_ids.tax_receipt
+                record.invoice_evidence = record.property_tax_detail_ids.tax_receipt_evidence
+                record.invoice_done_by_uid = record.property_tax_detail_ids.receipt_done_by_uid
+                record.invoice_done_date = record.property_tax_detail_ids.receipt_done_date
+
+            if not record.amount_type:
+                _logger.error(f"该条记录的amount_type为空：id={record.id}")
 
             record.amount_arrears = record.amount_receivable - record.amount_received
             record.company_id = record.contract_id.company_id
@@ -178,6 +251,7 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 if search_rst[0].period_d_end != deposit.date_rent_end:
                     search_rst[0].period_d_end = deposit.date_rent_end
 
+                search_rst._compute_received()
             else:
                 deposit_tgt = {
                     "deposit_detail_ids": deposit.id,
@@ -208,6 +282,7 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 if search_rst[0].period_d_end != rental.period_date_to:
                     search_rst[0].period_d_end = rental.period_date_to
 
+                search_rst._compute_received()
             else:
                 rental_tgt = {
                     "rental_detail_sub_ids": rental.id,
@@ -235,6 +310,7 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 if search_rst[0].period_d_end != fee_water.period_d_end:
                     search_rst[0].period_d_end = fee_water.period_d_end
 
+                search_rst._compute_received()
             else:
                 fee_water_tgt = {
                     "water_detail_ids": fee_water.id,
@@ -261,6 +337,7 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 if search_rst[0].period_d_end != fee_electricity.period_d_end:
                     search_rst[0].period_d_end = fee_electricity.period_d_end
 
+                search_rst._compute_received()
             else:
                 fee_electricity_tgt = {
                     "electricity_detail_ids": fee_electricity.id,
@@ -287,6 +364,7 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 if search_rst[0].period_d_end != fee_electricity_maintenance.period_d_end:
                     search_rst[0].period_d_end = fee_electricity_maintenance.period_d_end
 
+                search_rst._compute_received()
             else:
                 fee_electricity_maintenance_tgt = {
                     "electricity_maintenance_detail_ids": fee_electricity_maintenance.id,
@@ -312,7 +390,7 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                     search_rst[0].period_d_start = fee_maintenance.period_d_start
                 if search_rst[0].period_d_end != fee_maintenance.period_d_end:
                     search_rst[0].period_d_end = fee_maintenance.period_d_end
-
+                search_rst._compute_received()
             else:
                 fee_maintenance_tgt = {
                     "maintenance_detail_ids": fee_maintenance.id,
@@ -340,6 +418,7 @@ class EstateLeaseContractTurnoverAmtReceived(models.Model):
                 if search_rst[0].period_d_end != tax_rcd.date_rent_end:
                     search_rst[0].period_d_end = tax_rcd.date_rent_end
 
+                search_rst._compute_received()
             else:
                 property_tax_tgt = {
                     "property_tax_detail_ids": tax_rcd.id,
