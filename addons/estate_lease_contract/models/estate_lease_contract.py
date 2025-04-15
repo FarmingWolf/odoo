@@ -2931,4 +2931,6 @@ class EstateLeaseContract(models.Model):
                                    "此外，不建议点击【租赁标的】直接输入物业费实收数据。"
                                    "建议：从合同主页面选择【物业费明细】，"
                                    "点击根据物业费方案做成的物业费明细，录入物业费实收数据！")
-                    contract_property_hist.fee_maintenance_err_msg = err_msg
+                    # 当租金方案中including_management_fee为不包含物业费时（物业费独立设置与计算），上述提示文字才合适
+                    if not contract_property_hist.rental_plan_id.including_management_fee:
+                        contract_property_hist.fee_maintenance_err_msg = err_msg

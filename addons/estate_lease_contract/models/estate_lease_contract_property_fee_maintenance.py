@@ -110,14 +110,26 @@ class EstateLeaseContractPropertyFeeMaintenance(models.Model):
         # 若独立核算物业费，那么实收记录的period_d_start和period_d_end必须来自物业费明细
         manage_fee_details = self._get_manage_fee_details(self.contract_id, self.property_id)
         if not manage_fee_details:
+            # 如果租金包含物业费，那么物业费期间应该与租金明细期间保持一致
+            for rental_detail in self.contract_id.rental_details:
+                if rental_detail.period_date_from <= self.period_d_start <= rental_detail.period_date_to:
+                    if self.period_d_start != rental_detail.period_date_from:
+                        self.period_d_start = rental_detail.period_date_from
+                    if self.period_d_end != rental_detail.period_date_to:
+                        self.period_d_end = rental_detail.period_date_to
+                    return
+
             if self.period_d_start > self.period_d_end:
                 self.period_d_end = end_of(self.period_d_start, 'month')
         else:
             for detail in manage_fee_details:
                 if detail.period_date_from <= self.period_d_start <= detail.period_date_to:
-                    self.period_d_start = detail.period_date_from
-                    self.period_d_end = detail.period_date_to
-                    self.maintenance_receivable = detail.manage_fee_receivable
+                    if self.period_d_start != detail.period_date_from:
+                        self.period_d_start = detail.period_date_from
+                    if self.period_d_end != detail.period_date_to:
+                        self.period_d_end = detail.period_date_to
+                    if self.maintenance_receivable != detail.manage_fee_receivable:
+                        self.maintenance_receivable = detail.manage_fee_receivable
                     return
 
             if self.period_d_start > self.period_d_end:
@@ -144,7 +156,6 @@ class EstateLeaseContractPropertyFeeMaintenance(models.Model):
                 return detail.period_date_from
 
         return context_d
-
 
     def _cal_period_d_end(self):
         # context_d = fields.Date.context_today(self)
@@ -192,6 +203,10 @@ class EstateLeaseContractPropertyFeeMaintenance(models.Model):
 
                     if rcd.maintenance_arrears_sum != arrears_sum:
                         rcd.maintenance_arrears_sum = arrears_sum
+
+                    # 根据本次实收和欠缴反算本次应收（不同于总应收）
+                    if rcd.maintenance_receivable_this != rcd.maintenance_received + rcd.maintenance_arrears:
+                        rcd.maintenance_receivable_this = rcd.maintenance_received + rcd.maintenance_arrears
 
             else:  # 从物业费方案生成的物业费明细，在物业费明细tab页操作逻辑（同与租金明细的多次缴费逻辑）：
                 received_sum = 0.0
