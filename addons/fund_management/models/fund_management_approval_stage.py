@@ -65,11 +65,11 @@ class FundManagementApprovalStage(models.Model):
     category_id = fields.Many2one('fund.management.category',
                                   default=lambda self: self._get_default_category, store=True)
 
-    meeting_minute_types_by_category = fields.Many2many(string="Meeting Minutes Type By Category",
+    meeting_minute_types_by_category = fields.Many2many(string="Meeting Minutes Type By Category", copy=False,
                                                         related="category_id.meeting_minute_types")
     # dynamic domain should be set in views not here
     meeting_minute_types = fields.Many2many(
-        string="Meeting Minutes Type", comodel_name="fund.management.meeting.minutes.type",
+        string="Meeting Minutes Type", comodel_name="fund.management.meeting.minutes.type", copy=False,
         relation="stage_meeting_minutes_type_rel", column1="stage_id", column2="meeting_minutes_type_id")
 
     _sql_constraints = [
