@@ -142,9 +142,10 @@ class FundManagementApprovalStage(models.Model):
                         raise ValidationError(f"请勿同时设置阶段的结束标志和审批部门与角色职位。"
                                               f"阶段:{vals_list['name']}(序号:{vals_list['sequence']})")
                 elif ('pipe_end' in vals_list) and (not vals_list['pipe_end']):
-                    if (('op_department_id' or 'op_job_id') not in vals_list) or \
-                            (not vals_list['op_department_id'] or not vals_list['op_job_id']):
-                        raise ValidationError(f"请设置非结束阶段的审批部门与角色职位。"
+                    # 可仅设置部门或仅设置角色以应对多个部门相同角色的审核需求，如：企业负责人（经理）审批，企业不定
+                    if (('op_department_id' and 'op_job_id') not in vals_list) or \
+                            (not vals_list['op_department_id'] and not vals_list['op_job_id']):
+                        raise ValidationError(f"请设置非结束阶段的审批部门或角色职位。"
                                               f"阶段：{vals_list['name']}(序号:{vals_list['sequence']})")
 
         record = super().create(vals_list)
@@ -159,8 +160,8 @@ class FundManagementApprovalStage(models.Model):
         for record in self:
             if record.sequence > 0:
                 if not record.pipe_end:
-                    if (not record.op_department_id) or (not record.op_job_id):
-                        raise ValidationError(f"请设置非结束阶段的审批部门与角色职位。"
+                    if (not record.op_department_id) and (not record.op_job_id):
+                        raise ValidationError(f"请设置非结束阶段的审批部门或角色职位。"
                                               f"阶段：{record.name}(序号:{record.sequence})")
                 else:
                     if record.op_department_id or record.op_job_id:

@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+        <record id="hr_employee_view_form_inherit_fund_management" model="ir.ui.view">
+            <field name="name">hr.employee.view.form.management</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='managers']" position="inside">
+                    <field name="fund_management_manager_id" context="{'default_company_id': company_id}" widget="many2one_avatar_user"/>
+                </xpath>
+                 <xpath expr="//group[@name='managers']" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                </xpath>
+            </field>
+        </record>
 
         <record id="fund_management_view_fund_analysis_tree" model="ir.ui.view">
             <field name="name">fund.management.tree</field>
@@ -520,7 +533,7 @@ action = model.action_reject_confirm(env.context)
 
         <menuitem id="menu_fund_management_approve" name="Approve" parent="menu_fund_management_root"
                   action="action_fund_management_actions_to_be_approved"
-                  groups="fund_management.group_fund_management_user" sequence="10"/>
+                  groups="fund_management.group_fund_management_team_approver" sequence="10"/>
 
         <menuitem id="menu_fund_management_applications" name="Applications" sequence="20" parent="menu_fund_management_root"
                   groups="fund_management.group_fund_management_team_approver"/>
@@ -530,7 +543,7 @@ action = model.action_reject_confirm(env.context)
                   action="action_fund_management_actions_my_all" groups="fund_management.group_fund_management_team_approver"/>
         <menuitem id="menu_fund_management_all_applications_all" parent="menu_fund_management_applications"
                   action="action_fund_management_actions_applications_all"
-                  groups="fund_management.group_fund_management_user" sequence="30"/>
+                  groups="fund_management.group_fund_management_team_approver" sequence="30"/>
 
         <menuitem id="menu_fund_management_configuration" name="Configuration" parent="menu_fund_management_root"
                   groups="fund_management.group_fund_management_manager" sequence="100"/>

@@ -582,26 +582,35 @@ class FundManagement(models.Model):
             _logger.error(f"record.stage is None, set it as {default_stage}")
 
         if not self.env.user.has_group('fund_management.group_fund_management_team_approver'):
+            _logger.info(f"self.env.user:{self.env.user.name}没有fund_management.group_fund_management_team_approver权限")
             return False, record.stage
 
-        # 由于在stage创建时，对非起始stage（sequence!=0）时的部门和职位角色不为空做了强制要求，所以这部分逻辑仅对起始stage有效
+        # 由于在stage创建时，对非起始stage（sequence!=0）时的部门或职位角色不同时为空做了要求
         if not record.stage.op_department_id:
             if not record.stage.op_job_id:
-                _logger.debug(f"record.stage={record.stage.name}不要求部门和职位角色")
+                _logger.info(f"record.stage={record.stage.name}不要求部门和职位角色")
                 return True, record.stage
             else:
                 if this_employee_job_id == record.stage.op_job_id.id or \
                         self._get_employee().job_id.name == record.stage.op_job_id.name:
-                    _logger.debug(f"record.stage={record.stage.name}不要求部门，只要求职位角色")
+                    _logger.info(f"record.stage={record.stage.name}不要求部门，只要求职位角色")
                     return True, record.stage
                 else:
-                    return False, record.stage
+                    _logger.info(f"职位不一致:this_employee_job_id={this_employee_job_id}"
+                                 f"name={self._get_employee().job_id.name};"
+                                 f"record.stage.op_job_id.id={record.stage.op_job_id.id}"
+                                 f"name={record.stage.op_job_id.name};")
+                    # 暂时不返回，后边可能判断同级别节点
+                    # return False, record.stage
         else:
             if not record.stage.op_job_id:
                 if record.stage.op_department_id == this_employee_dep_id:
                     return True, record.stage
                 else:
-                    return False, record.stage
+                    _logger.info(f"record.stage.op_department_id={record.stage.op_department_id};"
+                                 f"this_employee_dep_id={this_employee_dep_id}")
+                    # 暂时不返回，后边可能判断同级别节点
+                    # return False, record.stage
 
         record_stage_dep_id = record.stage.op_department_id.id
         record_stage_job_id = record.stage.op_job_id.id
@@ -612,9 +621,26 @@ class FundManagement(models.Model):
             # 有可能是同级别中的平行节点，直到找到本用户对应的节点
             for same_level_stage in record.category_id.approval_stages:
                 if same_level_stage.sequence == record.stage.sequence:
-                    if same_level_stage.op_department_id.id == this_employee_dep_id and \
-                            same_level_stage.op_job_id.id == this_employee_job_id:
-                        return True, same_level_stage
+                    if not same_level_stage.op_department_id:
+                        if not same_level_stage.op_job_id:
+                            _logger.info(f"同级别节点：{same_level_stage}不要求部门和职位角色")
+                            return True, same_level_stage
+                        else:
+                            if same_level_stage.op_job_id.id == this_employee_job_id or \
+                                    same_level_stage.op_job_id.name == self._get_employee().job_id.name:
+                                _logger.info(f"同级别节点：{same_level_stage.op_job_id.name}仅要求职位角色")
+                                return True, same_level_stage
+                    else:
+                        if same_level_stage.op_department_id.id == this_employee_dep_id:
+                            if not same_level_stage.op_job_id:
+                                _logger.info(f"同级别节点：{same_level_stage.op_department_id.name}仅要求部门")
+                                return True, same_level_stage
+                            else:
+                                if same_level_stage.op_job_id.id == this_employee_job_id or \
+                                        same_level_stage.op_job_id.name == self._get_employee().job_id.name:
+                                    _logger.info(f"同级别节点：{same_level_stage}部门和职位角色符合要求")
+                                    return True, same_level_stage
+            _logger.info(f"同级别节点中无符合要求的节点，或无同级别节点")
             return False, record.stage
 
     def _create_approval_detail(self, record, approval_or_reject, is_cancel, tgt_stage, comment):
