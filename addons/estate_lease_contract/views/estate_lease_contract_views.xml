@@ -297,7 +297,7 @@
                                               decoration-danger="((date_payment &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')) and rental_received &lt; 0.01 and rental_amount &gt;= 0.01 and rental_receivable &gt; 0.01) or (rental_received &gt;= 0.01 and rental_receivable - rental_received &gt;= 0.01)"
                                               decoration-warning="(rental_amount - rental_receivable &gt;= 0.01) or (rental_receivable - rental_amount &gt;= 0.01)"
                                               decoration-success="rental_received &gt; 0 and (rental_received == rental_receivable or rental_received - rental_receivable &gt;= 0 or rental_receivable - rental_received &lt; 0.01)"
-                                              readonly="(not parent.edit_on_hist_page) and (not parent.approval_pipe_end or not parent.approval_switch)">
+                                              readonly="(not parent.edit_on_hist_page) and (not parent.approval_pipe_end or not parent.approval_switch)" create="False">
                                             <field name="edited" column_invisible="True"/>
                                             <field name="button_icon_invisible" column_invisible="1"/>
                                             <field name="property_id"/>
@@ -415,7 +415,7 @@
                                               decoration-danger="((date_payment &lt; (datetime.datetime.combine(context_today(), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d')) and manage_fee_received &lt; 0.01 and manage_fee_amount &gt;= 0.01 and manage_fee_receivable &gt; 0.01) or (manage_fee_received &gt;= 0.01 and manage_fee_receivable - manage_fee_received &gt;= 0.01)"
                                               decoration-warning="(manage_fee_amount - manage_fee_receivable &gt;= 0.01) or (manage_fee_receivable - manage_fee_amount &gt;= 0.01)"
                                               decoration-success="manage_fee_received &gt; 0 and (manage_fee_received == manage_fee_receivable or manage_fee_received - manage_fee_receivable &gt;= 0 or manage_fee_receivable - manage_fee_received &lt; 0.01)"
-                                              readonly="not parent.edit_on_hist_page">
+                                              readonly="(not parent.edit_on_hist_page) and (not parent.approval_pipe_end or not parent.approval_switch)" create="False">
                                             <field name="edited" column_invisible="True"/>
                                             <field name="button_icon_invisible" column_invisible="1"/>
                                             <field name="manage_fee_detail_sub_ids_editable" column_invisible="1"/>
