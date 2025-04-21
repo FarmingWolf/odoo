@@ -24,10 +24,12 @@
                     <field name="company_currency_id" column_invisible="True"/>
                     <field name="nb_attachment" column_invisible="True"/>
                     <field name="is_multiple_currency" column_invisible="True"/>
+                    <field name="apply_no" optional="show" readonly="not is_editable"/>
                     <field name="date" optional="show" readonly="not is_editable"/>
                     <field name="category_id" optional="show" readonly="not is_editable"/>
                     <field name="name" readonly="not is_editable"/>
                     <field name="employee_id" widget="many2one_avatar_user" readonly="not is_editable"/>
+                    <field name="applicant_unit" readonly="True"/>
                     <field name="activity_ids" widget="list_activity" optional="hide"/>
                     <field name="company_id" optional="hide" groups="base.group_multi_company" readonly="True"/>
                     <field name="nb_attachment" widget="fund_management_nb_attachment" nolabel="1" readonly="True"/>
@@ -147,6 +149,16 @@ action = model.action_reject_confirm(env.context)
                 </header>
                 <sheet>
                     <div class="d-flex" style="width: 100%;">
+                        <div class="flex-grow-1">
+                            <label for="apply_no"/>
+                            <field name="apply_no" readonly="1"/>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button name="%(fund_management.view_all_stage_status_by_category_action)d" type="action" string="All Stages" title="View All Stages"
+                                context="{'default_category_id': category_id, 'default_fund_management_id': id}" class="btn btn-secondary"/>
+                        </div>
+                    </div>
+                    <div class="d-flex" style="width: 100%;">
                         <div class="oe_title flex-grow-1">
                             <label for="name"/>
                             <div class="d-flex align-items-center">
@@ -155,10 +167,6 @@ action = model.action_reject_confirm(env.context)
                                 </h1>
 
                             </div>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button name="%(fund_management.view_all_stage_status_by_category_action)d" type="action" string="All Stages" title="View All Stages"
-                                context="{'default_category_id': category_id, 'default_fund_management_id': id}" class="btn btn-secondary"/>
                         </div>
                     </div>
                     <group>
@@ -213,6 +221,7 @@ action = model.action_reject_confirm(env.context)
                                        context="{'default_company_id': company_id}" widget="many2one_avatar_employee"
                                        options="{'relation': 'hr.employee', 'no_create': True}"
                                        readonly="1"/>
+                                <field name="applicant_unit" readonly="1"/>
                             </t>
                             <field name="contract_amount" widget='monetary' />
 
@@ -223,7 +232,7 @@ action = model.action_reject_confirm(env.context)
                         <field name="meeting_minutes_editable" invisible="1"/>
                     </div>
                     <notebook invisible="(nb_attachment == 0) and (not meeting_minutes_editable)">
-                        <page string="Meeting Minutes" readonly="(not is_editable) and (not meeting_minutes_editable)">
+                        <page string="Attachment List" readonly="(not is_editable) and (not meeting_minutes_editable)">
                             <field name="meeting_minutes_attach" mode="tree,form">
                                 <tree delete="False" create="False" edit="True">
                                     <field name="type"/>

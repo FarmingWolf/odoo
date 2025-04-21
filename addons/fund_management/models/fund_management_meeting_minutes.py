@@ -29,7 +29,7 @@ class FundManagementMeetingMinutes(models.Model):
     category_id = fields.Many2one(string="Fund Management Category", related="fund_management_id.category_id")
     stage_id = fields.Many2one(string="Fund Management Stage", related="fund_management_id.stage")
     type_domain = fields.Many2many(string="Meeting Minutes Type By Stage", related="stage_id.meeting_minute_types")
-    type = fields.Many2one(string="Meeting Minutes Type", comodel_name="fund.management.meeting.minutes.type")
+    type = fields.Many2one(string="Attachment Type", comodel_name="fund.management.meeting.minutes.type")
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
     nb_attachment = fields.Integer(string="Number of Attachments", compute='_compute_nb_attachment')
     attachment_ids = fields.Many2many('ir.attachment', string="Attachment", copy=False)

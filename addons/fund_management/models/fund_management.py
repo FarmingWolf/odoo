@@ -1,5 +1,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
+import random
 import re
 from datetime import datetime
 from xml import etree
@@ -30,6 +31,22 @@ class FundManagement(models.Model):
             raise ValidationError(_('The current user has no related employee. Please, create one.'))
         return employee
 
+    def _get_default_apply_no(self):
+        prefix_str = "FM-"
+
+        formatted_date = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y%m%d-%H%M%S')
+        random_number = '{:03d}'.format(random.randint(0, 999))
+        str_ret = prefix_str + formatted_date + '-' + random_number
+        return str_ret
+
+    apply_no = fields.Char(string="Application NO.", default=_get_default_apply_no, required=True,
+                           compute="_compute_apply_no")
+
+    def _compute_apply_no(self):
+        for record in self:
+            if not record.apply_no:
+                record.apply_no = record._get_default_apply_no()
+
     name = fields.Char(
         string="Description",
         compute='_compute_name', precompute=True, store=True, readonly=False,
@@ -48,6 +65,7 @@ class FundManagement(models.Model):
         domain=[('filter_for_fund_management', '=', True)],
         tracking=True
     )
+    applicant_unit = fields.Char(comodel_name='hr.department', related="employee_id.department_id.name")
     company_id = fields.Many2one(
         comodel_name='res.company',
         string="Company",
@@ -342,6 +360,11 @@ class FundManagement(models.Model):
         if 'tax_ids' in vals:
             if any(not expense.is_editable for expense in self):
                 raise UserError(_('You are not authorized to edit this fund management application.'))
+
+        for record in self:
+            if not record._is_amount_in_category():
+                raise UserError(_("Contract amount should be in the category amount range!"))
+
         res = super().write(vals)
 
         return res
@@ -1018,3 +1041,25 @@ class FundManagement(models.Model):
                     break
 
         return approval_exists, approval_result, next_stage_lst
+
+    def _is_amount_in_category(self):
+        for record in self:
+            if record.category_id.amount_max:
+                if record.category_id.amount_min <= record.contract_amount < record.category_id.amount_max:
+                    return True
+                else:
+                    return False
+            else:
+                if record.category_id.amount_min <= record.contract_amount:
+                    return True
+                else:
+                    return False
+
+    @api.model
+    def create(self, vals):
+        rcd = super().create(vals)
+
+        if not rcd._is_amount_in_category():
+            raise UserError(_("Contract amount should be in the category amount range!"))
+
+        return rcd
