@@ -9,6 +9,7 @@
                     <field name="property_id"/>
                     <field name="property_rent_area"/>
                     <field name="property_state"/>
+                    <field name="property_type_id"/>
                 </tree>
             </field>
         </record>
