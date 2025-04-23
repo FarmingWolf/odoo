@@ -410,13 +410,13 @@ class WebsiteEstateSlides(Home):
 
         return request.render('website_estate.estate_ads_slides_all', render_values)
 
-    @http.route(['/estate_slides/baidu_map/get_ak'], type='http', auth="public", website=True, sitemap=True)
-    def get_baidu_map_ak(self, **post):
+    @http.route(['/estate_slides/tdt_map/get_ak'], type='http', auth="public", website=True, sitemap=True)
+    def get_tdt_map_ak(self, **post):
         # 从系统参数中获取百度地图AK
-        baidu_map_ak = request.env['ir.config_parameter'].sudo().get_param('baidu_map_ak')
-        _logger.info(f"baidu_map_ak={baidu_map_ak}")
+        tdt_web_key = request.env['ir.config_parameter'].sudo().get_param('map_world_web_key')
+        _logger.info(f"map_world_web_key={tdt_web_key}")
         return request.make_response(
-            json.dumps({'ak': baidu_map_ak}),  # 将AK转换为JSON
+            json.dumps({'ak': tdt_web_key}),  # 将AK转换为JSON
             headers=[('Content-Type', 'application/json')]
         )
 

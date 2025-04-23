@@ -270,8 +270,8 @@
                                     </field>
                                 </group>
                                 <group col="1" string="">
-z                                   <div id="baidu-map-container" style="width:100%; height:400px;"/>
-                                    <script type="text/javascript" src="/estate/static/src/js/baidu_map.js"/>
+                                    <div id="property-map-container" style="width:100%; height:400px;"/>
+                                    <script type="text/javascript" src="/estate/static/src/js/tianditu_map.js?version=1.0.03026"/>
                                 </group>
                             </group>
                         </page>
