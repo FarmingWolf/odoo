@@ -37,11 +37,11 @@ del utils.py
 """
 
 zip_tgt_folders = [
-    'estate',
-    'estate_lease_contract',
     'utils',
     'parking',
     'estate_registration_addr',
+    'estate',
+    'estate_lease_contract',
     'event_option',
     'event_extend',
     'operation_contract',
@@ -51,17 +51,19 @@ zip_tgt_folders = [
     'wechat',
     'contacts',
     'estate_dashboard',
-    'estate_account',
     'sms_ali',
     'website_estate',
     'project',
     'ocr_partner',
+    'fund_management',
 ]
+
+update_addons = zip_tgt_folders.copy()
 
 zip_all_addons = True
 tmp_fn = "estate_management.x_pptx"
-customer_dis_name = "科汇中心"
-customer_name = "KH"
+customer_dis_name = "歌华文化集团"
+customer_name = "GHWH"
 # 初始化时，仅客户名写入此文件，第一次运行时，客户mac地址写入此文件，压缩包里必须有此文件，如无则判错
 customer_name_info_fn = "c_info_2_ck"
 
@@ -291,7 +293,6 @@ def write_customer_info_2_file(in_fld, in_fn, in_f_content):
 
 
 def zip_tgt_files(in_root, in_label, in_bar):
-
     try:
         # 先创建一个空文件，最后删除
         if not os.path.exists(out_zip_fld + kara_fn):
@@ -575,7 +576,6 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
 
             if not mac_lst_in_f:
                 if not check_product_code(entry_var.get(), product_code):
-
                     entry_product_code.config(state=tk.NORMAL)
                     txt_info = f"该版本是北京四九一科技有限公司为{customer_name_in_f}开发的专业版产品！\n" \
                                f"请在下方【产品编码】输入框输入正确的产品编码后，再点击【开始/启动】按钮！\n" \
@@ -778,9 +778,12 @@ def start_em_server(in_root, in_label, in_bar):
     command.extend(['-r', '491oddevadm'])
     command.extend(['--addons-path', '../addons'])
     command.extend(['-d', 'postgres'])
-    em_addons = f"utils,parking,estate_registration_addr,estate,estate_lease_contract,event_option,event_extend," \
-                f"operation_contract,accounting_subject,business_items,operation_contract_event_settle_account," \
-                f"wechat,contacts,estate_dashboard,sms_ali,website_estate,project,ocr_partner"
+    # em_addons = f"utils,parking,estate_registration_addr,estate,estate_lease_contract,event_option,event_extend," \
+    #             f"operation_contract,accounting_subject,business_items,operation_contract_event_settle_account," \
+    #             f"wechat,contacts,estate_dashboard,sms_ali,website_estate,project,ocr_partner,fund_management"
+    em_addons = ""
+    for each_addon in update_addons:
+        em_addons += str(each_addon) + ","
     command.extend(['-u', em_addons])
 
     _logger.debug(f"command={command}")
@@ -925,7 +928,6 @@ def update_log_and_progress(in_root, in_label, in_bar):
 
 
 def is_server_started(in_root, in_label, in_bar, retry_times=None):
-
     _logger.info("服务器状态校验")
     in_label.config(text=f"资产管理平台启动状态校验中……")
     if retry_times:
