@@ -20,6 +20,7 @@ class FundManagementCategory(models.Model):
                               help="Contains lower limit value, not upper limit value. e.g. 0 ≤ X<50000 \n"
                                    "The upper limit value of 0 represents infinity.")
     amount_max = fields.Float(string="Fund range(To)", default=None, copy=False)
+    contract_payment = fields.Boolean(string="Contract Payment", default=True, copy=False)
 
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
@@ -42,6 +43,7 @@ class FundManagementCategory(models.Model):
     def write(self, vals):
         res = super().write(vals)
         self._check_amount_range()
+        self._check_application_exists()
         return res
 
     def copy(self, default=None):
@@ -115,3 +117,9 @@ class FundManagementCategory(models.Model):
             'target': 'current',
         }
         return action
+
+    def _check_application_exists(self):
+        # todo 应考虑
+        #  1、属于该分类的审批流已经存在的情况下是否还允许修改流程分类，允许修改哪些字段？
+        #  2、流程作废应如何应对；
+        pass

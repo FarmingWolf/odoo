@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-07 04:33+0000\n"
-"PO-Revision-Date: 2025-04-07 04:33+0000\n"
+"POT-Creation-Date: 2025-04-24 09:13+0000\n"
+"PO-Revision-Date: 2025-04-24 09:13+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -29,6 +29,11 @@ msgstr "<span>设置审批流程步骤</span>"
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
 msgid "<span>to</span>"
 msgstr "<span>至</span>"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__account_subject_category
+msgid "Account Subject Category"
+msgstr "科目类别"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_needaction
@@ -123,7 +128,12 @@ msgstr "分析精度"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__employee_id
 msgid "Applicant"
-msgstr "申请人"
+msgstr "发起人"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__apply_no
+msgid "Application NO."
+msgstr "申请编号"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
@@ -144,12 +154,25 @@ msgstr "申请日期"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__total_amount_currency
 msgid "Apply In Currency"
-msgstr "合计"
+msgstr "申请金额"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__total_amount_currency_percent
 msgid "Apply In Percentage"
 msgstr "申请比例"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__apply_times
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Apply Times"
+msgstr "申请付款"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid "Apply amount should be in the category amount range!"
+msgstr "申请金额应在类别金额范围内"
 
 #. module: fund_management
 #: model:ir.actions.server,name:fund_management.action_agree_svr_action
@@ -286,9 +309,25 @@ msgid "Attachment Count"
 msgstr "附件数量"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Attachment List"
+msgstr "附件列表"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__type
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Attachment Type"
+msgstr "会议纪要类型"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__attachment_ids
 msgid "Attachments"
 msgstr "附件"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__bank_account
+msgid "Bank Account Number"
+msgstr "银行账号"
 
 #. module: fund_management
 #. odoo-python
@@ -317,7 +356,7 @@ msgstr "点击审批同意"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Click to reject"
-msgstr "点击拒绝"
+msgstr "点击驳回"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
@@ -334,8 +373,12 @@ msgstr "颜色"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__company_id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__company_id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__company_id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__company_id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__company_id
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Company"
 msgstr "组织"
@@ -355,6 +398,11 @@ msgstr ""
 "上限值为0代表无限大"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_id
+msgid "Contract ID"
+msgstr "合同名称"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_no
 msgid "Contract NO."
 msgstr "合同编号"
@@ -365,9 +413,23 @@ msgid "Contract Name"
 msgstr "合同名称"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_payment
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_category__contract_payment
+msgid "Contract Payment"
+msgstr "是否合同资金支付"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_amount
 msgid "Contract Total Amount"
 msgstr "合同总额（元）"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid "Contract amount should be in the category amount range!"
+msgstr "合同金额应在类别金额范围内"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_select_view_tree
@@ -393,8 +455,12 @@ msgstr "创建审批阶段"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__create_uid
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__create_uid
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__create_uid
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__create_uid
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__create_uid
 msgid "Created by"
 msgstr "创建人"
 
@@ -403,8 +469,12 @@ msgstr "创建人"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__create_date
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__create_date
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__create_date
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__create_date
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__create_date
 msgid "Created on"
 msgstr "创建日期"
 
@@ -414,17 +484,46 @@ msgid "Currency"
 msgstr "货币"
 
 #. module: fund_management
+#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_no_contract
+msgid "Define Fund Management No Contract here."
+msgstr "在此处定义基金管理无合同"
+
+#. module: fund_management
+#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_payment_method
+msgid "Define Payments Method here."
+msgstr "在此处定义付款方式"
+
+#. module: fund_management
+#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_procurement_method
+msgid "Define the Procurement Method here."
+msgstr "在此处定义采购方法"
+
+#. module: fund_management
+#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_fund_type
+msgid "Defining Fund Type here."
+msgstr "在此处定义资金类型"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__applicant_unit
+msgid "Department Name"
+msgstr "发起部门"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__name
 msgid "Description"
-msgstr "描述"
+msgstr "申请资金事由"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__display_name
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__display_name
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__display_name
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__display_name
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__display_name
 msgid "Display Name"
 msgstr "显示名"
 
@@ -557,14 +656,40 @@ msgid "Fund Management Category"
 msgstr "资金管理流程大类"
 
 #. module: fund_management
+#: model:ir.model,name:fund_management.model_fund_management_fund_type
+msgid "Fund Management Fund Type"
+msgstr "资金类型"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_hr_employee_public__fund_management_manager_id
 msgid "Fund Management Manager"
 msgstr "资金管理人"
 
 #. module: fund_management
+#: model:ir.model,name:fund_management.model_fund_management_no_contract
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__name
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_no_contract_view_form
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_no_contract_view_tree
+msgid "Fund Management No Contract"
+msgstr "回款方式"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__stage_id
 msgid "Fund Management Stage"
 msgstr "资金管理审批阶段"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__fund_type
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__name
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_type_view_form
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_type_view_tree
+msgid "Fund Type"
+msgstr "资金类型"
+
+#. module: fund_management
+#: model:ir.ui.menu,name:fund_management.menu_fund_management_types
+msgid "Fund Types"
+msgstr "资金类型"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
@@ -626,6 +751,28 @@ msgid "Future Activities"
 msgstr "未来活动"
 
 #. module: fund_management
+#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_fund_type
+msgid "Generally Financial Special Funds and Pooling Funds are used."
+msgstr "一般使用财政专项资金和集体资金"
+
+#. module: fund_management
+#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_no_contract
+msgid "Generally, Checks, and Cash are used"
+msgstr "通常使用支票和现金"
+
+#. module: fund_management
+#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_payment_method
+msgid "Generally, Online Banking Transfers, Checks, and Cash are used"
+msgstr "通常使用网上银行转账、支票和现金"
+
+#. module: fund_management
+#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_procurement_method
+msgid ""
+"Generally, Open Bidding, Competitive Negotiation, Comparison, and Other "
+"Methods are used."
+msgstr "一般来说，公开招标、竞争性谈判、比较和其他"
+
+#. module: fund_management
 #: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__legend_done
 msgid "Green indicates that the next stage can be entered"
 msgstr "标绿表示可进入下阶段"
@@ -656,8 +803,12 @@ msgstr "历史累计百分比"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__id
 msgid "ID"
 msgstr ""
 
@@ -724,8 +875,12 @@ msgstr "看板折叠"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__write_uid
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__write_uid
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__write_uid
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__write_uid
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__write_uid
 msgid "Last Updated by"
 msgstr "最后更新人"
 
@@ -734,8 +889,12 @@ msgstr "最后更新人"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__write_date
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__write_date
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__write_date
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__write_date
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__write_date
 msgid "Last Updated on"
 msgstr "最后更新日期"
 
@@ -769,7 +928,6 @@ msgstr "会议纪要类型"
 #: code:addons/fund_management/models/fund_management_meeting_minutes.py:0
 #: code:addons/fund_management/models/fund_management_meeting_minutes.py:0
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__name
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 #, python-format
 msgid "Meeting Minutes"
 msgstr "会议纪要"
@@ -782,7 +940,6 @@ msgstr "会议纪要可编辑"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__meeting_minute_types
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__meeting_minute_types
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__type
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__name
 msgid "Meeting Minutes Type"
 msgstr "会议纪要类型"
@@ -946,6 +1103,16 @@ msgid "Payee"
 msgstr "收款方"
 
 #. module: fund_management
+#: model:ir.model,name:fund_management.model_fund_management_payment_method
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__payment_method
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__name
+#: model:ir.ui.menu,name:fund_management.menu_fund_management_payment_method
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_payment_method_view_form
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_payment_method_view_tree
+msgid "Payment Method"
+msgstr "付款方式"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Please choose"
 msgstr "请选择"
@@ -964,6 +1131,16 @@ msgid "Please input approval comment..."
 msgstr "请输入审批意见..."
 
 #. module: fund_management
+#: model:ir.model,name:fund_management.model_fund_management_procurement_method
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__procurement_method
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__name
+#: model:ir.ui.menu,name:fund_management.menu_fund_management_procurement_method
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_procurement_method_view_form
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_procurement_method_view_tree
+msgid "Procurement Method"
+msgstr "采购方式"
+
+#. module: fund_management
 #: model:ir.model,name:fund_management.model_hr_employee_public
 msgid "Public Employee"
 msgstr "公共员工"
@@ -979,6 +1156,16 @@ msgstr "评级"
 #, python-format
 msgid "Ready for Next Stage"
 msgstr "可进入下一阶段"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__receiving_bank
+msgid "Receiving Bank"
+msgstr "开户行"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__receiving_unit
+msgid "Receiving Unit"
+msgstr "收款单位名称"
 
 #. module: fund_management
 #: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__legend_blocked
@@ -999,12 +1186,17 @@ msgstr "拒绝的申请"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Reject"
-msgstr "拒绝"
+msgstr "驳回"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__company_currency_id
 msgid "Report Company Currency"
 msgstr "货币"
+
+#. module: fund_management
+#: model:ir.model,name:fund_management.model_res_users
+msgid "Res Users"
+msgstr "用户"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_user_id
@@ -1062,6 +1254,26 @@ msgid "Sequence"
 msgstr "序号"
 
 #. module: fund_management
+#: model:ir.actions.act_window,name:fund_management.action_fund_management_no_contract
+msgid "Setting Fund Management No Contract"
+msgstr "设置付款方式"
+
+#. module: fund_management
+#: model:ir.actions.act_window,name:fund_management.action_fund_management_fund_type
+msgid "Setting Fund Type"
+msgstr "设置资金类型"
+
+#. module: fund_management
+#: model:ir.actions.act_window,name:fund_management.action_fund_management_payment_method
+msgid "Setting Payment Method"
+msgstr "设置付款方式"
+
+#. module: fund_management
+#: model:ir.actions.act_window,name:fund_management.action_fund_management_procurement_method
+msgid "Setting Procurement Method"
+msgstr "设置采购方式"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Show all records which has next action date is before today"
 msgstr "显示下一活动截止日期在今日之前的记录"
@@ -1111,6 +1323,27 @@ msgid "Team Approver"
 msgstr "团队审批者"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "The"
+msgstr "第"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management_no_contract.py:0
+#: model:ir.model.constraint,message:fund_management.constraint_fund_management_no_contract_name
+#, python-format
+msgid "The Fund Management No Contract can not be duplicated"
+msgstr "付款方式不能重复"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management_payment_method.py:0
+#: model:ir.model.constraint,message:fund_management.constraint_fund_management_payment_method_name
+#, python-format
+msgid "The Payment method can not be duplicated"
+msgstr "付款方式不能重复"
+
+#. module: fund_management
 #: model:ir.model.fields,help:fund_management.field_fund_management__stage_sequence
 #: model:ir.model.fields,help:fund_management.field_fund_management_approval_stage__sequence
 msgid ""
@@ -1142,6 +1375,14 @@ msgid ""
 msgstr "审批流程的最后阶段。处于此阶段的申请单方可生效。请将最大序号的审批阶段设置审批结束标志。"
 
 #. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management_procurement_method.py:0
+#: model:ir.model.constraint,message:fund_management.constraint_fund_management_procurement_method_name
+#, python-format
+msgid "The procurement method can not be duplicated"
+msgstr "采购方式不能重复"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
 msgid ""
 "The task at this stage is blocked. Click to change the task stage status."
@@ -1160,6 +1401,11 @@ msgid ""
 "The task is currently being processed in this stage. Click to change the "
 "task stage status."
 msgstr "本阶段任务处理中。点击可更改任务阶段状态。"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Time Payment"
+msgstr "次付款"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
@@ -1187,6 +1433,14 @@ msgid "Total Amount"
 msgstr "金额总计"
 
 #. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management_fund_type.py:0
+#: model:ir.model.constraint,message:fund_management.constraint_fund_management_fund_type_name
+#, python-format
+msgid "Type name can not be duplicated"
+msgstr "类型名称不能重复"
+
+#. module: fund_management
 #: model:ir.model.fields,help:fund_management.field_fund_management__activity_exception_decoration
 msgid "Type of the exception activity on record."
 msgstr "记录中异常活动的类型。"
@@ -1197,11 +1451,6 @@ msgstr "记录中异常活动的类型。"
 #, python-format
 msgid "Upload"
 msgstr "上传"
-
-#. module: fund_management
-#: model:ir.model,name:fund_management.model_res_users
-msgid "User"
-msgstr "用户"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
@@ -1304,6 +1553,10 @@ msgstr "会议纪要类型清单"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__sequence
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__sequence
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__sequence
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__sequence
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__sequence
 msgid "sequence"
 msgstr "序号"
 

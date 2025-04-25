@@ -15,7 +15,7 @@
 最高领导层增加一键叫停：流程直接打回至初始状态；
     """,
     'website': 'https://www.491tech.com/',
-    'depends': ['account', 'web_tour', 'hr'],
+    'depends': ['account', 'web_tour', 'hr', 'accounting_subject'],
     'data': [
         'security/fund_management_security.xml',
         'security/ir.model.access.csv',
@@ -25,6 +25,10 @@
         'views/fund_management_approval_detail_views.xml',
         'views/fund_management_approval_stage_views.xml',
         'views/fund_management_category_views.xml',
+        'views/fund_management_fund_type_views.xml',
+        'views/fund_management_procurement_method_views.xml',
+        'views/fund_management_payment_method_views.xml',
+        'views/fund_management_no_contract_views.xml',
         'views/fund_management_views.xml',
     ],
     'demo': [],

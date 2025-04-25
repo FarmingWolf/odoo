@@ -1,150 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-        <record id="hr_employee_view_form_inherit_fund_management" model="ir.ui.view">
-            <field name="name">hr.employee.view.form.management</field>
-            <field name="model">hr.employee</field>
-            <field name="inherit_id" ref="hr.view_employee_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//group[@name='managers']" position="inside">
-                    <field name="fund_management_manager_id" context="{'default_company_id': company_id}" widget="many2one_avatar_user"/>
-                </xpath>
-                 <xpath expr="//group[@name='managers']" position="attributes">
-                    <attribute name="invisible">0</attribute>
-                </xpath>
-            </field>
-        </record>
+    <record id="hr_employee_view_form_inherit_fund_management" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.management</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='managers']" position="inside">
+                <field name="fund_management_manager_id" context="{'default_company_id': company_id}"
+                       widget="many2one_avatar_user"/>
+            </xpath>
+            <xpath expr="//group[@name='managers']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+        </field>
+    </record>
 
-        <record id="fund_management_view_fund_analysis_tree" model="ir.ui.view">
-            <field name="name">fund.management.tree</field>
-            <field name="model">fund.management</field>
-            <field name="arch" type="xml">
-                <tree string="Fund Management" create="False" sample="1" js_class="fund_management_tree" decoration-info="state == 'draft'">
-                    <field name="is_editable" column_invisible="True"/>
-                    <field name="company_id" column_invisible="True"/>
-                    <field name="company_currency_id" column_invisible="True"/>
-                    <field name="nb_attachment" column_invisible="True"/>
-                    <field name="is_multiple_currency" column_invisible="True"/>
-                    <field name="apply_no" optional="show" readonly="not is_editable"/>
-                    <field name="date" optional="show" readonly="not is_editable"/>
-                    <field name="category_id" optional="show" readonly="not is_editable"/>
-                    <field name="name" readonly="not is_editable"/>
-                    <field name="employee_id" widget="many2one_avatar_user" readonly="not is_editable"/>
-                    <field name="applicant_unit" readonly="True"/>
-                    <field name="activity_ids" widget="list_activity" optional="hide"/>
-                    <field name="company_id" optional="hide" groups="base.group_multi_company" readonly="True"/>
-                    <field name="nb_attachment" widget="fund_management_nb_attachment" nolabel="1" readonly="True"/>
-                    <field name="total_amount" sum="Total Amount" widget='monetary'
-                           readonly="not is_editable"
-                           options="{'currency_field': 'company_currency_id'}" decoration-bf="1"/>
-                    <field name="currency_id" optional="hide" readonly="True" groups="base.group_multi_currency"/>
-                    <field name="stage" />
-                    <field name="state" optional="hide" readonly="True" decoration-info="state in ['submitted']"
-                           decoration-success="state == 'done'" decoration-warning="state == 'approved'"
-                           decoration-danger="state == 'refused'" widget="badge"/>
-                </tree>
-            </field>
-        </record>
+    <record id="fund_management_view_fund_analysis_tree" model="ir.ui.view">
+        <field name="name">fund.management.tree</field>
+        <field name="model">fund.management</field>
+        <field name="arch" type="xml">
+            <tree string="Fund Management" create="False" sample="1" js_class="fund_management_tree"
+                  decoration-info="state == 'draft'">
+                <field name="is_editable" column_invisible="True"/>
+                <field name="company_id" column_invisible="True"/>
+                <field name="company_currency_id" column_invisible="True"/>
+                <field name="nb_attachment" column_invisible="True"/>
+                <field name="is_multiple_currency" column_invisible="True"/>
+                <field name="apply_no" optional="show" readonly="not is_editable"/>
+                <field name="date" optional="show" readonly="not is_editable"/>
+                <field name="category_id" optional="hide" readonly="not is_editable"/>
+                <field name="name" readonly="not is_editable"/>
+                <field name="contract_payment" readonly="not is_editable"/>
+                <field name="employee_id" widget="many2one_avatar_user" readonly="not is_editable"/>
+                <field name="applicant_unit" readonly="True"/>
+                <field name="activity_ids" widget="list_activity" optional="hide"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company" readonly="True"/>
+                <field name="nb_attachment" widget="fund_management_nb_attachment" nolabel="1" readonly="True"/>
+                <field name="total_amount_currency" sum="Total Amount" widget='monetary'
+                       readonly="not is_editable"
+                       options="{'currency_field': 'company_currency_id'}" decoration-bf="1"/>
+                <field name="currency_id" optional="hide" readonly="True" groups="base.group_multi_currency"/>
+                <field name="stage"/>
+                <field name="state" optional="hide" readonly="True" decoration-info="state in ['submitted']"
+                       decoration-success="state == 'done'" decoration-warning="state == 'approved'"
+                       decoration-danger="state == 'refused'" widget="badge"/>
+            </tree>
+        </field>
+    </record>
 
-        <record id="view_fund_management_tree" model="ir.ui.view">
-            <field name="name">fund.management.tree</field>
-            <field name="model">fund.management</field>
-            <field name="inherit_id" ref="fund_management_view_fund_analysis_tree"/>
-            <field name="mode">primary</field>
-            <field name="arch" type="xml">
-                <xpath expr="//tree" position="attributes">
-                    <!-- Display the tree dashboard view with the header -->
-                    <attribute name="js_class">fund_management_dashboard_tree</attribute>
-                </xpath>
-            </field>
-        </record>
+    <record id="view_fund_management_tree" model="ir.ui.view">
+        <field name="name">fund.management.tree</field>
+        <field name="model">fund.management</field>
+        <field name="inherit_id" ref="fund_management_view_fund_analysis_tree"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <!-- Display the tree dashboard view with the header -->
+                <attribute name="js_class">fund_management_dashboard_tree</attribute>
+            </xpath>
+        </field>
+    </record>
 
-        <record id="view_fund_management_to_be_approved_tree" model="ir.ui.view">
-            <field name="name">fund.management.tree</field>
-            <field name="model">fund.management</field>
-            <field name="inherit_id" ref="view_fund_management_tree"/>
-            <field name="mode">primary</field>
-            <field name="arch" type="xml">
-                <xpath expr="//tree" position="attributes">
-                    <!-- Display the tree dashboard view with the header -->
-                    <attribute name="create">False</attribute>
-                    <attribute name="edit">False</attribute>
-                    <attribute name="delete">False</attribute>
-                </xpath>
-            </field>
-        </record>
+    <record id="view_fund_management_to_be_approved_tree" model="ir.ui.view">
+        <field name="name">fund.management.tree</field>
+        <field name="model">fund.management</field>
+        <field name="inherit_id" ref="view_fund_management_tree"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <!-- Display the tree dashboard view with the header -->
+                <attribute name="create">False</attribute>
+                <attribute name="edit">False</attribute>
+                <attribute name="delete">False</attribute>
+            </xpath>
+        </field>
+    </record>
 
-        <record id="view_my_fund_management_tree" model="ir.ui.view">
-            <field name="name">fund.management.tree</field>
-            <field name="model">fund.management</field>
-            <field name="priority">20</field>
-            <field name="inherit_id" ref="fund_management.view_fund_management_tree"/>
-            <field name="mode">primary</field>
-            <field name="arch" type="xml">
-                <xpath expr="//tree" position="attributes">
-                    <!-- Display the tree dashboard view with the header -->
-                    <attribute name="js_class">fund_management_dashboard_tree</attribute>
-                </xpath>
-            </field>
-        </record>
+    <record id="view_my_fund_management_tree" model="ir.ui.view">
+        <field name="name">fund.management.tree</field>
+        <field name="model">fund.management</field>
+        <field name="priority">20</field>
+        <field name="inherit_id" ref="fund_management.view_fund_management_tree"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <!-- Display the tree dashboard view with the header -->
+                <attribute name="js_class">fund_management_dashboard_tree</attribute>
+            </xpath>
+        </field>
+    </record>
 
-        <record id="fund_management_approval_dialog" model="ir.actions.client">
-            <field name="name">Input approval comment</field>
-            <field name="tag">fund_management.approval_comment_dialog</field>
-            <field name="target">new</field>
-        </record>
+    <record id="fund_management_approval_dialog" model="ir.actions.client">
+        <field name="name">Input approval comment</field>
+        <field name="tag">fund_management.approval_comment_dialog</field>
+        <field name="target">new</field>
+    </record>
 
-        <record id="action_agree_svr_action" model="ir.actions.server">
-            <field name="name">Approval Agree</field>
-            <field name="type">ir.actions.server</field>
-            <field name="model_id" ref="model_fund_management"/>
-            <field name="binding_model_id" ref="model_fund_management"/>
-            <field name="state">code</field>
-            <field name="code">
-action = model.action_agree_confirm(env.context)
-            </field>
-        </record>
+    <record id="action_agree_svr_action" model="ir.actions.server">
+        <field name="name">Approval Agree</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_fund_management"/>
+        <field name="binding_model_id" ref="model_fund_management"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.action_agree_confirm(env.context)
+        </field>
+    </record>
 
-        <record id="action_reject_svr_action" model="ir.actions.server">
-            <field name="name">Approval Reject</field>
-            <field name="type">ir.actions.server</field>
-            <field name="model_id" ref="model_fund_management"/>
-            <field name="binding_model_id" ref="model_fund_management"/>
-            <field name="state">code</field>
-            <field name="code">
-action = model.action_reject_confirm(env.context)
-            </field>
-        </record>
+    <record id="action_reject_svr_action" model="ir.actions.server">
+        <field name="name">Approval Reject</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_fund_management"/>
+        <field name="binding_model_id" ref="model_fund_management"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.action_reject_confirm(env.context)
+        </field>
+    </record>
 
-        <record id="fund_management_view_form" model="ir.ui.view">
-            <field name="name">fund.management.view.form</field>
-            <field name="model">fund.management</field>
-            <field name="arch" type="xml">
-                <form string="Fund info detail" js_class="fund_management_form_view" create="False">
+    <record id="fund_management_view_form" model="ir.ui.view">
+        <field name="name">fund.management.view.form</field>
+        <field name="model">fund.management</field>
+        <field name="arch" type="xml">
+            <form string="Fund info detail" js_class="fund_management_form_view" create="False">
                 <header>
                     <field name="stage_sequence" invisible="1"/>
                     <widget name="attach_document" string="Attach Receipt" action="attach_document" highlight="1"
                             invisible="1"/>
-                    <button name="action_save_fund_management" string="Save(not submit)" type="object" class="o_expense_submit" data-hotkey="v"
+                    <button name="action_save_fund_management" string="Save(not submit)" type="object"
+                            class="o_expense_submit" data-hotkey="v"
                             invisible="(state != 'draft') and (stage_sequence != 0)"/>
-                    <button name="action_submit_fund_management" string="Submit" type="object" class="o_expense_submit" data-hotkey="s"
+                    <button name="action_submit_fund_management" string="Submit" type="object" class="o_expense_submit"
+                            data-hotkey="s"
                             invisible="(state != 'draft') and (stage_sequence != 0)"/>
 
                     <div invisible="state in ('draft', 'done')">
-                        <button name="%(fund_management_approval_dialog)d" type="action" class="btn btn-success" string="Agree"
+                        <button name="%(fund_management_approval_dialog)d" type="action" class="btn btn-success"
+                                string="Agree"
                                 context="{'action_type': 'action_agree', 'res_id': id}"
-                                title="Click to approve" invisible="(state == 'refused') and (not meeting_minutes_editable)"/>
+                                title="Click to approve"
+                                invisible="(state == 'refused') and (not meeting_minutes_editable)"/>
                         <span>　</span>
-                        <button name="%(fund_management_approval_dialog)d" type="action" class="btn btn-danger" string="Reject"
+                        <button name="%(fund_management_approval_dialog)d" type="action" class="btn btn-danger"
+                                string="Reject"
                                 context="{'action_type': 'action_reject', 'res_id': id}"
                                 title="Click to reject" invisible="stage_sequence == 0"/>
                     </div>
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,done"
-                         invisible="state != 'draft'"/>
+                           invisible="state != 'draft'"/>
                     <field name="state" widget="statusbar" statusbar_visible="submitted,approved,done"
-                         invisible="state not in ['submitted', 'approved', 'done']"/>
+                           invisible="state not in ['submitted', 'approved', 'done']"/>
                     <field name="state" widget="statusbar" statusbar_visible="submitted,approved,refused"
-                         invisible="state != 'refused'"/>
+                           invisible="state != 'refused'"/>
                     <field name="stage" widget="statusbar" invisible="1"/>
                 </header>
                 <sheet>
@@ -154,8 +162,10 @@ action = model.action_reject_confirm(env.context)
                             <field name="apply_no" readonly="1"/>
                         </div>
                         <div class="d-flex justify-content-end">
-                            <button name="%(fund_management.view_all_stage_status_by_category_action)d" type="action" string="All Stages" title="View All Stages"
-                                context="{'default_category_id': category_id, 'default_fund_management_id': id}" class="btn btn-secondary"/>
+                            <button name="%(fund_management.view_all_stage_status_by_category_action)d" type="action"
+                                    string="All Stages" title="View All Stages"
+                                    context="{'default_category_id': category_id, 'default_fund_management_id': id}"
+                                    class="btn btn-secondary"/>
                         </div>
                     </div>
                     <div class="d-flex" style="width: 100%;">
@@ -163,7 +173,9 @@ action = model.action_reject_confirm(env.context)
                             <label for="name"/>
                             <div class="d-flex align-items-center">
                                 <h1 class="flex-grow-1 mb-0">
-                                    <field name="name" placeholder="e.g. The first payment of a construction contract for a certain project" readonly="not is_editable"/>
+                                    <field name="name"
+                                           placeholder="e.g. The first payment of a construction contract for a certain project"
+                                           readonly="not is_editable"/>
                                 </h1>
 
                             </div>
@@ -178,11 +190,15 @@ action = model.action_reject_confirm(env.context)
                             <field name="company_currency_id" invisible="1"/>
                             <field name="nb_attachment" invisible="1"/>
                             <field name="total_amount" invisible="1"/>
+                            <field name="contract_payment" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"
+                                   invisible="True"/>
                             <field name="id" invisible="1"/>
 
                             <label for="category_id"/>
                             <div>
-                                <field name="category_id" required="1" readonly="1" options="{'no_create': True, 'no_open': True}"
+                                <field name="category_id" required="1" readonly="1"
+                                       options="{'no_create': True, 'no_open': True}"
                                        class="w-100" placeholder="Please choose"/>
                                 <div class="fst-italic">
                                     <field name="category_description"/>
@@ -191,24 +207,33 @@ action = model.action_reject_confirm(env.context)
 
                             <!-- CASE: product has no cost defined -> user input amount (in other currency if multi-currency) -->
                             <label for="total_amount_currency" string="Amount Apply" readonly="not is_editable"/>
-                            <div class="o_row" >
-                                <field name="total_amount_currency" widget='monetary' options="{'currency_field': 'currency_id'}"
+                            <div class="o_row">
+                                <field name="total_amount_currency" widget='monetary'
+                                       options="{'currency_field': 'currency_id'}"
                                        readonly="not is_editable" class="oe_inline mw-50 me-0"/>
                                 <field name="currency_id" class="mw-25 ms-0" groups="base.group_multi_currency"
                                        options="{'no_create': True}" readonly="not is_editable" invisible="1"/>
                             </div>
-                            <field name="total_amount_currency_percent" widget="percentage"/>
-                            <label for="total_amt_cur_hist_accu" string="Historically Accumulation In Currency" readonly="not is_editable"/>
+                            <field name="total_amount_currency_percent" invisible="not contract_payment"
+                                   widget="percentage"/>
+                            <label for="apply_times" invisible="not contract_payment" string="Apply Times"/>
                             <div>
-                                <field name="total_amt_cur_hist_accu" widget='monetary' options="{'currency_field': 'currency_id'}"
+                                <span invisible="not contract_payment">
+                                    The<field name="apply_times" class="oe_inline o_input_9ch"/>
+                                    Time Payment
+                                </span>
+                            </div>
+                            <label for="total_amt_cur_hist_accu" invisible="not contract_payment"
+                                   string="Historically Accumulation In Currency"
+                                   readonly="not is_editable"/>
+
+                            <div>
+                                <field name="total_amt_cur_hist_accu" invisible="not contract_payment" widget='monetary'
+                                       options="{'currency_field': 'currency_id'}"
                                        readonly="not is_editable" class="oe_inline mw-50 me-0"/>
                             </div>
-                            <field name="total_amt_cur_hist_accu_percent" widget="percentage"/>
-
-                        </group>
-                        <group>
-                            <field name="contract_no"/>
-                            <field name="contract_name"/>
+                            <field name="total_amt_cur_hist_accu_percent" invisible="not contract_payment"
+                                   widget="percentage"/>
                             <field name="date" readonly="not is_editable"/>
                             <field name="is_editable" invisible="1"/>
                             <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'" invisible="True"/>
@@ -221,10 +246,22 @@ action = model.action_reject_confirm(env.context)
                                        context="{'default_company_id': company_id}" widget="many2one_avatar_employee"
                                        options="{'relation': 'hr.employee', 'no_create': True}"
                                        readonly="1"/>
-                                <field name="applicant_unit" readonly="1"/>
                             </t>
-                            <field name="contract_amount" widget='monetary' />
+                            <field name="applicant_unit" readonly="1"/>
+                            <field name="payment_method" invisible="not contract_payment"/>
 
+                        </group>
+                        <group>
+                            <field name="contract_no" invisible="not contract_payment"/>
+                            <field name="contract_name" invisible="not contract_payment"/>
+                            <field name="contract_amount" invisible="not contract_payment" widget='monetary'/>
+                            <field name="fund_type"/>
+                            <field name="procurement_method" invisible="not contract_payment"/>
+                            <field name="account_subject_category"/>
+                            <field name="receiving_unit"/>
+                            <field name="receiving_bank" domain="[('partner_id', '=', receiving_unit)]"
+                                   options="{'no_open': True, 'no_create': True}" readonly="not receiving_unit"/>
+                            <field name="bank_account"/>
                         </group>
                     </group>
                     <div>
@@ -235,15 +272,18 @@ action = model.action_reject_confirm(env.context)
                         <page string="Attachment List" readonly="(not is_editable) and (not meeting_minutes_editable)">
                             <field name="meeting_minutes_attach" mode="tree,form">
                                 <tree delete="False" create="False" edit="True">
-                                    <field name="type"/>
+                                    <field name="type" string="Attachment Type"/>
                                     <field name="attachment_ids" widget="many2many_binary"/>
                                 </tree>
                                 <form delete="False" create="False" edit="True">
                                     <group>
                                         <field name="name" invisible="1"/>
                                         <field name="type_domain" invisible="1"/>
-                                        <field name="type" domain="[('id', 'in', type_domain)]" options="{'no_create': True, 'no_open': True}" readonly="1"/>
-                                        <field name="attachment_ids" widget="many2many_binary" options="{'no_create': True}" readonly="not parent.meeting_minutes_editable"/>
+                                        <field name="type" domain="[('id', 'in', type_domain)]"
+                                               options="{'no_create': True, 'no_open': True}" readonly="1"/>
+                                        <field name="attachment_ids" widget="many2many_binary"
+                                               options="{'no_create': True}"
+                                               readonly="not parent.meeting_minutes_editable"/>
                                     </group>
                                 </form>
                             </field>
@@ -267,295 +307,330 @@ action = model.action_reject_confirm(env.context)
                         </field>
                     </group>
                 </sheet>
-                <div class="o_attachment_preview o_center_attachment" groups="fund_management.group_fund_management_manager"/>
+                <div class="o_attachment_preview o_center_attachment"
+                     groups="fund_management.group_fund_management_manager"/>
                 <div class="oe_chatter" groups="fund_management.group_fund_management_manager">
                     <field name="message_follower_ids"/>
                     <field name="activity_ids"/>
                     <field name="message_ids"/>
                 </div>
-                </form>
-            </field>
-        </record>
+            </form>
+        </field>
+    </record>
 
-        <record id="fund_management_view_form_without_header" model="ir.ui.view">
-            <field name="name">fund.management.view.form</field>
-            <field name="model">fund.management</field>
-            <field name="inherit_id" ref="fund_management.fund_management_view_form"/>
-            <field eval="35" name="priority"/>
-            <field name="mode">primary</field>
-            <field name="arch" type="xml">
-                <xpath expr="/form/header" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-                <field name="employee_id" position="attributes">
-                    <attribute name="readonly">1</attribute>
-                </field>
-                <field name="company_id" position="attributes">
-                    <attribute name="readonly">1</attribute>
-                </field>
+    <record id="fund_management_view_form_without_header" model="ir.ui.view">
+        <field name="name">fund.management.view.form</field>
+        <field name="model">fund.management</field>
+        <field name="inherit_id" ref="fund_management.fund_management_view_form"/>
+        <field eval="35" name="priority"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="/form/header" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <field name="employee_id" position="attributes">
+                <attribute name="readonly">1</attribute>
             </field>
-        </record>
+            <field name="company_id" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+        </field>
+    </record>
 
-        <record id="fund_management_view_fund_analysis_kanban" model="ir.ui.view">
-            <field name="name">fund.management.kanban</field>
-            <field name="model">fund.management</field>
-            <field name="arch" type="xml">
-                <kanban class="o_kanban_mobile fund_management" sample="1" js_class="fund_management_kanban" quick_create="false">
-                    <field name="name"/>
-                    <field name="employee_id"/>
-                    <field name="total_amount_currency"/>
-                    <field name="date"/>
-                    <field name="state"/>
-                    <field name="stage"/>
-                    <field name="activity_state"/>
-                    <field name="currency_id"/>
-                    <progressbar field="activity_state" colors='{"planned": "success", "today": "warning", "overdue": "danger"}'/>
-                    <templates>
-                        <t t-name="kanban-box">
-                            <div t-attf-class="oe_kanban_card oe_kanban_global_click">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <strong class="o_kanban_record_title"><span><t t-out="record.name.value"/></span></strong>
-                                        <strong class="o_kanban_record_subtitle float-end"><span class="text-end">
-                                            <field name="total_amount_currency" widget="monetary"/></span>
-                                        </strong>
-                                    </div>
+    <record id="fund_management_view_fund_analysis_kanban" model="ir.ui.view">
+        <field name="name">fund.management.kanban</field>
+        <field name="model">fund.management</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile fund_management" sample="1" js_class="fund_management_kanban"
+                    quick_create="false">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="total_amount_currency"/>
+                <field name="date"/>
+                <field name="state"/>
+                <field name="stage"/>
+                <field name="activity_state"/>
+                <field name="currency_id"/>
+                <progressbar field="activity_state"
+                             colors='{"planned": "success", "today": "warning", "overdue": "danger"}'/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <div class="row">
+                                <div class="col-12">
+                                    <strong class="o_kanban_record_title">
+                                        <span>
+                                            <t t-out="record.name.value"/>
+                                        </span>
+                                    </strong>
+                                    <strong class="o_kanban_record_subtitle float-end">
+                                        <span class="text-end">
+                                            <field name="total_amount_currency" widget="monetary"/>
+                                        </span>
+                                    </strong>
                                 </div>
-                                <div class="row mt8">
-                                    <div class="col-6 text-muted">
-                                        <field name="employee_id" widget="many2one_avatar_user"
-                                               options="{'display_avatar_name': True}"
-                                               readonly="True"/><br/>
-                                        <t t-out="record.date.value"/>
-                                    </div>
-                                    <div class="col-6">
-                                        <span class="float-end text-end">
-                                            <field name="state" widget="label_selection"
-                                                   options="{'classes': {'draft': 'default',
+                            </div>
+                            <div class="row mt8">
+                                <div class="col-6 text-muted">
+                                    <field name="employee_id" widget="many2one_avatar_user"
+                                           options="{'display_avatar_name': True}"
+                                           readonly="True"/>
+                                    <br/>
+                                    <t t-out="record.date.value"/>
+                                </div>
+                                <div class="col-6">
+                                    <span class="float-end text-end">
+                                        <field name="state" widget="label_selection"
+                                               options="{'classes': {'draft': 'default',
                                                                          'submitted': 'primary', 'refused': 'danger',
                                                                          'done': 'warning', 'approved': 'success'}}"/>
-                                        </span>
-                                    </div>
+                                    </span>
                                 </div>
                             </div>
-                        </t>
-                    </templates>
-                </kanban>
-            </field>
-        </record>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
 
-        <!-- Kanban view without header -->
-        <record id="fund_management_kanban_view" model="ir.ui.view">
-            <field name="name">fund.management.kanban</field>
-            <field name="model">fund.management</field>
-            <field name="inherit_id" ref="fund_management_view_fund_analysis_kanban"/>
-            <field name="mode">primary</field>
-            <field name="arch" type="xml">
-                <xpath expr="//kanban" position="attributes">
-                    <attribute name="js_class">fund_management_kanban</attribute>
-                </xpath>
-            </field>
-        </record>
+    <!-- Kanban view without header -->
+    <record id="fund_management_kanban_view" model="ir.ui.view">
+        <field name="name">fund.management.kanban</field>
+        <field name="model">fund.management</field>
+        <field name="inherit_id" ref="fund_management_view_fund_analysis_kanban"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="js_class">fund_management_kanban</attribute>
+            </xpath>
+        </field>
+    </record>
 
-        <!-- Kanban view with header. Used in "My Expenses -->
-        <record id="fund_management_kanban_view_header" model="ir.ui.view">
-            <field name="name">fund.management.kanban</field>
-            <field name="model">fund.management</field>
-            <field name="inherit_id" ref="fund_management_view_fund_analysis_kanban"/>
-            <field name="mode">primary</field>
-            <field name="arch" type="xml">
-                <xpath expr="//kanban" position="attributes">
-                    <attribute name="js_class">fund_management_dashboard_kanban</attribute>
-                </xpath>
-            </field>
-        </record>
+    <!-- Kanban view with header. Used in "My Expenses -->
+    <record id="fund_management_kanban_view_header" model="ir.ui.view">
+        <field name="name">fund.management.kanban</field>
+        <field name="model">fund.management</field>
+        <field name="inherit_id" ref="fund_management_view_fund_analysis_kanban"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="js_class">fund_management_dashboard_kanban</attribute>
+            </xpath>
+        </field>
+    </record>
 
-        <record id="fund_management_view_pivot" model="ir.ui.view">
-            <field name="name">fund.management.pivot</field>
-            <field name="model">fund.management</field>
-            <field name="arch" type="xml">
-                <pivot string="Fund Analysis" sample="1">
-                    <field name="employee_id" type="row"/>
-                    <field name="date" interval="month" type="col"/>
-                    <field name="total_amount_currency" type="measure"/>
-                </pivot>
-            </field>
-        </record>
+    <record id="fund_management_view_pivot" model="ir.ui.view">
+        <field name="name">fund.management.pivot</field>
+        <field name="model">fund.management</field>
+        <field name="arch" type="xml">
+            <pivot string="Fund Analysis" sample="1">
+                <field name="employee_id" type="row"/>
+                <field name="date" interval="month" type="col"/>
+                <field name="total_amount_currency" type="measure"/>
+            </pivot>
+        </field>
+    </record>
 
-        <record id="fund_management_view_graph" model="ir.ui.view">
-            <field name="name">fund.management.graph</field>
-            <field name="model">fund.management</field>
-            <field name="arch" type="xml">
-                <graph string="Fund Analysis" sample="1">
-                    <field name="date"/>
-                    <field name="employee_id"/>
-                    <field name="total_amount" type="measure" />
-                </graph>
-            </field>
-        </record>
+    <record id="fund_management_view_graph" model="ir.ui.view">
+        <field name="name">fund.management.graph</field>
+        <field name="model">fund.management</field>
+        <field name="arch" type="xml">
+            <graph string="Fund Analysis" sample="1">
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="total_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
 
-        <record id="fund_management_view_search" model="ir.ui.view">
-            <field name="name">fund.management.view.search</field>
-            <field name="model">fund.management</field>
-            <field name="arch" type="xml">
-                <search string="Fund">
-                    <field string="Fund Management" name="name"
-                           filter_domain="['|', '|', ('employee_id', 'ilike', self), ('name', 'ilike', self), ('category_id', 'ilike', self)]"/>
-                    <field name="date"/>
-                    <field name="employee_id"/>
-                    <filter string="My Applications" name="my_fund_management" domain="[('employee_id.user_id', '=', uid)]"/>
-                    <filter string="My Team" name="my_team_fund_management" domain="[('employee_id.parent_id.user_id', '=', uid)]"
-                            groups="fund_management.group_fund_management_team_approver" help="Application of Your Team Member"/>
-                    <separator />
-                    <filter string="To Be Approved" name="to_be_approved" domain="[('state', 'in', ('submitted', 'approved', 'refused'))]"/>
-                    <filter string="Refused" name="refused" domain="[('state', '=', 'refused')]" help="Refused Applications"/>
-                    <separator />
-                    <filter string="Apply Date" name="date" date="date"/>
-                    <separator />
-                    <filter string="Former Employees" name="inactive" domain="[('employee_id.active', '=', False)]"
-                            groups="fund_management.group_fund_management_user,fund_management.group_fund_management_manager"/>
-                    <separator/>
-                    <filter invisible="1" string="Late Activities" name="activities_overdue"
+    <record id="fund_management_view_search" model="ir.ui.view">
+        <field name="name">fund.management.view.search</field>
+        <field name="model">fund.management</field>
+        <field name="arch" type="xml">
+            <search string="Fund">
+                <field string="Fund Management" name="name"
+                       filter_domain="['|', '|', ('employee_id', 'ilike', self), ('name', 'ilike', self), ('category_id', 'ilike', self)]"/>
+                <field name="date"/>
+                <field name="employee_id"/>
+                <filter string="My Applications" name="my_fund_management"
+                        domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter string="My Team" name="my_team_fund_management"
+                        domain="[('employee_id.parent_id.user_id', '=', uid)]"
+                        groups="fund_management.group_fund_management_team_approver"
+                        help="Application of Your Team Member"/>
+                <separator/>
+                <filter string="To Be Approved" name="to_be_approved"
+                        domain="[('state', 'in', ('submitted', 'approved', 'refused'))]"/>
+                <filter string="Refused" name="refused" domain="[('state', '=', 'refused')]"
+                        help="Refused Applications"/>
+                <separator/>
+                <filter string="Apply Date" name="date" date="date"/>
+                <separator/>
+                <filter string="Former Employees" name="inactive" domain="[('employee_id.active', '=', False)]"
+                        groups="fund_management.group_fund_management_user,fund_management.group_fund_management_manager"/>
+                <separator/>
+                <filter invisible="1" string="Late Activities" name="activities_overdue"
                         domain="[('my_activity_date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"
                         help="Show all records which has next action date is before today"/>
-                    <filter invisible="1" string="Today Activities" name="activities_today"
+                <filter invisible="1" string="Today Activities" name="activities_today"
                         domain="[('my_activity_date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
-                    <filter invisible="1" string="Future Activities" name="activities_upcoming_all"
+                <filter invisible="1" string="Future Activities" name="activities_upcoming_all"
                         domain="[('my_activity_date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
-                    <group expand="0" string="Group By">
-                        <filter string="Employee" name="employee" domain="[]" context="{'group_by': 'employee_id'}"/>
-                        <filter string="Category" name="product" domain="[]" context="{'group_by': 'category_id'}"/>
-                        <filter string="Status" name="status" domain="[]" context="{'group_by': 'state'}"/>
-                        <filter string="Apply Date" name="fund_management_month" domain="[]" context="{'group_by': 'date'}"
-                                help="Apply Date"/>
-                        <filter string="Company" name="company" domain="[]" context="{'group_by': 'company_id'}"
-                                groups="base.group_multi_company"/>
-                    </group>
-                </search>
-            </field>
-        </record>
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="employee" domain="[]" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Category" name="product" domain="[]" context="{'group_by': 'category_id'}"/>
+                    <filter string="Status" name="status" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="Apply Date" name="fund_management_month" domain="[]" context="{'group_by': 'date'}"
+                            help="Apply Date"/>
+                    <filter string="Company" name="company" domain="[]" context="{'group_by': 'company_id'}"
+                            groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
 
-        <record id="fund_management_view_activity" model="ir.ui.view">
-            <field name="name">fund.management.activity</field>
-            <field name="model">fund.management</field>
-            <field name="arch" type="xml">
-                <activity string="Fund Management">
-                    <field name="employee_id"/>
-                    <field name="currency_id"/>
-                    <templates>
-                        <div t-name="activity-box">
-                            <img class="rounded"
-                                 t-att-src="activity_image('hr.employee', 'avatar_128', record.employee_id.raw_value)"
-                                 t-att-title="record.employee_id.value" t-att-alt="record.employee_id.value"/>
-                            <div class="ms-2">
-                                <field name="name" display="full" class="o_text_block"/>
-                                <field name="total_amount_currency" widget="monetary" muted="1" display="full"/>
-                            </div>
+    <record id="fund_management_view_activity" model="ir.ui.view">
+        <field name="name">fund.management.activity</field>
+        <field name="model">fund.management</field>
+        <field name="arch" type="xml">
+            <activity string="Fund Management">
+                <field name="employee_id"/>
+                <field name="currency_id"/>
+                <templates>
+                    <div t-name="activity-box">
+                        <img class="rounded"
+                             t-att-src="activity_image('hr.employee', 'avatar_128', record.employee_id.raw_value)"
+                             t-att-title="record.employee_id.value" t-att-alt="record.employee_id.value"/>
+                        <div class="ms-2">
+                            <field name="name" display="full" class="o_text_block"/>
+                            <field name="total_amount_currency" widget="monetary" muted="1" display="full"/>
                         </div>
-                    </templates>
-                </activity>
-            </field>
-        </record>
+                    </div>
+                </templates>
+            </activity>
+        </field>
+    </record>
 
-        <record id="action_fund_management_actions_my_all" model="ir.actions.act_window">
-            <field name="name">My Applications</field>
-            <field name="res_model">fund.management</field>
-            <field name="view_mode">tree,kanban,form,graph,pivot,activity</field>
-            <field name="search_view_id" ref="fund_management_view_search"/>
-            <field name="view_id" ref="view_my_fund_management_tree"/>
-            <field name="domain">[('employee_id.user_id', '=', uid)]</field>
-            <field name="context">{'search_default_my_fund_management': 1}</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_expense_receipt">
-                    No data yet!
-                </p><p>
-                    Create a new fund management application to submit for approval process.
-                </p>
-            </field>
-        </record>
+    <record id="action_fund_management_actions_my_all" model="ir.actions.act_window">
+        <field name="name">My Applications</field>
+        <field name="res_model">fund.management</field>
+        <field name="view_mode">tree,kanban,form,graph,pivot,activity</field>
+        <field name="search_view_id" ref="fund_management_view_search"/>
+        <field name="view_id" ref="view_my_fund_management_tree"/>
+        <field name="domain">[('employee_id.user_id', '=', uid)]</field>
+        <field name="context">{'search_default_my_fund_management': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_expense_receipt">
+                No data yet!
+            </p>
+            <p>
+                Create a new fund management application to submit for approval process.
+            </p>
+        </field>
+    </record>
 
-        <record id="action_fund_management_actions_applications_all" model="ir.actions.act_window">
-            <field name="name">All Applications</field>
-            <field name="res_model">fund.management</field>
-            <field name="view_mode">tree,kanban,form,graph,pivot,activity</field>
-            <field name="search_view_id" ref="fund_management_view_search"/>
-            <field name="context">{}</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_expense_receipt">
-                    No data yet!
-                </p><p>
-                    Create a new fund management application to submit for approval process.
-                </p>
-            </field>
-        </record>
+    <record id="action_fund_management_actions_applications_all" model="ir.actions.act_window">
+        <field name="name">All Applications</field>
+        <field name="res_model">fund.management</field>
+        <field name="view_mode">tree,kanban,form,graph,pivot,activity</field>
+        <field name="search_view_id" ref="fund_management_view_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_expense_receipt">
+                No data yet!
+            </p>
+            <p>
+                Create a new fund management application to submit for approval process.
+            </p>
+        </field>
+    </record>
 
-        <record id="action_fund_management_actions_to_be_approved" model="ir.actions.act_window">
-            <field name="name">All Applications</field>
-            <field name="res_model">fund.management</field>
-            <field name="view_mode">tree,kanban,form,graph,pivot,activity</field>
-            <field name="view_id" ref="view_fund_management_to_be_approved_tree"/>
-            <field name="search_view_id" ref="fund_management_view_search"/>
-            <field name="context">{'search_default_to_be_approved': 1}</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_expense_receipt">
-                    No data yet!
-                </p><p>
-                    Create a new fund management application to submit for approval process.
-                </p>
-            </field>
-        </record>
+    <record id="action_fund_management_actions_to_be_approved" model="ir.actions.act_window">
+        <field name="name">All Applications</field>
+        <field name="res_model">fund.management</field>
+        <field name="view_mode">tree,kanban,form,graph,pivot,activity</field>
+        <field name="view_id" ref="view_fund_management_to_be_approved_tree"/>
+        <field name="search_view_id" ref="fund_management_view_search"/>
+        <field name="context">{'search_default_to_be_approved': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_expense_receipt">
+                No data yet!
+            </p>
+            <p>
+                Create a new fund management application to submit for approval process.
+            </p>
+        </field>
+    </record>
 
-        <record id="fund_management_actions_all" model="ir.actions.act_window">
-            <field name="name">Fund Analysis</field>
-            <field name="res_model">fund.management</field>
-            <field name="view_mode">graph,pivot,tree,form</field>
-            <field name="search_view_id" ref="fund_management_view_search"/>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_empty_folder">
-                    No data yet!
-                </p><p>
-                    Create a new fund management application to submit for approval process.
-                </p>
-            </field>
-        </record>
+    <record id="fund_management_actions_all" model="ir.actions.act_window">
+        <field name="name">Fund Analysis</field>
+        <field name="res_model">fund.management</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="search_view_id" ref="fund_management_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">
+                No data yet!
+            </p>
+            <p>
+                Create a new fund management application to submit for approval process.
+            </p>
+        </field>
+    </record>
 
-        <record id="fund_management_actions_all_graph" model="ir.actions.act_window.view">
-            <field name="view_mode">graph</field>
-            <field name="view_id" ref="fund_management.fund_management_view_graph"/>
-            <field name="act_window_id" ref="fund_management_actions_all"/>
-        </record>
+    <record id="fund_management_actions_all_graph" model="ir.actions.act_window.view">
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="fund_management.fund_management_view_graph"/>
+        <field name="act_window_id" ref="fund_management_actions_all"/>
+    </record>
 
-        <record id="fund_management_actions_all_pivot" model="ir.actions.act_window.view">
-            <field name="view_mode">pivot</field>
-            <field name="view_id" ref="fund_management.fund_management_view_pivot"/>
-            <field name="act_window_id" ref="fund_management_actions_all"/>
-        </record>
+    <record id="fund_management_actions_all_pivot" model="ir.actions.act_window.view">
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="fund_management.fund_management_view_pivot"/>
+        <field name="act_window_id" ref="fund_management_actions_all"/>
+    </record>
 
-        <record id="fund_management_actions_all_tree" model="ir.actions.act_window.view">
-            <field name="view_mode">tree</field>
-            <field name="view_id" ref="fund_management_view_fund_analysis_tree"/>
-            <field name="act_window_id" ref="fund_management_actions_all"/>
-        </record>
+    <record id="fund_management_actions_all_tree" model="ir.actions.act_window.view">
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="fund_management_view_fund_analysis_tree"/>
+        <field name="act_window_id" ref="fund_management_actions_all"/>
+    </record>
 
-        <!-- Tree & Kanban view for "All My Expenses" with header -->
-        <menuitem id="menu_fund_management_root" name="Fund Management" sequence="233" web_icon="fund_management,static/description/icon.png"/>
+    <!-- Tree & Kanban view for "All My Expenses" with header -->
+    <menuitem id="menu_fund_management_root" name="Fund Management" sequence="233"
+              web_icon="fund_management,static/description/icon.png"/>
 
-        <menuitem id="menu_fund_management_approve" name="Approve" parent="menu_fund_management_root"
-                  action="action_fund_management_actions_to_be_approved"
-                  groups="fund_management.group_fund_management_team_approver" sequence="10"/>
+    <menuitem id="menu_fund_management_approve" name="Approve" parent="menu_fund_management_root"
+              action="action_fund_management_actions_to_be_approved"
+              groups="fund_management.group_fund_management_team_approver" sequence="10"/>
 
-        <menuitem id="menu_fund_management_applications" name="Applications" sequence="20" parent="menu_fund_management_root"
-                  groups="fund_management.group_fund_management_team_approver"/>
-        <menuitem id="menu_fund_management_create_application" sequence="1" parent="menu_fund_management_applications"
-                  action="action_fund_management_actions_create_new" groups="fund_management.group_fund_management_team_approver"/>
-        <menuitem id="menu_fund_management_my_applications" sequence="2" parent="menu_fund_management_applications"
-                  action="action_fund_management_actions_my_all" groups="fund_management.group_fund_management_team_approver"/>
-        <menuitem id="menu_fund_management_all_applications_all" parent="menu_fund_management_applications"
-                  action="action_fund_management_actions_applications_all"
-                  groups="fund_management.group_fund_management_team_approver" sequence="30"/>
+    <menuitem id="menu_fund_management_applications" name="Applications" sequence="20"
+              parent="menu_fund_management_root"
+              groups="fund_management.group_fund_management_team_approver"/>
+    <menuitem id="menu_fund_management_create_application" sequence="1" parent="menu_fund_management_applications"
+              action="action_fund_management_actions_create_new"
+              groups="fund_management.group_fund_management_team_approver"/>
+    <menuitem id="menu_fund_management_my_applications" sequence="2" parent="menu_fund_management_applications"
+              action="action_fund_management_actions_my_all"
+              groups="fund_management.group_fund_management_team_approver"/>
+    <menuitem id="menu_fund_management_all_applications_all" parent="menu_fund_management_applications"
+              action="action_fund_management_actions_applications_all"
+              groups="fund_management.group_fund_management_team_approver" sequence="30"/>
 
-        <menuitem id="menu_fund_management_configuration" name="Configuration" parent="menu_fund_management_root"
-                  groups="fund_management.group_fund_management_manager" sequence="100"/>
-        <menuitem id="menu_fund_management_categories" name="Fun Management Categories" parent="menu_fund_management_configuration"
-                  action="action_fund_management_category" groups="fund_management.group_fund_management_manager" sequence="10"/>
+    <menuitem id="menu_fund_management_configuration" name="Configuration" parent="menu_fund_management_root"
+              groups="fund_management.group_fund_management_manager" sequence="100"/>
+    <menuitem id="menu_fund_management_categories" name="Fun Management Categories"
+              parent="menu_fund_management_configuration"
+              action="action_fund_management_category" groups="fund_management.group_fund_management_manager"
+              sequence="10"/>
+    <menuitem id="menu_fund_management_types" name="Fund Types" parent="menu_fund_management_configuration"
+              action="action_fund_management_fund_type" groups="fund_management.group_fund_management_manager"
+              sequence="20"/>
+    <menuitem id="menu_fund_management_procurement_method" name="Procurement Method"
+              parent="menu_fund_management_configuration"
+              action="action_fund_management_procurement_method" groups="fund_management.group_fund_management_manager"
+              sequence="30"/>
+    <menuitem id="menu_fund_management_payment_method" name="Payment Method" parent="menu_fund_management_configuration"
+              action="action_fund_management_payment_method" groups="fund_management.group_fund_management_manager"
+              sequence="40"/>
 </odoo>

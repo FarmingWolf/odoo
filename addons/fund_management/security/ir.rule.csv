@@ -5,3 +5,6 @@ fund_management_meeting_minutes_type_company_rule,Restrict Fund Management Meeti
 fund_management_meeting_minutes_company_rule,Restrict Fund Management Meeting Minutes by Company,model_fund_management_meeting_minutes,"[('company_id','=',user.company_id.id)]"
 fund_management_approval_stage_company_rule,Restrict Fund Management Approval Stage by Company,model_fund_management_approval_stage,"[('company_id','=',user.company_id.id)]"
 fund_management_approval_detail_company_rule,Restrict Fund Management Approval detail by Company,model_fund_management_approval_detail,"[('company_id','=',user.company_id.id)]"
+fund_management_fund_type_company_rule,Restrict Fund Management Fund Type by Company,model_fund_management_fund_type,"[('company_id','=',user.company_id.id)]"
+fund_management_procurement_method_company_rule,Restrict Fund Management Procurement Method by Company,model_fund_management_procurement_method,"[('company_id','=',user.company_id.id)]"
+fund_management_payment_method_company_rule,Restrict fund management payment method views by Company,model_fund_management_payment_method,"[('company_id','=',user.company_id.id)]"

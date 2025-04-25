@@ -3,16 +3,9 @@ import logging
 import random
 import re
 from datetime import datetime
-from xml import etree
-
-from markupsafe import Markup
-import werkzeug
-
 from odoo import api, fields, Command, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.http import request
-from odoo.tools.misc import format_date
-from odoo.tools import email_split, float_repr, float_round, is_html_empty
 
 _logger = logging.getLogger(__name__)
 
@@ -33,6 +26,7 @@ class FundManagement(models.Model):
 
     def _get_default_apply_no(self):
         prefix_str = "FM-"
+
 
         formatted_date = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y%m%d-%H%M%S')
         random_number = '{:03d}'.format(random.randint(0, 999))
@@ -128,7 +122,7 @@ class FundManagement(models.Model):
         default=lambda self: self._get_default_category()
     )
     category_description = fields.Text(compute='_compute_category_description')
-
+    contract_payment = fields.Boolean(related='category_id.contract_payment')
     description = fields.Text(string="Notes", tracking=True)
     nb_attachment = fields.Integer(string="Number of Attachments", compute='_compute_nb_attachment')
     attachment_ids = fields.One2many(
@@ -184,10 +178,12 @@ class FundManagement(models.Model):
         self._get_view()
         return stage_domain
 
+
     stage = fields.Many2one('fund.management.approval.stage', ondelete='restrict', copy=False, tracking=True,
                             domain=lambda self: self._get_stage_domain(),
                             default=lambda self: self._get_default_stage_id())
     stage_sequence = fields.Integer("Approval Stage Sequence NO.", related="stage.sequence")
+    contract_id = fields.Integer(string='Contract ID')
     contract_no = fields.Char(string='Contract NO.', tracking=True, )
     contract_name = fields.Char(string='Contract Name', tracking=True, )
     contract_amount = fields.Float(string="Contract Total Amount", tracking=True, required=True)
@@ -205,6 +201,35 @@ class FundManagement(models.Model):
         compute='_compute_total_amount_currency_percent', store=True, readonly=True,
         tracking=False
     )
+    apply_times = fields.Integer(
+        string="Apply Times",
+        store=True,
+        readonly=True,
+        compute='_compute_apply_times',
+        # 关键点：设置默认值为1
+        default=0
+    )
+
+    @api.depends('contract_id')  # 关键点：添加依赖确保合同变更时重新计算
+    def _compute_apply_times(self):
+        for record in self:
+            # 如果 contract_id 未设置，直接返回默认值
+            if not record.contract_id:
+                record.apply_times = 1
+                continue
+            # 搜索同一合同的历史记录，按创建时间倒序排列
+            domain = [('contract_id', '=', record.contract_id.id)]
+            hist_records = self.search(domain, order="create_date DESC")
+
+            # 排除当前记录自身（避免新建时干扰）
+            hist_records = hist_records.filtered(lambda r: r.id != record.id)
+
+            if hist_records:
+                # 取最新记录的 apply_times 并 +1
+                record.apply_times = hist_records[0].apply_times + 1
+            else:
+                # 无历史记录时初始化为1
+                record.apply_times = 1
 
     @api.depends('total_amount_currency', 'contract_amount')
     def _compute_total_amount_currency_percent(self):
@@ -254,6 +279,36 @@ class FundManagement(models.Model):
         string="Report Company Currency",
         readonly=True,
     )
+    fund_type = fields.Many2one(
+        comodel_name='fund.management.fund.type',
+        string="Fund Type",
+    )
+    procurement_method = fields.Many2one(
+        comodel_name='fund.management.procurement.method',
+        string="Procurement Method",
+    )
+    payment_method = fields.Many2one(
+        comodel_name='fund.management.payment.method',
+        string="Payment Method",
+    )
+    account_subject_category = fields.Many2one(
+        comodel_name='accounting.subject.subject',
+        string="Account Subject Category",
+    )
+    receiving_unit = fields.Many2one(
+        comodel_name='res.partner',
+        string="Receiving Unit",
+    )
+
+    receiving_bank = fields.Many2one(
+        comodel_name="res.partner.bank",
+        string="Receiving Bank"
+    )
+    bank_account = fields.Char(
+        string="Bank Account Number",
+        related="receiving_bank.acc_number"
+    )
+
     is_multiple_currency = fields.Boolean(
         string="Is currency_id different from the company_currency_id",
         compute='_compute_is_multiple_currency',
@@ -1044,13 +1099,17 @@ class FundManagement(models.Model):
 
     def _is_amount_in_category(self):
         for record in self:
+            comp_tgt = record.contract_amount
+            if not record.contract_payment:
+                comp_tgt = record.total_amount_currency
+
             if record.category_id.amount_max:
-                if record.category_id.amount_min <= record.contract_amount < record.category_id.amount_max:
+                if record.category_id.amount_min <= comp_tgt < record.category_id.amount_max:
                     return True
                 else:
                     return False
             else:
-                if record.category_id.amount_min <= record.contract_amount:
+                if record.category_id.amount_min <= comp_tgt:
                     return True
                 else:
                     return False
@@ -1059,7 +1118,24 @@ class FundManagement(models.Model):
     def create(self, vals):
         rcd = super().create(vals)
 
+        #判断if-else 如果合同金额验证失败，进行下一步判断if rcd.contract_payment:
         if not rcd._is_amount_in_category():
-            raise UserError(_("Contract amount should be in the category amount range!"))
+            #判断是否是为合同类支付，如果是提示Contract合同金额应在类别金额范围内，
+            # 如果不是提示Apply申请金额应在类别金额范围内
+            if rcd.contract_payment:
+                raise UserError(_("Contract amount should be in the category amount range!"))
+            else:
+                raise UserError(_("Apply amount should be in the category amount range!"))
 
+        # 判断是否存在本合同的审批中的流程
+        search_domain = [('contract_id', '=', rcd.contract_id)]
+        records = self.search(search_domain)
+        for record in records:
+            if not record.stage.pipe_end:
+                raise UserError(_(f"A fund payment application of this contract ["
+                                  f"Application Number:{record.apply_no};"
+                                  f"Description:{record.description};"
+                                  f"Stage:{record.stage.name};"
+                                  "] is in approval process (has not been approved!)! "
+                                  f"Please make it approved first!"))
         return rcd

@@ -23,6 +23,7 @@
             <tree string="Fund Management Approval Category">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
+                <field name="contract_payment"/>
                 <field name="amount_min"/>
                 <field name="amount_max"/>
                 <field name="meeting_minute_types" widget="many2many_tags" options="{'color_field': 'color'}" />
@@ -43,12 +44,17 @@
                     </div>
 
                     <group>
-                        <label for="amount_min" string="Fund range"/>
-                        <div>
-                            <field name="amount_min" nolabel="True" class="oe_inline o_input_11ch"/>
-                            <span>to</span>
-                            <field name="amount_max" nolabel="True" class="oe_inline o_input_11ch" placeholder="0 means infinity"/>
-                        </div>
+                        <group>
+                            <label for="amount_min" string="Fund range"/>
+                            <div>
+                                <field name="amount_min" nolabel="True" class="oe_inline o_input_11ch"/>
+                                <span>to</span>
+                                <field name="amount_max" nolabel="True" class="oe_inline o_input_11ch" placeholder="0 means infinity"/>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="contract_payment" />
+                        </group>
                     </group>
                     <group>
                         <field name="meeting_minute_types" widget="many2many_tags" options="{'color_field': 'color'}" />
@@ -73,10 +79,12 @@
         <field name="arch" type="xml">
             <tree string="Select category to create a new Fund Management" create="False" edit="False" delete="False">
                 <field name="name"/>
+                <field name="contract_payment"/>
                 <field name="amount_min"/>
                 <field name="amount_max"/>
+                <field name="approval_stages" column_invisible="1"/>
                 <button type="object" name="action_select_category_create_application" string="Create New Application"
-                        context="{'default_category_id': active_id}"/>
+                        context="{'default_category_id': active_id}" invisible="not approval_stages"/>
             </tree>
         </field>
     </record>
