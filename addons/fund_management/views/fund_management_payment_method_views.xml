@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_fund_management_payment_method" model="ir.actions.act_window">
+        <field name="name">Setting Payment Method</field>
+        <field name="res_model">fund.management.payment.method</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Define Payments Method here.
+            </p>
+            <p>
+                Generally, Online Banking Transfers, Checks, and Cash are used
+            </p>
+        </field>
+    </record>
+
+    <record id="fund_management_payment_method_view_tree" model="ir.ui.view">
+        <field name="name">fund.management.payment.method.tree</field>
+        <field name="model">fund.management.payment.method</field>
+        <field name="arch" type="xml">
+            <tree string="Payment Method">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="fund_management_payment_method_view_form" model="ir.ui.view">
+        <field name="name">fund.management.payment.method.form</field>
+        <field name="model">fund.management.payment.method</field>
+        <field name="arch" type="xml">
+            <form string="Payment Method" create="True" edit="True" duplicate="False" delete="True">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -8,5 +8,4 @@ from . import fund_management_approval_detail
 from . import fund_management_fund_type
 from . import fund_management_procurement_method
 from . import fund_management_payment_method
-from . import fund_management_no_contract
 from . import fund_management
