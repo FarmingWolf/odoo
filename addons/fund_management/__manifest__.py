@@ -29,6 +29,9 @@
         'views/fund_management_procurement_method_views.xml',
         'views/fund_management_payment_method_views.xml',
         'views/fund_management_views.xml',
+
+        'report/fund_management_application_reports.xml',
+        'report/fund_management_application_templates.xml',
     ],
     'demo': [],
     'installable': True,
@@ -46,6 +49,9 @@
         ],
         'web.report_assets_common': [
             'fund_management/static/src/scss/fund_management.scss',
+        ],
+        'web.report_assets_pdf': [
+            'fund_management/static/src/scss/fund_management_report.scss',
         ],
         'web.qunit_suite_tests': [
         ],

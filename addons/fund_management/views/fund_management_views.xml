@@ -146,6 +146,8 @@
                                 context="{'action_type': 'action_reject', 'res_id': id}"
                                 title="Click to reject" invisible="stage_sequence == 0"/>
                     </div>
+                    <button name="action_print_application" string="Print" type="object" class="o_expense_submit"
+                            data-hotkey="p"/>
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,done"
                            invisible="state != 'draft'"/>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="paperformat_fund_management_application" model="report.paperformat">
+        <field name="name">资金支付申请单底版</field>
+        <field name="default" eval="False"/>
+        <field name="disable_shrinking" eval="True"/>
+        <field name="format">A4</field>
+        <field name="page_height">0</field>
+        <field name="page_width">0</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">8</field>
+        <field name="margin_left">20</field>
+        <field name="margin_right">10</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="action_print_contract_payment_application" model="ir.actions.report">
+        <field name="name">合同资金支付申请单</field>
+        <field name="model">fund.management</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">fund_management.contract_payment_application</field>
+        <field name="report_file">fund_management.contract_payment_application</field>
+        <field name="binding_model_id" ref="fund_management.model_fund_management"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Print Application'</field>
+        <field name="paperformat_id" ref="paperformat_fund_management_application"/>
+    </record>
+
+    <record id="action_print_no_contract_payment_application" model="ir.actions.report">
+        <field name="name">无合同资金支付申请单</field>
+        <field name="model">fund.management</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">fund_management.no_contract_payment_application</field>
+        <field name="report_file">fund_management.no_contract_payment_application</field>
+        <field name="binding_model_id" ref="fund_management.model_fund_management"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'无合同资金支付申请单'</field>
+        <field name="paperformat_id" ref="paperformat_fund_management_application"/>
+    </record>
+
+</odoo>

@@ -27,7 +27,6 @@ class FundManagement(models.Model):
     def _get_default_apply_no(self):
         prefix_str = "FM-"
 
-
         formatted_date = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y%m%d-%H%M%S')
         random_number = '{:03d}'.format(random.randint(0, 999))
         str_ret = prefix_str + formatted_date + '-' + random_number
@@ -177,7 +176,6 @@ class FundManagement(models.Model):
         _logger.debug(f"stage_domain={stage_domain}")
         self._get_view()
         return stage_domain
-
 
     stage = fields.Many2one('fund.management.approval.stage', ondelete='restrict', copy=False, tracking=True,
                             domain=lambda self: self._get_stage_domain(),
@@ -554,7 +552,8 @@ class FundManagement(models.Model):
 
             all_stages = self.env['fund.management.approval.stage'].search([('company_id', '=', record.company_id.id),
                                                                             (
-                                                                            'category_id', '=', record.category_id.id)])
+                                                                                'category_id', '=',
+                                                                                record.category_id.id)])
 
             max_stage_sequence = 0
             for each_stage in all_stages:
@@ -612,7 +611,8 @@ class FundManagement(models.Model):
 
             all_stages = self.env['fund.management.approval.stage'].search([('company_id', '=', record.company_id.id),
                                                                             (
-                                                                            'category_id', '=', record.category_id.id)])
+                                                                                'category_id', '=',
+                                                                                record.category_id.id)])
             for each_stage in all_stages:
                 if each_stage.sequence < record.stage.sequence:
                     tmp_stage = each_stage
@@ -642,7 +642,8 @@ class FundManagement(models.Model):
             self._create_approval_detail(record, False, True, tgt_stage, comment=None)
             all_stages = self.env['fund.management.approval.stage'].search([('company_id', '=', record.company_id.id),
                                                                             (
-                                                                            'category_id', '=', record.category_id.id)])
+                                                                                'category_id', '=',
+                                                                                record.category_id.id)])
             for each_stage in all_stages:
                 if each_stage.sequence == 1000:
                     record.stage = each_stage
@@ -992,12 +993,15 @@ class FundManagement(models.Model):
                 rst.append([stage, True])
                 continue
 
-            _logger.debug(f"stage={stage.name};sequence={stage.sequence}=record.stage.sequence?{record.stage.sequence == stage.sequence}")
+            _logger.debug(
+                f"stage={stage.name};sequence={stage.sequence}=record.stage.sequence?{record.stage.sequence == stage.sequence}")
             # 其他和本stage相同sequence的平行节点
             if stage.sequence == record.stage.sequence:
                 approved = False
                 for rcd in approval_details:
-                    _logger.debug(f"rcd.id={rcd.id}approval_stage_nm={rcd.approval_stage_nm};stage={rcd.approval_stage};stage.id={rcd.approval_stage.id};stage.nm={rcd.approval_stage.name}")
+                    _logger.debug(
+                        f"rcd.id={rcd.id}approval_stage_nm={rcd.approval_stage_nm};stage={rcd.approval_stage};"
+                        f"stage.id={rcd.approval_stage.id};stage.nm={rcd.approval_stage.name}")
                     if rcd.approval_stage_nm != rcd.approval_stage.name:
                         # 经确认，刚创建的detail记录中部分字段为空
                         continue
@@ -1063,7 +1067,9 @@ class FundManagement(models.Model):
         domain = [('fund_management_id', '=', record.id)]
         rcds = self.env[tgt_model].search(domain, order="id DESC")
         for rcd in rcds:
-            _logger.debug(f"rcd.id={rcd.id}approval_stage_nm={rcd.approval_stage_nm};stage={rcd.approval_stage};stage.id={rcd.approval_stage.id};stage.nm={rcd.approval_stage.name}")
+            _logger.debug(
+                f"rcd.id={rcd.id}approval_stage_nm={rcd.approval_stage_nm};stage={rcd.approval_stage};"
+                f"stage.id={rcd.approval_stage.id};stage.nm={rcd.approval_stage.name}")
             # 仅检查最新一轮提交
             if rcd.approval_stage.sequence == 0:
                 break
@@ -1091,7 +1097,8 @@ class FundManagement(models.Model):
                             break
 
                 if rcd.approval_stage_id == next_stage['stage'].id:
-                    _logger.debug(f"next_stage={next_stage['stage'].name}的result设置为{rcd.approval_decision}rcd.id={rcd.id}")
+                    _logger.debug(
+                        f"next_stage={next_stage['stage'].name}的result设置为{rcd.approval_decision}rcd.id={rcd.id}")
                     next_stage['stage_result'] = rcd.approval_decision
                     break
 
@@ -1118,9 +1125,9 @@ class FundManagement(models.Model):
     def create(self, vals):
         rcd = super().create(vals)
 
-        #判断if-else 如果合同金额验证失败，进行下一步判断if rcd.contract_payment:
+        # 判断if-else 如果合同金额验证失败，进行下一步判断if rcd.contract_payment:
         if not rcd._is_amount_in_category():
-            #判断是否是为合同类支付，如果是提示Contract合同金额应在类别金额范围内，
+            # 判断是否是为合同类支付，如果是提示Contract合同金额应在类别金额范围内，
             # 如果不是提示Apply申请金额应在类别金额范围内
             if rcd.contract_payment:
                 raise UserError(_("Contract amount should be in the category amount range!"))
@@ -1139,3 +1146,11 @@ class FundManagement(models.Model):
                                   "] is in approval process (has not been approved!)! "
                                   f"Please make it approved first!"))
         return rcd
+
+    def action_print_application(self):
+        if self.contract_payment:
+            tgt_action = 'fund_management.action_print_contract_payment_application'
+        else:
+            tgt_action = 'fund_management.action_print_no_contract_payment_application'
+
+        return self.env.ref(tgt_action).report_action(self)

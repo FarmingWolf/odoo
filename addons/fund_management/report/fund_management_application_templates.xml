@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="contract_payment_application">
+        <style type="text/css">
+            @import '/addons/fund_management/static/src/scss/fund_management_report.scss';
+        </style>
+        <t t-call="web.html_container">
+            <t t-call="web.internal_layout">
+                <div class="fm_report">
+                    <t t-foreach="docs" t-as="doc">
+                    <div class="enter_exit_form_div"
+                         style="border-top: 2px solid black; height: 5.31%; border-top: none;border-right: none; border-left: none;">
+                        <div style="column-span: all; margin-top: 10px;">
+                            <span style="font-size: 30px; font-weight: bold;">合同资金支付审批单</span>
+                        </div>
+                    </div>
+
+                    <div class="enter_exit_form_div"
+                         style="height: 3.67%;border-top: none;border-right: none; border-left: none;">
+                        <div class="grid-line">
+                            <div class="grid-item-left"
+                                 style="column-span: 1; width: 5%; padding-top: 5px; border-top: none;border-right: none; border-left: none;">
+                                <span style="margin-top: 10px;">编号:
+                                    <t t-esc="doc.apply_no or ''"/>
+                                </span>
+                            </div>
+                            <!--                                <div class="grid-item-left" style="column-span: 1; width: 25%;border-top: none;border-right: none; border-left: none;">-->
+                            <!--                                    <span>　</span>-->
+                            <!--                                </div>-->
+                            <div class="grid-item-right"
+                                 style="column-span: 1; width: 25%; padding-top: 5px; border-top: none;border-right: none;">
+                                <span style="margin-top: 10px;">发起日期:
+                                    <t t-esc="doc.date or ''"/>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="enter_exit_form_div" style="height: 3.67%;">
+                        <div class="grid-line">
+                            <div class="grid-item-left" style="column-span: 1; width: 18.4%; padding-top: 5px;">
+                                <span style="margin-top: 10px;">
+                                    发起人:
+                                    <t t-esc="doc.employee_id.name or ''"/>
+                                </span>
+                            </div>
+                            <!--                                <div class="grid-item-left" style="column-span: 1; width: 25%; ">-->
+                            <!--                                    <span>　</span>-->
+                            <!--                                </div>-->
+                            <div class="grid-item-left"
+                                 style="column-span: 1; width: 20%; padding-top: 5px;border-right: none;">
+                                <span style="margin-top: 10px;">发起部门:
+                                    <t t-esc="doc.employee_id.department_id.name or ''"/>
+                                </span>
+                            </div>
+                            <!--                                <div class="grid-item-right" style="column-span: 1; width: 30%;">-->
+                            <!--                                    <span>　</span>-->
+                            <!--                                </div>-->
+                        </div>
+                    </div>
+
+                    <div class="enter_exit_form_div" style="height: 10%;">
+                        <div class="grid-line">
+                            <div class="grid-item-left"
+                                 style="column-span: 1; width: 20%; height:%;border-right: none;">
+                                <div style="margin-top: 35px">
+                                    <span>申请资金事由:
+                                        <t t-esc="doc.name or ''"/>
+                                    </span>
+                                </div>
+                            </div>
+                            <!--                                <div class="grid-item-right" style="column-span: 4; width: 80%; height:0%;">-->
+                            <!--                                    <span>　</span>-->
+                            <!--                                </div>-->
+                        </div>
+                    </div>
+
+                    <div class="enter_exit_form_div" style="height: 3.67%;">
+                        <div class="grid-line">
+                            <div class="grid-item-left"
+                                 style="column-span: 1; width: 20%; padding-top: 5px;border-right: none;">
+                                <span>资金类型:
+                                    <t t-esc="doc.fund_type.name or ''"/>
+                                </span>
+                            </div>
+                            <!--                                <div class="grid-item-right" style="column-span: 4; width: 80%;">-->
+                            <!--                                    <span>　</span>-->
+                            <!--                                </div>-->
+                        </div>
+                    </div>
+
+                    <div class="enter_exit_form_div" style="height: 3.67%;">
+                        <div class="grid-line">
+                            <div class="grid-item-left" style="column-span: 1; width: 20%;border-right: none;">
+                                <div style="margin-top: 10px">
+                                    <span>采购方式:
+                                        <t t-esc="doc.procurement_method.name or ''"/>
+                                    </span>
+                                </div>
+                            </div>
+                            <!--                                <div class="grid-item-right" style="column-span: 4; width: 80%;">-->
+                            <!--                                    <span>　</span>-->
+                            <!--                                </div>-->
+                        </div>
+                    </div>
+
+                    <div class="enter_exit_form_div" style="height: 30%;">
+                        <div class="grid-line" style="column-span: 5;">
+                            <div class="grid-item-left" style="column-span: 1; width: 20%; height: 100%;">
+                                <div style="margin-top: 110px">
+                                    <span style="font-weight: bold">资金构成</span>
+                                    <br/>
+                                    <span style="font-weight: bold; margin-left: 10px">及支付情况</span>
+                                </div>
+                            </div>
+                            <div class="grid-item-right" style="column-span: 4; width: 80%; height: 100%;">
+                                <!-- Contract Name and Number -->
+                                <div class="grid-line"
+                                     style="column-span: 4; width: 100%; height: 16.66%; border-top: none; ">
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 20%; padding-top: 15px; border-top: none;">
+                                        <span>合同名称:
+                                            <t t-esc="doc.contract_name or ''"/>
+                                        </span>
+                                    </div>
+                                    <!--                                        <div class="grid-item-left" style="column-span: 1; width: 30%; border-top: none;">-->
+                                    <!--                                            <span>　</span>-->
+                                    <!--                                        </div>-->
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 20%; padding-top: 15px; border-top: none;border-right: none;">
+                                        <span>合同号:
+                                            <t t-esc="doc.contract_no or ''"/>
+                                        </span>
+                                    </div>
+                                    <!--                                        <div class="grid-item-right" style="column-span: 1; width: 30%; border-top: none;">-->
+                                    <!--                                            <span>　</span>-->
+                                    <!--                                        </div>-->
+                                </div>
+
+                                <!-- Contract Amount and Approval Date -->
+                                <div class="grid-line" style="column-span: 4; width: 100%; height: 16.66%;">
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 20%; padding-top: 15px;">
+                                        <span>合同总金额:
+                                            <t t-esc="doc.contract_amount or ''"/>
+                                        </span>
+                                    </div>
+                                    <!--                                        <div class="grid-item-left" style="column-span: 1; width: 30%;">-->
+                                    <!--                                            <span>　</span>-->
+                                    <!--                                        </div>-->
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 20%; padding-top: 5px;border-right: none;">
+                                        <span>资产会/党委会日期:</span>
+                                    </div>
+                                    <!--                                        <div class="grid-item-right" style="column-span: 1; width: 30%;">-->
+                                    <!--                                            <span>　</span>-->
+                                    <!--                                        </div>-->
+                                </div>
+
+                                <!-- Payment Amount and Ratio -->
+                                <div class="grid-line" style="column-span: 4; width: 100%; height: 16.66%;">
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 20%; padding-top: 2px;">
+                                        <span>本次申请<br/>支付金额:
+                                            <t t-esc="doc.total_amount_currency or ''"/>
+                                        </span>
+                                    </div>
+                                    <!--                                        <div class="grid-item-left" style="column-span: 1; width: 30%;">-->
+                                    <!--                                            <span>　</span>-->
+                                    <!--                                        </div>-->
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 20%; padding-top: 5px; display: flex; flex-direction: column;border-right: none;">
+                                        <div>
+                                            <span>付款比例:
+                                                <t
+                                                        t-esc="round(doc.total_amount_currency_percent*100, 2) or '0'"/>
+                                                %
+                                            </span>
+                                        </div>
+                                        <div style="margin-top: 2px">
+                                            <span style="font-size: 12px">(第<t t-esc="doc.apply_times or '0'"/>次付款)
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <!--                                        <div class="grid-item-right" style="column-span: 1; padding-top: 15px; width: 30%;">-->
+                                    <!--                                            <span>   %</span>-->
+                                    <!--                                        </div>-->
+                                </div>
+
+                                <div class="grid-line"
+                                     style="column-span: 4; width: 100%; height: 16.66%;border-right: none;">
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 20%; padding-top: 15px;">
+                                        <span>付款方式:
+                                            <t t-esc="doc.payment_method.name or ''"/>
+                                        </span>
+                                    </div>
+                                    <div class="grid-item-left" style="column-span: 1; width: 20%; height:0%;">
+                                        <span>　</span>
+                                    </div>
+                                    <!--                                        <div class="grid-item-left" style="column-span: 1; width: 20%; height:0%;">-->
+                                    <!--                                            <span>　</span>-->
+                                    <!--                                        </div>-->
+                                    <!--                                        <div class="grid-item-right" style="column-span: 1; width: 30%;">-->
+                                    <!--                                            <span>　</span>-->
+                                    <!--                                        </div>-->
+                                </div>
+
+                                <div class="grid-line" style="column-span: 4; width: 100%; height: 16.66%;">
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 20%; padding-top: 15px;">
+                                        <span>科目类别:
+                                            <t t-esc="doc.account_subject_category.name or ''"/>
+                                        </span>
+                                    </div>
+                                    <div class="grid-item-left" style="column-span: 1; width: 20%; height:0%;">
+                                        <span>　</span>
+                                    </div>
+                                    <!--                                        <div class="grid-item-left" style="column-span: 1; width: 20%; height:0%;">-->
+                                    <!--                                            <span>　</span>-->
+                                    <!--                                        </div>-->
+                                    <!--                                        <div class="grid-item-right" style="column-span: 1; width: 30%;">-->
+                                    <!--                                            <span>　</span>-->
+                                    <!--                                        </div>-->
+                                </div>
+
+                                <!-- Cumulative Payment Amount -->
+                                <div class="grid-line" style="column-span: 4; width: 100%;height: 18%;">
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 20%; padding-top: 5px;">
+                                        <span>本次付款后<br/>累计已付金额:
+                                            <t t-esc="doc.total_amt_cur_hist_accu or ''"/>
+                                        </span>
+                                    </div>
+                                    <!--                                        <div class="grid-item-left" style="column-span: 1; width: 30%; height:89%;">-->
+                                    <!--                                            <span>　</span>-->
+                                    <!--                                        </div>-->
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 20%; height:89%; padding-top: 15px;border-right: none;">
+                                        <span>剩余金额:
+                                            <t t-esc="doc.contract_amount - doc.total_amt_cur_hist_accu or ''"/>
+                                        </span>
+                                    </div>
+                                    <!--                                        <div class="grid-item-right" style="column-span: 1; width: 30%;">-->
+                                    <!--                                            <span>　</span>-->
+                                    <!--                                        </div>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="enter_exit_form_div" style="height: 7.34%;">
+                        <div class="grid-line">
+                            <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 25px;">
+                                <span>收款单位明细</span>
+                            </div>
+                            <div class="grid-item-right" style="column-span: 4; width: 80%;">
+                                <div style="height: 50%; margin: 0; padding: 0;">
+                                    <div class="grid-line"
+                                         style="column-span: 4; width: 100%; height: 100%; margin: 0; padding: 0; border-top: none;">
+                                        <div class="grid-item-left"
+                                             style="column-span: 1; width: 20%; padding-top: 5px; border-top: none;border-right: none;">
+                                            <span style="margin-top: 10px">收款单位名称:
+                                                <t t-esc="doc.receiving_unit.name or ''"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="height: 50%; margin: 0; padding: 0;">
+                                    <div class="grid-line"
+                                         style="column-span: 4; width: 100%; height: 100%; margin: 0; padding: 0;">
+                                        <div class="grid-item-left"
+                                             style="column-span: 1; width: 20%; padding-top: 5px;">
+                                            <span style="margin-top: 10px">开户行:
+                                                <t t-esc="doc.receiving_bank.bank_id.name or ''"/>
+                                            </span>
+                                        </div>
+
+                                        <div class="grid-item-left"
+                                             style="column-span: 1; width: 20%; padding-top: 5px;border-right: none;">
+                                            <span style="margin-top: 10px">银行账号:
+                                                <t t-esc="doc.bank_account or ''"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="enter_exit_form_div" style="height: 13.7%;">
+                        <div class="grid-line">
+                            <div class="grid-item-left" style="width: 20%;height:100%;">
+                                <div style="margin-top: 55px">
+                                    <span>相关材料</span>
+                                </div>
+                            </div>
+                            <div class="grid-item-right" style="column-span: 4; width: 80%;">
+                                <!-- 第一行 -->
+                                <div class="grid-line" style="width: 100%; height: 33.33%; border-top: none;">
+                                    <div class="grid-item-left"
+                                         style="width: 50%; padding-top: 10px; border-top: none;">
+                                        <span style="margin-top: 10px">
+                                            <input type="checkbox" id="invoice" name="materials;"/>
+                                            <span>发票 ___ 张</span>
+                                        </span>
+                                    </div>
+                                    <div class="grid-item-right"
+                                         style="width: 50%; padding-top: 10px; border-top: none;border-right: none;">
+                                        <span style="margin-top: 10px; ">
+                                            <input type="checkbox" id="payment_application" name="materials"/>
+                                            <span>付款申请函</span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- 第二行 -->
+                                <div class="grid-line" style="column-span: 4; width: 100%; height: 33.33%;">
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 40%; padding-top: 10px">
+                                        <span style="margin-top: 10px">
+                                            <input type="checkbox" id="settlement_report" name="materials"/>
+                                            <label for="settlement_report">结算审核报告</label>
+                                        </span>
+                                    </div>
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 40%; padding-top: 10px; border-right: none">
+                                        <span style="margin-top: 10px">
+                                            <input type="checkbox" id="acceptance_form" name="materials"/>
+                                            <label for="acceptance_form">工程竣工验收单</label>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- 第三行 -->
+                                <div class="grid-line"
+                                     style="column-span: 4; width: 100%; height: 35%;border-right: none;">
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 40%; padding-top: 10px;">
+                                        <span style="margin-top: 20px;">
+                                            <input type="checkbox" id="meeting_minutes"
+                                                   name="materials;border-right: none;"/>
+                                            <label for="meeting_minutes">企业会议纪要编号用章申请</label>
+                                        </span>
+
+                                    </div>
+                                    <div class="grid-item-left"
+                                         style="column-span: 1; width: 40%; padding-top: 10px;border-right: none;">
+                                        <span style="margin-top: 20px">
+                                            <input type="checkbox" id="village_minutes" name="materials"/>
+                                            <label for="village_minutes">乡会议纪要编号</label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="enter_exit_form_div" style="height: 4%;">
+                        <div class="grid-line">
+                            <div class="grid-item-left" style="column-span: 1; width: 20%; border-right: none;">
+                                <div style="margin-top: 10px;">
+                                    <span>审批流程</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="enter_exit_form_div"
+                         style="height: auto; border: 2px solid black; border-top: none; border-right: none;">
+                        <div class="grid-line" style="width: 100%;">
+                            <table style="width: 100%; border-collapse: collapse; margin: 0 auto;">
+                                <thead>
+                                    <tr>
+                                        <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal;">
+                                            审批阶段
+                                        </th>
+                                        <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal;">
+                                            审批决定
+                                        </th>
+                                        <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal;">
+                                            审批人
+                                        </th>
+                                        <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal;">
+                                            审批备注
+                                        </th>
+                                        <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal;">
+                                            审批时间
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="approval_details"
+                                       t-value="doc.approval_detail_ids.sorted(key=lambda r: r.id)"/>
+                                    <t t-foreach="approval_details" t-as="detail">
+                                        <tr>
+                                            <td style="border: 1px solid black; padding: 5px; text-align: center;">
+                                                <t t-esc="detail.approval_stage_nm or ''"/>
+                                            </td>
+                                            <td style="border: 1px solid black; padding: 5px; text-align: center;">
+                                                <t t-esc="detail.approval_decision_txt or ''"/>
+                                            </td>
+                                            <td style="border: 1px solid black; padding: 5px; text-align: center;">
+                                                <t t-esc="detail.approved_by_nm or ''"/>
+                                            </td>
+                                            <td style="border: 1px solid black; padding: 5px; text-align: center;">
+                                                <t t-esc="detail.approval_comments or ''"/>
+                                            </td>
+                                            <td style="border: 1px solid black; padding: 5px; text-align: center;">
+                                                <t t-esc="detail.approval_date_time or ''"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                    </div>
+                    <div style="position: absolute; right: 2; top: 0; bottom: 0; width: 0px; background: black;">
+
+                    </div>
+                    <div style="position: absolute; left: 2; right: 2; bottom: 0; height: 0px; background: black;">
+
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</t>
+</template>
+
+
+</odoo>
+
+
