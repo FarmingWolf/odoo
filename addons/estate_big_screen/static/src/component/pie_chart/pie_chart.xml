@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="estate_big_screen.PieChart">
+        <div t-att-class="'h-100 ' + props.class" t-ref="root">
+            <div class="h-100 position-relative" t-ref="container">
+                <t t-if="!props.data">
+                    <div class="text-white text-center">加载中...</div>
+                </t>
+                <canvas t-if="props.data" t-ref="canvas" />
+            </div>
+        </div>
+    </t>
+</templates>

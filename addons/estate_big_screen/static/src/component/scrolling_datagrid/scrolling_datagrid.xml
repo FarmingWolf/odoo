@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <!-- 主滚动表格组件 -->
+    <t t-name="estate_big_screen.ScrollingDataGrid">
+        <div class="scrolling-datagrid-container"
+             t-att-style="getContainerStyle()"
+             t-on-mouseenter="handleMouseEnter"
+             t-on-mouseleave="handleMouseLeave">
+
+            <!-- 加载中 -->
+            <t t-if="state.isLoading or !props.data.isReady">
+                <div class="loading-message">加载中...</div>
+            </t>
+
+            <!-- 错误信息 -->
+            <t t-elif="state.error">
+                <div class="error-message">数据加载失败</div>
+            </t>
+
+            <!-- 渲染表格 -->
+            <t t-elif="state.displayData and state.displayData.length > 0">
+                <table class="scrolling-table">
+                    <thead>
+                        <tr class="header-row">
+                            <t t-foreach="state.headers" t-as="header" t-key="header">
+                                <th t-esc="header"/>
+                            </t>
+                        </tr>
+                    </thead>
+                    <tbody t-att-class="state.isTransitioning ? 'fade-out' : 'fade-in'">
+                        <t t-set="ii" t-value="0"/>
+                        <tr t-foreach="state.currentDisplayData" t-as="record" t-key="record.id"
+                            class="data-row" t-att-class="state.rowClasses[ii]">
+                            <!-- 使用封装方法获取内层对象 -->
+                            <t t-set="innerRecord" t-value="getInnerRecord(record)" />
+                            <td t-foreach="state.headers" t-as="field" t-key="field">
+                                <span><t t-esc="innerRecord[field]" /></span>
+                            </td>
+                            <t t-set="ii" t-value="(ii + 1) % 5"/>
+                        </tr>
+                    </tbody>
+                </table>
+            </t>
+
+            <!-- 空数据提示 -->
+            <t t-else="">
+                <div class="empty-data-message"><t t-esc="props.no_data_label"/></div>
+            </t>
+        </div>
+    </t>
+</templates>

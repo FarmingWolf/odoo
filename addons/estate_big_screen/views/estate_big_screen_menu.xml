@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem name="Big Screen" id="estate_big_screen.menu_root" groups="estate_big_screen.estate_group_big_screen"
+                  action="estate_big_screen.estateBigScreen" />
+    </data>
+</odoo>

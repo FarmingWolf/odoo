@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="estate_big_screen.LineChart">  <!-- 模板名与JS中一致 -->
+        <div t-att-class="'h-100 ' + props.class" t-ref="root">
+            <div class="h-100 position-relative o_line_chart" t-att-class="props.className" t-ref="container">
+                <t t-if="!props.data || !props.data.values">
+                    <div class="text-white text-center">加载中...</div>
+                </t>
+                <t t-else="">
+                    <canvas t-ref="canvas" />
+                </t>
+            </div>
+        </div>
+    </t>
+</templates>

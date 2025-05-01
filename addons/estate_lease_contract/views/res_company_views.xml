@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='currency_id']" position="after">
                 <field name="one_year_days"/>
+                <field name="company_nm_4_big_screen"/>
             </xpath>
         </field>
     </record>

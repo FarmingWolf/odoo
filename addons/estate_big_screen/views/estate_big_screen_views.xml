@@ -1,0 +1,9 @@
+<odoo>
+    <data>
+        <record model="ir.actions.client" id="estateBigScreen">
+            <field name="name">EstateBigScreen</field>
+            <field name="tag">estate_big_screen.estateBigScreen</field>
+        </record>
+
+    </data>
+ </odoo>
