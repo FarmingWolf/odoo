@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import {Component, onMounted, onWillUnmount, useEffect, useState, reactive } from "@odoo/owl";
+import {Component, onMounted, onWillUnmount, useEffect, useState, reactive, onWillStart} from "@odoo/owl";
 import {useService} from "@web/core/utils/hooks";
 import {registry} from "@web/core/registry";
 import {Layout} from "@web/search/layout";
@@ -51,6 +51,13 @@ class EstateBigScreen extends Component {
 
         // 公司名称
         this.companyNM4BigScreen = useState(useService("estate_big_screen.companyName4BigScreenSvc"));
+
+        this.userService = useService("user");
+        this.showPropertyDashboard = false;
+
+        onWillStart(async () => {
+            this.showPropertyDashboard = await this.userService.hasGroup("estate_big_screen.estate_group_big_screen");
+        });
     }
 
     // 租金单价

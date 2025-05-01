@@ -31,391 +31,397 @@
                                 </span>
                             </div>
                         </div>
+                        <t t-if="showPropertyDashboard">
+                            <div class="big-item chartTitleDiv" style="z-index: 1011;">
+                                <div class="item-content chartTitle">
+                                    <span width="508" height="24">
+                                        资产出租率
+                                    </span>
+                                </div>
+                            </div>
 
-                        <div class="big-item chartTitleDiv" style="z-index: 1011;">
-                            <div class="item-content chartTitle">
-                                <span width="508" height="24">
-                                    资产出租率
-                                </span>
+                            <div class="big-item chartBackgroundImgDivContainer" style="top: 107px !important; left: 33px !important; width: 569px !important; height: 44px !important; z-index: 104 !important;">
+                                <div class="item-content chartBackgroundImgDiv">
+                                    <img src="/estate_big_screen/static/img/chart_title_background.png" width="569" height="44"/>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="big-item chartBackgroundImgDivContainer" style="top: 107px !important; left: 33px !important; width: 569px !important; height: 44px !important; z-index: 104 !important;">
-                            <div class="item-content chartBackgroundImgDiv">
-                                <img src="/estate_big_screen/static/img/chart_title_background.png" width="569" height="44"/>
+                            <div class="big-item pieChartBackgroundDivContainer big-e-chart-item">
+                                <div class="item-content chartBackgroundImgDiv">
+    <!--                                <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>-->
+    <!--                                <PieChartCard title="'出租空置面积(㎡)对比'" title2="'空置率　=　' + (1 - statistics.ratio_conventional_area) * 100 + '%'" values="statistics.pie_chart_ratio_conventional_area_quantity"/>-->
+                                    <DoughnutChart title="'出租空置面积(㎡)对比'" title2="'空置率　=　' + Math.round((1 - statistics.ratio_conventional_area) * 100) + '%'" data="doughnutChtRatioConvAreaQ" cutout="'70%'"
+                                                   centerText="'在租 ' + statistics.conventional_area_on_rent.toLocaleString()"
+                                                   centerText2="'空置 ' + (statistics.conventional_area - statistics.conventional_area_on_rent).toLocaleString()"
+                                                   centerText3="'总计 ' + statistics.conventional_area.toLocaleString()"/>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="big-item pieChartBackgroundDivContainer big-e-chart-item">
-                            <div class="item-content chartBackgroundImgDiv">
-<!--                                <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>-->
-<!--                                <PieChartCard title="'出租空置面积(㎡)对比'" title2="'空置率　=　' + (1 - statistics.ratio_conventional_area) * 100 + '%'" values="statistics.pie_chart_ratio_conventional_area_quantity"/>-->
-                                <DoughnutChart title="'出租空置面积(㎡)对比'" title2="'空置率　=　' + Math.round((1 - statistics.ratio_conventional_area) * 100) + '%'" data="doughnutChtRatioConvAreaQ" cutout="'70%'"
-                                               centerText="'在租 ' + statistics.conventional_area_on_rent.toLocaleString()"
-                                               centerText2="'空置 ' + (statistics.conventional_area - statistics.conventional_area_on_rent).toLocaleString()"
-                                               centerText3="'总计 ' + statistics.conventional_area.toLocaleString()"/>
+                            <div class="big-item pieChartBackgroundDivContainer big-e-chart-item" style="left: 300px !important;">
+                                <div class="item-content chartBackgroundImgDiv">
+    <!--                                <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>-->
+    <!--                                <PieChartCard title="'出租空置房屋间数对比'" title2="'空置率　=　' + (1 - statistics.ratio_conventional_cnt) * 100 + '%'" values="statistics.pie_chart_ratio_conventional_quantity"/>-->
+                                    <DoughnutChart title="'出租空置房屋间数对比'" title2="'空置率　=　' + Math.round((1 - statistics.ratio_conventional_cnt) * 100) + '%'" data="doughnutChtRatioConvQ" cutout="'70%'"
+                                                   centerText="'在租 ' + statistics.conventional_cnt_on_rent.toLocaleString()"
+                                                   centerText2="'空置 ' + (statistics.conventional_cnt - statistics.conventional_cnt_on_rent).toLocaleString()"
+                                                   centerText3="'总计 ' + statistics.conventional_cnt.toLocaleString()"/>
+                                </div>
                             </div>
-                        </div>
+                            <div class="big-item big-e-chart-item" style="top: 430px; left: 50px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
+                                <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <t t-if="lineChartDataRatioRentAreaConventional">
+                                        <LineChart data="lineChartDataRatioRentAreaConventional"/>
+                                    </t>
+                                </div>
+                            </div>
 
-                        <div class="big-item pieChartBackgroundDivContainer big-e-chart-item" style="left: 300px !important;">
-                            <div class="item-content chartBackgroundImgDiv">
-<!--                                <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>-->
-<!--                                <PieChartCard title="'出租空置房屋间数对比'" title2="'空置率　=　' + (1 - statistics.ratio_conventional_cnt) * 100 + '%'" values="statistics.pie_chart_ratio_conventional_quantity"/>-->
-                                <DoughnutChart title="'出租空置房屋间数对比'" title2="'空置率　=　' + Math.round((1 - statistics.ratio_conventional_cnt) * 100) + '%'" data="doughnutChtRatioConvQ" cutout="'70%'"
-                                               centerText="'在租 ' + statistics.conventional_cnt_on_rent.toLocaleString()"
-                                               centerText2="'空置 ' + (statistics.conventional_cnt - statistics.conventional_cnt_on_rent).toLocaleString()"
-                                               centerText3="'总计 ' + statistics.conventional_cnt.toLocaleString()"/>
-                            </div>
-                        </div>
-                        <div class="big-item big-e-chart-item" style="top: 430px; left: 50px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
-                            <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <t t-if="lineChartDataRatioRentAreaConventional">
-                                    <LineChart data="lineChartDataRatioRentAreaConventional"/>
-                                </t>
-                            </div>
-                        </div>
+    <!--                        <div class="big-item chartBackgroundImgDivContainer" style="top: 430px !important; left: 90px !important;" >-->
+    <!--                            <div class="item-content chartBackgroundImgDiv">-->
+    <!--                                <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>-->
+    <!--&lt;!&ndash;                                <div class="d-flex justify-content-center only-text-title">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    <span>面积(㎡)</span>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                </div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                <t t-if="statistics.conventional_area">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                        <div><span>计租总面积：</span></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="statistics.conventional_area.toLocaleString()"/></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                </t>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                <t t-if="statistics.conventional_area_on_rent">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                        <div><span>在租总面积：</span></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="statistics.conventional_area_on_rent.toLocaleString()"/></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                </t>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                <t t-if="statistics.conventional_area and statistics.conventional_area_on_rent">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                        <div><span>空置总面积：</span></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="(statistics.conventional_area - statistics.conventional_area_on_rent).toLocaleString()"/></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                </t>&ndash;&gt;-->
+    <!--                            </div>-->
+    <!--                        </div>-->
 
-<!--                        <div class="big-item chartBackgroundImgDivContainer" style="top: 430px !important; left: 90px !important;" >-->
-<!--                            <div class="item-content chartBackgroundImgDiv">-->
-<!--                                <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>-->
-<!--&lt;!&ndash;                                <div class="d-flex justify-content-center only-text-title">&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <span>面积(㎡)</span>&ndash;&gt;-->
-<!--&lt;!&ndash;                                </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <t t-if="statistics.conventional_area">&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <div><span>计租总面积：</span></div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="statistics.conventional_area.toLocaleString()"/></div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                </t>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <t t-if="statistics.conventional_area_on_rent">&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <div><span>在租总面积：</span></div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="statistics.conventional_area_on_rent.toLocaleString()"/></div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                </t>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <t t-if="statistics.conventional_area and statistics.conventional_area_on_rent">&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <div><span>空置总面积：</span></div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="(statistics.conventional_area - statistics.conventional_area_on_rent).toLocaleString()"/></div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                </t>&ndash;&gt;-->
-<!--                            </div>-->
-<!--                        </div>-->
+    <!--                        <div class="big-item chartBackgroundImgDivContainer" style="top: 430px !important; left: 340px !important;" >-->
+    <!--                            <div class="item-content chartBackgroundImgDiv">-->
+    <!--                                <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>-->
+    <!--&lt;!&ndash;                                <div class="d-flex justify-content-center only-text-title">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    <span>间数(套)</span>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                </div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                <t t-if="statistics.conventional_cnt">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                        <div><span>房屋总间数：</span></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="statistics.conventional_cnt.toLocaleString()"/></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                </t>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                <t t-if="statistics.conventional_cnt_on_rent">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                        <div><span>在租总间数：</span></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="statistics.conventional_cnt_on_rent.toLocaleString()"/></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                </t>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                <t t-if="statistics.conventional_cnt and statistics.conventional_cnt_on_rent">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
+    <!--&lt;!&ndash;                                        <div><span>空置总间数：</span></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="(statistics.conventional_cnt - statistics.conventional_cnt_on_rent).toLocaleString()"/></div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
+    <!--&lt;!&ndash;                                </t>&ndash;&gt;-->
+    <!--                            </div>-->
+    <!--                        </div>-->
 
-<!--                        <div class="big-item chartBackgroundImgDivContainer" style="top: 430px !important; left: 340px !important;" >-->
-<!--                            <div class="item-content chartBackgroundImgDiv">-->
-<!--                                <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>-->
-<!--&lt;!&ndash;                                <div class="d-flex justify-content-center only-text-title">&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <span>间数(套)</span>&ndash;&gt;-->
-<!--&lt;!&ndash;                                </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <t t-if="statistics.conventional_cnt">&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <div><span>房屋总间数：</span></div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="statistics.conventional_cnt.toLocaleString()"/></div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                </t>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <t t-if="statistics.conventional_cnt_on_rent">&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <div><span>在租总间数：</span></div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="statistics.conventional_cnt_on_rent.toLocaleString()"/></div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                </t>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <t t-if="statistics.conventional_cnt and statistics.conventional_cnt_on_rent">&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <div><span>空置总间数：</span></div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="(statistics.conventional_cnt - statistics.conventional_cnt_on_rent).toLocaleString()"/></div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                </t>&ndash;&gt;-->
-<!--                            </div>-->
-<!--                        </div>-->
+                            <div class="big-item chartTitleDiv" style="z-index: 1011; top: 697px !important;">
+                                <div class="item-content chartTitle">
+                                    <span width="508" height="24">
+                                        在租平均单价：<t t-esc="statistics.conventional_price_avg"/>（元/天/㎡）
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="big-item chartBackgroundImgDivContainer" style="top: 697px !important; left: 33px !important; width: 569px !important; height: 44px !important;">
+                                <div class="item-content chartBackgroundImgDiv">
+                                    <img src="/estate_big_screen/static/img/chart_title_background.png" width="569" height="44"/>
+                                </div>
+                            </div>
 
-                        <div class="big-item chartTitleDiv" style="z-index: 1011; top: 697px !important;">
-                            <div class="item-content chartTitle">
-                                <span width="508" height="24">
-                                    在租平均单价：<t t-esc="statistics.conventional_price_avg"/>（元/天/㎡）
-                                </span>
+                            <div class="big-item big-e-chart-item" style="top: 790px; left: 50px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
+                                <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <t t-if="lineChartDataPriceAVG">
+                                        <LineChart data="lineChartDataPriceAVG"/>
+                                    </t>
+                                </div>
                             </div>
-                        </div>
-                        <div class="big-item chartBackgroundImgDivContainer" style="top: 697px !important; left: 33px !important; width: 569px !important; height: 44px !important;">
-                            <div class="item-content chartBackgroundImgDiv">
-                                <img src="/estate_big_screen/static/img/chart_title_background.png" width="569" height="44"/>
+                            <div class="big-item chartTitleDiv" style="z-index: 1011; top: 735px !important; left: 700px !important;">
+                                <div class="item-content chartTitle d-flex flex-row">
+                                    <span width="508" height="24">空置资产清单</span><SharedInfoComponent/>
+                                </div>
                             </div>
-                        </div>
+                            <div class="big-item big-e-chart-item" style="top: 780px; left: 690px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
+                                <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <t t-if="outOfRentProperties">
+                                        <ScrollingDataGrid data="outOfRentProperties" interval="5000" fadeDuration="500" visibleRows="5" rowHeight="40" no_data_label="`当前所有资产都在出租中！`"/>
+                                    </t>
+                                </div>
+                            </div>
 
-                        <div class="big-item big-e-chart-item" style="top: 790px; left: 50px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
-                            <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <t t-if="lineChartDataPriceAVG">
-                                    <LineChart data="lineChartDataPriceAVG"/>
-                                </t>
+                            <div class="big-item chartTitleDiv" style="z-index: 1019; left: 1358px !important;">
+                                <div class="item-content chartTitle">
+                                    <span width="508" height="24">
+                                        租金应收与实收（万元）
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="big-item chartTitleDiv" style="z-index: 1011; top: 735px !important; left: 700px !important;">
-                            <div class="item-content chartTitle d-flex flex-row">
-                                <span width="508" height="24">空置资产清单</span><SharedInfoComponent/>
-                            </div>
-                        </div>
-                        <div class="big-item big-e-chart-item" style="top: 780px; left: 690px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
-                            <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <t t-if="outOfRentProperties">
-                                    <ScrollingDataGrid data="outOfRentProperties" interval="5000" fadeDuration="500" visibleRows="5" rowHeight="40" no_data_label="`当前所有资产都在出租中！`"/>
-                                </t>
-                            </div>
-                        </div>
 
-                        <div class="big-item chartTitleDiv" style="z-index: 1019; left: 1358px !important;">
-                            <div class="item-content chartTitle">
-                                <span width="508" height="24">
-                                    租金应收与实收（万元）
-                                </span>
+                            <div class="big-item chartTitleDiv" style="z-index: 1019; left: 1540px !important; top: 150px !important; opacity: 0.8">
+                                <div class="item-content chartTitle">
+                                    <span width="508" height="26">
+                                        应收（万元）
+                                    </span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="big-item chartTitleDiv" style="z-index: 1019; left: 1540px !important; top: 150px !important; opacity: 0.8">
-                            <div class="item-content chartTitle">
-                                <span width="508" height="26">
-                                    应收（万元）
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="left: 1344px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto; opacity: 0.8">
-                            <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <img src="/estate_big_screen/static/img/calendar-week.svg?version=1.0.6" alt="本周" class="calender-img"/>
-                                    <div class="justify-content-between align-items-center" style="font-size: 1.5em">
-                                        <div><span>本周应收</span></div>
-                                        <div class="float-end">
-                                            <t t-if="statistics.rental_receivable_week">
-                                                <t t-esc="(Math.round(statistics.rental_receivable_week / 100) / 100).toLocaleString()"/>
-                                            </t>
-                                            <t t-else=""><span>0</span>
-                                            </t>
+                            <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="left: 1344px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto; opacity: 0.8">
+                                <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <img src="/estate_big_screen/static/img/calendar-week.svg?version=1.0.6" alt="本周" class="calender-img"/>
+                                        <div class="justify-content-between align-items-center" style="font-size: 1.5em">
+                                            <div><span>本周应收</span></div>
+                                            <div class="float-end">
+                                                <t t-if="statistics.rental_receivable_week">
+                                                    <t t-esc="(Math.round(statistics.rental_receivable_week / 100) / 100).toLocaleString()"/>
+                                                </t>
+                                                <t t-else=""><span>0</span>
+                                                </t>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="left: 1634px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto; opacity: 0.8">
-                            <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <img src="/estate_big_screen/static/img/calendar-quarter.svg?version=1.0.6" alt="本季" class="calender-img"/>
-                                    <div class="justify-content-between align-items-center" style="font-size: 1.5em">
-                                        <div><span>本季应收</span></div>
-                                        <div class="float-end">
-                                            <t t-if="statistics.rental_receivable_quarter">
-                                                <t t-esc="(Math.round(statistics.rental_receivable_quarter / 100) / 100).toLocaleString()"/>
-                                            </t>
-                                            <t t-else=""><span>0</span>
-                                            </t>
+                            <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="left: 1634px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto; opacity: 0.8">
+                                <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <img src="/estate_big_screen/static/img/calendar-quarter.svg?version=1.0.6" alt="本季" class="calender-img"/>
+                                        <div class="justify-content-between align-items-center" style="font-size: 1.5em">
+                                            <div><span>本季应收</span></div>
+                                            <div class="float-end">
+                                                <t t-if="statistics.rental_receivable_quarter">
+                                                    <t t-esc="(Math.round(statistics.rental_receivable_quarter / 100) / 100).toLocaleString()"/>
+                                                </t>
+                                                <t t-else=""><span>0</span>
+                                                </t>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="top: 235px !important;left: 1344px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto; opacity: 0.8">
-                            <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <img src="/estate_big_screen/static/img/calendar-month.svg?version=1.0.6" alt="本月" class="calender-img"/>
-                                    <div class="justify-content-between align-items-center" style="font-size: 1.5em">
-                                        <div><span>本月应收</span></div>
-                                        <div class="float-end">
-                                            <t t-if="statistics.rental_receivable_month">
-                                                <t t-esc="(Math.round(statistics.rental_receivable_month / 100) / 100).toLocaleString()"/>
-                                            </t>
-                                            <t t-else=""><span>0</span>
-                                            </t>
+                            <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="top: 235px !important;left: 1344px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto; opacity: 0.8">
+                                <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <img src="/estate_big_screen/static/img/calendar-month.svg?version=1.0.6" alt="本月" class="calender-img"/>
+                                        <div class="justify-content-between align-items-center" style="font-size: 1.5em">
+                                            <div><span>本月应收</span></div>
+                                            <div class="float-end">
+                                                <t t-if="statistics.rental_receivable_month">
+                                                    <t t-esc="(Math.round(statistics.rental_receivable_month / 100) / 100).toLocaleString()"/>
+                                                </t>
+                                                <t t-else=""><span>0</span>
+                                                </t>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="top: 235px !important;left: 1634px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto; opacity: 0.8">
-                            <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <img src="/estate_big_screen/static/img/calendar-year.svg?version=1.0.6" alt="本年" class="calender-img"/>
-                                    <div class="justify-content-between align-items-center" style="font-size: 1.5em">
-                                        <div><span>本年应收</span></div>
-                                        <div class="float-end">
-                                            <t t-if="statistics.rental_receivable_year">
-                                                <t t-esc="(Math.round(statistics.rental_receivable_year / 100) / 100).toLocaleString()"/>
-                                            </t>
-                                            <t t-else=""><span>0</span>
-                                            </t>
+                            <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="top: 235px !important;left: 1634px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto; opacity: 0.8">
+                                <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <img src="/estate_big_screen/static/img/calendar-year.svg?version=1.0.6" alt="本年" class="calender-img"/>
+                                        <div class="justify-content-between align-items-center" style="font-size: 1.5em">
+                                            <div><span>本年应收</span></div>
+                                            <div class="float-end">
+                                                <t t-if="statistics.rental_receivable_year">
+                                                    <t t-esc="(Math.round(statistics.rental_receivable_year / 100) / 100).toLocaleString()"/>
+                                                </t>
+                                                <t t-else=""><span>0</span>
+                                                </t>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="big-item big-e-chart-item" style="top: 330px; left: 1350px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
-                            <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <t t-if="lineChartDataRentalReceivableMonth">
-                                    <LineChart data="lineChartDataRentalReceivableMonth"/>
-                                </t>
+                            <div class="big-item big-e-chart-item" style="top: 330px; left: 1350px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
+                                <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <t t-if="lineChartDataRentalReceivableMonth">
+                                        <LineChart data="lineChartDataRentalReceivableMonth"/>
+                                    </t>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="big-item chartTitleDiv" style="z-index: 1019; left: 1540px !important; top: 600px !important;">
-                            <div class="item-content chartTitle">
-                                <span width="508" height="26">
-                                    实收（万元）
-                                </span>
+                            <div class="big-item chartTitleDiv" style="z-index: 1019; left: 1540px !important; top: 600px !important;">
+                                <div class="item-content chartTitle">
+                                    <span width="508" height="26">
+                                        实收（万元）
+                                    </span>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="left: 1344px !important; top: 620px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto;">
-                            <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <img src="/estate_big_screen/static/img/calendar-week-grey.svg?version=1.0.6" alt="本周" class="calender-img"/>
-                                    <div class="justify-content-between align-items-center" style="font-size: 1.5em">
-                                        <div><span>本周实收</span></div>
-                                        <div class="float-end">
-                                            <t t-if="statistics.rental_received_week">
-                                                <t t-esc="(Math.round(statistics.rental_received_week / 100) / 100).toLocaleString()"/>
-                                            </t>
-                                            <t t-else=""><span>0</span>
-                                            </t>
+                            <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="left: 1344px !important; top: 620px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto;">
+                                <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <img src="/estate_big_screen/static/img/calendar-week-grey.svg?version=1.0.6" alt="本周" class="calender-img"/>
+                                        <div class="justify-content-between align-items-center" style="font-size: 1.5em">
+                                            <div><span>本周实收</span></div>
+                                            <div class="float-end">
+                                                <t t-if="statistics.rental_received_week">
+                                                    <t t-esc="(Math.round(statistics.rental_received_week / 100) / 100).toLocaleString()"/>
+                                                </t>
+                                                <t t-else=""><span>0</span>
+                                                </t>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="left: 1634px !important; top: 620px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto;">
-                            <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <img src="/estate_big_screen/static/img/calendar-quarter-grey.svg?version=1.0.6" alt="本季" class="calender-img"/>
-                                    <div class="justify-content-between align-items-center" style="font-size: 1.5em">
-                                        <div><span>本季实收</span></div>
-                                        <div class="float-end">
-                                            <t t-if="statistics.rental_received_quarter">
-                                                <t t-esc="(Math.round(statistics.rental_received_quarter / 100) / 100).toLocaleString()"/>
-                                            </t>
-                                            <t t-else=""><span>0</span>
-                                            </t>
+                            <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="left: 1634px !important; top: 620px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto;">
+                                <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <img src="/estate_big_screen/static/img/calendar-quarter-grey.svg?version=1.0.6" alt="本季" class="calender-img"/>
+                                        <div class="justify-content-between align-items-center" style="font-size: 1.5em">
+                                            <div><span>本季实收</span></div>
+                                            <div class="float-end">
+                                                <t t-if="statistics.rental_received_quarter">
+                                                    <t t-esc="(Math.round(statistics.rental_received_quarter / 100) / 100).toLocaleString()"/>
+                                                </t>
+                                                <t t-else=""><span>0</span>
+                                                </t>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="top: 690px !important;left: 1344px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto;">
-                            <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <img src="/estate_big_screen/static/img/calendar-month-grey.svg?version=1.0.6" alt="本月" class="calender-img"/>
-                                    <div class="justify-content-between align-items-center" style="font-size: 1.5em">
-                                        <div><span>本月实收</span></div>
-                                        <div class="float-end">
-                                            <t t-if="statistics.rental_received_month">
-                                                <t t-esc="(Math.round(statistics.rental_received_month / 100) / 100).toLocaleString()"/>
-                                            </t>
-                                            <t t-else=""><span>0</span>
-                                            </t>
+                            <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="top: 690px !important;left: 1344px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto;">
+                                <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <img src="/estate_big_screen/static/img/calendar-month-grey.svg?version=1.0.6" alt="本月" class="calender-img"/>
+                                        <div class="justify-content-between align-items-center" style="font-size: 1.5em">
+                                            <div><span>本月实收</span></div>
+                                            <div class="float-end">
+                                                <t t-if="statistics.rental_received_month">
+                                                    <t t-esc="(Math.round(statistics.rental_received_month / 100) / 100).toLocaleString()"/>
+                                                </t>
+                                                <t t-else=""><span>0</span>
+                                                </t>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="top: 690px !important;left: 1634px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto;">
-                            <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <img src="/estate_big_screen/static/img/calendar-year-grey.svg?version=1.0.6" alt="本年" class="calender-img"/>
-                                    <div class="justify-content-between align-items-center" style="font-size: 1.5em">
-                                        <div><span>本年实收</span></div>
-                                        <div class="float-end">
-                                            <t t-if="statistics.rental_received_year">
-                                                <t t-esc="(Math.round(statistics.rental_received_year / 100) / 100).toLocaleString()"/>
-                                            </t>
-                                            <t t-else=""><span>0</span>
-                                            </t>
+                            <div class="big-item chartBackgroundImgDivContainer big-e-chart-item" style="top: 690px !important;left: 1634px !important; width: 180px; height: 70px; transform: translate(0px, 0px); z-index: 1039;pointer-events: auto;">
+                                <div class="item-content " style="opacity:1;height:190pxpx;--animation:2s;--animation-flash:0.2s;filter:saturate(1) contrast(1.15) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <img src="/estate_big_screen/static/img/calendar-year-grey.svg?version=1.0.6" alt="本年" class="calender-img"/>
+                                        <div class="justify-content-between align-items-center" style="font-size: 1.5em">
+                                            <div><span>本年实收</span></div>
+                                            <div class="float-end">
+                                                <t t-if="statistics.rental_received_year">
+                                                    <t t-esc="(Math.round(statistics.rental_received_year / 100) / 100).toLocaleString()"/>
+                                                </t>
+                                                <t t-else=""><span>0</span>
+                                                </t>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="big-item chartBackgroundImgDivContainer" style="top: 107px !important; left: 1318px !important; width: 569px !important; height: 44px !important;">
-                            <div class="item-content chartBackgroundImgDiv">
-                                <img src="/estate_big_screen/static/img/chart_title_background.png" width="569" height="44"/>
+                            <div class="big-item chartBackgroundImgDivContainer" style="top: 107px !important; left: 1318px !important; width: 569px !important; height: 44px !important;">
+                                <div class="item-content chartBackgroundImgDiv">
+                                    <img src="/estate_big_screen/static/img/chart_title_background.png" width="569" height="44"/>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="big-item big-e-chart-item" style="top: 790px; left: 1350px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
-                            <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <t t-if="lineChartDataRentalReceivedMonth">
-                                    <LineChart data="lineChartDataRentalReceivedMonth"/>
-                                </t>
+                            <div class="big-item big-e-chart-item" style="top: 790px; left: 1350px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
+                                <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <t t-if="lineChartDataRentalReceivedMonth">
+                                        <LineChart data="lineChartDataRentalReceivedMonth"/>
+                                    </t>
+                                </div>
                             </div>
-                        </div>
-                        <div class="big-item " style="top: 194px; left: 601px; width: 736px; height: 540px; transform: translate(0px, 0px); z-index: 1021;pointer-events: auto; mix-blend-mode:screen;--objectfit:cover">
-                            <div style="opacity:0.6;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;filter:saturate(0.57) contrast(1) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <video class="art-video" preload="metadata" crossorigin="anonymous" src="/estate_big_screen/static/img/wormhole_mv03.mov" autoplay="autoplay" loop="loop" muted="true" width="736" height="540"/>
+                            <div class="big-item " style="top: 194px; left: 601px; width: 736px; height: 540px; transform: translate(0px, 0px); z-index: 1021;pointer-events: auto; mix-blend-mode:screen;--objectfit:cover">
+                                <div style="opacity:0.6;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;filter:saturate(0.57) contrast(1) hue-rotate(1deg) brightness(1) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <video class="art-video" preload="metadata" crossorigin="anonymous" src="/estate_big_screen/static/img/wormhole_mv03.mov" autoplay="autoplay" loop="loop" muted="true" width="736" height="540"/>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="big-item main-number-div-container" >
-                            <div _tmplitem="51" class="item-content main-number-div">
-                                <img src="/estate_big_screen/static/img/main-number-background.png" width="234" height="197"/>
+                            <div class="big-item main-number-div-container" >
+                                <div _tmplitem="51" class="item-content main-number-div">
+                                    <img src="/estate_big_screen/static/img/main-number-background.png" width="234" height="197"/>
+                                </div>
                             </div>
-                        </div>
-                        <div class="big-item chartBackgroundImgDivContainer" style="top: 120px !important; left: 670px !important; font-size: 1.1em !important; font-weight: bold;" >
-                            <div class="item-content chartBackgroundImgDiv">
-                                <t t-if="statistics.conventional_area">
-                                    <div class="d-flex flex-column align-items-center only-text">
-                                        <div style="font-size: 1.3em !important; font-weight: bold;"><t t-esc="statistics.conventional_area.toLocaleString()"/></div>
-                                        <div><span>资产总面积(㎡)</span></div>
-                                    </div>
-                                </t>
+                            <div class="big-item chartBackgroundImgDivContainer" style="top: 120px !important; left: 670px !important; font-size: 1.1em !important; font-weight: bold;" >
+                                <div class="item-content chartBackgroundImgDiv">
+                                    <t t-if="statistics.conventional_area">
+                                        <div class="d-flex flex-column align-items-center only-text">
+                                            <div style="font-size: 1.3em !important; font-weight: bold;"><t t-esc="statistics.conventional_area.toLocaleString()"/></div>
+                                            <div><span>资产总面积(㎡)</span></div>
+                                        </div>
+                                    </t>
+                                </div>
                             </div>
-                        </div>
-                        <div class="big-item main-number-div-container" style="left: 854px; !important;">
-                            <div _tmplitem="51" class="item-content main-number-div">
-                                <img src="/estate_big_screen/static/img/main-number-background.png" width="234" height="197"/>
+                            <div class="big-item main-number-div-container" style="left: 854px; !important;">
+                                <div _tmplitem="51" class="item-content main-number-div">
+                                    <img src="/estate_big_screen/static/img/main-number-background.png" width="234" height="197"/>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="big-item chartBackgroundImgDivContainer" style="top: 120px !important; left: 890px !important; font-size: 1.1em !important; font-weight: bold;" >
-                            <div class="item-content chartBackgroundImgDiv">
-                                <t t-if="statistics.conventional_cnt">
-                                    <div class="d-flex flex-column align-items-center only-text">
-                                        <div style="font-size: 1.3em !important; font-weight: bold;"><t t-esc="statistics.conventional_cnt.toLocaleString()"/></div>
-                                        <div><span>房屋间数</span></div>
-                                    </div>
-                                </t>
+                            <div class="big-item chartBackgroundImgDivContainer" style="top: 120px !important; left: 890px !important; font-size: 1.1em !important; font-weight: bold;" >
+                                <div class="item-content chartBackgroundImgDiv">
+                                    <t t-if="statistics.conventional_cnt">
+                                        <div class="d-flex flex-column align-items-center only-text">
+                                            <div style="font-size: 1.3em !important; font-weight: bold;"><t t-esc="statistics.conventional_cnt.toLocaleString()"/></div>
+                                            <div><span>房屋间数</span></div>
+                                        </div>
+                                    </t>
+                                </div>
                             </div>
-                        </div>
-                        <div class="big-item main-number-div-container" style="left: 1066px; !important;">
-                            <div _tmplitem="51" class="item-content main-number-div">
-                                <img src="/estate_big_screen/static/img/main-number-background.png" width="234" height="197"/>
+                            <div class="big-item main-number-div-container" style="left: 1066px; !important;">
+                                <div _tmplitem="51" class="item-content main-number-div">
+                                    <img src="/estate_big_screen/static/img/main-number-background.png" width="234" height="197"/>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="big-item chartBackgroundImgDivContainer" style="top: 120px !important; left: 1102px !important; font-size: 1.1em !important; font-weight: bold;" >
-                            <div class="item-content chartBackgroundImgDiv">
-                                <t t-if="statistics.conventional_price_avg">
-                                    <div class="d-flex flex-column align-items-center only-text">
-                                        <div style="font-size: 1.3em !important; font-weight: bold;"><t t-esc="statistics.conventional_price_avg.toLocaleString()"/></div>
-                                        <div><span>平均单价(元/天/㎡)</span></div>
-                                    </div>
-                                </t>
+                            <div class="big-item chartBackgroundImgDivContainer" style="top: 120px !important; left: 1102px !important; font-size: 1.1em !important; font-weight: bold;" >
+                                <div class="item-content chartBackgroundImgDiv">
+                                    <t t-if="statistics.conventional_price_avg">
+                                        <div class="d-flex flex-column align-items-center only-text">
+                                            <div style="font-size: 1.3em !important; font-weight: bold;"><t t-esc="statistics.conventional_price_avg.toLocaleString()"/></div>
+                                            <div><span>平均单价(元/天/㎡)</span></div>
+                                        </div>
+                                    </t>
+                                </div>
                             </div>
-                        </div>
-                        <div class="big-item " style="top: 709px; left: 659px; width: 637px; height: 336px; transform: translate(0px, 0px); z-index: 1010;pointer-events: auto;">
-                            <div _tmplitem="51" class="item-content chartBackgroundImgDiv">
-                                <img src="/estate_big_screen/static/img/chart_title_background0.png" width="637" height="336"/>
+                            <div class="big-item " style="top: 709px; left: 659px; width: 637px; height: 336px; transform: translate(0px, 0px); z-index: 1010;pointer-events: auto;">
+                                <div _tmplitem="51" class="item-content chartBackgroundImgDiv">
+                                    <img src="/estate_big_screen/static/img/chart_title_background0.png" width="637" height="336"/>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="big-item" style="top: 182px; left: 656px; width: 642px; height: 515px; transform: translate(0px, 0px); z-index: 1020;pointer-events: auto;">
-                            <div class="item-content headerImg">
-                                <img src="/estate_big_screen/static/img/big_screen_center.png" width="642" height="515"/>
+                            <div class="big-item" style="top: 182px; left: 656px; width: 642px; height: 515px; transform: translate(0px, 0px); z-index: 1020;pointer-events: auto;">
+                                <div class="item-content headerImg">
+                                    <img src="/estate_big_screen/static/img/big_screen_center.png" width="642" height="515"/>
+                                </div>
                             </div>
-                        </div>
-                        <div class="big-item " style="top: -4px; left: -14px; width: 1941px; height: 1086px; transform: translate(0px, 0px); z-index: 101;pointer-events: auto;">
-                            <div class="item-content" style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;filter:saturate(0.89) contrast(1.31) hue-rotate(1deg) brightness(0.7) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                <video class="art-video" preload="metadata" crossorigin="anonymous" src="/estate_big_screen/static/img/page_background.mp4" autoplay="autoplay" loop="loop" muted="true" width="1941" height="1086"/>
+                            <div class="big-item " style="top: -4px; left: -14px; width: 1941px; height: 1086px; transform: translate(0px, 0px); z-index: 101;pointer-events: auto;">
+                                <div class="item-content" style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;filter:saturate(0.89) contrast(1.31) hue-rotate(1deg) brightness(0.7) blur(0px);transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
+                                    <video class="art-video" preload="metadata" crossorigin="anonymous" src="/estate_big_screen/static/img/page_background.mp4" autoplay="autoplay" loop="loop" muted="true" width="1941" height="1086"/>
+                                </div>
                             </div>
-                        </div>
+                        </t>
+                        <t t-else="">
+                            <div>
+                                <div class="empty-data-message"><span>您没有查看大屏的权限哦~向管理员申请开通查看大屏的权限吧！记得准备一些刚出炉的面包~</span></div>
+                            </div>
+                        </t>
                     </div>
                 </div>
             </Layout>

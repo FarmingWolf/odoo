@@ -39,6 +39,10 @@ def get_12_months_end_dates_around_today():
 class EstateBigScreen(http.Controller):
     @http.route('/estate_big_screen/statistics', type='json', auth='user')
     def get_line_chart_data(self):
+        if not request.env.user.has_group('estate_big_screen.estate_group_big_screen'):
+            _logger.error(f"用户{request.env.user.id}:{request.env.user.name}没有大屏权限")
+            return {}
+
         date_lst = get_12_months_end_dates_around_today()
         # 以当前日期为基准，查询过去12个月的租金单价、面积出租率、租金实收、租金应收
         tgt_model = 'estate.lease.contract.property.daily.status'
@@ -79,6 +83,9 @@ class EstateBigScreen(http.Controller):
 
     @http.route('/estate_big_screen/get_out_of_rent_properties', type='json', auth='user')
     def get_out_of_rent_properties(self):
+        if not request.env.user.has_group('estate_big_screen.estate_group_big_screen'):
+            _logger.error(f"用户{request.env.user.id}:{request.env.user.name}没有大屏权限")
+            return []
         _logger.info("开始获取空置资产")
         tgt_model = 'estate.property'
         tgt_domain = [('active', '=', True), '|', ('state', '!=', 'sold'), ('state', '=', False)]
@@ -102,6 +109,9 @@ class EstateBigScreen(http.Controller):
 
     @http.route('/estate_big_screen/get_company_nm_4_big_screen', type='json', auth='user')
     def get_company_nm_4_big_screen(self):
+        if not request.env.user.has_group('estate_big_screen.estate_group_big_screen'):
+            _logger.error(f"用户{request.env.user.id}:{request.env.user.name}没有大屏权限")
+            return {}
 
         company_id = request.env.user.company_id.id
         company_nm = request.env.user.company_id.name
