@@ -161,9 +161,11 @@ export class ScrollingDataGrid extends Component {
             const nextIndex = this.state.currentIndex + this.props.visibleRows;
             this.state.currentIndex = nextIndex >= this.state.displayData.length ? 0 : nextIndex;
             this.updateCurrentDisplayData();
-
-            this.state.info4Show = "（" + (this.state.currentIndex + 1) +
-                "—" + (this.state.currentIndex + this.props.visibleRows) + "）/" + this.state.displayData.length;
+            let end_idx = this.state.currentIndex + this.props.visibleRows
+            if (end_idx > this.state.displayData.length) {
+                end_idx = this.state.displayData.length
+            }
+            this.state.info4Show = "（" + (this.state.currentIndex + 1) + "—" + end_idx + "）/ " + this.state.displayData.length;
             this.state.sharedState.out_of_rent_p_info_show = this.state.info4Show;
 
             setTimeout(() => {
