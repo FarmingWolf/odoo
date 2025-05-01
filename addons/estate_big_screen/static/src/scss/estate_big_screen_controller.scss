@@ -441,3 +441,12 @@ tbody.fade-in {
 .fade-out {
     animation: fadeOut 0.5s ease-in-out forwards;
 }
+
+.white-button {
+    color: white !important;
+}
+.white-button:hover {
+    color: #f0f0f0 !important; /* 可选：悬停时的浅色效果 */
+    font-weight: bolder;
+    font-size: larger;
+}

@@ -13,7 +13,11 @@
                             </div>
                         </div>
                         <div class="big-item headerDiv">
-                            <div class="item-content ">
+                            <div class="item-content d-flex flex-row">
+                                <button t-on-click="goBack" class="btn p-0 ms-1 border-0 white-button">
+                                    <i class="fa fa-arrow-left"/>
+                                    <span>　返回</span>
+                                </button>
                                 <ClockComponent />
                             </div>
                         </div>
@@ -418,8 +422,14 @@
                             </div>
                         </t>
                         <t t-else="">
-                            <div>
-                                <div class="empty-data-message"><span>您没有查看大屏的权限哦~向管理员申请开通查看大屏的权限吧！记得准备一些刚出炉的面包~</span></div>
+                            <div class="empty-data-message d-flex flex-column align-items-center">
+                                <div><span>您没有查看大屏的权限哦~向管理员申请开通查看大屏的权限吧！记得准备一些刚出炉的面包~</span></div>
+                                <div>
+                                    <button t-on-click="goBack" class="btn p-0 ms-1 border-0 white-button">
+                                        <i class="fa fa-arrow-left"/>
+                                        <span>　返回</span>
+                                    </button>
+                                </div>
                             </div>
                         </t>
                     </div>

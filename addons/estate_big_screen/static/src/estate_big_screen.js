@@ -127,6 +127,10 @@ class EstateBigScreen extends Component {
         };
     }
 
+    goBack() {
+        window.history.back();
+    }
+
 }
 
 registry.category("actions").add("estate_big_screen.estateBigScreen", EstateBigScreen);
