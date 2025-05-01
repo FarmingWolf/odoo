@@ -1,0 +1,220 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* estate_big_screen
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 17.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-01 13:33+0000\n"
+"PO-Revision-Date: 2025-05-01 13:33+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: estate_big_screen
+#: model:ir.ui.menu,name:estate_big_screen.menu_root
+msgid "Big Screen"
+msgstr "资产管理大屏"
+
+#. module: estate_big_screen
+#: model:ir.actions.client,name:estate_big_screen.estateBigScreen
+msgid "EstateBigScreen"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/component/doughnut_chart/doughnut_chart.xml:0
+#: code:addons/estate_big_screen/static/src/component/line_chart/line_chart.xml:0
+#: code:addons/estate_big_screen/static/src/component/pie_chart/pie_chart.xml:0
+#: code:addons/estate_big_screen/static/src/component/scrolling_datagrid/scrolling_datagrid.xml:0
+#, python-format
+msgid "加载中..."
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "在租平均单价："
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "实收（万元）"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "平均单价(元/天/㎡)"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "应收（万元）"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "房屋间数"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/component/scrolling_datagrid/scrolling_datagrid.xml:0
+#, python-format
+msgid "数据加载失败"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "本周"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "本周实收"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "本周应收"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "本季"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "本季实收"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "本季应收"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "本年"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "本年实收"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "本年应收"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "本月"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "本月实收"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "本月应收"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "歌华文化发展集团"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "租金应收与实收（万元）"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "空置资产清单"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "资产出租率"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "资产总面积(㎡)"
+msgstr ""
+
+#. module: estate_big_screen
+#: model:res.groups,name:estate_big_screen.estate_group_big_screen
+msgid "资产管理大屏"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "资产管理数据大屏"
+msgstr ""
+
+#. module: estate_big_screen
+#. odoo-javascript
+#: code:addons/estate_big_screen/static/src/estate_big_screen.xml:0
+#, python-format
+msgid "（元/天/㎡）"
+msgstr ""
