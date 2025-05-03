@@ -14,9 +14,9 @@
                         </div>
                         <div class="big-item headerDiv">
                             <div class="item-content d-flex flex-row">
-                                <button t-on-click="goBack" class="btn p-0 ms-1 border-0 white-button">
+                                <button t-on-click="goBack" class="btn p-0 ms-1 border-0 white-button" style="opacity: 0.5">
                                     <i class="fa fa-arrow-left"/>
-                                    <span>　返回</span>
+                                    <span>　返回　</span>
                                 </button>
                                 <ClockComponent />
                             </div>
