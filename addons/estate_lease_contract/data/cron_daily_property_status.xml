@@ -7,7 +7,7 @@
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field> <!-- -1 表示无限次执行 -->
         <!-- 执行时间0：08，实际上是东八区的8:08，生成当日数据（系统日期前一日） 先执行estate_lease_property_daily_cron，再执行本任务-->
-        <field name="nextcall" eval="(DateTime.now().replace(hour=16, minute=8)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="nextcall" eval="(DateTime.now().replace(hour=0, minute=8)).strftime('%Y-%m-%d %H:%M:%S')" />
         <field name="doall" eval="True"/> <!-- True表示即使服务器关闭期间错过执行也会补执行 -->
         <field name="code">model.automatic_daily_calc_status()</field>
         <field name="user_id" eval="2"/><!--admin-->
