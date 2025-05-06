@@ -16,9 +16,13 @@ from odoo.tools.float_utils import float_is_zero
 from odoo.exceptions import AccessError
 from odoo.tools import format_duration
 
+
 def get_google_maps_url(latitude, longitude):
     return "https://maps.google.com?q=%s,%s" % (latitude, longitude)
 
+
+def get_tdt_check_i_o_maps_url(base_url, latitude, longitude):
+    return f"{base_url}/hr_attendance/tdt_i_o_map_template?lat={latitude}&lon={longitude}"
 
 class HrAttendance(models.Model):
     _name = "hr.attendance"
@@ -423,7 +427,7 @@ class HrAttendance(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_url',
-            'url': get_google_maps_url(self.in_latitude, self.in_longitude),
+            'url': get_tdt_check_i_o_maps_url(self.get_base_url(), self.in_latitude, self.in_longitude),
             'target': 'new'
         }
 
@@ -431,6 +435,6 @@ class HrAttendance(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_url',
-            'url': get_google_maps_url(self.out_latitude, self.out_longitude),
+            'url': get_tdt_check_i_o_maps_url(self.get_base_url(), self.out_latitude, self.out_longitude),
             'target': 'new'
         }

@@ -156,3 +156,7 @@ class HrAttendance(http.Controller):
     def user_attendance_data(self):
         employee = request.env.user.employee_id
         return self._get_employee_info_response(employee)
+
+    @http.route('/hr_attendance/tdt_i_o_map_template', type='http', auth='public')
+    def tdt_map_template(self, **kwargs):
+        return request.render('hr_attendance.tdt_i_o_map_template')
