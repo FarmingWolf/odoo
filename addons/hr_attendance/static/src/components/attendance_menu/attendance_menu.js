@@ -53,28 +53,29 @@ export class ActivityMenu extends Component {
     }
 
     async signInOut() {
-        // iOS app lacks permissions to call `getCurrentPosition`
-        // if (!isIosApp()) {
-        //     navigator.geolocation.getCurrentPosition(
-        //         async ({coords: {latitude, longitude}}) => {
-        //             await this.rpc("/hr_attendance/systray_check_in_out", {
-        //                 latitude,
-        //                 longitude
-        //             })
-        //             await this.searchReadEmployee()
-        //         },
-        //         async err => {
-        //             await this.rpc("/hr_attendance/systray_check_in_out")
-        //             await this.searchReadEmployee()
-        //         },
-        //         {
-        //             enableHighAccuracy: true,
-        //         }
-        //     )
-        // } else {
-            await this.rpc("/hr_attendance/systray_check_in_out")
-            await this.searchReadEmployee()
-        // }
+
+        function handleSuccess(position) {
+            console.log("getCurrentPosition success");
+            const {latitude, longitude} = position.coords;
+            this.rpc("/hr_attendance/systray_check_in_out", {latitude, longitude})
+                .then(() => this.searchReadEmployee());
+        }
+
+        function handleError(error) {
+            console.log("getCurrentPosition error:", error.message);
+            this.rpc("/hr_attendance/systray_check_in_out")
+                .then(() => this.searchReadEmployee());
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                handleSuccess.bind(this),
+                handleError.bind(this),
+                {timeout: 5000, enableHighAccuracy: false}
+            );
+        } else {
+            console.error("Geolocation is not supported by this browser.");
+        }
     }
 }
 
