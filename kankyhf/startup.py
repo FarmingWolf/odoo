@@ -57,6 +57,7 @@ zip_tgt_folders = [
     'ocr_partner',
     'fund_management',
     'estate_big_screen',
+    'hr_attendance',
 ]
 
 update_addons = zip_tgt_folders.copy()
