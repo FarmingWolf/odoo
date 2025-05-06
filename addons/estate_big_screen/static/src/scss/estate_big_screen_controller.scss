@@ -444,9 +444,89 @@ tbody.fade-in {
 
 .white-button {
     color: white !important;
+    z-index: 10000;
 }
 .white-button:hover {
     color: #f0f0f0 !important; /* 可选：悬停时的浅色效果 */
     font-weight: bolder;
     font-size: larger;
+    z-index: 10000;
+}
+
+// 添加在文件最底部
+@media only screen and (max-width: 768px) {
+    // 1. 允许移动端滚动
+    .dashboard-container, .dv-full-screen-container {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 100vh;
+        overflow: auto !important;
+        touch-action: pan-y;
+        -webkit-overflow-scrolling: touch;
+        position: relative;
+        transform: none !important;
+    }
+
+    .div-full-screen {
+        width: 200% !important;  // 放大内容以便移动端可以拖动查看
+        height: auto !important;
+        min-height: 200vh;
+        transform-origin: 0 0;
+    }
+
+    // 2. 移动端透明覆盖层
+    .mobile-touch-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: transparent;
+        pointer-events: auto;
+
+        @media (min-width: 769px) {
+            display: none !important;
+        }
+    }
+
+    // 禁用视频/图片的默认行为
+    video, img {
+        pointer-events: none !important;
+    }
+
+    // 保持交互元素可点击
+    .btn, button, [t-on-click] {
+        pointer-events: auto !important;
+    }
+}
+
+// PC端保持原样
+@media only screen and (min-width: 769px) {
+    .mobile-touch-overlay {
+        display: none !important;
+        pointer-events: none !important;
+    }
+
+    // 恢复PC端的视频/图片交互
+    video, img {
+        pointer-events: auto !important;
+    }
+}
+.mobile-back-button {
+    position: fixed;
+    top: 15px;
+    left: 10px;
+    z-index: 10000; /* 比覆盖层更高 */
+    pointer-events: auto !important;
+
+    @media (min-width: 769px) {
+        display: none; /* PC端隐藏这个额外按钮 */
+    }
+}
+/* 隐藏原布局中的返回按钮（移动端） */
+@media (max-width: 768px) {
+    .headerDiv .white-button {
+        display: none;
+    }
 }

@@ -24,6 +24,34 @@ class EstateBigScreen extends Component {
             // 进入页面时隐藏导航栏
             document.querySelector('.o_main_navbar')?.classList.add('d-none');
             document.querySelector('.o_sub_menu')?.classList.add('d-none');
+            // 新增移动端触摸控制逻辑
+            if (window.innerWidth <= 768) {
+                const overlay = document.querySelector('.mobile-touch-overlay');
+                const scrollContainer = document.querySelector('.dv-full-screen-container');
+                let startX, startY;
+
+                overlay?.addEventListener('touchstart', function(e) {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                }, {passive: true});
+
+                overlay?.addEventListener('touchmove', function(e) {
+                    if (e.target.closest('.mobile-back-button')) return;
+
+                    if (!startX || !startY) return;
+
+                    const x = e.touches[0].clientX;
+                    const y = e.touches[0].clientY;
+
+                    // 同时处理水平和垂直滚动
+                    scrollContainer.scrollLeft += startX - x;
+                    scrollContainer.scrollTop += startY - y;
+
+                    startX = x;
+                    startY = y;
+                    e.preventDefault();
+                }, {passive: false});
+            }
         });
 
         onWillUnmount(() => {
@@ -34,18 +62,7 @@ class EstateBigScreen extends Component {
 
         this.statistics = useState(useService("estate_big_screen.statistics"));
         this.lineChartStatistics = useState(useService("estate_big_screen.lineChartDataService"));
-        if (!this.lineChartStatistics["average_price_lst"]) {
-            this.lineChartStatistics["average_price_lst"] = [];
-        }
-        if (!this.lineChartStatistics["rent_ratio_lst"]) {
-            this.lineChartStatistics["rent_ratio_lst"] = [];
-        }
-        if (!this.lineChartStatistics["rental_received_lst"]) {
-            this.lineChartStatistics["rental_received_lst"] = [];
-        }
-        if (!this.lineChartStatistics["rental_receivable_lst"]) {
-            this.lineChartStatistics["rental_receivable_lst"] = [];
-        }
+
         // 空置资产列表
         this.outOfRentProperties = useState(useService("estate_big_screen.outOfRentProperties"));
 

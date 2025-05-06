@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
- <templates xml:space="preserve">
+<templates xml:space="preserve">
 
-     <t t-name="estate_big_screen.EstateBigScreen">
-         <div class="dashboard-container">
+    <t t-name="estate_big_screen.EstateBigScreen">
+        <div class="dashboard-container">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
+
+            <button t-on-click="goBack" class="btn p-0 ms-1 border-0 white-button mobile-back-button" style="opacity: 0.5">
+                <i class="fa fa-arrow-left"/>
+                <span>　返回　</span>
+            </button>
+
+            <div class="mobile-touch-overlay"/>
             <Layout display="display" className="'o_big_screen_dashboard h-100'">
                 <div class="dv-full-screen-container" style="background-color: rgb(14, 37, 61);">
                     <div class="div-full-screen" style="position: absolute;width:1920px;height:1080px;background-color:rgba(14, 37, 61, 1);" >
@@ -432,10 +440,11 @@
                                 </div>
                             </div>
                         </t>
+
                     </div>
                 </div>
             </Layout>
-         </div>
-     </t>
+        </div>
+    </t>
 
- </templates>
+</templates>
