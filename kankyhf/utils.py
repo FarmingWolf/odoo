@@ -111,11 +111,13 @@ def unzip_tgt_file(in_args):
             if (in_args["customer_name_info_fn"] not in zip_ref.namelist()) or \
                     (in_args["days_limit_info_fn"] not in zip_ref.namelist()) or \
                     (in_args["tiered_pricing_info_fn"] not in zip_ref.namelist()) or \
+                    (in_args["customer_name_4_pwd_fn"] not in zip_ref.namelist()) or \
                     (in_args["tmp_fn"] not in zip_ref.namelist()):
                 msg = f"基础文件损坏，文件内容错误：找不到" \
                       f"{in_args['customer_name_info_fn']}/" \
                       f"{in_args['days_limit_info_fn']}/" \
                       f"{in_args['tiered_pricing_info_fn']}/" \
+                      f"{in_args['customer_name_4_pwd_fn']}/" \
                       f"{in_args['tmp_fn']}，" \
                       f"文件可能遭到人为破坏。"
                 return False, msg
@@ -130,6 +132,11 @@ def unzip_tgt_file(in_args):
             tiered_pricing_zip_info = zip_ref.getinfo(in_args['tiered_pricing_info_fn'])
             zip_ref.extract(tiered_pricing_zip_info, in_args['out_zip_fld'])
 
+            zip_ref.setpassword(in_args["pwd_base"].encode('utf-8'))
+            customer_name_4_pwd_zip_info = zip_ref.getinfo(in_args['customer_name_4_pwd_fn'])
+            zip_ref.extract(customer_name_4_pwd_zip_info, in_args['out_zip_fld'])
+
+            zip_ref.setpassword(in_args["zip_pwd"].encode('utf-8'))
             addons_zip = zip_ref.getinfo(in_args['tmp_fn'])
             extracted_bytes = 0
 
@@ -154,6 +161,7 @@ def unzip_tgt_file(in_args):
         set_file_attributes(in_args['out_zip_fld'] + in_args['customer_name_info_fn'])
         set_file_attributes(in_args['out_zip_fld'] + in_args['days_limit_info_fn'])
         set_file_attributes(in_args['out_zip_fld'] + in_args['tiered_pricing_info_fn'])
+        set_file_attributes(in_args['out_zip_fld'] + in_args['customer_name_4_pwd_fn'])
 
 
 def rezip_tgt_file(in_args):
@@ -174,6 +182,11 @@ def rezip_tgt_file(in_args):
                                      in_args['zip_pwd'], 'a')
         remove_temp_files(in_args['out_zip_fld'], in_args['tiered_pricing_info_fn'])
 
+        add_file_2_zip_with_password(in_args['out_zip_fld'] + in_args['customer_name_4_pwd_fn'],
+                                     in_args['customer_name_4_pwd_fn'], tmp_z_fn,
+                                     in_args['pwd_base'], 'a')
+        remove_temp_files(in_args['out_zip_fld'], in_args['customer_name_4_pwd_fn'])
+
         add_file_2_zip_with_password(in_args['in_zip_file'], in_args['tmp_fn'], tmp_z_fn, in_args['zip_pwd'], 'a',
                                      in_args['file_2_customer'])
         return True, "OK"
@@ -186,6 +199,7 @@ def rezip_tgt_file(in_args):
         remove_temp_files(in_args['out_zip_fld'], in_args['customer_name_info_fn'])
         remove_temp_files(in_args['out_zip_fld'], in_args['days_limit_info_fn'])
         remove_temp_files(in_args['out_zip_fld'], in_args['tiered_pricing_info_fn'])
+        remove_temp_files(in_args['out_zip_fld'], in_args['customer_name_4_pwd_fn'])
         remove_temp_files("", in_args['out_zip_file'])
 
 

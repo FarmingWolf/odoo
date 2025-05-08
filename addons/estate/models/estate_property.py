@@ -48,12 +48,24 @@ def _get_property_cnt_limit():
     module_path = os.path.dirname(os.path.abspath(__file__))
     _logger.info(f"module_path={module_path}")
     tgt_path = os.path.join(module_path, '..\\..\\..\\', 'estate_management.zip')
+    pwd_base = "491491491Tech+"
+    # 先获取客户名缩写
+    args = {
+        "file_2_customer": tgt_path,
+        "customer_name_4_pwd_fn": "c_info_5_ck",
+        "zip_pwd": pwd_base,
+    }
+    custom_name_short = Utils.get_customer_name_short(args)
+    _logger.info(f"custom_name_short={custom_name_short}")
+
     args = {
         "file_2_customer": tgt_path,
         "tiered_pricing_info_fn": "c_info_4_ck",
-        "zip_pwd": "491491491Tech+E50",
+        "zip_pwd": pwd_base + custom_name_short,
     }
     property_limit = Utils.get_property_cnt_limit(args)
+    _logger.info(f"property_limit={property_limit}")
+
     return property_limit
 
 
@@ -260,7 +272,7 @@ class EstateProperty(models.Model):
 
     active = fields.Boolean(default=True)
     state = fields.Selection(
-        string='资产状态',
+        string='资产状态', default='new',
         selection=[('repairing', '整备中'), ('new', '待租中'), ('offer_received', '洽谈中'), ('offer_accepted', '接受报价'),
                    ('sold', '已租'), ('canceled', '已取消'), ('out_dated', '租约已到期')],
     )

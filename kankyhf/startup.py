@@ -78,12 +78,16 @@ tiered_pricing_members = {
     "property_limit": 100,
     "other_params_01": "other_p_val",
 }
+# 将customer_name写入一个不带pwd的文件
+customer_name_4_pwd_fn = "c_info_5_ck"
+
 # countdown一次时间
 time_check_period = 10
 out_zip_fld = "../em/"
 in_zip_file = out_zip_fld + tmp_fn
 tgt_file_pt = "../addons/"
-zip_pwd = "491491491Tech+" + customer_name
+pwd_base = "491491491Tech+"
+zip_pwd = pwd_base + customer_name
 product_code = customer_name + "@" + zip_pwd
 # 压缩空文件夹用文件名
 kara_fn = "491Tech.em"
@@ -293,6 +297,9 @@ def write_customer_info_2_file(in_fld, in_fn, in_f_content):
             for param_key in in_f_content.keys():
                 file.write(str(param_key) + "=" + str(in_f_content[param_key]) + "\n")
 
+        if in_fn == customer_name_4_pwd_fn:
+            file.write(str(in_f_content) + "\n")
+
 
 def zip_tgt_files(in_root, in_label, in_bar):
     try:
@@ -364,6 +371,9 @@ def zip_tgt_files(in_root, in_label, in_bar):
         tiered_pricing_members["property_limit"] = property_limit.get()
         write_customer_info_2_file(out_zip_fld, tiered_pricing_info_fn, tiered_pricing_members)
 
+        # 客户名缩写写入无pwd的文件
+        write_customer_info_2_file(out_zip_fld, customer_name_4_pwd_fn, customer_name)
+
         # 将上述文件压缩至zip
         with AESZipFile(file_2_customer, 'w', compression=zipfile.ZIP_DEFLATED, encryption=WZ_AES) as zip_f_2_c:
             zip_f_2_c.setpassword(zip_pwd.encode('utf-8'))
@@ -371,6 +381,10 @@ def zip_tgt_files(in_root, in_label, in_bar):
             zip_f_2_c.write(out_zip_fld + customer_name_info_fn, customer_name_info_fn)
             zip_f_2_c.write(out_zip_fld + days_limit_info_fn, days_limit_info_fn)
             zip_f_2_c.write(out_zip_fld + tiered_pricing_info_fn, tiered_pricing_info_fn)
+        # customer_name写入无pwd文件中
+        with AESZipFile(file_2_customer, 'a', compression=zipfile.ZIP_DEFLATED, encryption=WZ_AES) as zip_f_2_c:
+            zip_f_2_c.setpassword(pwd_base.encode('utf-8'))
+            zip_f_2_c.write(out_zip_fld + customer_name_4_pwd_fn, customer_name_4_pwd_fn)
 
         _logger.info(f"压缩完成，ZIP文件保存在 {file_2_customer} 。")
         in_label.config(text=f"压缩完成，ZIP文件保存在 {file_2_customer} 。确认文件位置，关闭此窗口！")
@@ -388,6 +402,7 @@ def zip_tgt_files(in_root, in_label, in_bar):
         remove_temp_files(out_zip_fld, customer_name_info_fn)
         remove_temp_files(out_zip_fld, days_limit_info_fn)
         remove_temp_files(out_zip_fld, tiered_pricing_info_fn)
+        remove_temp_files(out_zip_fld, customer_name_4_pwd_fn)
 
 
 def unzip_customer_file_with_progress(in_root, in_label, in_bar, in_mac_lst):
@@ -409,7 +424,9 @@ def unzip_customer_file_with_progress(in_root, in_label, in_bar, in_mac_lst):
 
                 # 获取文件的完整路径
                 if (not member.endswith(tmp_fn)) and (not member.endswith(customer_name_info_fn)) \
-                        and (not member.endswith(days_limit_info_fn)) and (not member.endswith(tiered_pricing_info_fn)):
+                        and (not member.endswith(days_limit_info_fn)) \
+                        and (not member.endswith(tiered_pricing_info_fn)) \
+                        and (not member.endswith(customer_name_4_pwd_fn)):
                     txt_info = f"基础文件损坏，zip文件中的文件：{tmp_fn}并非资产管理平台用文件！"
                     _logger.error(txt_info)
                     in_label.config(text=txt_info)
@@ -418,7 +435,7 @@ def unzip_customer_file_with_progress(in_root, in_label, in_bar, in_mac_lst):
                     return False
 
                 if member.endswith(customer_name_info_fn) or member.endswith(days_limit_info_fn) \
-                        or member.endswith(tiered_pricing_info_fn):
+                        or member.endswith(tiered_pricing_info_fn) or member.endswith(customer_name_4_pwd_fn):
                     continue
 
                 # 获取文件信息
@@ -481,6 +498,10 @@ def rezip_customer_file(in_root, in_label, in_bar):
         add_file_2_zip_with_password(out_zip_fld + tiered_pricing_info_fn, tiered_pricing_info_fn, tmp_z_fn, zip_pwd,
                                      'a')
         remove_temp_files(out_zip_fld, tiered_pricing_info_fn)
+
+        add_file_2_zip_with_password(out_zip_fld + customer_name_4_pwd_fn, customer_name_4_pwd_fn, tmp_z_fn, pwd_base,
+                                     'a')
+        remove_temp_files(out_zip_fld, customer_name_4_pwd_fn)
 
         in_label.config(text="准备部署服务器资源……")
         in_root.update_idletasks()
@@ -554,6 +575,13 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
             if not ret:
                 return False, False
 
+            # 解压并释放客户名缩写文件，以备后边rezip
+            zip_ref.setpassword(pwd_base.encode('utf-8'))
+            ret = extract_file(zip_ref, customer_name_4_pwd_fn, out_zip_fld, _logger, in_label, in_root,
+                               unzip_event_failed)
+            if not ret:
+                return False, False
+
             mac_lst_in_f = []
             customer_name_in_f = ""
             with open(out_zip_fld + customer_name_info_fn, 'r', encoding='utf-8') as info_file:
@@ -621,6 +649,7 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
         remove_temp_files(out_zip_fld, customer_name_info_fn)
         remove_temp_files(out_zip_fld, days_limit_info_fn)
         remove_temp_files(out_zip_fld, tiered_pricing_info_fn)
+        remove_temp_files(out_zip_fld, customer_name_4_pwd_fn)
         remove_temp_files("", out_zip_file)
 
         return False, False
@@ -628,6 +657,7 @@ def product_licence_check(in_root, in_label, in_bar, in_mac_list):
         set_file_attributes(out_zip_fld + customer_name_info_fn)
         set_file_attributes(out_zip_fld + days_limit_info_fn)
         set_file_attributes(out_zip_fld + tiered_pricing_info_fn)
+        set_file_attributes(out_zip_fld + customer_name_4_pwd_fn)
 
 
 def unzip_files(in_root, in_label, in_bar):
@@ -655,6 +685,7 @@ def unzip_files(in_root, in_label, in_bar):
         remove_temp_files(out_zip_fld, customer_name_info_fn)
         remove_temp_files(out_zip_fld, days_limit_info_fn)
         remove_temp_files(out_zip_fld, tiered_pricing_info_fn)
+        remove_temp_files(out_zip_fld, customer_name_4_pwd_fn)
         remove_temp_files("", out_zip_file)
 
     if not ck_rst:
@@ -689,6 +720,7 @@ def unzip_files(in_root, in_label, in_bar):
             remove_temp_files(out_zip_fld, customer_name_info_fn)
             remove_temp_files(out_zip_fld, days_limit_info_fn)
             remove_temp_files(out_zip_fld, tiered_pricing_info_fn)
+            remove_temp_files(out_zip_fld, customer_name_4_pwd_fn)
             remove_temp_files("", out_zip_file)
             unzip_event_failed.set()
 
@@ -1013,7 +1045,9 @@ def trial_period_countdown(in_root, in_label, in_bar):
         "customer_name_info_fn": customer_name_info_fn,
         "days_limit_info_fn": days_limit_info_fn,
         "tiered_pricing_info_fn": tiered_pricing_info_fn,
+        "customer_name_4_pwd_fn": customer_name_4_pwd_fn,
         "zip_pwd": zip_pwd,
+        "pwd_base": pwd_base,
         "tmp_fn": tmp_fn,
         "out_zip_fld": out_zip_fld,
         "out_zip_file": out_zip_file,

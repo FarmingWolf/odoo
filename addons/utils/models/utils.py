@@ -161,6 +161,34 @@ class Utils:
             _logger.error(f"读取资产条目限制数出错了{e}")
             return limit_return
 
+    @staticmethod
+    def get_customer_name_short(in_args):
+        name_default = ""
+        name_return = name_default
+
+        # 从tiered_pricing_info_fn文件中读取
+        try:
+            with AESZipFile(in_args["file_2_customer"], 'r', compression=zipfile.ZIP_DEFLATED,
+                            encryption=WZ_AES) as zip_ref:
+                # 设置密码
+                zip_ref.setpassword(in_args["zip_pwd"].encode('utf-8'))
+                if ("customer_name_4_pwd_fn" not in in_args.keys()) or \
+                        (in_args["customer_name_4_pwd_fn"] not in zip_ref.namelist()):
+                    return name_return
+
+                customer_name_4_pwd_zip_info = zip_ref.getinfo(in_args['customer_name_4_pwd_fn'])
+                file_content = zip_ref.read(customer_name_4_pwd_zip_info)
+                context_text = file_content.decode('utf-8').splitlines()
+                for each_l in context_text:
+                    name_return = each_l
+                    break
+
+                return name_return
+
+        except Exception as e:
+            _logger.error(f"读取客户名简拼出错了{e}")
+            return name_return
+
 
 def main():
     args = {
@@ -171,6 +199,21 @@ def main():
     ret_val = Utils.get_property_cnt_limit(args)
     print(ret_val)
 
+    args = {
+        "file_2_customer": "../../../estate_management.zip",
+        "customer_name_4_pwd_fn": "c_info_5_ck",
+    }
+    ret_val = Utils.get_customer_name_short(args)
+    print(ret_val)
+
+    args = {
+        "file_2_customer": "../../../estate_management.zip",
+        "tiered_pricing_info_fn": "c_info_4_ck",
+        "zip_pwd": "491491491Tech+" + ret_val,
+    }
+    print("491491491Tech+" + ret_val)
+    ret_val = Utils.get_property_cnt_limit(args)
+    print(ret_val)
 
 if __name__ == "__main__":
     main()
