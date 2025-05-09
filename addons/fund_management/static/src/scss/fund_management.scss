@@ -134,3 +134,9 @@
     white-space: normal !important;
     overflow-wrap: break-word;
 }
+
+.approval-comment-textarea {
+    min-height: 9em !important;
+    resize: both;
+    width: 100%;
+}

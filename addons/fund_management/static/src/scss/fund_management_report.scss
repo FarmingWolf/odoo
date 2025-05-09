@@ -158,6 +158,33 @@ h1.report_title {
     flex: 1 1 auto;
 }
 
+.grid-single-item-right {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.grid-single-item-right > div:first-child {
+    margin-top: auto; /* 首元素向上推 */
+}
+.grid-single-item-right > div:last-child {
+    margin-bottom: auto; /* 尾元素向下推 */
+}
+
+/* 定义网格内单元格的样式 */
+.div-single-item {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-align: left;
+    vertical-align: middle;
+}
+.div-single-item > div:first-child {
+    margin-top: auto; /* 第一个 div 向上推 */
+}
+.div-single-item > div:last-child {
+    margin-bottom: auto; /* 最后一个 div 向下推 */
+}
+
 /* 定义网格内单元格的样式 */
 .grid-item-right {
     /* 设置内部边框 */

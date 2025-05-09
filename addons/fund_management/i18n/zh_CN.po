@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-24 09:13+0000\n"
-"PO-Revision-Date: 2025-04-24 09:13+0000\n"
+"POT-Creation-Date: 2025-05-07 05:14+0000\n"
+"PO-Revision-Date: 2025-05-07 05:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,9 +16,59 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: fund_management
+#: model:ir.actions.report,print_report_name:fund_management.action_print_contract_payment_application
+msgid "'Print Application'"
+msgstr ""
+
+#. module: fund_management
+#: model:ir.actions.report,print_report_name:fund_management.action_print_no_contract_payment_application
+msgid "'无合同资金支付申请单'"
+msgstr ""
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
 msgid "0 means infinity"
 msgstr "0代表无限大"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid "<span style=\"font-size: 30px; font-weight: bold;\">合同资金支付审批单</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span style=\"font-size: 30px; font-weight: bold;\">无合同资金支付审批单</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid ""
+"<span style=\"font-weight: bold\">资金构成</span>\n"
+"                                        <br/>\n"
+"                                        <span style=\"font-weight: bold; margin-left: 10px\">及支付情况</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid ""
+"<span style=\"margin-top: 10px;\">申请人\n"
+"                                    </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid ""
+"<span style=\"margin-top: 10px;\">申请部门\n"
+"                                    </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid ""
+"<span style=\"position: absolute; left: 0; top: 0; padding: "
+"2px;\">【同意】</span>"
+msgstr ""
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
@@ -29,6 +79,235 @@ msgstr "<span>设置审批流程步骤</span>"
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
 msgid "<span>to</span>"
 msgstr "<span>至</span>"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>上传银行回单</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>主管副总经理审核意见</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid ""
+"<span>事项名称\n"
+"                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid ""
+"<span>付款方式\n"
+"\n"
+"                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>付款方式\n"
+"                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid "<span>付款比例</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid "<span>付款申请函</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>企业财务审核意见</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>剩余金额\n"
+"                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid "<span>发票 ___ 张</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>发起人\n"
+"                                    </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>发起部门\n"
+"                                    </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>合同号\n"
+"                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>合同名称\n"
+"                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>合同总金额\n"
+"                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>备注</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>审批流程</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid ""
+"<span>开户行\n"
+"                                                </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>总经理审核意见</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>支付日期</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid ""
+"<span>收款单位名称\n"
+"                                                </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>收款单位明细</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>本次付款后<br/>累计已付金额\n"
+"                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>本次申请<br/>支付金额\n"
+"                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid ""
+"<span>本次申请支付金额\n"
+"                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid ""
+"<span>申请资金事由\n"
+"\n"
+"                                    </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>申请资金事由\n"
+"                                    </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>相关材料</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid ""
+"<span>科目类别\n"
+"\n"
+"                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>科目类别\n"
+"                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>资产会日期/<br/>党委会日期\n"
+"                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid ""
+"<span>资金类型\n"
+"\n"
+"                                    </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>资金类型\n"
+"                                    </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid ""
+"<span>采购方式\n"
+"                                    </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>银行账号</span>"
+msgstr ""
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__account_subject_category
@@ -128,7 +407,7 @@ msgstr "分析精度"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__employee_id
 msgid "Applicant"
-msgstr "发起人"
+msgstr "申请人"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__apply_no
@@ -154,7 +433,7 @@ msgstr "申请日期"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__total_amount_currency
 msgid "Apply In Currency"
-msgstr "申请金额"
+msgstr "合计"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__total_amount_currency_percent
@@ -356,7 +635,7 @@ msgstr "点击审批同意"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Click to reject"
-msgstr "点击驳回"
+msgstr "点击拒绝"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
@@ -376,7 +655,6 @@ msgstr "颜色"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__company_id
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__company_id
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
@@ -458,7 +736,6 @@ msgstr "创建审批阶段"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__create_uid
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__create_uid
 msgid "Created by"
@@ -472,7 +749,6 @@ msgstr "创建人"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__create_date
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__create_date
 msgid "Created on"
@@ -482,11 +758,6 @@ msgstr "创建日期"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__currency_id
 msgid "Currency"
 msgstr "货币"
-
-#. module: fund_management
-#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_no_contract
-msgid "Define Fund Management No Contract here."
-msgstr "在此处定义基金管理无合同"
 
 #. module: fund_management
 #: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_payment_method
@@ -511,7 +782,7 @@ msgstr "发起部门"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__name
 msgid "Description"
-msgstr "申请资金事由"
+msgstr "描述(标题)"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__display_name
@@ -521,7 +792,6 @@ msgstr "申请资金事由"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__display_name
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__display_name
 msgid "Display Name"
@@ -529,6 +799,7 @@ msgstr "显示名"
 
 #. module: fund_management
 #: model:ir.model.fields.selection,name:fund_management.selection__fund_management__state__done
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Done"
 msgstr "已完成"
 
@@ -666,14 +937,6 @@ msgid "Fund Management Manager"
 msgstr "资金管理人"
 
 #. module: fund_management
-#: model:ir.model,name:fund_management.model_fund_management_no_contract
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__name
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_no_contract_view_form
-#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_no_contract_view_tree
-msgid "Fund Management No Contract"
-msgstr "回款方式"
-
-#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__stage_id
 msgid "Fund Management Stage"
 msgstr "资金管理审批阶段"
@@ -756,11 +1019,6 @@ msgid "Generally Financial Special Funds and Pooling Funds are used."
 msgstr "一般使用财政专项资金和集体资金"
 
 #. module: fund_management
-#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_no_contract
-msgid "Generally, Checks, and Cash are used"
-msgstr "通常使用支票和现金"
-
-#. module: fund_management
 #: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_payment_method
 msgid "Generally, Online Banking Transfers, Checks, and Cash are used"
 msgstr "通常使用网上银行转账、支票和现金"
@@ -806,7 +1064,6 @@ msgstr "历史累计百分比"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__id
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__id
 msgid "ID"
@@ -878,7 +1135,6 @@ msgstr "看板折叠"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__write_uid
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__write_uid
 msgid "Last Updated by"
@@ -892,7 +1148,6 @@ msgstr "最后更新人"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__write_date
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__write_date
 msgid "Last Updated on"
@@ -1057,12 +1312,12 @@ msgstr "正常表示本阶段正常推进中"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__description
 msgid "Notes"
-msgstr "备注"
+msgstr "备注(申请资金事由等)"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Notes..."
-msgstr "备注……"
+msgstr "申请资金事由等备注……"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_needaction_counter
@@ -1131,6 +1386,11 @@ msgid "Please input approval comment..."
 msgstr "请输入审批意见..."
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Print"
+msgstr "打印"
+
+#. module: fund_management
 #: model:ir.model,name:fund_management.model_fund_management_procurement_method
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__procurement_method
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__name
@@ -1186,17 +1446,12 @@ msgstr "拒绝的申请"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Reject"
-msgstr "驳回"
+msgstr "拒绝"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__company_currency_id
 msgid "Report Company Currency"
 msgstr "货币"
-
-#. module: fund_management
-#: model:ir.model,name:fund_management.model_res_users
-msgid "Res Users"
-msgstr "用户"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_user_id
@@ -1252,11 +1507,6 @@ msgstr "选择该人员的\"管理者\"（资金管理申请），如果不选�
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__sequence
 msgid "Sequence"
 msgstr "序号"
-
-#. module: fund_management
-#: model:ir.actions.act_window,name:fund_management.action_fund_management_no_contract
-msgid "Setting Fund Management No Contract"
-msgstr "设置付款方式"
 
 #. module: fund_management
 #: model:ir.actions.act_window,name:fund_management.action_fund_management_fund_type
@@ -1330,7 +1580,6 @@ msgstr "第"
 #. module: fund_management
 #. odoo-python
 #: code:addons/fund_management/models/fund_management_no_contract.py:0
-#: model:ir.model.constraint,message:fund_management.constraint_fund_management_no_contract_name
 #, python-format
 msgid "The Fund Management No Contract can not be duplicated"
 msgstr "付款方式不能重复"
@@ -1453,6 +1702,11 @@ msgid "Upload"
 msgstr "上传"
 
 #. module: fund_management
+#: model:ir.model,name:fund_management.model_res_users
+msgid "User"
+msgstr "用户"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "View All Stages"
 msgstr "查看流程全部阶段"
@@ -1554,7 +1808,6 @@ msgstr "会议纪要类型清单"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__sequence
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__sequence
-#: model:ir.model.fields,field_description:fund_management.field_fund_management_no_contract__sequence
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__sequence
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__sequence
 msgid "sequence"
@@ -1568,6 +1821,98 @@ msgid "to be approved"
 msgstr "待审批"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "乡会议纪要编号"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "企业会议纪要编号"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid "企业会议纪要编号用章申请"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "发票 张"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid "发起日期:"
+msgstr ""
+
+#. module: fund_management
+#: model:ir.actions.report,name:fund_management.action_print_contract_payment_application
+msgid "合同资金支付申请单"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "审批人"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "审批决定"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "审批备注"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "审批时间"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "审批阶段"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid "工程竣工验收单"
+msgstr ""
+
+#. module: fund_management
+#: model:ir.actions.report,name:fund_management.action_print_no_contract_payment_application
+msgid "无合同资金支付申请单"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid "次付款)"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "申请日期:"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid "结算审核报告"
+msgstr ""
+
+#. module: fund_management
 #: model:ir.model,name:fund_management.model_res_partner
 msgid "继承partner"
 msgstr "联系人"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "编号:"
+msgstr ""

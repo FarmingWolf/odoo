@@ -212,7 +212,7 @@
                             <div class="o_row">
                                 <field name="total_amount_currency" widget='monetary'
                                        options="{'currency_field': 'currency_id'}"
-                                       readonly="not is_editable" class="oe_inline mw-50 me-0"/>
+                                       readonly="not is_editable"/>
                                 <field name="currency_id" class="mw-25 ms-0" groups="base.group_multi_currency"
                                        options="{'no_create': True}" readonly="not is_editable" invisible="1"/>
                             </div>
@@ -232,7 +232,7 @@
                             <div>
                                 <field name="total_amt_cur_hist_accu" invisible="not contract_payment" widget='monetary'
                                        options="{'currency_field': 'currency_id'}"
-                                       readonly="not is_editable" class="oe_inline mw-50 me-0"/>
+                                       readonly="not is_editable"/>
                             </div>
                             <field name="total_amt_cur_hist_accu_percent" invisible="not contract_payment"
                                    widget="percentage"/>
@@ -466,6 +466,7 @@
                         domain="[('state', 'in', ('submitted', 'approved', 'refused'))]"/>
                 <filter string="Refused" name="refused" domain="[('state', '=', 'refused')]"
                         help="Refused Applications"/>
+                <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
                 <separator/>
                 <filter string="Apply Date" name="date" date="date"/>
                 <separator/>

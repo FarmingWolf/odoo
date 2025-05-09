@@ -32,7 +32,7 @@ class FundManagement(models.Model):
         str_ret = prefix_str + formatted_date + '-' + random_number
         return str_ret
 
-    apply_no = fields.Char(string="Application NO.", default=_get_default_apply_no, required=True,
+    apply_no = fields.Char(string="Application NO.", default=_get_default_apply_no, required=True, store=True,
                            compute="_compute_apply_no")
 
     def _compute_apply_no(self):
@@ -414,11 +414,11 @@ class FundManagement(models.Model):
             if any(not expense.is_editable for expense in self):
                 raise UserError(_('You are not authorized to edit this fund management application.'))
 
+        res = super().write(vals)
+
         for record in self:
             if not record._is_amount_in_category():
                 raise UserError(_("Contract amount should be in the category amount range!"))
-
-        res = super().write(vals)
 
         return res
 
