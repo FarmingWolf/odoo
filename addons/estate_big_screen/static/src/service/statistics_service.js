@@ -3,28 +3,76 @@
 import {registry} from "@web/core/registry";
 import {reactive} from "@odoo/owl";
 
-const statisticsService = {
-    dependencies: ["rpc"],
+export class StatisticsService {
 
-    start(env, { rpc }) {
-
-        const statistics = reactive({ isReady: false });
-
-        async function loadData() {
+    constructor(env, { rpc }) {
+        this.rpc = rpc;
+        this.statistics = reactive({
+            isReady: false,
+            ...JSON.parse(localStorage.getItem('estate_stats') || '{}')
+        });
+        this.initialized = false;
+        this.intervalId = null;
+    }
+    async loadData() {
+        try {
             // 利用既存逻辑
-            const updates = await rpc("/estate_dashboard/statistics");
-            // const updates = await rpc("/estate_big_screen/statistics");
-            Object.assign(statistics, updates, { isReady: true });
+            const updates = await this.rpc("/estate_dashboard/statistics");
+            Object.assign(this.statistics, updates, {isReady: true});
+            // 缓存数据到本地存储
+            localStorage.setItem('estate_stats', JSON.stringify({
+                ...updates,
+                isReady: true
+            }));
+        } catch (error) {
+            console.error("Failed to load statistics:", error);
+            this.statistics.isReady = false;
         }
+    }
 
-        setInterval(loadData, 1000*60*30);
-        loadData().then(r => {});
+    initialize() {
+        if (!this.initialized) {
+            this.initialized = true;
+            this.loadData();
+            this.intervalId = setInterval(() => this.loadData(), 1000 * 60 * 30);
+        }
+    }
 
-        return statistics;
+    destroy() {
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+        }
+    }
+}
+
+export const statisticsService = {
+    dependencies: ["rpc"],
+    start(env, services) {
+        const service = new StatisticsService(env, services);
+
+        return new Proxy(service, {
+            get(target, prop) {
+                if (prop === 'destroy') return target[prop];
+                // 当访问任何属性时自动初始化
+                debugger;
+                if (!target.initialized) {
+                    target.initialize();
+                }
+                // 返回整个 statistics 对象或特定属性
+                if (prop === 'statistics') {
+                    return target.statistics;
+                }
+                // 优先从 statistics 对象获取属性
+                if (prop in target.statistics) {
+                    return target.statistics[prop];
+                }
+                return target.statistics[prop];
+            }
+        });
     },
 };
 
-const lineChartDataService = {
+export const lineChartDataService = {
     dependencies: ["rpc"],
 
     start(env, { rpc }) {
@@ -57,7 +105,7 @@ const lineChartDataService = {
     },
 };
 
-const outOfRentProperties = {
+export const outOfRentProperties = {
     dependencies: ["rpc"],
 
     start(env, { rpc }) {
@@ -97,7 +145,7 @@ const outOfRentProperties = {
 
 };
 
-const companyName4BigScreenSvc = {
+export const companyName4BigScreenSvc = {
     dependencies: ["rpc"],
 
     start(env, { rpc }) {
@@ -113,7 +161,6 @@ const companyName4BigScreenSvc = {
                 const company_nm = await rpc("/estate_big_screen/get_company_nm_4_big_screen");
                 // 判断是否是数组
                 // 安全更新，不影响原来对象结构
-                debugger;
                 companyNM.nm = company_nm ? Object.values(company_nm)[0] : "";
                 companyNM.isReady = true;
             } catch (error) {

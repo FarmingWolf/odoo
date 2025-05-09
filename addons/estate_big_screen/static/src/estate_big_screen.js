@@ -19,7 +19,12 @@ class EstateBigScreen extends Component {
         this.display = {
             controlPanel: false,
         };
-
+        onMounted(() => {
+            console.log("Component onMounted, statistics state:", {
+                isReady: this.statistics.isReady,
+                data: this.statistics.pie_chart_ratio_conventional_area_quantity
+            });
+        });
         onMounted(() => {
             // 进入页面时隐藏导航栏
             document.querySelector('.o_main_navbar')?.classList.add('d-none');
@@ -75,6 +80,16 @@ class EstateBigScreen extends Component {
         onWillStart(async () => {
             this.showPropertyDashboard = await this.userService.hasGroup("estate_big_screen.estate_group_big_screen");
         });
+
+        this.state = useState({
+            showLineCharts: false,
+        });
+
+        useEffect(() => {
+            if (this.lineChartStatistics.isReady) {
+                this.state.showLineCharts = true;
+            }
+        });
     }
 
     // 租金单价
@@ -126,21 +141,44 @@ class EstateBigScreen extends Component {
     // 计租面积环形图数据
     get doughnutChtRatioConvAreaQ() {
         // {labels: ['A', 'B', 'C'], values: [30, 50, 20]}
+        debugger;
+        if (!this.statistics?.isReady || !this.statistics?.pie_chart_ratio_conventional_area_quantity) {
+            console.log("Statistics not ready:", {
+                isReady: this.statistics?.isReady,
+                data: this.statistics?.pie_chart_ratio_conventional_area_quantity
+            });
+            return {
+                labels: ['在租(㎡)', '空置(㎡)'],
+                values: [0, 0],
+                isLoading: true
+            };
+        }
+        console.log("Statistics data loaded:", this.statistics.pie_chart_ratio_conventional_area_quantity);
         return {
             labels: ['在租(㎡)', '空置(㎡)'],
             values:
-                [this.statistics.pie_chart_ratio_conventional_area_quantity['在租(㎡)'],
-                this.statistics.pie_chart_ratio_conventional_area_quantity['空置(㎡)']]
+                [this.statistics.pie_chart_ratio_conventional_area_quantity['在租(㎡)'] || 0,
+                this.statistics.pie_chart_ratio_conventional_area_quantity['空置(㎡)'] || 0],
+            isLoading: false
         };
     }
     // 房屋间数环形图数据
     get doughnutChtRatioConvQ() {
+        debugger;
         // {labels: ['A', 'B', 'C'], values: [30, 50, 20]}
+        if (!this.statistics?.isReady || !this.statistics?.pie_chart_ratio_conventional_quantity) {
+            return {
+                labels: ['在租间数', '空置间数'],
+                values: [0, 0],
+                isLoading: true
+            };
+        }
         return {
             labels: ['在租间数', '空置间数'],
             values:
-                [this.statistics.pie_chart_ratio_conventional_quantity['在租间数'],
-                this.statistics.pie_chart_ratio_conventional_quantity['空置间数']]
+                [this.statistics.pie_chart_ratio_conventional_quantity['在租间数'] || 0,
+                this.statistics.pie_chart_ratio_conventional_quantity['空置间数'] || 0],
+            isLoading: false
         };
     }
 

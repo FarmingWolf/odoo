@@ -62,10 +62,19 @@
                                 <div class="item-content chartBackgroundImgDiv">
     <!--                                <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>-->
     <!--                                <PieChartCard title="'出租空置面积(㎡)对比'" title2="'空置率　=　' + (1 - statistics.ratio_conventional_area) * 100 + '%'" values="statistics.pie_chart_ratio_conventional_area_quantity"/>-->
-                                    <DoughnutChart title="'出租空置面积(㎡)对比'" title2="'空置率　=　' + Math.round((1 - statistics.ratio_conventional_area) * 100) + '%'" data="doughnutChtRatioConvAreaQ" cutout="'70%'"
-                                                   centerText="'在租 ' + statistics.conventional_area_on_rent.toLocaleString()"
-                                                   centerText2="'空置 ' + (statistics.conventional_area - statistics.conventional_area_on_rent).toLocaleString()"
-                                                   centerText3="'总计 ' + statistics.conventional_area.toLocaleString()"/>
+                                    <t t-if="statistics.isReady">
+                                        <DoughnutChart title="'出租空置面积(㎡)对比'" title2="'空置率　=　' + Math.round((1 - statistics.ratio_conventional_area) * 100) + '%'"
+                                                       data="doughnutChtRatioConvAreaQ" cutout="'70%'"
+                                                       centerText="'在租 ' + statistics.conventional_area_on_rent.toLocaleString()"
+                                                       centerText2="'空置 ' + (statistics.conventional_area - statistics.conventional_area_on_rent).toLocaleString()"
+                                                       centerText3="'总计 ' + statistics.conventional_area.toLocaleString()"/>
+                                    </t>
+                                    <t t-else="">
+                                        <!-- 加载中状态 -->
+                                        <div class="text-center">
+                                            <i class="fa fa-refresh fa-spin"/> 加载中...
+                                        </div>
+                                    </t>
                                 </div>
                             </div>
 
@@ -73,15 +82,24 @@
                                 <div class="item-content chartBackgroundImgDiv">
     <!--                                <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>-->
     <!--                                <PieChartCard title="'出租空置房屋间数对比'" title2="'空置率　=　' + (1 - statistics.ratio_conventional_cnt) * 100 + '%'" values="statistics.pie_chart_ratio_conventional_quantity"/>-->
-                                    <DoughnutChart title="'出租空置房屋间数对比'" title2="'空置率　=　' + Math.round((1 - statistics.ratio_conventional_cnt) * 100) + '%'" data="doughnutChtRatioConvQ" cutout="'70%'"
-                                                   centerText="'在租 ' + statistics.conventional_cnt_on_rent.toLocaleString()"
-                                                   centerText2="'空置 ' + (statistics.conventional_cnt - statistics.conventional_cnt_on_rent).toLocaleString()"
-                                                   centerText3="'总计 ' + statistics.conventional_cnt.toLocaleString()"/>
+                                    <t t-if="statistics.isReady">
+                                        <DoughnutChart title="'出租空置房屋间数对比'" title2="'空置率　=　' + Math.round((1 - statistics.ratio_conventional_cnt) * 100) + '%'"
+                                                       data="doughnutChtRatioConvQ" cutout="'70%'"
+                                                       centerText="'在租 ' + statistics.conventional_cnt_on_rent.toLocaleString()"
+                                                       centerText2="'空置 ' + (statistics.conventional_cnt - statistics.conventional_cnt_on_rent).toLocaleString()"
+                                                       centerText3="'总计 ' + statistics.conventional_cnt.toLocaleString()"/>
+                                    </t>
+                                    <t t-else="">
+                                        <!-- 加载中状态 -->
+                                        <div class="text-center">
+                                            <i class="fa fa-refresh fa-spin"/> 加载中...
+                                        </div>
+                                    </t>
                                 </div>
                             </div>
                             <div class="big-item big-e-chart-item" style="top: 430px; left: 50px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
                                 <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                    <t t-if="lineChartDataRatioRentAreaConventional">
+                                    <t t-if="state.showLineCharts">
                                         <LineChart data="lineChartDataRatioRentAreaConventional"/>
                                     </t>
                                 </div>
@@ -156,7 +174,7 @@
 
                             <div class="big-item big-e-chart-item" style="top: 790px; left: 50px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
                                 <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                    <t t-if="lineChartDataPriceAVG">
+                                    <t t-if="state.showLineCharts">
                                         <LineChart data="lineChartDataPriceAVG"/>
                                     </t>
                                 </div>
@@ -262,7 +280,7 @@
 
                             <div class="big-item big-e-chart-item" style="top: 330px; left: 1350px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
                                 <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                    <t t-if="lineChartDataRentalReceivableMonth">
+                                    <t t-if="state.showLineCharts">
                                         <LineChart data="lineChartDataRentalReceivableMonth"/>
                                     </t>
                                 </div>
@@ -354,7 +372,7 @@
 
                             <div class="big-item big-e-chart-item" style="top: 790px; left: 1350px; width: 570px; height: 250px; transform: translate(0px, 0px); z-index: 1041;pointer-events: auto;">
                                 <div class="item-content " style="opacity:1;border-radius:0px;border-width:0px ;border-style:solid ;--animation:2s;--animation-flash:0.2s;transform:  rotateX(0deg) rotateY(0deg) rotateZ(0deg);">
-                                    <t t-if="lineChartDataRentalReceivedMonth">
+                                    <t t-if="state.showLineCharts">
                                         <LineChart data="lineChartDataRentalReceivedMonth"/>
                                     </t>
                                 </div>
