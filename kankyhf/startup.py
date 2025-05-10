@@ -37,7 +37,6 @@ del utils.py
 """
 
 zip_tgt_folders = [
-    'account',
     'utils',
     'parking',
     'estate_registration_addr',
