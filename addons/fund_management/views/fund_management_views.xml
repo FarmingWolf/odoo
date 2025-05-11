@@ -226,15 +226,22 @@
                                 </span>
                             </div>
                             <label for="total_amt_cur_hist_accu" invisible="not contract_payment"
-                                   string="Historically Accumulation In Currency"
-                                   readonly="not is_editable"/>
+                                   string="Historically Accumulation In Currency"/>
 
                             <div>
                                 <field name="total_amt_cur_hist_accu" invisible="not contract_payment" widget='monetary'
-                                       options="{'currency_field': 'currency_id'}"
-                                       readonly="not is_editable"/>
+                                       options="{'currency_field': 'currency_id'}"/>
                             </div>
                             <field name="total_amt_cur_hist_accu_percent" invisible="not contract_payment"
+                                   widget="percentage"/>
+                            <label for="total_hist_include_this" invisible="not contract_payment"
+                                   string="Historically Accumulation In Currency including this application"/>
+
+                            <div>
+                                <field name="total_hist_include_this" invisible="not contract_payment" widget='monetary'
+                                       options="{'currency_field': 'currency_id'}"/>
+                            </div>
+                            <field name="total_hist_percentage_include_this" invisible="not contract_payment"
                                    widget="percentage"/>
                             <field name="date" readonly="not is_editable"/>
                             <field name="is_editable" invisible="1"/>
@@ -250,7 +257,6 @@
                                        readonly="1"/>
                             </t>
                             <field name="applicant_unit" readonly="1"/>
-                            <field name="payment_method" invisible="not contract_payment"/>
 
                         </group>
                         <group>
@@ -264,6 +270,7 @@
                             <field name="receiving_bank" domain="[('partner_id', '=', receiving_unit)]"
                                    options="{'no_open': True, 'no_create': True}" readonly="not receiving_unit"/>
                             <field name="bank_account"/>
+                            <field name="payment_method" invisible="not contract_payment"/>
                         </group>
                     </group>
                     <div>

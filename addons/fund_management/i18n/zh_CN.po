@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-07 05:14+0000\n"
-"PO-Revision-Date: 2025-05-07 05:14+0000\n"
+"POT-Creation-Date: 2025-05-10 16:43+0000\n"
+"PO-Revision-Date: 2025-05-10 16:43+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 
 #. module: fund_management
 #: model:ir.actions.report,print_report_name:fund_management.action_print_contract_payment_application
-msgid "'Print Application'"
+msgid "'合同资金支付申请单'"
 msgstr ""
 
 #. module: fund_management
@@ -29,16 +29,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
 msgid "0 means infinity"
 msgstr "0代表无限大"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
-msgid "<span style=\"font-size: 30px; font-weight: bold;\">合同资金支付审批单</span>"
-msgstr ""
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
-msgid "<span style=\"font-size: 30px; font-weight: bold;\">无合同资金支付审批单</span>"
-msgstr ""
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
@@ -239,15 +229,8 @@ msgid ""
 msgstr ""
 
 #. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
-msgid ""
-"<span>申请资金事由\n"
-"\n"
-"                                    </span>"
-msgstr ""
-
-#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
 msgid ""
 "<span>申请资金事由\n"
 "                                    </span>"
@@ -445,13 +428,6 @@ msgstr "申请比例"
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Apply Times"
 msgstr "申请付款"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "Apply amount should be in the category amount range!"
-msgstr "申请金额应在类别金额范围内"
 
 #. module: fund_management
 #: model:ir.actions.server,name:fund_management.action_agree_svr_action
@@ -700,14 +676,6 @@ msgstr "是否合同资金支付"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_amount
 msgid "Contract Total Amount"
 msgstr "合同总额（元）"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "Contract amount should be in the category amount range!"
-msgstr "合同金额应在类别金额范围内"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_select_view_tree
@@ -1052,9 +1020,20 @@ msgid "Historically Accumulation In Currency"
 msgstr "历史累计总额"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__total_hist_include_this
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Historically Accumulation In Currency including this application"
+msgstr "含本次累计申请总额"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__total_amt_cur_hist_accu_percent
 msgid "Historically Accumulation In Percentage"
 msgstr "历史累计百分比"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__total_hist_percentage_include_this
+msgid "Historically Accumulation In Percentage including this application"
+msgstr "含本次累计申请占比"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__id
@@ -1379,6 +1358,13 @@ msgid "Please do not include spaces in the category name"
 msgstr "类型名称中请勿包含空格"
 
 #. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid "Please input Contract Info!"
+msgstr "请输入合同信息（合同编号、合同名称、合同总额）"
+
+#. module: fund_management
 #. odoo-javascript
 #: code:addons/fund_management/static/src/components/approval_comment.xml:0
 #, python-format
@@ -1579,13 +1565,6 @@ msgstr "第"
 
 #. module: fund_management
 #. odoo-python
-#: code:addons/fund_management/models/fund_management_no_contract.py:0
-#, python-format
-msgid "The Fund Management No Contract can not be duplicated"
-msgstr "付款方式不能重复"
-
-#. module: fund_management
-#. odoo-python
 #: code:addons/fund_management/models/fund_management_payment_method.py:0
 #: model:ir.model.constraint,message:fund_management.constraint_fund_management_payment_method_name
 #, python-format
@@ -1607,6 +1586,15 @@ msgid ""
 "The approval stage is used to track the approval process of fund "
 "applications from input, submission for approval to approval."
 msgstr "审批阶段用于跟踪处理资金申请从录入、提交审批到审批通过的各阶段审批流。"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid ""
+"The current application amount plus the cumulative historical application "
+"amount cannot exceed the total contract amount!"
+msgstr "本次申请金额加历史累计申请金额不能超过合同总额！"
 
 #. module: fund_management
 #. odoo-python
@@ -1722,13 +1710,6 @@ msgid "Website communication history"
 msgstr "本站在线沟通记录"
 
 #. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "You are not authorized to edit this fund management application."
-msgstr "您无权编辑这份资金管理流程。"
-
-#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
 msgid ""
 "You can add a description to help understand the significance and purpose of"
@@ -1741,13 +1722,6 @@ msgid ""
 "You can define approval status labels here as the default labels in the "
 "Kanban view."
 msgstr "您可以在此处定义审批状态标签，作为看板视图中的默认标签。"
-
-#. module: fund_management
-#. odoo-python
-#: code:addons/fund_management/models/fund_management.py:0
-#, python-format
-msgid "You cannot delete a posted or approved fund management application."
-msgstr "您不能删除已发布或批准的资金管理流程。"
 
 #. module: fund_management
 #. odoo-python
@@ -1838,12 +1812,22 @@ msgstr ""
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "其他资金支付审批单"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
 msgid "发票 张"
 msgstr ""
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
 msgid "发起日期:"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
+msgid "合同资金支付审批单"
 msgstr ""
 
 #. module: fund_management

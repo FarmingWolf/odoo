@@ -181,10 +181,10 @@ class FundManagement(models.Model):
                             domain=lambda self: self._get_stage_domain(),
                             default=lambda self: self._get_default_stage_id())
     stage_sequence = fields.Integer("Approval Stage Sequence NO.", related="stage.sequence")
-    contract_id = fields.Integer(string='Contract ID')
-    contract_no = fields.Char(string='Contract NO.', tracking=True, )
-    contract_name = fields.Char(string='Contract Name', tracking=True, )
-    contract_amount = fields.Float(string="Contract Total Amount", tracking=True, required=True)
+    contract_id = fields.Integer(string='Contract ID')  # 现阶段不对接合同模块，所以用contract_no代替contract_id
+    contract_no = fields.Char(string='Contract NO.', tracking=True, required=contract_payment)
+    contract_name = fields.Char(string='Contract Name', tracking=True, required=contract_payment)
+    contract_amount = fields.Float(string="Contract Total Amount", tracking=True, required=contract_payment)
     party_b_id = fields.Many2one('res.partner', string='Payee', index=True, copy=True, tracking=True,
                                  domain="[('company_id', '=', company_id)]")
     # Amount fields
@@ -208,15 +208,33 @@ class FundManagement(models.Model):
         default=0
     )
 
-    @api.depends('contract_id')  # 关键点：添加依赖确保合同变更时重新计算
+    @api.onchange('total_amount_currency')
+    def _onchange_total_amount_currency(self):
+        self.total_hist_include_this = self.total_amt_cur_hist_accu + self.total_amount_currency
+
+    @api.onchange('contract_no')
+    def _onchange_contract_no(self):
+        search_domain = [('state', 'in', ['submitted', 'approved', 'done']),
+                         '|', '&', ('contract_id', '=', self.contract_id), ('contract_id', '!=', False),
+                              '&', ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
+        rcd_hist = self.search(search_domain, order="create_date DESC", limit=1)
+        for rcd in rcd_hist:
+            if self.contract_name != rcd.contract_name:
+                self.contract_name = rcd.contract_name
+            if self.contract_amount != rcd.contract_amount:
+                self.contract_amount = rcd.contract_amount
+
+    @api.depends('contract_id', 'contract_no')  # 关键点：添加依赖确保合同变更时重新计算
     def _compute_apply_times(self):
         for record in self:
             # 如果 contract_id 未设置，直接返回默认值
-            if not record.contract_id:
+            if (not record.contract_id) and (not record.contract_no):
                 record.apply_times = 1
                 continue
             # 搜索同一合同的历史记录，按创建时间倒序排列
-            domain = [('contract_id', '=', record.contract_id.id)]
+            domain = [('state', 'in', ['submitted', 'approved', 'done']),
+                      '|', '&', ('contract_id', '=', self.contract_id), ('contract_id', '!=', False),
+                           '&', ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
             hist_records = self.search(domain, order="create_date DESC")
 
             # 排除当前记录自身（避免新建时干扰）
@@ -239,10 +257,24 @@ class FundManagement(models.Model):
 
     total_amt_cur_hist_accu = fields.Monetary(
         string="Historically Accumulation In Currency",
+        compute="_compute_total_amt_cur_hist_accu",
         currency_field='currency_id',
-        store=True, readonly=False,
-        tracking=True,
+        store=True, readonly=True,
     )
+
+    @api.depends('contract_id', 'contract_no')
+    def _compute_total_amt_cur_hist_accu(self):
+        for record in self:
+            search_domain = [('state', 'in', ['submitted', 'approved', 'done']),
+                             '|', '&', ('contract_id', '=', self.contract_id), ('contract_id', '!=', False),
+                                  '&', ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
+            records = self.search(search_domain)
+            apply_hist_amt = 0
+            for rcd in records:
+                if rcd.id != record.id:
+                    apply_hist_amt += rcd.total_amount_currency
+
+            record.total_amt_cur_hist_accu = apply_hist_amt
 
     total_amt_cur_hist_accu_percent = fields.Float(
         string="Historically Accumulation In Percentage",
@@ -250,7 +282,7 @@ class FundManagement(models.Model):
         tracking=False
     )
 
-    @api.depends('total_amt_cur_hist_accu', 'contract_amount')
+    @api.depends('total_amt_cur_hist_accu', 'contract_amount', 'total_amount_currency')
     def _compute_total_amt_cur_hist_accu_per(self):
         for record in self:
             if record.contract_amount:
@@ -317,6 +349,29 @@ class FundManagement(models.Model):
 
     approval_detail_ids = fields.One2many(comodel_name='fund.management.approval.detail',
                                           inverse_name='fund_management_id', string="Approval Details")
+    total_hist_include_this = fields.Monetary(
+        string="Historically Accumulation In Currency including this application",
+        compute="_compute_total_amt_cur_hist_accu_include_this", readonly=True,
+        currency_field='currency_id',
+    )
+    total_hist_percentage_include_this = fields.Float(
+        string="Historically Accumulation In Percentage including this application",
+        compute='_compute_total_amt_cur_hist_accu_per_include_this', readonly=True,
+    )
+
+    @api.depends('contract_id', 'contract_no', 'total_amount_currency')
+    def _compute_total_amt_cur_hist_accu_include_this(self):
+        for record in self:
+            record.total_hist_include_this = record.total_amt_cur_hist_accu + record.total_amount_currency
+
+    @api.depends('total_amt_cur_hist_accu', 'contract_amount', 'total_amount_currency')
+    def _compute_total_amt_cur_hist_accu_per_include_this(self):
+        for record in self:
+            if record.contract_amount:
+                record.total_hist_percentage_include_this = \
+                    (record.total_amt_cur_hist_accu + record.total_amount_currency) / record.contract_amount
+            else:
+                record.total_hist_percentage_include_this = 0
 
     @api.onchange("category_id")
     def _onchange_category_id(self):
@@ -397,37 +452,6 @@ class FundManagement(models.Model):
     def attach_document(self, **kwargs):
         """When an attachment is uploaded as a receipt, set it as the main attachment."""
         self.message_main_attachment_id = kwargs['attachment_ids'][-1]
-
-    # ----------------------------------------
-    # ORM Overrides
-    # ----------------------------------------
-
-    @api.ondelete(at_uninstall=False)
-    def _unlink_except_posted_or_approved(self):
-        for expense in self:
-            if expense.state in {'done', 'approved'}:
-                raise UserError(_('You cannot delete a posted or approved fund management application.'))
-
-    @api.model
-    def write(self, vals):
-        if 'tax_ids' in vals:
-            if any(not expense.is_editable for expense in self):
-                raise UserError(_('You are not authorized to edit this fund management application.'))
-
-        res = super().write(vals)
-
-        for record in self:
-            if not record._is_amount_in_category():
-                raise UserError(_("Contract amount should be in the category amount range!"))
-
-        return res
-
-    def unlink(self):
-        attachments_to_unlink = self.env['ir.attachment']
-        checksums = set(self.attachment_ids.mapped('checksum'))
-        attachments_to_unlink += self.attachment_ids.filtered(lambda att: att.checksum in checksums)
-        attachments_to_unlink.with_context(sync_attachment=False).unlink()
-        return super().unlink()
 
     # ----------------------------------------
     # Actions
@@ -1121,31 +1145,85 @@ class FundManagement(models.Model):
                 else:
                     return False
 
+    def _record_check(self):
+        for rcd in self:
+            if rcd.contract_payment:
+                if (not rcd.contract_no) or (not rcd.contract_amount) or (not rcd.contract_name):
+                    raise UserError(_("Please input Contract Info!"))
+
+                if rcd.total_amount_currency + rcd.total_amt_cur_hist_accu > rcd.contract_amount:
+                    raise UserError(_("The current application amount plus the cumulative historical "
+                                      "application amount cannot exceed the total contract amount!"))
+
+                # 判断是否存在本合同的审批中的流程
+                search_domain = [('state', 'in', ['submitted', 'approved', 'done']),
+                                 '|', '&', ('contract_id', '=', self.contract_id), ('contract_id', '!=', False),
+                                      '&', ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
+                records = self.search(search_domain)
+                for record in records:
+                    if record.id == rcd.id:
+                        continue
+                    if not record.stage.pipe_end:
+                        raise UserError(_(f"A fund payment application of this contract ["
+                                          f"Application Number:{record.apply_no};"
+                                          f"Description:{record.description};"
+                                          f"Stage:{record.stage.name};"
+                                          "] is in approval process (has not been approved!)! "
+                                          f"Please make it approved first!"))
+                    if record.contract_name != rcd.contract_name:
+                        raise UserError(_("Please keep the contract name consistent "
+                                          "with the contract name of historical applications:"
+                                          f"{record.contract_name}"))
+                    if record.contract_amount != rcd.contract_amount:
+                        raise UserError(_("Please keep the contract amount consistent "
+                                          "with the contract amount of historical applications:"
+                                          f"{record.contract_amount}"))
+
+            # 判断if-else 如果合同金额验证失败，进行下一步判断if rcd.contract_payment:
+            if not rcd._is_amount_in_category():
+                # 判断是否是为合同类支付，如果是提示Contract合同金额应在类别金额范围内，
+                # 如果不是提示Apply申请金额应在类别金额范围内
+                if rcd.contract_payment:
+                    raise UserError(_("Contract amount should be in the category amount range!"))
+                else:
+                    raise UserError(_("Apply amount should be in the category amount range!"))
+
+    # ----------------------------------------
+    # ORM Overrides
+    # ----------------------------------------
     @api.model
     def create(self, vals):
         rcd = super().create(vals)
 
-        # 判断if-else 如果合同金额验证失败，进行下一步判断if rcd.contract_payment:
-        if not rcd._is_amount_in_category():
-            # 判断是否是为合同类支付，如果是提示Contract合同金额应在类别金额范围内，
-            # 如果不是提示Apply申请金额应在类别金额范围内
-            if rcd.contract_payment:
-                raise UserError(_("Contract amount should be in the category amount range!"))
-            else:
-                raise UserError(_("Apply amount should be in the category amount range!"))
+        rcd._record_check()
 
-        # 判断是否存在本合同的审批中的流程
-        search_domain = [('contract_id', '=', rcd.contract_id)]
-        records = self.search(search_domain)
-        for record in records:
-            if not record.stage.pipe_end:
-                raise UserError(_(f"A fund payment application of this contract ["
-                                  f"Application Number:{record.apply_no};"
-                                  f"Description:{record.description};"
-                                  f"Stage:{record.stage.name};"
-                                  "] is in approval process (has not been approved!)! "
-                                  f"Please make it approved first!"))
         return rcd
+
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_posted_or_approved(self):
+        for expense in self:
+            if expense.state in {'done', 'approved'}:
+                raise UserError(_('You cannot delete a posted or approved fund management application.'))
+
+    @api.model
+    def write(self, vals):
+        if 'tax_ids' in vals:
+            if any(not expense.is_editable for expense in self):
+                raise UserError(_('You are not authorized to edit this fund management application.'))
+
+        res = super().write(vals)
+
+        for record in self:
+            record._record_check()
+
+        return res
+
+    def unlink(self):
+        attachments_to_unlink = self.env['ir.attachment']
+        checksums = set(self.attachment_ids.mapped('checksum'))
+        attachments_to_unlink += self.attachment_ids.filtered(lambda att: att.checksum in checksums)
+        attachments_to_unlink.with_context(sync_attachment=False).unlink()
+        return super().unlink()
 
     def action_print_application(self):
         if self.contract_payment:
