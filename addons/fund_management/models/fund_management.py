@@ -197,9 +197,9 @@ class FundManagement(models.Model):
                             default=lambda self: self._get_default_stage_id())
     stage_sequence = fields.Integer("Approval Stage Sequence NO.", related="stage.sequence")
     contract_id = fields.Integer(string='Contract ID')  # 现阶段不对接合同模块，所以用contract_no代替contract_id
-    contract_no = fields.Char(string='Contract NO.', tracking=True, required=contract_payment)
-    contract_name = fields.Char(string='Contract Name', tracking=True, required=contract_payment)
-    contract_amount = fields.Float(string="Contract Total Amount", tracking=True, required=contract_payment)
+    contract_no = fields.Char(string='Contract NO.', tracking=True)
+    contract_name = fields.Char(string='Contract Name', tracking=True)
+    contract_amount = fields.Float(string="Contract Total Amount", tracking=True)
     party_b_id = fields.Many2one('res.partner', string='Payee', index=True, copy=True, tracking=True,
                                  domain="[('company_id', '=', company_id)]")
     # Amount fields

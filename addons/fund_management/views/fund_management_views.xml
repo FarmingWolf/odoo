@@ -260,9 +260,9 @@
 
                         </group>
                         <group>
-                            <field name="contract_no" invisible="not contract_payment" readonly="not is_editable"/>
-                            <field name="contract_name" invisible="not contract_payment" readonly="not is_editable"/>
-                            <field name="contract_amount" invisible="not contract_payment" widget='monetary' readonly="not is_editable"/>
+                            <field name="contract_no" invisible="not contract_payment" readonly="not is_editable" required="contract_payment"/>
+                            <field name="contract_name" invisible="not contract_payment" readonly="not is_editable" required="contract_payment"/>
+                            <field name="contract_amount" invisible="not contract_payment" widget='monetary' readonly="not is_editable" required="contract_payment"/>
                             <field name="fund_type" readonly="not is_editable"/>
                             <field name="procurement_method" invisible="not contract_payment" readonly="not is_editable"/>
                             <field name="account_subject_category" readonly="not is_editable"/>
