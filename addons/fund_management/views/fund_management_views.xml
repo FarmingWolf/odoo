@@ -260,17 +260,17 @@
 
                         </group>
                         <group>
-                            <field name="contract_no" invisible="not contract_payment"/>
-                            <field name="contract_name" invisible="not contract_payment"/>
-                            <field name="contract_amount" invisible="not contract_payment" widget='monetary'/>
-                            <field name="fund_type"/>
-                            <field name="procurement_method" invisible="not contract_payment"/>
-                            <field name="account_subject_category"/>
-                            <field name="receiving_unit"/>
+                            <field name="contract_no" invisible="not contract_payment" readonly="not is_editable"/>
+                            <field name="contract_name" invisible="not contract_payment" readonly="not is_editable"/>
+                            <field name="contract_amount" invisible="not contract_payment" widget='monetary' readonly="not is_editable"/>
+                            <field name="fund_type" readonly="not is_editable"/>
+                            <field name="procurement_method" invisible="not contract_payment" readonly="not is_editable"/>
+                            <field name="account_subject_category" readonly="not is_editable"/>
+                            <field name="receiving_unit" readonly="not is_editable"/>
                             <field name="receiving_bank" domain="[('partner_id', '=', receiving_unit)]"
-                                   options="{'no_open': True, 'no_create': True}" readonly="not receiving_unit"/>
+                                   options="{'no_open': True, 'no_create': True}" readonly="(not receiving_unit) or (not is_editable)"/>
                             <field name="bank_account"/>
-                            <field name="payment_method" invisible="not contract_payment"/>
+                            <field name="payment_method" invisible="not contract_payment" readonly="not is_editable"/>
                         </group>
                     </group>
                     <div>

@@ -109,7 +109,7 @@
                         <div class="enter_exit_form_div" style="height: 3.67%;">
                             <div class="grid-line">
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 20%;">
+                                     style="column-span: 1; width: 20%;;padding-top: 5px;">
                                     <span>采购方式
                                     </span>
                                 </div>
@@ -239,7 +239,7 @@
                                         </div>
                                         <div class="grid-item-left"
                                              style="column-span: 1; width: 70%;padding-top: 15px;text-align: left; padding-left: 0;border-right: none;">
-                                            <span><t t-esc="doc.account_subject_category.name or '　'"/>
+                                            <span><t t-esc="doc.account_subject_category.code"/><t t-esc="doc.account_subject_category.name or '　'"/>
                                             </span>
                                         </div>
                                     </div>
@@ -252,9 +252,9 @@
                                             </span>
                                         </div>
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%;padding-top: 5px;text-align: left; padding-left: 0;">
+                                             style="column-span: 1; width: 20%;padding-top: 15px;text-align: left; padding-left: 0;">
                                             <span>
-                                                <t t-esc="doc.total_amt_cur_hist_accu or '　'"/>
+                                                <t t-esc="doc.total_hist_include_this or '　'"/>
                                             </span>
                                         </div>
 
@@ -266,7 +266,7 @@
                                         <div class="grid-item-left"
                                              style="column-span: 1; width: 20%;padding-top: 15px;border-right: none;text-align: left; padding-left: 0;">
                                             <span>
-                                                <t t-esc="doc.contract_amount - doc.total_amt_cur_hist_accu or '　'"/>
+                                                <t t-esc="doc.contract_amount - doc.total_hist_include_this or '　'"/>
                                             </span>
                                         </div>
                                     </div>
@@ -332,75 +332,55 @@
                             </div>
                         </div>
 
-                        <div class="enter_exit_form_div" style="height: 13.7%;">
+                        <div class="enter_exit_form_div" t-attf-style="height: {{doc.meeting_minutes_attach_div_h}}%;">
                             <div class="grid-line">
                                 <div class="grid-item-left" style="width: 20%;height:100%;">
-                                    <div style="margin-top: 55px">
-                                        <span>相关材料</span>
-                                    </div>
+                                    <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
+                                       <div t-attf-style="height: {{doc.meeting_minutes_attach_div_right_h}}%; padding-top: 5px;">
+                                           <t t-if="each_attach_type_index == ((len(doc.meeting_minute_types) + 1) // 2) - 1">
+                                               <span>相关材料</span>
+                                           </t>
+                                       </div>
+                                    </t>
                                 </div>
-                                <div class="grid-item-right" style="column-span: 4; width: 80%;">
-                                    <!-- 第一行 -->
-                                    <div class="grid-line" style="width: 100%; height: 33.33%; border-top: none;">
-                                        <div class="grid-item-left"
-                                             style="width: 50%; padding-top: 10px; border-top: none;">
-                                            <span style="margin-top: 10px">
-                                                <input type="checkbox" id="invoice" name="materials;"/>
-                                                <span>发票 ___ 张</span>
-                                            </span>
-                                        </div>
-                                        <div class="grid-item-right"
-                                             style="width: 50%; padding-top: 10px; border-top: none;border-right: none;">
-                                            <span style="margin-top: 10px; ">
-                                                <input type="checkbox" id="payment_application" name="materials"/>
-                                                <span>付款申请函</span>
-                                            </span>
-                                        </div>
-                                    </div>
+                                <div class="grid-item-right" style="column-span: 4; width: 80%;border-top: none;">
 
-                                    <!-- 第二行 -->
-                                    <div class="grid-line" style="column-span: 4; width: 100%; height: 33.33%;">
-                                        <div class="grid-item-left"
-                                             style="column-span: 1; width: 40%; padding-top: 10px">
-                                            <span style="margin-top: 10px">
-                                                <input type="checkbox" id="settlement_report" name="materials"/>
-                                                <label for="settlement_report">结算审核报告</label>
-                                            </span>
-                                        </div>
-                                        <div class="grid-item-left"
-                                             style="column-span: 1; width: 40%; padding-top: 10px; border-right: none">
-                                            <span style="margin-top: 10px">
-                                                <input type="checkbox" id="acceptance_form" name="materials"/>
-                                                <label for="acceptance_form">工程竣工验收单</label>
-                                            </span>
-                                        </div>
-                                    </div>
+                                    <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
+                                        <div class="grid-line" style="width: 100%; display: flex; align-items: center;" t-attf-style="height: {{doc.meeting_minutes_attach_div_right_h}}%;">
+                                            <div class="grid-item-left" style="width: 100%; border-right: none; text-align: left; padding-top: 5px;">
+                                                <span>
+                                                    <t t-foreach="doc.meeting_minutes_attach" t-as="each_attach">
+                                                        <t t-if="each_attach.type == each_attach_type">
+                                                            <t t-if="each_attach.nb_attachment != 0">
+                                                                <input type="checkbox" checked="1"/>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <input type="checkbox"/>
+                                                            </t>
 
-                                    <!-- 第三行 -->
-                                    <div class="grid-line"
-                                         style="column-span: 4; width: 100%; height: 35%;border-right: none;">
-                                        <div class="grid-item-left"
-                                             style="column-span: 1; width: 40%; padding-top: 10px;">
-                                            <span style="margin-top: 20px;">
-                                                <input type="checkbox" id="meeting_minutes"
-                                                       name="materials;border-right: none;"/>
-                                                <label for="meeting_minutes">企业会议纪要编号用章申请</label>
-                                            </span>
+                                                            <t t-if="each_attach_type.name == '发票'">
+                                                                <span>发票　<t t-esc="each_attach.nb_attachment"/>　张</span>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <span><t t-esc="each_attach_type.name"/></span>
+                                                            </t>
+                                                            <t t-if="each_attach.nb_attachment != 0">
+                                                                <t t-foreach="each_attach.attachment_ids" t-as="each_attachment_file">
+                                                                    <t t-esc="each_attachment_file.name"/>
+                                                                </t>
+                                                            </t>
+                                                        </t>
+                                                    </t>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </t>
 
-                                        </div>
-                                        <div class="grid-item-left"
-                                             style="column-span: 1; width: 40%; padding-top: 10px;border-right: none;">
-                                            <span style="margin-top: 20px">
-                                                <input type="checkbox" id="village_minutes" name="materials"/>
-                                                <label for="village_minutes">乡会议纪要编号</label>
-                                            </span>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="enter_exit_form_div" style="height: 4%;">
+                        <div class="enter_exit_form_div" style="height: 4%;" t-attf-style="#{'page-break-before:always;' if (len(doc.meeting_minute_types) >= 7) else ''}">
                             <div class="grid-line">
                                 <div class="grid-item-left" style="column-span: 1; width: 20%; border-right: none;">
                                     <div style="margin-top: 10px;">
@@ -412,7 +392,8 @@
 
                         <div class="enter_exit_form_div"
                              style="height: auto; border-top: 1px solid black; border-bottom: 2px solid black; position: relative; border-right: none; border-left: none;">
-                            <div class="grid-line" style="width: 100%; page-break-before: always;">
+                            <div class="grid-line" style="width: 100%;"
+                                 t-attf-style="#{'page-break-before:always;' if (len(doc.meeting_minute_types) &lt; 7) else ''}">
                                 <table style="width: 100%; border-collapse: collapse; margin: 0 auto; page-break-inside: avoid; border-left: 2px solid black; border-right: 2px solid black; border-bottom: 2px solid black;">
                                     <thead>
                                         <tr>
@@ -612,14 +593,12 @@
                                     <div class="grid-line" style="column-span: 4;width: 100%;height: 34.5%;">
                                         <div class="grid-item-left"
                                              style="column-span: 1; width: 20%; padding-top: 15px;">
-                                            <span>科目类别
-
-                                            </span>
+                                            <span>科目类别</span>
                                         </div>
                                         <div class="grid-item-left"
                                              style="column-span: 1; width: 70%;padding-top: 15px;border-right: none;text-align: left; padding-left: 0;">
                                             <span>
-                                                <t t-esc="doc.account_subject_category.name or '　'"/>
+                                                <t t-esc="doc.account_subject_category.code"/><t t-esc="doc.account_subject_category.name or '　'"/>
                                             </span>
                                         </div>
                                     </div>
@@ -701,7 +680,7 @@
                                              style="width: 100%; padding-top: 10px;border-right: none; text-align: left;">
                                             <span>
                                                 <input type="checkbox" id="invoice" name="materials"/>
-                                                <label for="invoice">发票 张</label>
+                                                <label for="invoice">发票　张</label>
                                             </span>
                                         </div>
                                     </div>

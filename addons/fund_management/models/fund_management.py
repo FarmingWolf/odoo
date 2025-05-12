@@ -151,6 +151,21 @@ class FundManagement(models.Model):
     meeting_minutes_attach = fields.One2many(string="Meeting minutes attachment", inverse_name="fund_management_id",
                                              comodel_name="fund.management.meeting.minutes")
 
+    meeting_minutes_attach_div_h = fields.Float(string="Meeting Minutes Types Area Height",
+                                                compute="_compute_meeting_minutes_attach_div_h", store=True)
+    meeting_minutes_attach_div_right_h = fields.Float(string="Meeting Minutes Types Area Right Height",
+                                                      compute="_compute_meeting_minutes_attach_div_h", store=True)
+
+    @api.depends("meeting_minutes_attach")
+    def _compute_meeting_minutes_attach_div_h(self):
+        for record in self:
+            record.meeting_minutes_attach_div_h = len(record.meeting_minute_types) * 4.56
+
+            if record.meeting_minute_types:
+                record.meeting_minutes_attach_div_right_h = 1 / len(record.meeting_minute_types) * 100
+            else:
+                record.meeting_minutes_attach_div_right_h = 33.33
+
     @api.model
     def _get_view(self, view_id=None, view_type='form', **options):
         default_category_id = self._get_default_category()
@@ -217,12 +232,26 @@ class FundManagement(models.Model):
         search_domain = [('state', 'in', ['submitted', 'approved', 'done']),
                          '|', '&', ('contract_id', '=', self.contract_id), ('contract_id', '!=', False),
                               '&', ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
-        rcd_hist = self.search(search_domain, order="create_date DESC", limit=1)
+        rcd_hist = self.search(search_domain, order="state ASC, create_date DESC", limit=1)
         for rcd in rcd_hist:
             if self.contract_name != rcd.contract_name:
                 self.contract_name = rcd.contract_name
             if self.contract_amount != rcd.contract_amount:
                 self.contract_amount = rcd.contract_amount
+            if self.fund_type != rcd.fund_type:
+                self.fund_type = rcd.fund_type
+            if self.procurement_method != rcd.procurement_method:
+                self.procurement_method = rcd.procurement_method
+            if self.account_subject_category != rcd.account_subject_category:
+                self.account_subject_category = rcd.account_subject_category
+            if self.receiving_unit != rcd.receiving_unit:
+                self.receiving_unit = rcd.receiving_unit
+            if self.receiving_bank != rcd.receiving_bank:
+                self.receiving_bank = rcd.receiving_bank
+            if self.bank_account != rcd.bank_account:
+                self.bank_account = rcd.bank_account
+            if self.payment_method != rcd.payment_method:
+                self.payment_method = rcd.payment_method
 
     @api.depends('contract_id', 'contract_no')  # 关键点：添加依赖确保合同变更时重新计算
     def _compute_apply_times(self):
@@ -814,7 +843,7 @@ class FundManagement(models.Model):
             ])
 
         if not expenses:
-            raise UserError(_('You have no fund application to report'))
+            raise UserError(_("You have no fund application to report"))
         return expenses.action_save_fund_management()
 
     # ----------------------------------------
@@ -1164,20 +1193,25 @@ class FundManagement(models.Model):
                     if record.id == rcd.id:
                         continue
                     if not record.stage.pipe_end:
-                        raise UserError(_(f"A fund payment application of this contract ["
-                                          f"Application Number:{record.apply_no};"
-                                          f"Description:{record.description};"
-                                          f"Stage:{record.stage.name};"
-                                          "] is in approval process (has not been approved!)! "
-                                          f"Please make it approved first!"))
+                        raise UserError(_(
+                            "A fund payment application of this contract is in approval process "
+                            "(has not been approved!)! Please make it approved first!"
+                            "[Application Number: %(apply_no)s; "
+                            "Description: %(description)s; "
+                            "Stage: %(stage_name)s; ]"
+                        ) % {
+                            'apply_no': record.apply_no,
+                            'description': record.description,
+                            'stage_name': record.stage.name})
+
                     if record.contract_name != rcd.contract_name:
                         raise UserError(_("Please keep the contract name consistent "
                                           "with the contract name of historical applications:"
-                                          f"{record.contract_name}"))
+                                          "%(contract_name)s") % {'contract_name': record.contract_name})
                     if record.contract_amount != rcd.contract_amount:
                         raise UserError(_("Please keep the contract amount consistent "
                                           "with the contract amount of historical applications:"
-                                          f"{record.contract_amount}"))
+                                          "%(contract_amount)s") % {'contract_amount': record.contract_amount})
 
             # 判断if-else 如果合同金额验证失败，进行下一步判断if rcd.contract_payment:
             if not rcd._is_amount_in_category():
@@ -1203,13 +1237,13 @@ class FundManagement(models.Model):
     def _unlink_except_posted_or_approved(self):
         for expense in self:
             if expense.state in {'done', 'approved'}:
-                raise UserError(_('You cannot delete a posted or approved fund management application.'))
+                raise UserError(_("You cannot delete a posted or approved fund management application."))
 
     @api.model
     def write(self, vals):
         if 'tax_ids' in vals:
             if any(not expense.is_editable for expense in self):
-                raise UserError(_('You are not authorized to edit this fund management application.'))
+                raise UserError(_("You are not authorized to edit this fund management application."))
 
         res = super().write(vals)
 

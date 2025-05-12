@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-10 16:43+0000\n"
-"PO-Revision-Date: 2025-05-10 16:43+0000\n"
+"POT-Creation-Date: 2025-05-12 06:23+0000\n"
+"PO-Revision-Date: 2025-05-12 06:23+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -293,6 +293,19 @@ msgid "<span>银行账号</span>"
 msgstr ""
 
 #. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid ""
+"A fund payment application of this contract is in approval process (has not "
+"been approved!)! Please make it approved first![Application Number: "
+"%(apply_no)s; Description: %(description)s; Stage: %(stage_name)s; ]"
+msgstr ""
+"本合同已有一个资金申请审批流程正在处理（尚未最终审批完成）"
+"请先确保其处理完成！[申请编号: "
+"%(apply_no)s; 申请事由: %(description)s; 阶段: %(stage_name)s; ]"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__account_subject_category
 msgid "Account Subject Category"
 msgstr "科目类别"
@@ -428,6 +441,13 @@ msgstr "申请比例"
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Apply Times"
 msgstr "申请付款"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid "Apply amount should be in the category amount range!"
+msgstr "申请资金额度应在所选流程分类设置的金额范围内！"
 
 #. module: fund_management
 #: model:ir.actions.server,name:fund_management.action_agree_svr_action
@@ -572,7 +592,7 @@ msgstr "附件列表"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__type
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Attachment Type"
-msgstr "会议纪要类型"
+msgstr "附件/会议纪要"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__attachment_ids
@@ -676,6 +696,13 @@ msgstr "是否合同资金支付"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_amount
 msgid "Contract Total Amount"
 msgstr "合同总额（元）"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid "Contract amount should be in the category amount range!"
+msgstr "合同金额应在所选流程分类设置的金额范围内！"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_select_view_tree
@@ -1175,8 +1202,9 @@ msgstr "会议纪要可编辑"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__meeting_minute_types
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__meeting_minute_types
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__name
+#: model:ir.model,name:fund_management.model_fund_management_meeting_minutes_type
 msgid "Meeting Minutes Type"
-msgstr "会议纪要类型"
+msgstr "附件/会议纪要"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__meeting_minute_types_by_category
@@ -1199,11 +1227,6 @@ msgid "Meeting minutes attachment"
 msgstr "会议纪要附件"
 
 #. module: fund_management
-#: model:ir.model,name:fund_management.model_fund_management_meeting_minutes_type
-msgid "Meeting minutes type"
-msgstr "会议纪要类型"
-
-#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_meeting_minutes_type_view_tree
 msgid "Meeting minutes type name"
 msgstr "会议纪要类型"
@@ -1211,7 +1234,7 @@ msgstr "会议纪要类型"
 #. module: fund_management
 #: model:ir.model.constraint,message:fund_management.constraint_fund_management_meeting_minutes_type_name
 msgid "Meeting minutes type name duplicated!"
-msgstr "会议纪要类型名称重复了！"
+msgstr "附件/会议纪要类型名称重复了！"
 
 #. module: fund_management
 #: model_terms:ir.actions.act_window,help:fund_management.fund_management_meeting_minutes_type
@@ -1370,6 +1393,29 @@ msgstr "请输入合同信息（合同编号、合同名称、合同总额）"
 #, python-format
 msgid "Please input approval comment..."
 msgstr "请输入审批意见..."
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid ""
+"Please keep the contract amount consistent with the contract amount of "
+"historical applications:%(contract_amount)s"
+msgstr ""
+"请确保合同金额与上次申请录入的合同金额保持一致！"
+"上次录入合同金额:%(contract_amount)s"
+
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid ""
+"Please keep the contract name consistent with the contract name of "
+"historical applications:%(contract_name)s"
+msgstr ""
+"请确保合同名称与上次申请录入的合同名称保持一致！"
+"上次录入合同名称:%(contract_name)s"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
@@ -1710,6 +1756,13 @@ msgid "Website communication history"
 msgstr "本站在线沟通记录"
 
 #. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid "You are not authorized to edit this fund management application."
+msgstr "您没有权限编辑本资金申请审批流。"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
 msgid ""
 "You can add a description to help understand the significance and purpose of"
@@ -1722,6 +1775,13 @@ msgid ""
 "You can define approval status labels here as the default labels in the "
 "Kanban view."
 msgstr "您可以在此处定义审批状态标签，作为看板视图中的默认标签。"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid "You cannot delete a posted or approved fund management application."
+msgstr "不能删除一个处于审批流程中或已完成审批的申请。"
 
 #. module: fund_management
 #. odoo-python
