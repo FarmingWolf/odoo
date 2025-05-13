@@ -423,8 +423,11 @@ class FundManagement(models.Model):
             if record.state == "draft":
                 record.is_editable = True
             else:
-                if record.stage and record.stage.input_meeting_minutes:
-                    record.is_editable = True
+                if record.stage:
+                    if record.stage.input_meeting_minutes or record.stage.sequence == 0:
+                        record.is_editable = True
+                    else:
+                        record.is_editable = False
                 else:
                     record.is_editable = False
 
@@ -546,7 +549,7 @@ class FundManagement(models.Model):
 
     def action_submit_fund_management(self):
         self.action_save_fund_management()
-        self.action_agree('新建', from_action_submit=True)
+        self.action_agree('', from_action_submit=True)
 
     def action_agree_confirm(self, context):
         _logger.info(f"context={context}")

@@ -183,96 +183,96 @@
                             </div>
                         </div>
                     </div>
-                    <group>
-                        <group>
-                            <field name="is_multiple_currency" invisible="1"/>
-                            <field name="is_editable" invisible="1"/>
-                            <field name="currency_id" invisible="1"/>
-                            <field name="company_id" invisible="1"/>
-                            <field name="company_currency_id" invisible="1"/>
-                            <field name="nb_attachment" invisible="1"/>
-                            <field name="total_amount" invisible="1"/>
-                            <field name="contract_payment" invisible="1"/>
-                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"
-                                   invisible="True"/>
-                            <field name="id" invisible="1"/>
-
-                            <label for="category_id"/>
-                            <div>
-                                <field name="category_id" required="1" readonly="1"
-                                       options="{'no_create': True, 'no_open': True}"
-                                       class="w-100" placeholder="Please choose"/>
-                                <div class="fst-italic">
-                                    <field name="category_description"/>
+                    <div>
+                        <field name="is_multiple_currency" invisible="1"/>
+                        <field name="is_editable" invisible="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="company_currency_id" invisible="1"/>
+                        <field name="nb_attachment" invisible="1"/>
+                        <field name="total_amount" invisible="1"/>
+                        <field name="contract_payment" invisible="1"/>
+                        <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"
+                               invisible="True"/>
+                        <field name="id" invisible="1"/>
+                        <group cols="2">
+                            <group cols="1">
+                                <label for="category_id"/>
+                                <div>
+                                    <field name="category_id" required="1" readonly="1"
+                                           options="{'no_create': True, 'no_open': True}"
+                                           class="w-100" placeholder="Please choose"/>
+                                    <div class="fst-italic">
+                                        <field name="category_description"/>
+                                    </div>
                                 </div>
-                            </div>
+                                <field name="is_editable" invisible="1"/>
+                                <field name="date" readonly="not is_editable"/>
+                                <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'" invisible="True"/>
+                                <t groups="fund_management.group_fund_management_team_approver">
+                                    <field name="employee_id" groups="!hr.group_hr_user"
+                                           context="{'default_company_id': company_id}" widget="many2one_avatar_employee"
+                                           options="{'relation': 'hr.employee.public', 'no_create': True}"
+                                           readonly="1"/>
+                                    <field name="employee_id" groups="hr.group_hr_user"
+                                           context="{'default_company_id': company_id}" widget="many2one_avatar_employee"
+                                           options="{'relation': 'hr.employee', 'no_create': True}"
+                                           readonly="1"/>
+                                </t>
+                                <field name="applicant_unit" readonly="1"/>
+                                <!-- CASE: product has no cost defined -> user input amount (in other currency if multi-currency) -->
+                                <label for="total_amount_currency" string="Amount Apply" readonly="not is_editable"/>
+                                <div class="o_row">
+                                    <field name="total_amount_currency" widget='monetary'
+                                           options="{'currency_field': 'currency_id'}"
+                                           readonly="not is_editable"/>
+                                    <field name="currency_id" class="mw-25 ms-0" groups="base.group_multi_currency"
+                                           options="{'no_create': True}" readonly="not is_editable" invisible="1"/>
+                                </div>
+                                <field name="total_amount_currency_percent" invisible="not contract_payment"
+                                       widget="percentage"/>
+                                <label for="apply_times" invisible="not contract_payment" string="Apply Times"/>
+                                <div>
+                                    <span invisible="not contract_payment">
+                                        The<field name="apply_times" class="oe_inline o_input_9ch"/>
+                                        Time Payment
+                                    </span>
+                                </div>
+                                <label for="total_amt_cur_hist_accu" invisible="not contract_payment"
+                                       string="Historically Accumulation In Currency"/>
 
-                            <!-- CASE: product has no cost defined -> user input amount (in other currency if multi-currency) -->
-                            <label for="total_amount_currency" string="Amount Apply" readonly="not is_editable"/>
-                            <div class="o_row">
-                                <field name="total_amount_currency" widget='monetary'
-                                       options="{'currency_field': 'currency_id'}"
-                                       readonly="not is_editable"/>
-                                <field name="currency_id" class="mw-25 ms-0" groups="base.group_multi_currency"
-                                       options="{'no_create': True}" readonly="not is_editable" invisible="1"/>
-                            </div>
-                            <field name="total_amount_currency_percent" invisible="not contract_payment"
-                                   widget="percentage"/>
-                            <label for="apply_times" invisible="not contract_payment" string="Apply Times"/>
-                            <div>
-                                <span invisible="not contract_payment">
-                                    The<field name="apply_times" class="oe_inline o_input_9ch"/>
-                                    Time Payment
-                                </span>
-                            </div>
-                            <label for="total_amt_cur_hist_accu" invisible="not contract_payment"
-                                   string="Historically Accumulation In Currency"/>
+                                <div>
+                                    <field name="total_amt_cur_hist_accu" invisible="not contract_payment" widget='monetary'
+                                           options="{'currency_field': 'currency_id'}"/>
+                                </div>
+                                <field name="total_amt_cur_hist_accu_percent" invisible="not contract_payment"
+                                       widget="percentage"/>
+                                <label for="total_hist_include_this" invisible="not contract_payment"
+                                       string="Historically Accumulation In Currency including this application"/>
 
-                            <div>
-                                <field name="total_amt_cur_hist_accu" invisible="not contract_payment" widget='monetary'
-                                       options="{'currency_field': 'currency_id'}"/>
-                            </div>
-                            <field name="total_amt_cur_hist_accu_percent" invisible="not contract_payment"
-                                   widget="percentage"/>
-                            <label for="total_hist_include_this" invisible="not contract_payment"
-                                   string="Historically Accumulation In Currency including this application"/>
+                                <div>
+                                    <field name="total_hist_include_this" invisible="not contract_payment" widget='monetary'
+                                           options="{'currency_field': 'currency_id'}"/>
+                                </div>
+                                <field name="total_hist_percentage_include_this" invisible="not contract_payment"
+                                       widget="percentage"/>
 
-                            <div>
-                                <field name="total_hist_include_this" invisible="not contract_payment" widget='monetary'
-                                       options="{'currency_field': 'currency_id'}"/>
-                            </div>
-                            <field name="total_hist_percentage_include_this" invisible="not contract_payment"
-                                   widget="percentage"/>
-                            <field name="date" readonly="not is_editable"/>
-                            <field name="is_editable" invisible="1"/>
-                            <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'" invisible="True"/>
-                            <t groups="fund_management.group_fund_management_team_approver">
-                                <field name="employee_id" groups="!hr.group_hr_user"
-                                       context="{'default_company_id': company_id}" widget="many2one_avatar_employee"
-                                       options="{'relation': 'hr.employee.public', 'no_create': True}"
-                                       readonly="1"/>
-                                <field name="employee_id" groups="hr.group_hr_user"
-                                       context="{'default_company_id': company_id}" widget="many2one_avatar_employee"
-                                       options="{'relation': 'hr.employee', 'no_create': True}"
-                                       readonly="1"/>
-                            </t>
-                            <field name="applicant_unit" readonly="1"/>
-
+                            </group>
+                            <group cols="1">
+                                <field name="contract_no" invisible="not contract_payment" readonly="not is_editable" required="contract_payment"/>
+                                <field name="contract_name" invisible="not contract_payment" readonly="not is_editable" required="contract_payment"/>
+                                <field name="contract_amount" invisible="not contract_payment" widget='monetary' readonly="not is_editable" required="contract_payment"/>
+                                <field name="fund_type" readonly="not is_editable"/>
+                                <field name="procurement_method" invisible="not contract_payment" readonly="not is_editable"/>
+                                <field name="account_subject_category" readonly="not is_editable"/>
+                                <field name="receiving_unit" readonly="not is_editable"/>
+                                <field name="receiving_bank" domain="[('partner_id', '=', receiving_unit)]"
+                                       options="{'no_open': True, 'no_create': True}" readonly="(not receiving_unit) or (not is_editable)"/>
+                                <field name="bank_account"/>
+                                <field name="payment_method" readonly="not is_editable"/>
+                            </group>
                         </group>
-                        <group>
-                            <field name="contract_no" invisible="not contract_payment" readonly="not is_editable" required="contract_payment"/>
-                            <field name="contract_name" invisible="not contract_payment" readonly="not is_editable" required="contract_payment"/>
-                            <field name="contract_amount" invisible="not contract_payment" widget='monetary' readonly="not is_editable" required="contract_payment"/>
-                            <field name="fund_type" readonly="not is_editable"/>
-                            <field name="procurement_method" invisible="not contract_payment" readonly="not is_editable"/>
-                            <field name="account_subject_category" readonly="not is_editable"/>
-                            <field name="receiving_unit" readonly="not is_editable"/>
-                            <field name="receiving_bank" domain="[('partner_id', '=', receiving_unit)]"
-                                   options="{'no_open': True, 'no_create': True}" readonly="(not receiving_unit) or (not is_editable)"/>
-                            <field name="bank_account"/>
-                            <field name="payment_method" invisible="not contract_payment" readonly="not is_editable"/>
-                        </group>
-                    </group>
+                    </div>
                     <div>
                         <field name="description" placeholder="Notes..." readonly="not is_editable"/>
                         <field name="meeting_minutes_editable" invisible="1"/>

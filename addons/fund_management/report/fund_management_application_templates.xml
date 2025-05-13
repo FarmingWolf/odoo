@@ -9,7 +9,7 @@
                 <div class="fm_report">
                     <t t-foreach="docs" t-as="doc">
                         <div class="enter_exit_form_div"
-                             style="border-top: 2px solid black; height: 5.31%; border-top: none;border-right: none; border-left: none;">
+                             style="height: 5.31%; border-top: none;border-right: none; border-left: none;">
                             <div style="column-span: all; margin-top: 10px;">
                                 <span style="font-size: 30px; font-weight: bold;"><t t-esc="doc.employee_id.department_id.name"/>合同资金支付审批单</span>
                             </div>
@@ -75,15 +75,12 @@
                                         <div class="div-single-item">
                                             <div style="height: 50%;">
                                                 <div style="height: 50%;"/>
-                                                <div style="height: 50%;">
-                                                    <span><t t-esc="doc.name"/></span>
+                                                <div>
+                                                    <span><t t-esc="doc.name"/>　</span>
+                                                    <span><t t-esc="doc.description or '　'"/></span>
                                                 </div>
                                             </div>
                                             <div style="height: 50%">
-                                                <div style="height: 50%;">
-                                                    <span><t t-esc="doc.description or '　'"/></span>
-                                                </div>
-                                                <div style="height: 50%;"/>
                                             </div>
                                         </div>
                                     </div>
@@ -125,9 +122,9 @@
                             <div class="grid-line" style="column-span: 5;">
                                 <div class="grid-item-left" style="column-span: 1; width: 20%; height: 100%;">
                                     <div style="margin-top: 110px">
-                                        <span style="font-weight: bold">资金构成</span>
+                                        <span>资金构成</span>
                                         <br/>
-                                        <span style="font-weight: bold; margin-left: 10px">及支付情况</span>
+                                        <span style="margin-left: 10px">及支付情况</span>
                                     </div>
                                 </div>
                                 <div class="grid-item-right" style="column-span: 4; width: 80%; height: 100%;">
@@ -333,7 +330,7 @@
                         </div>
 
                         <div class="enter_exit_form_div" t-attf-style="height: {{doc.meeting_minutes_attach_div_h}}%;">
-                            <div class="grid-line">
+                            <div class="grid-line" style="border-bottom: 2px solid black;" >
                                 <div class="grid-item-left" style="width: 20%;height:100%;">
                                     <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
                                        <div t-attf-style="height: {{doc.meeting_minutes_attach_div_right_h}}%; padding-top: 5px;">
@@ -358,7 +355,7 @@
                                                                 <input type="checkbox"/>
                                                             </t>
 
-                                                            <t t-if="each_attach_type.name == '发票'">
+                                                            <t t-if="'发票' in each_attach_type.name">
                                                                 <span>发票　<t t-esc="each_attach.nb_attachment"/>　张</span>
                                                             </t>
                                                             <t t-else="">
@@ -380,8 +377,8 @@
                             </div>
                         </div>
 
-                        <div class="enter_exit_form_div" style="height: 4%;" t-attf-style="#{'page-break-before:always;' if (len(doc.meeting_minute_types) >= 7) else ''}">
-                            <div class="grid-line">
+                        <div class="enter_exit_form_div" style="height: 4%; page-break-before:always;">
+                            <div class="grid-line" style="border-top: 1px solid black;">
                                 <div class="grid-item-left" style="column-span: 1; width: 20%; border-right: none;">
                                     <div style="margin-top: 10px;">
                                         <span>审批流程</span>
@@ -391,9 +388,8 @@
                         </div>
 
                         <div class="enter_exit_form_div"
-                             style="height: auto; border-top: 1px solid black; border-bottom: 2px solid black; position: relative; border-right: none; border-left: none;">
-                            <div class="grid-line" style="width: 100%;"
-                                 t-attf-style="#{'page-break-before:always;' if (len(doc.meeting_minute_types) &lt; 7) else ''}">
+                             style="height: auto; position: relative; border-right: none; border-left: none;">
+                            <div class="grid-line" style="width: 100%;">
                                 <table style="width: 100%; border-collapse: collapse; margin: 0 auto; page-break-inside: avoid; border-left: 2px solid black; border-right: 2px solid black; border-bottom: 2px solid black;">
                                     <thead>
                                         <tr>
@@ -455,7 +451,7 @@
                 <div class="fm_report">
                     <t t-foreach="docs" t-as="doc">
                         <div class="enter_exit_form_div"
-                             style="border-top: 2px solid black; height: 5.31%; border-top: none;border-right: none; border-left: none;">
+                             style="height: 5.31%; border-top: none;border-right: none; border-left: none;">
                             <div style="column-span: all; margin-top: 10px;">
                                 <span style="font-size: 30px; font-weight: bold;"><t t-esc="doc.employee_id.department_id.name"/>其他资金支付审批单</span>
                             </div>
@@ -480,7 +476,7 @@
                             </div>
                         </div>
 
-                        <div class="enter_exit_form_div" style="height: 3.67%; border-top: 2px solid black;">
+                        <div class="enter_exit_form_div" style="height: 3.67%; border-top: 1px solid black;">
                             <div class="grid-line">
                                 <div class="grid-item-left"
                                      style="style=column-span: 1; width: 20%; padding-top: 5px;">
@@ -509,13 +505,24 @@
                         <div class="enter_exit_form_div" style="height: 10%;">
                             <div class="grid-line">
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 20%;padding-top: 30px;">
+                                     style="column-span: 1; width: 20%;height:100%;padding-top: 35px;">
                                     <span>申请资金事由
                                     </span>
                                 </div>
-                                <div class="grid-single-item-right" style="background-color: red">
-                                    <span><t t-esc="doc.name"/></span><br/>
-                                    <span><t t-esc="doc.description or '　'"/></span>
+                                <div class="grid-item-right" style="width: 80%;">
+                                    <div class="grid-single-item-right">
+                                        <div class="div-single-item">
+                                            <div style="height: 50%;">
+                                                <div style="height: 50%;"/>
+                                                <div>
+                                                    <span><t t-esc="doc.name"/>　</span>
+                                                    <span><t t-esc="doc.description or '　'"/></span>
+                                                </div>
+                                            </div>
+                                            <div style="height: 50%">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -524,26 +531,23 @@
                             <div class="grid-line">
                                 <div class="grid-item-left"
                                      style="column-span: 1; width: 20%;padding-top: 5px;">
-                                    <span>资金类型
-
-                                    </span>
+                                    <span>资金类型</span>
                                 </div>
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 80%;padding-top: 5px;border-right: none;text-align: left; padding-left: 0;">
+                                     style="column-span: 1; width: 80%;padding-top: 5px;text-align: left; padding-left: 0;border-right: none;">
                                     <span><t t-esc="doc.fund_type.name or '　'"/>
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-
                         <div class="enter_exit_form_div" style="height: 15%;">
                             <div class="grid-line" style="column-span: 5;">
                                 <div class="grid-item-left" style="column-span: 1; width: 20%; height: 100%;">
                                     <div style="margin-top: 50px">
-                                        <span style="font-weight: bold">资金构成</span>
+                                        <span>资金构成</span>
                                         <br/>
-                                        <span style="font-weight: bold; margin-left: 10px">及支付情况</span>
+                                        <span style="margin-left: 10px">及支付情况</span>
                                     </div>
                                 </div>
 
@@ -569,7 +573,7 @@
                                         </div>
                                         <div class="grid-item-left"
                                              style="column-span: 1; width: 18%;padding-top: 15px;border-right: none;text-align: left; padding-left: 0;">
-                                            <span><t t-esc="doc.contract_no or '　'"/>
+                                            <span><t t-esc="doc.total_amount_currency or '　'"/>
                                             </span>
                                         </div>
                                     </div>
@@ -665,10 +669,10 @@
                             </div>
                         </div>
 
-                        <div class="enter_exit_form_div" style="height: 15%;">
+                        <div class="enter_exit_form_div" style="height: 17%;">
                             <div class="grid-line">
                                 <div class="grid-item-left" style="width: 20%; height:100%;">
-                                    <div style="margin-top: 63px">
+                                    <div style="margin-top: 70px">
                                         <span>相关材料</span>
                                     </div>
                                 </div>
@@ -679,8 +683,23 @@
                                         <div class="grid-item-left"
                                              style="width: 100%; padding-top: 10px;border-right: none; text-align: left;">
                                             <span>
-                                                <input type="checkbox" id="invoice" name="materials"/>
-                                                <label for="invoice">发票　张</label>
+                                                <t t-foreach="doc.meeting_minutes_attach" t-as="each_attach">
+                                                    <t t-if="'发票' in each_attach.type.name">
+                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                            <input type="checkbox" checked="1"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <input type="checkbox"/>
+                                                        </t>
+
+                                                        <span>发票　<t t-esc="each_attach.nb_attachment"/>　张</span>
+                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                            <t t-foreach="each_attach.attachment_ids" t-as="each_attachment_file">
+                                                                <t t-esc="each_attachment_file.name"/>
+                                                            </t>
+                                                        </t>
+                                                    </t>
+                                                </t>
                                             </span>
                                         </div>
                                     </div>
@@ -691,8 +710,23 @@
                                         <div class="grid-item-left"
                                              style="width: 100%; padding-top: 10px;border-right: none; text-align: left;">
                                             <span>
-                                                <input type="checkbox" id="meeting_minutes" name="materials"/>
-                                                <label for="meeting_minutes">企业会议纪要编号</label>
+                                                <t t-foreach="doc.meeting_minutes_attach" t-as="each_attach">
+                                                    <t t-if="'企业会议纪要' in each_attach.type.name">
+                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                            <input type="checkbox" checked="1"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <input type="checkbox"/>
+                                                        </t>
+
+                                                        <span>企业会议纪要编号　</span>
+                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                            <t t-foreach="each_attach.attachment_ids" t-as="each_attachment_file">
+                                                                <t t-esc="each_attachment_file.name"/>
+                                                            </t>
+                                                        </t>
+                                                    </t>
+                                                </t>
                                             </span>
                                         </div>
                                     </div>
@@ -703,8 +737,23 @@
                                         <div class="grid-item-left"
                                              style="width: 100%; padding-top: 10px;border-right: none; text-align: left;">
                                             <span>
-                                                <input type="checkbox" id="village_minutes" name="materials"/>
-                                                <label for="village_minutes">乡会议纪要编号</label>
+                                                <t t-foreach="doc.meeting_minutes_attach" t-as="each_attach">
+                                                    <t t-if="'乡会议纪要' in each_attach.type.name">
+                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                            <input type="checkbox" checked="1"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <input type="checkbox"/>
+                                                        </t>
+
+                                                        <span>乡会议纪要编号　</span>
+                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                            <t t-foreach="each_attach.attachment_ids" t-as="each_attachment_file">
+                                                                <t t-esc="each_attachment_file.name"/>
+                                                            </t>
+                                                        </t>
+                                                    </t>
+                                                </t>
                                             </span>
                                         </div>
                                     </div>
@@ -784,7 +833,7 @@
                         </div>
 
 
-                        <div class="enter_exit_form_div" style="height: 3.67%;">
+                        <div class="enter_exit_form_div" style="height: 3.67%;border-bottom: 1px solid black;">
                             <div class="grid-line">
                                 <div class="grid-item-left" style="width: 20%;height:100%;">
                                     <div style="margin-top: 8px">
@@ -797,8 +846,9 @@
                             </div>
                         </div>
 
-                        <div class="enter_exit_form_div" style="height: 4%;">
-                            <div class="grid-line">
+                        <div class="enter_exit_form_div"
+                             style="height: auto; border-top: 1px solid black; border-bottom: none; position: relative; page-break-before: always;">
+                            <div class="grid-line" style="width: 100%;">
                                 <div class="grid-item-left" style="column-span: 1; width: 20%; border-right: none;">
                                     <div style="margin-top: 10px;">
                                         <span>审批流程</span>
@@ -807,13 +857,12 @@
                             </div>
                         </div>
 
-                        <div class="enter_exit_form_div"
-                             style="height: auto; border-top: 1px solid black; border-bottom: 2px solid black; position: relative; border-right: none; border-left: none;">
-                            <div class="grid-line" style="width: 100%; page-break-before: always;">
-                                <table style="width: 100%; border-collapse: collapse; margin: 0 auto; page-break-inside: avoid; border-left: 2px solid black; border-right: 2px solid black; border-bottom: 2px solid black;">
+                        <div class="enter_exit_form_div">
+                            <div class="grid-line">
+                                <table style="width: 100%; border-collapse: collapse; margin: 0 auto; page-break-inside: avoid; border-left: none; border-right: none; border-bottom: 2px solid black;">
                                     <thead>
                                         <tr>
-                                            <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
+                                            <th style="border: 1px solid black; border-left: none; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
                                                 审批阶段
                                             </th>
                                             <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
@@ -825,17 +874,17 @@
                                             <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
                                                 审批备注
                                             </th>
-                                            <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
+                                            <th style="border: 1px solid black; border-right: none; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
                                                 审批时间
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody style="border-right: none;">
                                         <t t-set="approval_details"
                                            t-value="doc.approval_detail_ids.sorted(key=lambda r: r.id)"/>
                                         <t t-foreach="approval_details" t-as="detail">
                                             <tr>
-                                                <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
+                                                <td style="border: 1px solid black; border-left: none; padding: 5px; text-align: center; vertical-align: middle;">
                                                     <t t-esc="detail.approval_stage_nm or '　'"/>
                                                 </td>
                                                 <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
@@ -847,7 +896,7 @@
                                                 <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
                                                     <t t-esc="detail.approval_comments or '　'"/>
                                                 </td>
-                                                <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
+                                                <td style="border: 1px solid black; border-right: none; padding: 5px; text-align: center; vertical-align: middle;">
                                                     <t t-esc="detail.approval_date_time or '　'"/>
                                                 </td>
                                             </tr>
