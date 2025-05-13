@@ -126,9 +126,9 @@ class EstateLeaseContractPropertyExtend(models.Model):
                                                                    ('direct_and_franchisee', '直营+加盟')],
                                                         default='direct_sale', store=False)
     set_rent_plan_business_type_id = fields.Many2one("estate.lease.contract.rental.business.type", string="经营业态",
-                                                     store=False)
+                                                     store=False, default=lambda self: self._get_default_business_type())
     set_rent_plan_main_category = fields.Many2one("estate.lease.contract.rental.main.category", string="主品类",
-                                                  store=False)
+                                                  store=False, default=lambda self: self._get_default_main_category())
     set_rent_plan_billing_method = fields.Selection(string='计费方式', store=False,
                                                     selection=[('by_fixed_price', '固定金额'), ('by_progress', '按递增率')],
                                                     default='by_fixed_price')
@@ -161,6 +161,22 @@ class EstateLeaseContractPropertyExtend(models.Model):
     # 该字段仅在租赁标的主页面选择固定金额方案，并设置固定租金时可设置
     set_rent_plan_including_management_fee = fields.Boolean(string="含物业费", default=True,
                                                             help="勾选表示租金包含物业费，不勾选则表示租金不包含物业费")
+
+    def _get_default_business_type(self):
+        default_types = self.env["estate.lease.contract.rental.business.type"].search(domain=[], limit=1)
+        tgt_type_id = False
+        for default_type in default_types:
+            tgt_type_id = default_type.id
+
+        return tgt_type_id
+
+    def _get_default_main_category(self):
+        default_types = self.env["estate.lease.contract.rental.main.category"].search(domain=[], limit=1)
+        tgt_type_id = False
+        for default_type in default_types:
+            tgt_type_id = default_type.id
+
+        return tgt_type_id
 
     @api.onchange("set_rent_plan_payment_period")
     def _onchange_set_rent_plan_payment_period(self):
@@ -817,12 +833,12 @@ class EstateLeaseContractPropertyExtend(models.Model):
         if 'set_rent_plan_business_type_id' in vals:
             set_rent_plan_business_type_id = vals['set_rent_plan_business_type_id']
         else:
-            set_rent_plan_business_type_id = self._origin.set_rent_plan_business_type_id
+            set_rent_plan_business_type_id = self._origin.set_rent_plan_business_type_id.id
 
         if 'set_rent_plan_main_category' in vals:
             set_rent_plan_main_category = vals['set_rent_plan_main_category']
         else:
-            set_rent_plan_main_category = self._origin.set_rent_plan_main_category
+            set_rent_plan_main_category = self._origin.set_rent_plan_main_category.id
 
         set_rent_plan_billing_method = 'by_fixed_price'
 

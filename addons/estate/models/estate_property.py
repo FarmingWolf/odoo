@@ -78,7 +78,8 @@ class EstateProperty(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char('资产名称', required=True, translate=True, tracking=True)
-    property_type_id = fields.Many2one("estate.property.type", string="资产类型")
+    property_type_id = fields.Many2one("estate.property.type", string="资产类型",
+                                       default=lambda self: self._get_default_property_type())
     tag_ids = fields.Many2many("estate.property.tag", string="标签")
     sales_person_id = fields.Many2one('res.users', string='销售员', index=True,
                                       default=lambda self: self.env.user,
@@ -148,6 +149,14 @@ class EstateProperty(models.Model):
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
     latitude = fields.Float(string="latitude")
     longitude = fields.Float(string="longitude")
+
+    def _get_default_property_type(self):
+        default_types = self.env["estate.property.type"].search([('name', 'ilike', '办公')], limit=1)
+        tgt_type_id = False
+        for default_type in default_types:
+            tgt_type_id = default_type.id
+
+        return tgt_type_id
 
     @api.model
     def update_property_location(self, record_id, latitude, longitude):

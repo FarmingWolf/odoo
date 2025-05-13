@@ -607,6 +607,7 @@ class Partner(models.Model):
     _description = '直接输入名称创建partner'
     _inherit = 'res.partner'
 
+    is_company = fields.Boolean(default=True)
     contract_party_b_id = fields.One2many(comodel_name="estate.lease.contract", inverse_name="renter_id",
                                           string="乙方单位/个人", copy=False)
     contract_party_b_contact_name = fields.Char(string="联系人", compute="_compute_party_b_contact_info")

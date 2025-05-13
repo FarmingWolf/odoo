@@ -37,8 +37,10 @@ class EstateLeaseContractRentalPlan(models.Model):
                                                      ('agent', '代理'), ('direct_and_agent', '直营+代理'),
                                                      ('direct_and_franchisee', '直营+加盟')], )
 
-    business_type_id = fields.Many2one("estate.lease.contract.rental.business.type", string="经营业态")
-    main_category = fields.Many2one("estate.lease.contract.rental.main.category", string="主品类")
+    business_type_id = fields.Many2one("estate.lease.contract.rental.business.type", string="经营业态",
+                                       default=lambda self: self._get_default_business_type())
+    main_category = fields.Many2one("estate.lease.contract.rental.main.category", string="主品类",
+                                    default=lambda self: self._get_default_main_category())
 
     billing_method = fields.Selection(string='计费方式', required=True, default="by_progress",
                                       selection=[('by_fixed_price', '固定金额'), ('by_percentage', '纯抽成'),
@@ -94,6 +96,22 @@ class EstateLeaseContractRentalPlan(models.Model):
     _sql_constraints = [
         ('name', 'unique(name, company_id)', '租金方案名不能重复')
     ]
+
+    def _get_default_business_type(self):
+        default_types = self.env["estate.lease.contract.rental.business.type"].search(domain=[], limit=1)
+        tgt_type_id = False
+        for default_type in default_types:
+            tgt_type_id = default_type.id
+
+        return tgt_type_id
+
+    def _get_default_main_category(self):
+        default_types = self.env["estate.lease.contract.rental.main.category"].search(domain=[], limit=1)
+        tgt_type_id = False
+        for default_type in default_types:
+            tgt_type_id = default_type.id
+
+        return tgt_type_id
 
     @api.model
     def create(self, vals_list):
