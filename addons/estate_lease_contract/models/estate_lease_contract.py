@@ -100,7 +100,7 @@ def _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, pro
 
 
 def _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property_id, rent_price_adapt,
-                       rent_amount_monthly_adapt, one_year_days):
+                       rent_amount_monthly_adapt, one_year_days, rent_price_period_lst):
     """
     租金计算方法：先计算年租金，再计算每月租金或每期租金
     年租金=租金单价×计租面积×一年天数
@@ -109,18 +109,43 @@ def _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property
     三个月租金=月租金×3
     以此类推
     """
-    # rental_amount_year = property_id.rent_area * rent_price_val * one_year_days
-    # rental_amount_month = rental_amount_year / 12
 
-    # if property_id.rent_amount_monthly_adjust:
-    #     rental_amount_month = property_id.rent_amount_monthly_adjust
-    rental_amount_month = rent_amount_monthly_adapt
+    # 如果本期垮了多个月，那么有可能本期租金垮了递增区间临界值
+    rental_amount = 0
+    if month_cnt <= 1:
 
-    if date_e > current_e:
-        rental_amount = rental_amount_month * month_cnt
-    else:  # 最后一期租金
-        rental_amount = _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, property_id,
-                                                rent_price_adapt, rent_amount_monthly_adapt, one_year_days)
+        rental_amount_month = rent_amount_monthly_adapt
+
+        if date_e > current_e:
+            rental_amount = rental_amount_month * month_cnt
+        else:  # 最后一期租金
+            rental_amount = _cal_last_period_rental(month_cnt, current_s, current_e, date_s, date_e, property_id,
+                                                    rent_price_adapt, rent_amount_monthly_adapt, one_year_days)
+    else:
+        # 每个月单独获取rent_price_adapt和rent_amount_monthly_adapt，再累加
+        for i in range(month_cnt):
+            tmp_current_s = current_s
+            _logger.info(f"tmp_current_s={tmp_current_s}")
+            for ii in range(i):
+                tmp_current_e = _get_current_e(tmp_current_s)
+                tmp_current_s = tmp_current_e + timedelta(days=1)
+                _logger.info(f"tmp_current_s={tmp_current_s}")
+
+            if tmp_current_s > date_e:
+                break
+
+            tmp_current_e = _get_current_e(tmp_current_s)
+
+            tmp_monthly_adapt, tmp_price_adapt = _cal_rent_price_and_amount_monthly_val(tmp_current_s,
+                                                                                        rent_price_period_lst)
+            _logger.info(f"tmp_current_s={tmp_current_s};tmp_monthly_adapt={tmp_monthly_adapt};"
+                         f"tmp_price_adapt={tmp_price_adapt}")
+            if date_e > tmp_current_e:
+                rental_amount += tmp_monthly_adapt
+            else:
+                rental_amount += _cal_last_period_rental(1, tmp_current_s, tmp_current_e, date_s, date_e, property_id,
+                                                         tmp_price_adapt, tmp_monthly_adapt, one_year_days)
+            _logger.info(f"rental_amount({i})={rental_amount}")
 
     return rental_amount
 
@@ -242,8 +267,8 @@ def _prepare_rent_price_period_lst(property_id, rent_amount_monthly_val, rental_
 
                 # 这才开始进入第一条递增期间
                 temp_date_s = temp_date_e + timedelta(days=1)
-
                 next_date_s_or_total_end = record_self.date_rent_end
+                _logger.info(f"递增开始日：{temp_date_s}，next_date_s_or_total_end={next_date_s_or_total_end}")
 
                 next_date_s = next_date_s_or_total_end + timedelta(days=1)  # 这只是虚拟值，最后一行才用得上
                 # 看看有没有下一条递增率规则
@@ -254,6 +279,7 @@ def _prepare_rent_price_period_lst(property_id, rent_amount_monthly_val, rental_
                                                       next_period_percentage.billing_progress_info_month_from - 1,
                                                       record_self.date_rent_end) + timedelta(days=1)
                     next_date_s_or_total_end = min(record_self.date_rent_end, next_date_s)
+                    _logger.info(f"有两条以上规则，下一条规则的开始日：{next_date_s}，next_date_s_or_total_end：{next_date_s_or_total_end}")
 
                 while temp_date_s <= next_date_s_or_total_end:
                     # 本条规则的结束日的最大值
@@ -262,6 +288,10 @@ def _prepare_rent_price_period_lst(property_id, rent_amount_monthly_val, rental_
                     temp_date_e = _get_period_total_e(temp_date_s,
                                                       period_percentage.billing_progress_info_month_every,
                                                       this_period_e_max)
+                    _logger.info(f"temp_date_e：{temp_date_e}")
+                    if temp_date_e < temp_date_s:
+                        break
+
                     # 上一条的适配后租金是本条的基础租金
                     base_rent_amount_monthly_val = rtn_lst[len(rtn_lst) - 1].get('rent_amount_adapt')
                     base_rent_price = rtn_lst[len(rtn_lst) - 1].get('rent_price_adapt')
@@ -281,7 +311,9 @@ def _prepare_rent_price_period_lst(property_id, rent_amount_monthly_val, rental_
                                    'period_to': temp_date_e}
 
                     rtn_lst.append(period_data)
+                    _logger.info(f"period_data：{period_data}")
                     temp_date_s = temp_date_e + timedelta(days=1)
+                    _logger.info(f"temp_date_s：{temp_date_s}")
 
         return rtn_lst  # todo 非期间段递增的情况，也按照固定金额走
 
@@ -473,7 +505,7 @@ def _generate_details_from_rent_plan(record_self, one_year_days):
             billing_method_str = dict(rental_plan._fields['billing_method'].selection).get(rental_plan.billing_method)
             payment_date_str = dict(rental_plan._fields['payment_date'].selection).get(rental_plan.payment_date)
             rental_amount = _cal_rental_amount(month_cnt, current_s, current_e, date_s, date_e, property_id,
-                                               rent_price_adapt, rent_amount_monthly_adapt, one_year_days)
+                                               rent_price_adapt, rent_amount_monthly_adapt, one_year_days, rent_price_period_lst)
             rental_amount_zh = Utils.arabic_to_chinese(round(rental_amount, 2))
 
             rental_periods_details.append({
