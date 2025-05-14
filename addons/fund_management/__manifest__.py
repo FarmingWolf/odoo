@@ -29,6 +29,7 @@
         'views/fund_management_procurement_method_views.xml',
         'views/fund_management_payment_method_views.xml',
         'views/fund_management_views.xml',
+        'views/fund_management_menu_views.xml',
 
         'report/fund_management_application_reports.xml',
         'report/fund_management_application_templates.xml',
