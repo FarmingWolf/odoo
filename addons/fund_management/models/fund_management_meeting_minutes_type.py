@@ -19,6 +19,7 @@ class FundManagementMeetingMinutesType(models.Model):
     sequence = fields.Integer(string="Sequence", required=True, default=0, copy=False)
     color = fields.Integer()
     active = fields.Boolean(default=True)
+    mandatory = fields.Boolean(string="Mandatory", default=True)
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     _sql_constraints = [

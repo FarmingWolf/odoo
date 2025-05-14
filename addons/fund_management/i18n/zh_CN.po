@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-12 06:23+0000\n"
-"PO-Revision-Date: 2025-05-12 06:23+0000\n"
+"POT-Creation-Date: 2025-05-14 14:39+0000\n"
+"PO-Revision-Date: 2025-05-14 14:39+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -29,15 +29,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
 msgid "0 means infinity"
 msgstr "0代表无限大"
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
-#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
-msgid ""
-"<span style=\"font-weight: bold\">资金构成</span>\n"
-"                                        <br/>\n"
-"                                        <span style=\"font-weight: bold; margin-left: 10px\">及支付情况</span>"
-msgstr ""
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
@@ -82,6 +73,11 @@ msgstr ""
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>乡会议纪要编号　</span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
 msgid ""
 "<span>事项名称\n"
 "                                            </span>"
@@ -108,8 +104,8 @@ msgid "<span>付款比例</span>"
 msgstr ""
 
 #. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
-msgid "<span>付款申请函</span>"
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>企业会议纪要编号　</span>"
 msgstr ""
 
 #. module: fund_management
@@ -122,11 +118,6 @@ msgstr ""
 msgid ""
 "<span>剩余金额\n"
 "                                            </span>"
-msgstr ""
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
-msgid "<span>发票 ___ 张</span>"
 msgstr ""
 
 #. module: fund_management
@@ -243,18 +234,15 @@ msgid "<span>相关材料</span>"
 msgstr ""
 
 #. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
-msgid ""
-"<span>科目类别\n"
-"\n"
-"                                            </span>"
-msgstr ""
-
-#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
 msgid ""
 "<span>科目类别\n"
 "                                            </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>科目类别</span>"
 msgstr ""
 
 #. module: fund_management
@@ -265,11 +253,12 @@ msgid ""
 msgstr ""
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
 #: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
 msgid ""
-"<span>资金类型\n"
-"\n"
-"                                    </span>"
+"<span>资金构成</span>\n"
+"                                        <br/>\n"
+"                                        <span style=\"margin-left: 10px\">及支付情况</span>"
 msgstr ""
 
 #. module: fund_management
@@ -277,6 +266,11 @@ msgstr ""
 msgid ""
 "<span>资金类型\n"
 "                                    </span>"
+msgstr ""
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
+msgid "<span>资金类型</span>"
 msgstr ""
 
 #. module: fund_management
@@ -301,9 +295,8 @@ msgid ""
 "been approved!)! Please make it approved first![Application Number: "
 "%(apply_no)s; Description: %(description)s; Stage: %(stage_name)s; ]"
 msgstr ""
-"本合同已有一个资金申请审批流程正在处理（尚未最终审批完成）"
-"请先确保其处理完成！[申请编号: "
-"%(apply_no)s; 申请事由: %(description)s; 阶段: %(stage_name)s; ]"
+"本合同已有一个资金申请审批流程正在处理（尚未最终审批完成）请先确保其处理完成！[申请编号: %(apply_no)s; 申请事由: "
+"%(description)s; 阶段: %(stage_name)s; ]"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__account_subject_category
@@ -592,7 +585,7 @@ msgstr "附件列表"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__type
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Attachment Type"
-msgstr "附件/会议纪要"
+msgstr "会议纪要类型"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__attachment_ids
@@ -1170,6 +1163,22 @@ msgid "Main Attachment"
 msgstr "主附件"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__mandatory
+msgid "Mandatory"
+msgstr "必传"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid ""
+"Mandatory Meeting Minutes at this stage [%(stage_name)s] are not "
+"uploaded:%(err_lst)s"
+msgstr ""
+"本阶段 [%(stage_name)s] 有必须上传的附件而未上传： "
+"%(err_lst)s"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__legend_done
 msgid "Mark in green"
 msgstr "标绿"
@@ -1202,9 +1211,9 @@ msgstr "会议纪要可编辑"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__meeting_minute_types
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__meeting_minute_types
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__name
-#: model:ir.model,name:fund_management.model_fund_management_meeting_minutes_type
+#: model:ir.ui.menu,name:fund_management.menu_fund_management_meeting_minutes_type
 msgid "Meeting Minutes Type"
-msgstr "附件/会议纪要"
+msgstr "会议纪要类型"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__meeting_minute_types_by_category
@@ -1217,6 +1226,16 @@ msgid "Meeting Minutes Type By Stage"
 msgstr "该阶段会议纪要类型"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__meeting_minutes_attach_div_h
+msgid "Meeting Minutes Types Area Height"
+msgstr ""
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__meeting_minutes_attach_div_right_h
+msgid "Meeting Minutes Types Area Right Height"
+msgstr ""
+
+#. module: fund_management
 #: model:ir.model,name:fund_management.model_fund_management_meeting_minutes
 msgid "Meeting minutes"
 msgstr "会议纪要"
@@ -1227,6 +1246,11 @@ msgid "Meeting minutes attachment"
 msgstr "会议纪要附件"
 
 #. module: fund_management
+#: model:ir.model,name:fund_management.model_fund_management_meeting_minutes_type
+msgid "Meeting minutes type"
+msgstr "会议纪要类型"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_meeting_minutes_type_view_tree
 msgid "Meeting minutes type name"
 msgstr "会议纪要类型"
@@ -1234,7 +1258,7 @@ msgstr "会议纪要类型"
 #. module: fund_management
 #: model:ir.model.constraint,message:fund_management.constraint_fund_management_meeting_minutes_type_name
 msgid "Meeting minutes type name duplicated!"
-msgstr "附件/会议纪要类型名称重复了！"
+msgstr "会议纪要类型名称重复了！"
 
 #. module: fund_management
 #: model_terms:ir.actions.act_window,help:fund_management.fund_management_meeting_minutes_type
@@ -1401,10 +1425,7 @@ msgstr "请输入审批意见..."
 msgid ""
 "Please keep the contract amount consistent with the contract amount of "
 "historical applications:%(contract_amount)s"
-msgstr ""
-"请确保合同金额与上次申请录入的合同金额保持一致！"
-"上次录入合同金额:%(contract_amount)s"
-
+msgstr "请确保合同金额与上次申请录入的合同金额保持一致！上次录入合同金额:%(contract_amount)s"
 
 #. module: fund_management
 #. odoo-python
@@ -1413,9 +1434,7 @@ msgstr ""
 msgid ""
 "Please keep the contract name consistent with the contract name of "
 "historical applications:%(contract_name)s"
-msgstr ""
-"请确保合同名称与上次申请录入的合同名称保持一致！"
-"上次录入合同名称:%(contract_name)s"
+msgstr "请确保合同名称与上次申请录入的合同名称保持一致！上次录入合同名称:%(contract_name)s"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
@@ -1686,6 +1705,16 @@ msgid ""
 msgstr "本阶段任务处理中。点击可更改任务阶段状态。"
 
 #. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid ""
+"This application has been rejected at stage [%(stage_name)s], Please reject "
+"it !"
+msgstr ""
+"本流程已经在 [%(stage_name)s] 被驳回, 请继续驳回 !"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Time Payment"
 msgstr "次付款"
@@ -1779,9 +1808,45 @@ msgstr "您可以在此处定义审批状态标签，作为看板视图中的默
 #. module: fund_management
 #. odoo-python
 #: code:addons/fund_management/models/fund_management.py:0
+#: code:addons/fund_management/models/fund_management.py:0
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid "You can not process this stage: %(stage_name)s"
+msgstr "您不能处理这个阶段: %(stage_name)s"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
 #, python-format
 msgid "You cannot delete a posted or approved fund management application."
 msgstr "不能删除一个处于审批流程中或已完成审批的申请。"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid ""
+"You have %(err_msg)s this application, and you can not approve it again!"
+msgstr ""
+"您已经 %(err_msg)s 本流程, 不能再同意了！"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid ""
+"You have %(err_msg)s this application, and you can not cancel it again!"
+msgstr ""
+"您已经 %(err_msg)s 本流程，不能再取消了！"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid ""
+"You have %(err_msg)s this application, and you can not reject it again!"
+msgstr ""
+"您已经 %(err_msg)s 本流程，不能再驳回了！"
 
 #. module: fund_management
 #. odoo-python
@@ -1855,29 +1920,14 @@ msgid "to be approved"
 msgstr "待审批"
 
 #. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
-#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
-msgid "乡会议纪要编号"
-msgstr ""
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
-msgid "企业会议纪要编号"
-msgstr ""
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
-msgid "企业会议纪要编号用章申请"
-msgstr ""
-
-#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
 msgid "其他资金支付审批单"
 msgstr ""
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
 #: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
-msgid "发票 张"
+msgid "发票"
 msgstr ""
 
 #. module: fund_management
@@ -1926,11 +1976,6 @@ msgid "审批阶段"
 msgstr ""
 
 #. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
-msgid "工程竣工验收单"
-msgstr ""
-
-#. module: fund_management
 #: model:ir.actions.report,name:fund_management.action_print_no_contract_payment_application
 msgid "无合同资金支付申请单"
 msgstr ""
@@ -1943,11 +1988,6 @@ msgstr ""
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
 msgid "申请日期:"
-msgstr ""
-
-#. module: fund_management
-#: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
-msgid "结算审核报告"
 msgstr ""
 
 #. module: fund_management

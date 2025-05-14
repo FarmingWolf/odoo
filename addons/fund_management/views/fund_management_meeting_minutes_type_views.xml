@@ -15,9 +15,10 @@
         <field name="name">meeting.minutes.type.tree</field>
         <field name="model">fund.management.meeting.minutes.type</field>
         <field name="arch" type="xml">
-            <tree string="meeting_minutes_type_tree">
+            <tree string="meeting_minutes_type_tree" editable="bottom" create="1" edit="1" delete="1" open_form_view="1" multi_edit="1">
                 <field name="sequence" widget="handle"/>
                 <field name="name" string="Meeting minutes type name"/>
+                <field name="mandatory"/>
             </tree>
         </field>
     </record>
@@ -30,6 +31,7 @@
                 <sheet>
                     <group>
                         <field name="name" default_focus="True"/>
+                        <field name="mandatory"/>
                     </group>
                 </sheet>
             </form>

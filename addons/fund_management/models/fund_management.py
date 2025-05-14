@@ -564,7 +564,7 @@ class FundManagement(models.Model):
             check_right, tgt_stage = self._check_approval_rights(record)
             _logger.debug(f"tgt_stage={tgt_stage.name};tgt_stage.seq={tgt_stage.sequence}")
             if not check_right:
-                raise UserError(f"您不能审批当前阶段：{record.stage.name}")
+                raise UserError(_("You can not process this stage: %(stage_name)s") % {'stage_name': record.stage.name})
 
             # 先检查本节点是否已经审批通过，若已通过则不用再次创建审批记录
             stage_approved, approval_decision, next_stage_lst = \
@@ -580,7 +580,8 @@ class FundManagement(models.Model):
                     if not next_stage["stage_result"]:
                         if not from_action_submit:
                             if not record.stage.input_meeting_minutes:
-                                raise UserError(f"本流程在【{next_stage['stage'].name}】已被驳回，请继续驳回本流程！")
+                                raise UserError(_("This application has been rejected at stage [%(stage_name)s], "
+                                                  "Please reject it !") % {'stage_name': next_stage['stage'].name})
 
             can_approve_again = False
             if stage_approved:
@@ -593,7 +594,12 @@ class FundManagement(models.Model):
                                 break
 
             if stage_approved and not can_approve_again:
-                raise UserError(f"您已审批{'通过' if approval_decision else '驳回'}，不能再【同意】")
+                err_msg = "approved" if approval_decision else "rejected"
+                raise UserError(_("You have %(err_msg)s this application, "
+                                  "and you can not approve it again!") % {'err_msg': err_msg})
+
+            # 判断必传附件是否上传
+            self._check_attach_mandatory()
 
             next_state = 'submitted' if record.stage.sequence == 0 else 'approved'
             # 先创建当前阶段的审批记录
@@ -643,7 +649,7 @@ class FundManagement(models.Model):
 
             check_right, tgt_stage = self._check_approval_rights(record)
             if not check_right:
-                raise UserError(f"您不能审批当前阶段：{record.stage.name}")
+                raise UserError(_("You can not process this stage: %(stage_name)s") % {'stage_name': record.stage.name})
 
             # 先检查一下本节点是否已经审批通过，若已通过则不用再次创建审批记录
             stage_approved, approval_decision, next_stage_lst = \
@@ -660,7 +666,9 @@ class FundManagement(models.Model):
                             break
 
             if stage_approved and not can_approve_again:
-                raise UserError(f"您已审批{'通过' if approval_decision else '驳回'}，不能再【驳回】")
+                err_msg = "approved" if approval_decision else "rejected"
+                raise UserError(_("You have %(err_msg)s this application, "
+                                  "and you can not reject it again!") % {'err_msg': err_msg})
 
             # 先创建当前阶段的驳回记录
             self._create_approval_detail(record, False, False, tgt_stage, comment)
@@ -686,14 +694,16 @@ class FundManagement(models.Model):
 
             check_right, tgt_stage = self._check_approval_rights(record)
             if not check_right:
-                raise UserError(f"您不能操作当前阶段：{record.stage.name}")
+                raise UserError(_("You can not process this stage: %(stage_name)s") % {'stage_name': record.stage.name})
 
             # 先检查一下本节点是否已经审批通过，若已通过则不用再次创建审批记录
             stage_approved, approval_decision, next_stage_lst = \
                 self._check_multi_stage_approved(record, tgt_stage)
 
             if stage_approved:
-                raise UserError(f"您已审批{'通过' if approval_decision else '驳回'}，不能再【取消】")
+                err_msg = "approved" if approval_decision else "rejected"
+                raise UserError(_("You have %(err_msg)s this application, "
+                                  "and you can not cancel it again!") % {'err_msg': err_msg})
 
             self._create_approval_detail(record, False, True, tgt_stage, comment=None)
             all_stages = self.env['fund.management.approval.stage'].search([('company_id', '=', record.company_id.id),
@@ -1269,3 +1279,27 @@ class FundManagement(models.Model):
             tgt_action = 'fund_management.action_print_no_contract_payment_application'
 
         return self.env.ref(tgt_action).report_action(self)
+
+    def _check_attach_mandatory(self):
+        for rcd in self:
+            err_lst = []
+            _logger.info(f"rcd.stage.meeting_minute_types={rcd.stage.meeting_minute_types}")
+            for m_m_type in rcd.stage.meeting_minute_types:
+                if not m_m_type.mandatory:
+                    continue
+
+                type_exists = False
+                _logger.info(f"rcd.meeting_minutes_attach={rcd.meeting_minutes_attach}")
+                for meeting_minutes_created in rcd.meeting_minutes_attach:
+                    if m_m_type == meeting_minutes_created.type and meeting_minutes_created.nb_attachment > 0:
+                        type_exists = True
+                        break
+                _logger.info(f"type_exists={type_exists}")
+                if not type_exists:
+                    err_lst.append(m_m_type.name)
+
+            _logger.info(f"err_lst={err_lst}")
+            if err_lst:
+                raise UserError(_("Mandatory Meeting Minutes at this stage [%(stage_name)s] "
+                                  "are not uploaded:%(err_lst)s") % {'stage_name': rcd.stage.name, 'err_lst': err_lst})
+
