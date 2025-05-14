@@ -191,7 +191,7 @@
                                     <field name="set_rent_plan_business_method_id" placeholder="请选择"/>
                                     <field name="set_rent_plan_main_category" placeholder="请选择"/>
                                     <field name="set_rent_plan_billing_method" readonly="1"/>
-                                    <field name="set_rent_plan_rent_price" digits="[12, 2]"/>
+                                    <field name="set_rent_plan_rent_price" digits="[20, 16]"/>
                                 </group>
                                 <group>
                                     <group col="1">
@@ -245,7 +245,7 @@
                                 <field name="turnover_percentage_id"/>
                             </group>
                             <group string="固定单价" col="2" invisible="billing_progress_method_no_progress_invisible">
-                                <field name="rent_price" string="无递增固定单价（元/天/㎡）" digits="[12, 2]"/>
+                                <field name="rent_price" string="无递增固定单价（元/天/㎡）" digits="[20, 16]"/>
                                 <field name="rent_amount_monthly_auto" digits="[12, 2]"/>
                                     <field name="latest_annual_rent" readonly="1" digits="[12, 2]"/>
                                 <field name="rent_amount_monthly_adjust" digits="[12, 2]"/>
@@ -261,7 +261,7 @@
                         <group string="取高" col="1" invisible="billing_method_fixed_price_percentage_higher_invisible">
                             <group col="2">
                                 <group col="1">
-                                    <field name="rent_price" string="保底单价（元/天/㎡）" digits="[12, 2]"/>
+                                    <field name="rent_price" string="保底单价（元/天/㎡）" digits="[20, 16]"/>
                                     <field name="rent_amount_monthly_auto" digits="[12, 2]"/>
                                     <field name="latest_annual_rent" readonly="1" digits="[12, 2]"/>
                                     <field name="rent_amount_monthly_adjust" digits="[12, 2]"/>

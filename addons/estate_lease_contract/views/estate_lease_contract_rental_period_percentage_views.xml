@@ -37,18 +37,25 @@
                         </group>
                     </group>
                     <group>
-                        <group col="3">
-                            <group>
-                                <field name="billing_progress_info_month_from"/>
-                            </group>
-                            <group>
-                                <field name="billing_progress_info_month_every"/>
-                            </group>
-                            <group>
-                                <field name="billing_progress_info_up_percentage"/>
-                            </group>
+                        <group>
+                            <field name="billing_progress_info_month_from"/>
                         </group>
-
+                        <group>
+                            <field name="billing_progress_info_month_every"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="billing_progress_info_up_percentage_digit" digits="[21, 18]" readonly="0"/>
+                        </group>
+                        <group>
+                            <label for="billing_progress_info_up_percentage" class="oe_edit_only"/>
+                            <div class="o_row">
+                                <field name="billing_progress_info_up_percentage" digits="[19, 16]"/><span>%</span>
+                            </div>
+                        </group>
+                    </group>
+                    <group>
                         <group>
                             <field name="name_description"/>
                         </group>

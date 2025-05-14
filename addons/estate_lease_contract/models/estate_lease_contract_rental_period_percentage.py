@@ -47,9 +47,33 @@ class EstateLeaseContractRentalPeriodPercentage(models.Model):
     # 按时间段递增的情况下：
     billing_progress_info_month_from = fields.Integer(string="从第N月起", copy=False)
     billing_progress_info_month_every = fields.Integer(string="每X个月")
-    billing_progress_info_up_percentage = fields.Float(default=0.0, string="递增百分比")
+    billing_progress_info_up_percentage_digit = fields.Float(default=lambda self: self._get_default_percentage_digit(),
+                                                             string="递增百分比（小数）",
+                                                             compute="_cal_default_percentage_digit")
+    billing_progress_info_up_percentage = fields.Float(default=0.0, string="递增%")
 
     name_description = fields.Char(string="时间段递增率描述", readonly=True, compute="_combine_description")
+
+    def _cal_default_percentage_digit(self):
+        for record in self:
+            if record.billing_progress_info_up_percentage_digit != record.billing_progress_info_up_percentage / 100:
+                record.billing_progress_info_up_percentage_digit = record.billing_progress_info_up_percentage / 100
+
+    def _get_default_percentage_digit(self):
+        ret = self.billing_progress_info_up_percentage_digit
+        if ret != self.billing_progress_info_up_percentage / 100:
+            ret = self.billing_progress_info_up_percentage / 100
+        return ret
+
+    @api.onchange("billing_progress_info_up_percentage_digit")
+    def _onchange_billing_progress_info_up_percentage_digit(self):
+        if self.billing_progress_info_up_percentage != self.billing_progress_info_up_percentage_digit * 100:
+            self.billing_progress_info_up_percentage = self.billing_progress_info_up_percentage_digit * 100
+
+    @api.onchange("billing_progress_info_up_percentage")
+    def _onchange_billing_progress_info_up_percentage(self):
+        if self.billing_progress_info_up_percentage_digit != self.billing_progress_info_up_percentage / 100:
+            self.billing_progress_info_up_percentage_digit = self.billing_progress_info_up_percentage / 100
 
     def _compute_sequence(self):
         for record in self:
