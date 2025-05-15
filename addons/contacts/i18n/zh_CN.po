@@ -51,7 +51,7 @@ msgstr "联系人称谓"
 #: model:ir.ui.menu,name:contacts.menu_contacts
 #: model:ir.ui.menu,name:contacts.res_partner_menu_contacts
 msgid "Contacts"
-msgstr "联系人"
+msgstr "招商客户"
 
 #. module: contacts
 #: model:ir.ui.menu,name:contacts.menu_country_partner
