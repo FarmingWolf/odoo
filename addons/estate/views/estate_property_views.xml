@@ -303,10 +303,10 @@
                 <field name="rent_area" string="面积>=" filter_domain="[('rent_area', '>=', self)]"/>
                 <separator/>
                 <group expand='1' string='按资产状态'>
-                    <filter string='资产状态' name="state" context="{'group_by': 'state'}"/>
-                    <filter string='资产类型' name="property_type_id" context="{'group_by': 'property_type_id'}"/>
                     <filter string='楼栋号' name="building_no" context="{'group_by': 'building_no'}"/>
                     <filter string='楼层号' name="floor" context="{'group_by': 'floor'}"/>
+                    <filter string='资产状态' name="state" context="{'group_by': 'state'}"/>
+                    <filter string='资产类型' name="property_type_id" context="{'group_by': 'property_type_id'}"/>
                 </group>
             </search>
         </field>
@@ -317,7 +317,7 @@
         <field name="model">estate.property</field>
 
         <field name="arch" type="xml">
-            <kanban default_group_by="building_no" group_create="False" group_delete="False" group_edit="False"
+            <kanban default_group_by="floor" group_create="False" group_delete="False" group_edit="False"
                     groups_draggable="False" quick_create="False" archivable="False"
                     edit="False"> <!-- 添加default_group_by属性以按type分组，readonly="1"禁止拖放 -->
                 <field name="state"/>
