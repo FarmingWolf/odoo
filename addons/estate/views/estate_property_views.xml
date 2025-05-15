@@ -305,6 +305,8 @@
                 <group expand='1' string='按资产状态'>
                     <filter string='资产状态' name="state" context="{'group_by': 'state'}"/>
                     <filter string='资产类型' name="property_type_id" context="{'group_by': 'property_type_id'}"/>
+                    <filter string='楼栋号' name="building_no" context="{'group_by': 'building_no'}"/>
+                    <filter string='楼层号' name="floor" context="{'group_by': 'floor'}"/>
                 </group>
             </search>
         </field>
