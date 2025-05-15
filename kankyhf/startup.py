@@ -64,8 +64,10 @@ update_addons = zip_tgt_folders.copy()
 
 zip_all_addons = True
 tmp_fn = "estate_management.x_pptx"
-customer_dis_name = "歌华文化集团"
-customer_name = "GHWH"
+# customer_dis_name = "歌华文化集团"
+# customer_name = "GHWH"
+customer_dis_name = "科汇时代中心"
+customer_name = "KH"
 # 初始化时，仅客户名写入此文件，第一次运行时，客户mac地址写入此文件，压缩包里必须有此文件，如无则判错
 customer_name_info_fn = "c_info_2_ck"
 
