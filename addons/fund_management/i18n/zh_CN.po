@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-14 14:39+0000\n"
-"PO-Revision-Date: 2025-05-14 14:39+0000\n"
+"POT-Creation-Date: 2025-05-16 04:40+0000\n"
+"PO-Revision-Date: 2025-05-16 04:40+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1174,9 +1174,7 @@ msgstr "必传"
 msgid ""
 "Mandatory Meeting Minutes at this stage [%(stage_name)s] are not "
 "uploaded:%(err_lst)s"
-msgstr ""
-"本阶段 [%(stage_name)s] 有必须上传的附件而未上传： "
-"%(err_lst)s"
+msgstr "本阶段 [%(stage_name)s] 有必须上传的附件而未上传： %(err_lst)s"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__legend_done
@@ -1711,8 +1709,7 @@ msgstr "本阶段任务处理中。点击可更改任务阶段状态。"
 msgid ""
 "This application has been rejected at stage [%(stage_name)s], Please reject "
 "it !"
-msgstr ""
-"本流程已经在 [%(stage_name)s] 被驳回, 请继续驳回 !"
+msgstr "本流程已经在 [%(stage_name)s] 被驳回, 请继续驳回 !"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
@@ -1827,8 +1824,7 @@ msgstr "不能删除一个处于审批流程中或已完成审批的申请。"
 #, python-format
 msgid ""
 "You have %(err_msg)s this application, and you can not approve it again!"
-msgstr ""
-"您已经 %(err_msg)s 本流程, 不能再同意了！"
+msgstr "您已经 %(err_msg)s 本流程, 不能再同意了！"
 
 #. module: fund_management
 #. odoo-python
@@ -1836,8 +1832,7 @@ msgstr ""
 #, python-format
 msgid ""
 "You have %(err_msg)s this application, and you can not cancel it again!"
-msgstr ""
-"您已经 %(err_msg)s 本流程，不能再取消了！"
+msgstr "您已经 %(err_msg)s 本流程，不能再取消了！"
 
 #. module: fund_management
 #. odoo-python
@@ -1845,8 +1840,7 @@ msgstr ""
 #, python-format
 msgid ""
 "You have %(err_msg)s this application, and you can not reject it again!"
-msgstr ""
-"您已经 %(err_msg)s 本流程，不能再驳回了！"
+msgstr "您已经 %(err_msg)s 本流程，不能再驳回了！"
 
 #. module: fund_management
 #. odoo-python
@@ -1868,6 +1862,15 @@ msgstr "流程审批已结束"
 #, python-format
 msgid "approval process on going"
 msgstr "流程审批进行中"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#: code:addons/fund_management/models/fund_management.py:0
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid "approved"
+msgstr "同意"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_approval_stage_view_form
@@ -1903,6 +1906,15 @@ msgstr "会议纪要类型"
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_meeting_minutes_type_view_tree
 msgid "meeting_minutes_type_tree"
 msgstr "会议纪要类型清单"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#: code:addons/fund_management/models/fund_management.py:0
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid "rejected"
+msgstr "驳回"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__sequence

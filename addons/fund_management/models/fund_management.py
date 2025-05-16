@@ -594,7 +594,7 @@ class FundManagement(models.Model):
                                 break
 
             if stage_approved and not can_approve_again:
-                err_msg = "approved" if approval_decision else "rejected"
+                err_msg = _("approved") if approval_decision else _("rejected")
                 raise UserError(_("You have %(err_msg)s this application, "
                                   "and you can not approve it again!") % {'err_msg': err_msg})
 
@@ -666,7 +666,7 @@ class FundManagement(models.Model):
                             break
 
             if stage_approved and not can_approve_again:
-                err_msg = "approved" if approval_decision else "rejected"
+                err_msg = _("approved") if approval_decision else _("rejected")
                 raise UserError(_("You have %(err_msg)s this application, "
                                   "and you can not reject it again!") % {'err_msg': err_msg})
 
@@ -701,7 +701,7 @@ class FundManagement(models.Model):
                 self._check_multi_stage_approved(record, tgt_stage)
 
             if stage_approved:
-                err_msg = "approved" if approval_decision else "rejected"
+                err_msg = _("approved") if approval_decision else _("rejected")
                 raise UserError(_("You have %(err_msg)s this application, "
                                   "and you can not cancel it again!") % {'err_msg': err_msg})
 
