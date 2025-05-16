@@ -145,6 +145,7 @@ class FundManagement(models.Model):
         default='draft',
     )
 
+    invisible_meeting_minutes = fields.Boolean("Meeting Minutes Invisible", compute="_compute_invisible_meeting_minutes")
     meeting_minutes_editable = fields.Boolean("Meeting Minutes Editable", related="stage.input_meeting_minutes")
     meeting_minute_types = fields.Many2many(string="Meeting Minute Types", related="category_id.meeting_minute_types")
 
@@ -155,6 +156,17 @@ class FundManagement(models.Model):
                                                 compute="_compute_meeting_minutes_attach_div_h", store=True)
     meeting_minutes_attach_div_right_h = fields.Float(string="Meeting Minutes Types Area Right Height",
                                                       compute="_compute_meeting_minutes_attach_div_h", store=True)
+
+    def _compute_invisible_meeting_minutes(self):
+        for record in self:
+            if record.nb_attachment:
+                record.invisible_meeting_minutes = False
+            else:
+                check_right, tgt_stage = self._check_approval_rights(record)
+                if record.stage and record.stage.input_meeting_minutes and check_right:
+                    record.invisible_meeting_minutes = False
+                else:
+                    record.invisible_meeting_minutes = True
 
     @api.depends("meeting_minutes_attach")
     def _compute_meeting_minutes_attach_div_h(self):

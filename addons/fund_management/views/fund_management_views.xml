@@ -275,9 +275,10 @@
                     </div>
                     <div>
                         <field name="description" placeholder="Notes..." readonly="not is_editable"/>
+                        <field name="invisible_meeting_minutes" invisible="1"/>
                         <field name="meeting_minutes_editable" invisible="1"/>
                     </div>
-                    <notebook invisible="(nb_attachment == 0) and (not meeting_minutes_editable)">
+                    <notebook invisible="invisible_meeting_minutes">
                         <page string="Attachment List" readonly="(not is_editable) and (not meeting_minutes_editable)">
                             <field name="meeting_minutes_attach" mode="tree,form">
                                 <tree delete="False" create="False" edit="True">
