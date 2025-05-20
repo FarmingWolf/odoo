@@ -28,6 +28,7 @@
         'views/fund_management_fund_type_views.xml',
         'views/fund_management_procurement_method_views.xml',
         'views/fund_management_payment_method_views.xml',
+        'views/fund_management_contract_views.xml',
         'views/fund_management_views.xml',
         'views/fund_management_menu_views.xml',
 

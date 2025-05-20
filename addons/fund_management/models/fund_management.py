@@ -20,7 +20,7 @@ class FundManagement(models.Model):
     @api.model
     def _default_employee_id(self):
         employee = self.env.user.employee_id
-        if not employee and not self.env.user.has_group('fund_management.group_fund_management_team_approve'):
+        if not employee and not self.env.user.has_group('fund_management.group_fund_management_team_approver'):
             raise ValidationError(_('The current user has no related employee. Please, create one.'))
         return employee
 
@@ -208,12 +208,12 @@ class FundManagement(models.Model):
                             domain=lambda self: self._get_stage_domain(),
                             default=lambda self: self._get_default_stage_id())
     stage_sequence = fields.Integer("Approval Stage Sequence NO.", related="stage.sequence")
-    contract_id = fields.Integer(string='Contract ID')  # 现阶段不对接合同模块，所以用contract_no代替contract_id
-    contract_no = fields.Char(string='Contract NO.', tracking=True)
-    contract_name = fields.Char(string='Contract Name', tracking=True)
-    contract_amount = fields.Float(string="Contract Total Amount", tracking=True)
-    party_b_id = fields.Many2one('res.partner', string='Payee', index=True, copy=True, tracking=True,
-                                 domain="[('company_id', '=', company_id)]")
+    contract_id = fields.Many2one(string='Contract ID', comodel_name="fund.management.contract", ondelete="restrict")
+    contract_no = fields.Char(string='Contract NO.', related="contract_id.contract_no", store=True)
+    contract_name = fields.Char(string='Contract Name', related="contract_id.name", store=True)
+    contract_amount = fields.Float(string="Contract Total Amount", related="contract_id.contract_amount", store=True)
+    party_b_id = fields.Many2one('res.partner', string='Payee', index=True, copy=True, store=True,
+                                 related="contract_id.receiving_unit", domain="[('company_id', '=', company_id)]")
     # Amount fields
     total_amount_currency = fields.Monetary(
         string="Apply In Currency",
@@ -235,37 +235,59 @@ class FundManagement(models.Model):
         default=0
     )
 
+    @api.onchange("contract_id")
+    def _onchange_contract_id(self):
+        if self.contract_name != self.contract_id.name:
+            self.contract_name = self.contract_id.name
+        if self.contract_no != self.contract_id.contract_no:
+            self.contract_no = self.contract_id.contract_no
+
+        self._set_contract_fields(self.contract_id)
+
+
     @api.onchange('total_amount_currency')
     def _onchange_total_amount_currency(self):
         self.total_hist_include_this = self.total_amt_cur_hist_accu + self.total_amount_currency
 
+    def _set_contract_fields(self, rcd):
+        if self.contract_amount != rcd.contract_amount:
+            self.contract_amount = rcd.contract_amount
+        if self.fund_type != rcd.fund_type:
+            self.fund_type = rcd.fund_type
+        if self.procurement_method != rcd.procurement_method:
+            self.procurement_method = rcd.procurement_method
+        if self.account_subject_category != rcd.account_subject_category:
+            self.account_subject_category = rcd.account_subject_category
+        if self.receiving_unit != rcd.receiving_unit:
+            self.receiving_unit = rcd.receiving_unit
+        if self.receiving_bank != rcd.receiving_bank:
+            self.receiving_bank = rcd.receiving_bank
+        if self.bank_account != rcd.bank_account:
+            self.bank_account = rcd.bank_account
+        if self.payment_method != rcd.payment_method:
+            self.payment_method = rcd.payment_method
+
     @api.onchange('contract_no')
     def _onchange_contract_no(self):
-        search_domain = [('state', 'in', ['submitted', 'approved', 'done']),
-                         '|', '&', ('contract_id', '=', self.contract_id), ('contract_id', '!=', False),
-                              '&', ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
-        rcd_hist = self.search(search_domain, order="state ASC, create_date DESC", limit=1)
-        for rcd in rcd_hist:
-            if self.contract_name != rcd.contract_name:
-                self.contract_name = rcd.contract_name
-            if self.contract_amount != rcd.contract_amount:
-                self.contract_amount = rcd.contract_amount
-            if self.fund_type != rcd.fund_type:
-                self.fund_type = rcd.fund_type
-            if self.procurement_method != rcd.procurement_method:
-                self.procurement_method = rcd.procurement_method
-            if self.account_subject_category != rcd.account_subject_category:
-                self.account_subject_category = rcd.account_subject_category
-            if self.receiving_unit != rcd.receiving_unit:
-                self.receiving_unit = rcd.receiving_unit
-            if self.receiving_bank != rcd.receiving_bank:
-                self.receiving_bank = rcd.receiving_bank
-            if self.bank_account != rcd.bank_account:
-                self.bank_account = rcd.bank_account
-            if self.payment_method != rcd.payment_method:
-                self.payment_method = rcd.payment_method
+        contract_domain = [('contract_no', '=', self.contract_no)]
+        contract_rcd = self.env['fund.management.contract'].search(contract_domain, limit=1)
+        for rcd in contract_rcd:
+            if self.contract_id.id != rcd.id:
+                self.contract_id = rcd
+            if self.contract_name != rcd.name:
+                self.contract_name = rcd.name
 
-    @api.depends('contract_id', 'contract_no')  # 关键点：添加依赖确保合同变更时重新计算
+            self._set_contract_fields(rcd)
+
+        # search_domain = [('state', 'in', ['submitted', 'approved', 'done']), ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
+        # rcd_hist = self.search(search_domain, order="state ASC, create_date DESC", limit=1)
+        # for rcd in rcd_hist:
+        #     if self.contract_name != rcd.contract_name:
+        #         self.contract_name = rcd.contract_name
+        #
+        #     self._set_contract_fields(rcd)
+
+    @api.depends('contract_id', 'contract_no')
     def _compute_apply_times(self):
         for record in self:
             # 如果 contract_id 未设置，直接返回默认值
@@ -274,7 +296,7 @@ class FundManagement(models.Model):
                 continue
             # 搜索同一合同的历史记录，按创建时间倒序排列
             domain = [('state', 'in', ['submitted', 'approved', 'done']),
-                      '|', '&', ('contract_id', '=', self.contract_id), ('contract_id', '!=', False),
+                      '|', '&', ('contract_id', '=', self.contract_id.id), ('contract_id', '!=', False),
                            '&', ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
             hist_records = self.search(domain, order="create_date DESC")
 
@@ -307,7 +329,7 @@ class FundManagement(models.Model):
     def _compute_total_amt_cur_hist_accu(self):
         for record in self:
             search_domain = [('state', 'in', ['submitted', 'approved', 'done']),
-                             '|', '&', ('contract_id', '=', self.contract_id), ('contract_id', '!=', False),
+                             '|', '&', ('contract_id', '=', self.contract_id.id), ('contract_id', '!=', False),
                                   '&', ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
             records = self.search(search_domain)
             apply_hist_amt = 0
@@ -353,31 +375,38 @@ class FundManagement(models.Model):
     fund_type = fields.Many2one(
         comodel_name='fund.management.fund.type',
         string="Fund Type",
+        store=True,
     )
     procurement_method = fields.Many2one(
         comodel_name='fund.management.procurement.method',
         string="Procurement Method",
+        store=True,
     )
     payment_method = fields.Many2one(
         comodel_name='fund.management.payment.method',
         string="Payment Method",
+        store=True,
     )
     account_subject_category = fields.Many2one(
         comodel_name='accounting.subject.subject',
         string="Account Subject Category",
+        store=True,
     )
     receiving_unit = fields.Many2one(
         comodel_name='res.partner',
         string="Receiving Unit",
+        store=True,
     )
 
     receiving_bank = fields.Many2one(
         comodel_name="res.partner.bank",
-        string="Receiving Bank"
+        string="Receiving Bank",
+        store=True,
     )
     bank_account = fields.Char(
         string="Bank Account Number",
-        related="receiving_bank.acc_number"
+        related="receiving_bank.acc_number",
+        store=True,
     )
 
     is_multiple_currency = fields.Boolean(
@@ -1198,12 +1227,16 @@ class FundManagement(models.Model):
                     return True
                 else:
                     return False
+        return True
 
     def _record_check(self):
         for rcd in self:
             if rcd.contract_payment:
-                if (not rcd.contract_no) or (not rcd.contract_amount) or (not rcd.contract_name):
-                    raise UserError(_("Please input Contract Info!"))
+                if not rcd.contract_id:  # 如果已经选择了合同ID，那么这三个要素一定存在了
+                    if (not rcd.contract_no) or (not rcd.contract_amount) or (not rcd.contract_name):
+                        raise UserError(_("Please input Contract Info!"))
+                else:
+                    self._set_contract_fields(rcd.contract_id)
 
                 if rcd.total_amount_currency + rcd.total_amt_cur_hist_accu > rcd.contract_amount:
                     raise UserError(_("The current application amount plus the cumulative historical "
@@ -1211,7 +1244,7 @@ class FundManagement(models.Model):
 
                 # 判断是否存在本合同的审批中的流程
                 search_domain = [('state', 'in', ['submitted', 'approved', 'done']),
-                                 '|', '&', ('contract_id', '=', self.contract_id), ('contract_id', '!=', False),
+                                 '|', '&', ('contract_id', '=', self.contract_id.id), ('contract_id', '!=', False),
                                       '&', ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
                 records = self.search(search_domain)
                 for record in records:
@@ -1314,4 +1347,53 @@ class FundManagement(models.Model):
             if err_lst:
                 raise UserError(_("Mandatory Meeting Minutes at this stage [%(stage_name)s] "
                                   "are not uploaded:%(err_lst)s") % {'stage_name': rcd.stage.name, 'err_lst': err_lst})
+
+    def _create_or_update_contract(self, rcd):
+        if rcd.contract_id:
+            contracts = self.env['fund.management.contract'].search([('id', '=', rcd.contract_id.id)])
+            for contract in contracts:
+                if contract.contract_no != rcd.contract_no:
+                    contract.contract_no = rcd.contract_no
+                if contract.contract_amount != rcd.contract_amount:
+                    contract.contract_amount = rcd.contract_amount
+                if contract.fund_type != rcd.fund_type:
+                    contract.fund_type = rcd.fund_type
+                if contract.procurement_method != rcd.procurement_method:
+                    contract.procurement_method = rcd.procurement_method
+                if contract.account_subject_category != rcd.account_subject_category:
+                    contract.account_subject_category = rcd.account_subject_category
+                if contract.receiving_unit != rcd.receiving_unit:
+                    contract.receiving_unit = rcd.receiving_unit
+                if contract.receiving_bank != rcd.receiving_bank:
+                    contract.receiving_bank = rcd.receiving_bank
+                if contract.bank_account != rcd.bank_account:
+                    contract.bank_account = rcd.bank_account
+                if contract.payment_method != rcd.payment_method:
+                    contract.payment_method = rcd.payment_method
+                if contract.party_a_unit != rcd.party_a_unit:
+                    contract.party_a_unit = rcd.party_a_unit
+                if contract.date_sign != rcd.date_sign:
+                    contract.date_sign = rcd.date_sign
+                if contract.date_start != rcd.date_start:
+                    contract.date_start = rcd.date_start
+                if contract.date_end != rcd.date_end:
+                    contract.date_end = rcd.date_end
+        else:
+            contract_rcd = {
+                "contract_no": rcd.contract_no,
+                "contract_amount": rcd.contract_amount,
+                "fund_type": rcd.fund_type.id,
+                "procurement_method": rcd.procurement_method.id,
+                "account_subject_category": rcd.account_subject_category.id,
+                "receiving_unit": rcd.receiving_unit.id,
+                "receiving_bank": rcd.receiving_bank.id,
+                "bank_account": rcd.bank_account,
+                "payment_method": rcd.payment_method.id,
+                "party_a_unit": rcd.party_a_unit.id,
+                "date_sign": rcd.date_sign,
+                "date_start": rcd.date_start,
+                "date_end": rcd.date_end,
+                "fund_management_id": rcd.id,
+            }
+            rcd.contract_id = self.env['fund.management.contract'].create(contract_rcd)
 

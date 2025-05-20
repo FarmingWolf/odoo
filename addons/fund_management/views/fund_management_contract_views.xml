@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_fund_management_contract" model="ir.actions.act_window">
+        <field name="name">Setting Fund Contract</field>
+        <field name="res_model">fund.management.contract</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Defining Fund Contract here.
+            </p>
+        </field>
+    </record>
+
+    <record id="fund_management_contract_view_tree" model="ir.ui.view">
+        <field name="name">fund.management.contract.tree</field>
+        <field name="model">fund.management.contract</field>
+        <field name="arch" type="xml">
+            <tree string="Fund Contract">
+                <field name="name"/>
+                <field name="contract_no"/>
+                <field name="contract_amount"/>
+                <field name="fund_type"/>
+                <field name="procurement_method"/>
+                <field name="account_subject_category"/>
+                <field name="receiving_unit"/>
+                <field name="receiving_bank"/>
+                <field name="bank_account"/>
+                <field name="payment_method"/>
+                <field name="party_a_unit"/>
+                <field name="date_sign"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="fund_management_contract_view_form" model="ir.ui.view">
+        <field name="name">fund.management.contract.form</field>
+        <field name="model">fund.management.contract</field>
+        <field name="arch" type="xml">
+            <form string="Fund Contract" create="True" edit="True" duplicate="False" delete="True">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="contract_no"/>
+                            <field name="contract_amount"/>
+                            <field name="fund_type"/>
+                            <field name="procurement_method"/>
+                            <field name="account_subject_category"/>
+                        </group>
+                        <group>
+                            <field name="receiving_unit"/>
+                            <field name="receiving_bank" domain="[('partner_id', '=', receiving_unit)]"
+                                   options="{'no_open': True, 'no_create': True}" readonly="not receiving_unit"/>
+                            <field name="bank_account"/>
+                            <field name="payment_method"/>
+                            <field name="party_a_unit"/>
+                            <field name="date_sign"/>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                    </group>
+                </sheet>
+
+                <div class="oe_chatter" groups="fund_management.group_fund_management_manager">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+</odoo>
