@@ -122,7 +122,7 @@ class FundManagement(models.Model):
     )
     category_description = fields.Text(compute='_compute_category_description')
     contract_payment = fields.Boolean(related='category_id.contract_payment')
-    description = fields.Text(string="Notes", tracking=True)
+    description = fields.Text(string="Notes", tracking=True, required=True)
     nb_attachment = fields.Integer(string="Number of Attachments", compute='_compute_nb_attachment')
     attachment_ids = fields.One2many(
         comodel_name='ir.attachment',
