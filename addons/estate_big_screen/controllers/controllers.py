@@ -109,9 +109,6 @@ class EstateBigScreen(http.Controller):
 
     @http.route('/estate_big_screen/get_company_nm_4_big_screen', type='json', auth='user')
     def get_company_nm_4_big_screen(self):
-        if not request.env.user.has_group('estate_big_screen.estate_group_big_screen'):
-            _logger.error(f"用户{request.env.user.id}:{request.env.user.name}没有大屏权限")
-            return {}
 
         company_id = request.env.user.company_id.id
         company_nm = request.env.user.company_id.name
