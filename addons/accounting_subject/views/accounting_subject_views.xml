@@ -46,7 +46,7 @@
         </record>
 
         <!-- 菜单项 -->
-        <menuitem id="menu_accounting_subject_subject" groups="base.group_user" name="会计科目"
+        <menuitem id="menu_accounting_subject_subject" groups="group_accounting_subject_manager" name="会计科目设置"
                   action="action_accounting_subject"/>
     </data>
 </odoo>

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
+    <record id="operation_contract_settle_opr" model="res.groups">
+        <field name="name">运营部合同结算</field>
+        <field name="category_id" ref="base.module_category_operation_operation_contract"/>
+    </record>
 </odoo>

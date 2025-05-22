@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
+    <record id="group_accounting_subject_manager" model="res.groups">
+        <field name="name">会计科目设置</field>
+        <field name="category_id" ref="base.module_category_accounting_accounting"/>
+    </record>
 </odoo>

@@ -92,7 +92,7 @@
         </record>
 
         <!-- 菜单项 -->
-        <menuitem id="menu_operation_contract_event_settle_account_group" groups="base.group_user" name="合同活动结算"
+        <menuitem id="menu_operation_contract_event_settle_account_group" groups="operation_contract_settle_opr" name="合同活动结算"
                   action="action_operation_contract_event_settle_account_group"/>
         <menuitem name="结算事项设置" id="business_items_setting" sequence="3"
                   parent="menu_operation_contract_event_settle_account_group"

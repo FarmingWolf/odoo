@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Tree & Kanban view for "All My Expenses" with header -->
-    <menuitem id="menu_fund_management_root" name="Fund Management" sequence="233"
+    <menuitem id="menu_fund_management_root" name="Fund Management" sequence="0"
               web_icon="fund_management,static/description/icon.png"/>
 
     <menuitem id="menu_fund_management_approve" name="Approve" parent="menu_fund_management_root"
