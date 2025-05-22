@@ -1222,7 +1222,8 @@
             </field>
         </record>
 
-        <menuitem id="menu_hr_expense_root" name="Expenses" sequence="230" web_icon="hr_expense,static/description/icon.png"/>
+        <menuitem id="menu_hr_expense_root" name="Expenses" sequence="230" groups="hr_expense.group_hr_expense_team_approver"
+                  web_icon="hr_expense,static/description/icon.png"/>
 
         <menuitem id="menu_hr_expense_my_expenses" name="My Expenses" sequence="1" parent="menu_hr_expense_root" groups="base.group_user"/>
         <menuitem id="menu_hr_expense_my_expenses_all" sequence="1" parent="menu_hr_expense_my_expenses"
