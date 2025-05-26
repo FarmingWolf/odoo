@@ -181,22 +181,32 @@ class EstateLeaseContractPropertyExtend(models.Model):
     @api.onchange("set_rent_plan_payment_period")
     def _onchange_set_rent_plan_payment_period(self):
         for record in self:
-            record.latest_payment_method = _set_payment_method_str(record)
+            tmp_str = _set_payment_method_str(record)
+            if record.latest_payment_method != tmp_str:
+                record.latest_payment_method = tmp_str
 
     @api.onchange("set_rent_plan_rent_price")
     def _onchange_set_rent_plan_rent_price(self):
         for record in self:
             if record.set_rent_plan_rent_price:
-                record.set_rent_plan_annual_rent = record.set_rent_plan_rent_price * self._get_one_year_days() * record.rent_area
-                record.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_annual_rent / 12
+                if record.set_rent_plan_annual_rent != record.set_rent_plan_rent_price * self._get_one_year_days() * record.rent_area:
+                    record.set_rent_plan_annual_rent = record.set_rent_plan_rent_price * self._get_one_year_days() * record.rent_area
+                if record.set_rent_plan_rent_amount_monthly_adjust != record.set_rent_plan_annual_rent / 12:
+                    record.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_annual_rent / 12
 
-                record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
-                record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
-                record._origin.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
-                record._origin.set_rent_plan_including_management_fee = record.set_rent_plan_including_management_fee
+                if record._origin.set_rent_plan_rent_price != record.set_rent_plan_rent_price:
+                    record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
+                if record._origin.set_rent_plan_annual_rent != record.set_rent_plan_annual_rent:
+                    record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
+                if record._origin.set_rent_plan_rent_amount_monthly_adjust != record.set_rent_plan_rent_amount_monthly_adjust:
+                    record._origin.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
+                if record._origin.set_rent_plan_including_management_fee != record.set_rent_plan_including_management_fee:
+                    record._origin.set_rent_plan_including_management_fee = record.set_rent_plan_including_management_fee
             else:
-                record.set_rent_plan_annual_rent = 0
-                record.set_rent_plan_rent_amount_monthly_adjust = 0
+                if record.set_rent_plan_annual_rent:
+                    record.set_rent_plan_annual_rent = 0
+                if record.set_rent_plan_rent_amount_monthly_adjust:
+                    record.set_rent_plan_rent_amount_monthly_adjust = 0
 
             self._set_back_set_rent_plan_values()
 
@@ -205,16 +215,24 @@ class EstateLeaseContractPropertyExtend(models.Model):
         one_year_days = self._get_one_year_days()
         for record in self:
             if record.set_rent_plan_rent_amount_monthly_adjust:
-                record.set_rent_plan_annual_rent = record.set_rent_plan_rent_amount_monthly_adjust * 12
-                record.set_rent_plan_rent_price = record.set_rent_plan_annual_rent / one_year_days / record.rent_area
+                if record.set_rent_plan_annual_rent != record.set_rent_plan_rent_amount_monthly_adjust * 12:
+                    record.set_rent_plan_annual_rent = record.set_rent_plan_rent_amount_monthly_adjust * 12
+                if record.set_rent_plan_rent_price != record.set_rent_plan_annual_rent / one_year_days / record.rent_area:
+                    record.set_rent_plan_rent_price = record.set_rent_plan_annual_rent / one_year_days / record.rent_area
 
-                record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
-                record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
-                record._origin.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
-                record._origin.set_rent_plan_including_management_fee = record.set_rent_plan_including_management_fee
+                if record._origin.set_rent_plan_rent_price != record.set_rent_plan_rent_price:
+                    record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
+                if record._origin.set_rent_plan_annual_rent != record.set_rent_plan_annual_rent:
+                    record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
+                if record._origin.set_rent_plan_rent_amount_monthly_adjust != record.set_rent_plan_rent_amount_monthly_adjust:
+                    record._origin.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
+                if record._origin.set_rent_plan_including_management_fee != record.set_rent_plan_including_management_fee:
+                    record._origin.set_rent_plan_including_management_fee = record.set_rent_plan_including_management_fee
             else:
-                record.set_rent_plan_annual_rent = 0
-                record.set_rent_plan_rent_price = 0
+                if record.set_rent_plan_annual_rent:
+                    record.set_rent_plan_annual_rent = 0
+                if record.set_rent_plan_rent_price:
+                    record.set_rent_plan_rent_price = 0
 
             self._set_back_set_rent_plan_values()
 
@@ -223,34 +241,49 @@ class EstateLeaseContractPropertyExtend(models.Model):
         one_year_days = self._get_one_year_days()
         for record in self:
             if record.set_rent_plan_annual_rent:
-                record.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_annual_rent / 12
-                record.set_rent_plan_rent_price = record.set_rent_plan_annual_rent / one_year_days / record.rent_area
+                if record.set_rent_plan_rent_amount_monthly_adjust != record.set_rent_plan_annual_rent / 12:
+                    record.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_annual_rent / 12
+                if record.set_rent_plan_rent_price != record.set_rent_plan_annual_rent / one_year_days / record.rent_area:
+                    record.set_rent_plan_rent_price = record.set_rent_plan_annual_rent / one_year_days / record.rent_area
 
-                record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
-                record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
-                record._origin.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
-                record._origin.set_rent_plan_including_management_fee = record.set_rent_plan_including_management_fee
+                if record._origin.set_rent_plan_rent_price != record.set_rent_plan_rent_price:
+                    record._origin.set_rent_plan_rent_price = record.set_rent_plan_rent_price
+                if record._origin.set_rent_plan_annual_rent != record.set_rent_plan_annual_rent:
+                    record._origin.set_rent_plan_annual_rent = record.set_rent_plan_annual_rent
+                if record._origin.set_rent_plan_rent_amount_monthly_adjust != record.set_rent_plan_rent_amount_monthly_adjust:
+                    record._origin.set_rent_plan_rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
+                if record._origin.set_rent_plan_including_management_fee != record.set_rent_plan_including_management_fee:
+                    record._origin.set_rent_plan_including_management_fee = record.set_rent_plan_including_management_fee
             else:
-                record.set_rent_plan_rent_amount_monthly_adjust = 0
-                record.set_rent_plan_rent_price = 0
+                if record.set_rent_plan_rent_amount_monthly_adjust:
+                    record.set_rent_plan_rent_amount_monthly_adjust = 0
+                if record.set_rent_plan_rent_price:
+                    record.set_rent_plan_rent_price = 0
 
             self._set_back_set_rent_plan_values()
 
     def _compute_set_rent_plan_plan_name(self):
         for record in self:
-            record.set_rent_plan_plan_name = \
-                str(record.name) + "-固定金额-" + \
-                fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y%m%d%H%M%S')
+            tmp_nm = str(record.name) + "-固定金额-" + fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y%m%d%H%M%S')
+            if record.set_rent_plan_plan_name != tmp_nm:
+                record.set_rent_plan_plan_name = tmp_nm
 
     def _set_back_set_rent_plan_values(self):
         for record in self:
             if record.set_rent_plan_on_this_page:
-                record.rent_price = record.set_rent_plan_rent_price
-                record.including_management_fee = record.set_rent_plan_including_management_fee
-                record.rent_amount_monthly_auto = record.set_rent_plan_rent_amount_monthly_adjust
-                record.rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
-                record.latest_annual_rent = record.set_rent_plan_annual_rent
-                record.latest_payment_method = _set_payment_method_str(record)
+                if record.rent_price != record.set_rent_plan_rent_price:
+                    record.rent_price = record.set_rent_plan_rent_price
+                if record.including_management_fee != record.set_rent_plan_including_management_fee:
+                    record.including_management_fee = record.set_rent_plan_including_management_fee
+                if record.rent_amount_monthly_auto != record.set_rent_plan_rent_amount_monthly_adjust:
+                    record.rent_amount_monthly_auto = record.set_rent_plan_rent_amount_monthly_adjust
+                if record.rent_amount_monthly_adjust != record.set_rent_plan_rent_amount_monthly_adjust:
+                    record.rent_amount_monthly_adjust = record.set_rent_plan_rent_amount_monthly_adjust
+                if record.latest_annual_rent != record.set_rent_plan_annual_rent:
+                    record.latest_annual_rent = record.set_rent_plan_annual_rent
+                tmp_s = _set_payment_method_str(record)
+                if record.latest_payment_method != tmp_s:
+                    record.latest_payment_method = tmp_s
 
     @api.onchange("set_rent_plan_on_this_page")
     def _onchange_set_rent_plan_on_this_page(self):
@@ -277,40 +310,55 @@ class EstateLeaseContractPropertyExtend(models.Model):
     def _cal_deposit(self):
         for record in self:
             if record.rent_amount_monthly_adjust:
-                record.deposit_amount = record.deposit_months * record.rent_amount_monthly_adjust
-                record.deposit_months = record.deposit_amount / record.rent_amount_monthly_adjust
+                if record.deposit_amount != record.deposit_months * record.rent_amount_monthly_adjust:
+                    record.deposit_amount = record.deposit_months * record.rent_amount_monthly_adjust
+                if record.deposit_months != record.deposit_amount / record.rent_amount_monthly_adjust:
+                    record.deposit_months = record.deposit_amount / record.rent_amount_monthly_adjust
 
             else:
-                record.deposit_amount = record.deposit_months * record.rent_amount_monthly_auto
+                if record.deposit_amount != record.deposit_months * record.rent_amount_monthly_auto:
+                    record.deposit_amount = record.deposit_months * record.rent_amount_monthly_auto
                 if record.rent_amount_monthly_auto:
-                    record.deposit_months = record.deposit_amount / record.rent_amount_monthly_auto
+                    if record.deposit_months != record.deposit_amount / record.rent_amount_monthly_auto:
+                        record.deposit_months = record.deposit_amount / record.rent_amount_monthly_auto
                 else:
-                    record.deposit_months = 0
+                    if record.deposit_months:
+                        record.deposit_months = 0
 
-            record.latest_payment_method = _set_payment_method_str(record)
+            tmp_s = _set_payment_method_str(record)
+            if record.latest_payment_method != tmp_s:
+                record.latest_payment_method = tmp_s
 
     @api.onchange("rent_amount_monthly_adjust", "deposit_months")
     def _cal_month_2_amount_change(self):
         for record in self:
             if record.rent_amount_monthly_adjust:
-                record.deposit_amount = record.deposit_months * record.rent_amount_monthly_adjust
+                if record.deposit_amount != record.deposit_months * record.rent_amount_monthly_adjust:
+                    record.deposit_amount = record.deposit_months * record.rent_amount_monthly_adjust
             else:
-                record.deposit_amount = record.deposit_months * record.rent_amount_monthly_auto
-
-            record.latest_payment_method = _set_payment_method_str(record)
+                if record.deposit_amount != record.deposit_months * record.rent_amount_monthly_auto:
+                    record.deposit_amount = record.deposit_months * record.rent_amount_monthly_auto
+            tmp_s = _set_payment_method_str(record)
+            if record.latest_payment_method != tmp_s:
+                record.latest_payment_method = tmp_s
 
     @api.onchange("rent_amount_monthly_adjust", "deposit_amount")
     def _cal_amount_2_month_change(self):
         for record in self:
             if record.rent_amount_monthly_adjust:
-                record.deposit_months = record.deposit_amount / record.rent_amount_monthly_adjust
+                if record.deposit_months != record.deposit_amount / record.rent_amount_monthly_adjust:
+                    record.deposit_months = record.deposit_amount / record.rent_amount_monthly_adjust
             else:
                 if record.rent_amount_monthly_auto:
-                    record.deposit_months = record.deposit_amount / record.rent_amount_monthly_auto
+                    if record.deposit_months != record.deposit_amount / record.rent_amount_monthly_auto:
+                        record.deposit_months = record.deposit_amount / record.rent_amount_monthly_auto
                 else:
-                    record.deposit_months = 0
+                    if record.deposit_months:
+                        record.deposit_months = 0
 
-            record.latest_payment_method = _set_payment_method_str(record)
+            tmp_s = _set_payment_method_str(record)
+            if record.latest_payment_method != tmp_s:
+                record.latest_payment_method = tmp_s
 
     @api.onchange("rent_amount_yearly_adjust")
     def _onchange_rent_amount_yearly_adjust(self):
@@ -354,17 +402,20 @@ class EstateLeaseContractPropertyExtend(models.Model):
         session_contract_id, from_menu_root = self._get_default_contract()
         for record in self:
             if not session_contract_id:
-                record.management_fee_name_description = ""
+                if record.management_fee_name_description:
+                    record.management_fee_name_description = ""
             else:
                 for management_fee_plan in record.management_fee_plan_id:
                     _logger.info(f"estate_lease_contract={management_fee_plan.estate_lease_contract}")
                     _logger.info(f"contract_uuid={management_fee_plan.estate_lease_contract_uuid}")
 
                     if management_fee_plan.estate_lease_contract.id == session_contract_id:
-                        record.management_fee_name_description = management_fee_plan.name_description
+                        if record.management_fee_name_description != management_fee_plan.name_description:
+                            record.management_fee_name_description = management_fee_plan.name_description
                         break
 
-                record.management_fee_name_description = ""
+                if record.management_fee_name_description:
+                    record.management_fee_name_description = ""
 
     @api.depends("rent_plan_id")
     def _compute_billing_method_group_invisible(self):

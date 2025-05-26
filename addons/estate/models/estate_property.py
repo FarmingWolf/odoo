@@ -41,7 +41,7 @@ def _get_payment_method_str(record):
             return f"押{'{:.2f}'.format(round(deposit_months, 2)).rstrip('0').rstrip('.')}" \
                    f"付{record.rent_plan_id.payment_period}"
     else:
-        return None
+        return ""
 
 
 def _get_property_cnt_limit():
