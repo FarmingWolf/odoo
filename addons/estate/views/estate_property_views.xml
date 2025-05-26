@@ -40,6 +40,7 @@
                 <field name="floor"/>
                 <field name="room_no"/>
                 <field name="date_availability" string="交付日期"/>
+                <field name="tag_ids" optional="hide" widget="many2many_tags"/>
             </tree>
         </field>
     </record>
