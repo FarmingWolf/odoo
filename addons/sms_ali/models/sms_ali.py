@@ -315,6 +315,7 @@ class SmsAli(models.Model):
 
             elif rule.sms_send_period in ('daily', 'weekly', 'monthly'):
                 if "资产出租率汇报" in rule.sms_template_name:
+                    _logger.info(f"开始处理资产出租率汇报短信，company={hist_company_id}")
                     json_ret = EstateDashboardService.get_statistics_svc(company_id=hist_company_id,
                                                                          env=self.env(su=True))
                     if '491' in rule.sms_template_name:
@@ -339,10 +340,12 @@ class SmsAli(models.Model):
                         "company_id": hist_company_id,
                     })
                 elif "流程超期提醒" in rule.sms_template_name:
+                    _logger.info(f"开始处理流程超期提醒，company={hist_company_id}")
                     overdues = self.env['fund.management.overdue'].sudo().search([('active', '=', True),
                                                                                   ('sms_created', '=', False),
                                                                                   ('receive_employee_id', '!=', False),
-                                                                                  ('receive_mobile', '!=', False)],
+                                                                                  ('receive_mobile', '!=', False),
+                                                                                  ('company_id', '=', hist_company_id)],
                                                                                  order="receive_employee_id ASC, overdue_hours ASC")
                     overdue_list = {}
                     for overdue in overdues:
@@ -386,9 +389,9 @@ class SmsAli(models.Model):
 
                 else:
                     # todo 目前只有这一个模板，其他模板先不发短信
-                    _logger.error(f"改模板暂时没处理短信逻辑：rule.sms_template_name={rule.sms_template_name}")
+                    _logger.error(f"该模板暂时没处理短信逻辑：rule.id={rule.id}sms_template_name={rule.sms_template_name}")
             else:
-                _logger.error(f"出现了新情况：rule.sms_send_period={rule.sms_send_period}")
+                _logger.error(f"出现了新情况：id={rule.id}name={rule.sms_template_name}send_period={rule.sms_send_period}")
 
     @staticmethod
     def log_rotate() -> None:
