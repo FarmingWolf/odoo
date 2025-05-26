@@ -35,6 +35,7 @@
         <field name="model">fund.management.overdue</field>
         <field name="arch" type="xml">
             <tree string="Fund Management Approval overdue">
+                <field name="company_currency_id" column_invisible="True"/>
                 <field name="apply_no"/>
                 <field name="name"/>
                 <field name="category_id"/>
@@ -43,10 +44,10 @@
                 <field name="overdue_reminder_hours"/>
                 <field name="apply_date" optional="hide"/>
                 <field name="employee_id" optional="hide"/>
-                <field name="applicant_unit" optional="hide"/>
-                <field name="total_amount"/>
+                <field name="applicant_unit"/>
+                <field name="total_amount" optional="hide" widget='monetary' options="{'currency_field': 'company_currency_id'}" sum="total"/>
                 <field name="contract_payment" optional="hide" />
-                <field name="contract_amount" optional="hide" />
+                <field name="contract_amount" optional="hide" widget='monetary' options="{'currency_field': 'company_currency_id'}" sum="total"/>
                 <field name="state"/>
                 <field name="stage"/>
                 <field name="latest_approval_detail_id" optional="hide"/>
