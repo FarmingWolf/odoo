@@ -22,7 +22,7 @@ def is_in_time(self, rcd):
             (sys_time + relativedelta(minutes=10)).strftime("%Y%m%d%H%M%S"):
         return True
     else:
-        _logger.info(f"跳过id{rcd.id},mobile{rcd.tgt_mobile},date_send={rcd.date_send}非当前{sys_time}前后10分钟之内")
+        _logger.info(f"跳过id{rcd.id},mobile{rcd.tgt_mobile if rcd.tgt_mobile else rcd.tgt_mobile_from_data},date_send={rcd.date_send}非当前{sys_time}前后10分钟之内")
         return False
 
 
@@ -34,7 +34,7 @@ def set_single_param(self, send_tgt):
 
         res = {
             "id": tgt.id,
-            "phone_numbers": tgt.tgt_mobile,
+            "phone_numbers": tgt.tgt_mobile if tgt.tgt_mobile else tgt.tgt_mobile_from_data,
             "sign_name": tgt.sms_sign_name,
             "template_code": tgt.sms_template_code,
             "template_param": tgt.sent_content_params,
@@ -55,7 +55,7 @@ def set_batch_param(self, batch_param):
             continue
 
         ids.append(record.id)
-        phone_numbers.append(record.tgt_mobile)
+        phone_numbers.append(record.tgt_mobile if record.tgt_mobile else record.tgt_mobile_from_data)
         sign_name.append(record.sms_sign_name)
         template_param.append(record.sent_content_params)
         template_code = record.sms_template_code
@@ -205,8 +205,10 @@ class SmsAliHist(models.Model):
     sms_ali_id = fields.Many2one(string="模板对象", comodel_name="sms.ali", ondelete="cascade")
 
     tgt_partner_id = fields.Many2one(string="短信对象", comodel_name="res.partner", related="sms_ali_id.tgt_partner_id",
-                                     readonly=True)
+                                     readonly=True, store=True)
     tgt_mobile = fields.Char(string="手机号", related="sms_ali_id.tgt_mobile", readonly=True, store=True)
+    tgt_partner_id_from_data = fields.Many2one(string="短信对象-备", comodel_name="res.partner")
+    tgt_mobile_from_data = fields.Char(string="手机号")
     sms_sign_name = fields.Char(string="短信签名", related="sms_ali_id.sms_sign_name", readonly=True)
     sms_template_name = fields.Char(string="模板名称", related="sms_ali_id.sms_template_name", readonly=True)
     sms_template_code = fields.Char(string="模板编码", related="sms_ali_id.sms_template_code", readonly=True, store=True)
@@ -262,8 +264,11 @@ class SmsAliHist(models.Model):
                         if il == tgt_cnt - 1:
                             i_e = il + 1
                         else:
-                            if send_tgt[il + 1].sms_template_code != send_tgt[il].sms_template_code \
-                                    or send_tgt[il + 1].tgt_mobile == send_tgt[il].tgt_mobile:
+                            if (send_tgt[il + 1].sms_template_code != send_tgt[il].sms_template_code
+                                    or (send_tgt[il].tgt_mobile
+                                        and send_tgt[il + 1].tgt_mobile == send_tgt[il].tgt_mobile)
+                                    or (send_tgt[il].tgt_mobile_from_data
+                                        and send_tgt[il + 1].tgt_mobile_from_data == send_tgt[il].tgt_mobile_from_data)):
                                 i_e = il + 1
 
                     if i_e - i_s > 0:
@@ -332,7 +337,9 @@ class SmsAliHist(models.Model):
             sms_size = bk_data["sms_size"]
             # out_id = bk_data["out_id"]
 
-            record = self.env['sms.ali.hist'].sudo().search([('tgt_mobile', '=', tgt_mobile), ('biz_id', '=', biz_id)])
+            record = self.env['sms.ali.hist'].sudo().search([('biz_id', '=', biz_id),
+                                                             '|', ('tgt_mobile', '=', tgt_mobile),
+                                                             ('tgt_mobile_from_data', '=', tgt_mobile)])
             _logger.info(f"更新tgt_mobile{tgt_mobile},biz_id={biz_id},对象{len(record)}条")
             record.date_sent = sent_date
             record.sent_result = result

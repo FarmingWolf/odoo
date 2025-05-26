@@ -9,6 +9,8 @@
                 <tree string="短信记录" create="false" delete="false" edit="false">
                     <field name="tgt_partner_id"/>
                     <field name="tgt_mobile"/>
+                    <field name="tgt_partner_id_from_data"/>
+                    <field name="tgt_mobile_from_data"/>
                     <field name="date_send_no_tz"/>
                     <field name="date_sent_no_tz"/>
                     <field name="sent_result"/>
@@ -33,9 +35,12 @@
                                 <field name="sms_ali_id"/>
                                 <field name="date_send_no_tz"/>
                                 <field name="sms_size"/>
+                                <field name="tgt_partner_id"/>
+                                <field name="tgt_mobile"/>
                             </group>
                             <group>
-                                <field name="tgt_mobile"/>
+                                <field name="tgt_partner_id_from_data"/>
+                                <field name="tgt_mobile_from_data"/>
                                 <field name="date_sent_no_tz"/>
                                 <field name="sent_result"/>
                             </group>

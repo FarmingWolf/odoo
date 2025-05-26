@@ -167,6 +167,17 @@ def _set_template_arrears_alert(detail, date_today):
     return hist_params, hist_content
 
 
+def _set_template_params_overdue(overdue, overdue_list):
+    hist_params = {
+        "content": "流程超期",
+        "overdue_cnt": overdue_list[overdue]['overdue_cnt'],
+        "d_or_h": overdue_list[overdue]['d_or_h'],
+        "tgt_ids": '尾号：' + ', '.join(map(str, overdue_list[overdue]['tgt_ids'])),
+    }
+    hist_content = (f"{hist_params['content']}提醒：您有{hist_params['overdue_cnt']}条流程已超{hist_params['d_or_h']}未处理。"
+                    f"{hist_params['tgt_ids']}请及时处理！如已处理，请忽略此短信！")
+    return hist_params, hist_content
+
 class SmsAli(models.Model):
     _name = 'sms.ali'
     _description = 'SMS sending by aliyun'
@@ -327,6 +338,52 @@ class SmsAli(models.Model):
                         "text_content": hist_text_content,
                         "company_id": hist_company_id,
                     })
+                elif "流程超期提醒" in rule.sms_template_name:
+                    overdues = self.env['fund.management.overdue'].sudo().search([('active', '=', True),
+                                                                                  ('sms_created', '=', False),
+                                                                                  ('receive_employee_id', '!=', False),
+                                                                                  ('receive_mobile', '!=', False)],
+                                                                                 order="receive_employee_id ASC, overdue_hours ASC")
+                    overdue_list = {}
+                    for overdue in overdues:
+                        employee_partner_id = overdue.receive_employee_id.user_id.partner_id.id
+                        if employee_partner_id not in overdue_list:
+
+                            overdue_list[employee_partner_id] = {
+                                'receive_employee_id': overdue.receive_employee_id.id,
+                                'employee_partner_id': employee_partner_id,
+                                'overdue_cnt': 1,
+                                'receive_mobile': overdue.receive_mobile,
+                                'd_or_h': overdue.overdue_description,
+                                'tgt_ids': [overdue.apply_no_suffix]
+                            }
+                        else:
+                            overdue_list[employee_partner_id]['overdue_cnt'] += 1
+                            overdue_list[employee_partner_id]['tgt_ids'].append(overdue.apply_no_suffix)
+                        overdue.sms_created = True
+
+                    for overdue_rcd in overdue_list:
+                        _logger.info(f"overdue_rcd: {overdue_rcd}")
+                        _logger.info(f"overdue_list[overdue_rcd]: {overdue_list[overdue_rcd]}")
+                        _logger.info(f"overdue_list[overdue_rcd]['receive_mobile']: {overdue_list[overdue_rcd]['receive_mobile']}")
+                        hist_sent_content_params, hist_text_content = _set_template_params_overdue(overdue_rcd, overdue_list)
+
+                        sms_tgt = {
+                            "sms_ali_id": hist_sms_ali_id,
+                            "tgt_partner_id_from_data": overdue_rcd,
+                            "tgt_mobile_from_data": overdue_list[overdue_rcd]['receive_mobile'],
+                            "sms_sign_name": hist_sms_sign_name,
+                            "sms_template_name": hist_sms_template_name,
+                            "sms_template_code": hist_sms_template_code,
+                            "date_send": hist_date_send,
+                            "date_sent": None,
+                            "sent_result": None,
+                            "sent_content_params": str(hist_sent_content_params),
+                            "text_content": hist_text_content,
+                            "company_id": hist_company_id,
+                        }
+                        self.env['sms.ali.hist'].sudo().create(sms_tgt)
+
                 else:
                     # todo 目前只有这一个模板，其他模板先不发短信
                     _logger.error(f"改模板暂时没处理短信逻辑：rule.sms_template_name={rule.sms_template_name}")
