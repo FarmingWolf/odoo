@@ -265,7 +265,7 @@ class SmsAli(models.Model):
                 continue
 
             hist_sms_ali_id = rule.id
-            hist_tgt_partner_id = rule.tgt_partner_id
+            hist_tgt_partner_id = rule.tgt_partner_id.id
             hist_tgt_mobile = rule.tgt_mobile
             hist_sms_sign_name = rule.sms_sign_name
             hist_sms_template_name = rule.sms_template_name
