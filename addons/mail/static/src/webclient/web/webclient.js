@@ -53,45 +53,54 @@ patch(WebClient.prototype, {
      * @return {Promise<void>}
      */
     async _subscribePush(numberTry = 1) {
-        const pushManager = await this.pushManager();
-        if (!pushManager) {
-            return;
-        }
-        let subscription = await pushManager.getSubscription();
-        const previousEndpoint = browser.localStorage.getItem(`${USER_DEVICES_MODEL}_endpoint`);
-        // This may occur if the subscription was refreshed by the browser,
-        // but it may also happen if the subscription has been revoked or lost.
-        if (!subscription) {
-            subscription = await pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: await this._getApplicationServerKey(),
-            });
-            browser.localStorage.setItem(`${USER_DEVICES_MODEL}_endpoint`, subscription.endpoint);
-        }
-        const kwargs = subscription.toJSON();
-        if (previousEndpoint && subscription.endpoint !== previousEndpoint) {
-            kwargs.previous_endpoint = previousEndpoint;
-        }
-        try {
-            kwargs.vapid_public_key = this._arrayBufferToBase64(
-                subscription.options.applicationServerKey
-            );
-            await this.orm.call(USER_DEVICES_MODEL, "register_devices", [], kwargs);
-        } catch (e) {
-            const invalidVapidErrorClass =
-                "odoo.addons.mail.models.partner_devices.InvalidVapidError";
-            const warningMessage = "Error sending subscription information to the server";
-            if (e.data?.name === invalidVapidErrorClass) {
-                const MAX_TRIES = 2;
-                if (numberTry < MAX_TRIES) {
-                    await subscription.unsubscribe();
-                    this._subscribePush(numberTry + 1);
-                } else {
-                    console.warn(warningMessage);
-                }
-            } else {
-                console.warn(`${warningMessage}: ${e.data?.debug}`);
+        try{
+
+            const pushManager = await this.pushManager();
+            if (!pushManager) {
+                return;
             }
+            let subscription = await pushManager.getSubscription();
+            const previousEndpoint = browser.localStorage.getItem(`${USER_DEVICES_MODEL}_endpoint`);
+            // This may occur if the subscription was refreshed by the browser,
+            // but it may also happen if the subscription has been revoked or lost.
+            if (!subscription) {
+                subscription = await pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: await this._getApplicationServerKey(),
+                });
+                browser.localStorage.setItem(`${USER_DEVICES_MODEL}_endpoint`, subscription.endpoint);
+            }
+            const kwargs = subscription.toJSON();
+            if (previousEndpoint && subscription.endpoint !== previousEndpoint) {
+                kwargs.previous_endpoint = previousEndpoint;
+            }
+            try {
+                kwargs.vapid_public_key = this._arrayBufferToBase64(
+                    subscription.options.applicationServerKey
+                );
+                await this.orm.call(USER_DEVICES_MODEL, "register_devices", [], kwargs);
+            } catch (e) {
+                const invalidVapidErrorClass =
+                    "odoo.addons.mail.models.partner_devices.InvalidVapidError";
+                const warningMessage = "Error sending subscription information to the server";
+                if (e.data?.name === invalidVapidErrorClass) {
+                    const MAX_TRIES = 2;
+                    if (numberTry < MAX_TRIES) {
+                        await subscription.unsubscribe();
+                        this._subscribePush(numberTry + 1);
+                    } else {
+                        console.warn(warningMessage);
+                    }
+                } else {
+                    console.warn(`${warningMessage}: ${e.data?.debug}`);
+                }
+            }
+        } catch (error) {
+            if (error.name === 'AbortError' && error.message.includes('push service error')) {
+                console.error('Push service registration failed:', error);
+                return; // 静默处理，不抛出错误
+            }
+            throw error; // 重新抛出其他类型的错误
         }
     },
 
