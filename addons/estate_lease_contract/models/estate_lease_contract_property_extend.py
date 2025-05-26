@@ -461,41 +461,57 @@ class EstateLeaseContractPropertyExtend(models.Model):
         for record in self:
 
             if record.rent_plan_id:
-                # print("record.rent_plan_id.billing_method={0}".format(record.rent_plan_id.billing_method))
-                # print("record.rent_plan_id.billing_progress_method_id={0}".format(
-                #     record.rent_plan_id.billing_progress_method_id))
 
-                record.business_method_id = dict(record.rent_plan_id._fields['business_method_id'].selection).get(
-                    record.rent_plan_id.business_method_id)
-                record.business_type_id = record.rent_plan_id.business_type_id.name
-                record.main_category = record.rent_plan_id.main_category.name
-                record.billing_method = dict(record.rent_plan_id._fields['billing_method'].selection).get(
-                    record.rent_plan_id.billing_method)
-                record.billing_progress_method_id = dict(
-                    record.rent_plan_id._fields['billing_progress_method_id'].selection).get(
-                    record.rent_plan_id.billing_progress_method_id)
+                tmp_id0 = dict(record.rent_plan_id._fields['business_method_id'].selection).get(record.rent_plan_id.business_method_id)
+                if record.business_method_id != tmp_id0:
+                    record.business_method_id = tmp_id0
+                if record.business_type_id != record.rent_plan_id.business_type_id.name:
+                    record.business_type_id = record.rent_plan_id.business_type_id.name
+                if record.main_category != record.rent_plan_id.main_category.name:
+                    record.main_category = record.rent_plan_id.main_category.name
+                tmp_id1 = dict(record.rent_plan_id._fields['billing_method'].selection).get(record.rent_plan_id.billing_method)
+                if record.billing_method != tmp_id1:
+                    record.billing_method = tmp_id1
+                tmp_id2 = dict(record.rent_plan_id._fields['billing_progress_method_id'].selection).get(record.rent_plan_id.billing_progress_method_id)
+                if record.billing_progress_method_id != tmp_id2:
+                    record.billing_progress_method_id = tmp_id2
 
-                record.period_percentage_id = self._format_m2m_values(record.rent_plan_id.period_percentage_id)
-                record.turnover_percentage_id = self._format_m2m_values(record.rent_plan_id.turnover_percentage_id)
-
-                record.payment_period = dict(record.rent_plan_id._fields['payment_period'].selection).get(
-                    record.rent_plan_id.payment_period)
-                record.rent_price = Utils.remove_last_zero(record.rent_plan_id.rent_price)
+                tmp_v0 = self._format_m2m_values(record.rent_plan_id.period_percentage_id)
+                if record.period_percentage_id != tmp_v0:
+                    record.period_percentage_id = tmp_v0
+                tmp_v1 = self._format_m2m_values(record.rent_plan_id.turnover_percentage_id)
+                if record.turnover_percentage_id != tmp_v1:
+                    record.turnover_percentage_id = tmp_v1
+                tmp_v2 = dict(record.rent_plan_id._fields['payment_period'].selection).get(record.rent_plan_id.payment_period)
+                if record.payment_period != tmp_v2:
+                    record.payment_period = tmp_v2
+                tmp_v3 = Utils.remove_last_zero(record.rent_plan_id.rent_price)
+                if record.rent_price != tmp_v3:
+                    record.rent_price = tmp_v3
                 _logger.info(f"record.rent_price={record.rent_price}")
-                record.including_management_fee = record.rent_plan_id.including_management_fee
-                record.rent_amount_monthly_auto = record.rent_plan_id.rent_price * record.rent_area * one_year_days / 12
+                if record.including_management_fee != record.rent_plan_id.including_management_fee:
+                    record.including_management_fee = record.rent_plan_id.including_management_fee
+                tmp_v4 = record.rent_plan_id.rent_price * record.rent_area * one_year_days / 12
+                if record.rent_amount_monthly_auto != tmp_v4:
+                    record.rent_amount_monthly_auto = tmp_v4
                 if record.rent_amount_monthly_adjust:
                     pass
                 else:
-                    record.rent_amount_monthly_adjust = record.rent_plan_id.rent_price * record.rent_area * one_year_days / 12
+                    if record.rent_amount_monthly_adjust != tmp_v4:
+                        record.rent_amount_monthly_adjust = tmp_v4
 
-                record.payment_date = dict(record.rent_plan_id._fields['payment_date'].selection).get(
-                    record.rent_plan_id.payment_date)
-                record.compensation_method = dict(record.rent_plan_id._fields['compensation_method'].selection).get(
-                    record.rent_plan_id.compensation_method)
-                record.compensation_period = dict(record.rent_plan_id._fields['compensation_period'].selection).get(
-                    record.rent_plan_id.compensation_period)
-                record.latest_payment_method = _set_payment_method_str(record)
+                tmp_v5 = dict(record.rent_plan_id._fields['payment_date'].selection).get(record.rent_plan_id.payment_date)
+                if record.payment_date != tmp_v5:
+                    record.payment_date = tmp_v5
+                tmp_v6 = dict(record.rent_plan_id._fields['compensation_method'].selection).get(record.rent_plan_id.compensation_method)
+                if record.compensation_method != tmp_v6:
+                    record.compensation_method = tmp_v6
+                tmp_v7 = dict(record.rent_plan_id._fields['compensation_period'].selection).get(record.rent_plan_id.compensation_period)
+                if record.compensation_period != tmp_v7:
+                    record.compensation_period = tmp_v7
+                tmp_v8 = _set_payment_method_str(record)
+                if record.latest_payment_method != tmp_v8:
+                    record.latest_payment_method = tmp_v8
 
             else:
                 record.business_method_id = ""

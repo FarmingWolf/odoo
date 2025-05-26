@@ -210,21 +210,62 @@ class EstateProperty(models.Model):
                                                                          ('active', '=', True),
                                                                          ('state', '=', 'released')],
                                                                         order='date_rent_end DESC', limit=1)
-            record.current_contract_id = current_contract.id if current_contract else False
-            record.current_contract_no = current_contract.contract_no if current_contract else False
-            record.current_contract_nm = current_contract.name if current_contract else False
-            record.latest_rent_date_s = current_contract.date_rent_start if current_contract else False
-            record.latest_rent_date_e = current_contract.date_rent_end if current_contract else False
-            record.latest_sign_date = current_contract.date_sign if current_contract else False
-            record.latest_contract_date_s = current_contract.date_start if current_contract else False
-            record.latest_rent_days = current_contract.days_rent_total if current_contract else False
-            record.latest_payment_method = _get_payment_method_str(record)
-            record.latest_deposit = record.deposit_amount
-            record.latest_monthly_rent = record.rent_amount_monthly_adjust if record.rent_amount_monthly_adjust else \
-                record.rent_amount_monthly_auto
-            record.latest_annual_rent = record.latest_monthly_rent * 12
-            record.latest_contact_person = current_contract.renter_id.name if current_contract else False
-            record.latest_contact_person_tel = current_contract.renter_id.phone if current_contract else False
+            if current_contract:
+                if record.current_contract_id != current_contract.id:
+                    record.current_contract_id = current_contract.id
+                if record.current_contract_no != current_contract.contract_no:
+                    record.current_contract_no = current_contract.contract_no
+                if record.current_contract_nm != current_contract.name:
+                    record.current_contract_nm = current_contract.name
+                if record.latest_rent_date_s != current_contract.date_rent_start:
+                    record.latest_rent_date_s = current_contract.date_rent_start
+                if record.latest_rent_date_e != current_contract.date_rent_end:
+                    record.latest_rent_date_e = current_contract.date_rent_end
+                if record.latest_sign_date != current_contract.date_sign:
+                    record.latest_sign_date = current_contract.date_sign
+                if record.latest_contract_date_s != current_contract.date_start:
+                    record.latest_contract_date_s = current_contract.date_start
+                if record.latest_rent_days != current_contract.days_rent_total:
+                    record.latest_rent_days = current_contract.days_rent_total
+                if record.latest_contact_person != current_contract.renter_id.name:
+                    record.latest_contact_person = current_contract.renter_id.name
+                if record.latest_contact_person_tel != current_contract.renter_id.phone:
+                    record.latest_contact_person_tel = current_contract.renter_id.phone
+            else:
+                if record.current_contract_id:
+                    record.current_contract_id = False
+                if record.current_contract_no:
+                    record.current_contract_no = False
+                if record.current_contract_nm:
+                    record.current_contract_nm = False
+                if record.latest_rent_date_s:
+                    record.latest_rent_date_s = False
+                if record.latest_rent_date_e:
+                    record.latest_rent_date_e = False
+                if record.latest_sign_date:
+                    record.latest_sign_date = False
+                if record.latest_contract_date_s:
+                    record.latest_contract_date_s = False
+                if record.latest_rent_days:
+                    record.latest_rent_days = False
+                if record.latest_contact_person:
+                    record.latest_contact_person = False
+                if record.latest_contact_person_tel:
+                    record.latest_contact_person_tel = False
+
+            tmp_str = _get_payment_method_str(record)
+            if record.latest_payment_method != tmp_str:
+                record.latest_payment_method = tmp_str
+            if record.latest_deposit != record.deposit_amount:
+                record.latest_deposit = record.deposit_amount
+            if record.rent_amount_monthly_adjust:
+                if record.latest_monthly_rent != record.rent_amount_monthly_adjust:
+                    record.latest_monthly_rent = record.rent_amount_monthly_adjust
+            else:
+                if record.latest_monthly_rent != record.rent_amount_monthly_auto:
+                    record.latest_monthly_rent = record.rent_amount_monthly_auto
+            if record.latest_annual_rent != record.latest_monthly_rent * 12:
+                record.latest_annual_rent = record.latest_monthly_rent * 12
 
             old_contract = self.env['estate.lease.contract'].search([('property_ids', 'in', record.id),
                                                                      ('active', '=', True),
@@ -233,34 +274,46 @@ class EstateProperty(models.Model):
                                                                     limit=1)
 
             if old_contract:
-                record.last_rent_date_s = old_contract.date_rent_start
+                if record.last_rent_date_s != old_contract.date_rent_start:
+                    record.last_rent_date_s = old_contract.date_rent_start
 
                 if old_contract.terminated and old_contract.date_terminated:
-                    record.last_rent_date_e = old_contract.date_terminated
+                    if record.last_rent_date_e != old_contract.date_terminated:
+                        record.last_rent_date_e = old_contract.date_terminated
                 else:
-                    record.last_rent_date_e = old_contract.date_rent_end
+                    if record.last_rent_date_e != old_contract.date_rent_end:
+                        record.last_rent_date_e = old_contract.date_rent_end
 
-                record.date_availability = record.last_rent_date_e + timedelta(days=1)
+                if record.date_availability != record.last_rent_date_e + timedelta(days=1):
+                    record.date_availability = record.last_rent_date_e + timedelta(days=1)
             else:
-                record.last_rent_date_s = False
-                record.last_rent_date_e = False
+                if record.last_rent_date_s:
+                    record.last_rent_date_s = False
+                if record.last_rent_date_e:
+                    record.last_rent_date_e = False
 
             if record.latest_rent_date_s:
                 if record.date_availability:
-                    record.out_of_rent_days = (record.latest_rent_date_s - record.date_availability).days - 1
+                    if record.out_of_rent_days != (record.latest_rent_date_s - record.date_availability).days - 1:
+                        record.out_of_rent_days = (record.latest_rent_date_s - record.date_availability).days - 1
                 else:
                     if record.last_rent_date_e:
-                        record.out_of_rent_days = (record.latest_rent_date_s - record.last_rent_date_e).days - 1
+                        if record.out_of_rent_days != (record.latest_rent_date_s - record.last_rent_date_e).days - 1:
+                            record.out_of_rent_days = (record.latest_rent_date_s - record.last_rent_date_e).days - 1
                     else:
-                        record.out_of_rent_days = 0
+                        if record.out_of_rent_days:
+                            record.out_of_rent_days = 0
             else:
                 if record.date_availability:
-                    record.out_of_rent_days = (fields.Date.context_today(self) - record.date_availability).days
+                    if record.out_of_rent_days != (fields.Date.context_today(self) - record.date_availability).days:
+                        record.out_of_rent_days = (fields.Date.context_today(self) - record.date_availability).days
                 else:
                     if record.last_rent_date_e:
-                        record.out_of_rent_days = (fields.Date.context_today(self) - record.last_rent_date_e).days
+                        if record.out_of_rent_days != (fields.Date.context_today(self) - record.last_rent_date_e).days:
+                            record.out_of_rent_days = (fields.Date.context_today(self) - record.last_rent_date_e).days
                     else:
-                        record.out_of_rent_days = 0
+                        if record.out_of_rent_days:
+                            record.out_of_rent_days = 0
 
             if record.out_of_rent_days < 0:
                 record.out_of_rent_days = 0
