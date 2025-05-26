@@ -25,6 +25,7 @@
         'views/fund_management_approval_detail_views.xml',
         'views/fund_management_approval_stage_views.xml',
         'views/fund_management_category_views.xml',
+        'views/fund_management_overdue_views.xml',
         'views/fund_management_fund_type_views.xml',
         'views/fund_management_procurement_method_views.xml',
         'views/fund_management_payment_method_views.xml',
@@ -34,6 +35,8 @@
 
         'report/fund_management_application_reports.xml',
         'report/fund_management_application_templates.xml',
+
+        'data/cron_daily_sms_ali_fund_management.xml',
     ],
     'demo': [],
     'installable': True,

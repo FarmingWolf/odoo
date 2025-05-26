@@ -44,16 +44,20 @@
                     </div>
 
                     <group>
-                        <group>
+                        <div>
                             <label for="amount_min" string="Fund range"/>
-                            <div>
-                                <field name="amount_min" nolabel="True" class="oe_inline o_input_11ch"/>
-                                <span>to</span>
-                                <field name="amount_max" nolabel="True" class="oe_inline o_input_11ch" placeholder="0 means infinity"/>
-                            </div>
-                        </group>
+                            <field name="amount_min" nolabel="True" class="oe_inline o_input_15ch"/>
+                            <span>to</span>
+                            <field name="amount_max" nolabel="True" class="oe_inline o_input_15ch" placeholder="0 means infinity"/>
+                        </div>
+
                         <group>
-                            <field name="contract_payment" />
+                            <group>
+                                <field name="contract_payment" />
+                            </group>
+                            <group>
+                                <field name="overdue_reminder_hours" />
+                            </group>
                         </group>
                     </group>
                     <group>

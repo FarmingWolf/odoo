@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-20 05:37+0000\n"
-"PO-Revision-Date: 2025-05-20 05:37+0000\n"
+"POT-Creation-Date: 2025-05-25 05:38+0000\n"
+"PO-Revision-Date: 2025-05-25 05:38+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -313,6 +313,7 @@ msgstr "需要的动作"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__active
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__active
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__active
 msgid "Active"
 msgstr "激活"
 
@@ -404,15 +405,18 @@ msgstr "分析精度"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__employee_id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__employee_id
 msgid "Applicant"
 msgstr "申请人"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__apply_no
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__apply_no
 msgid "Application NO."
 msgstr "申请编号"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_overdue_view_search
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Application of Your Team Member"
 msgstr "您团队成员的申请"
@@ -424,6 +428,7 @@ msgstr "申请"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__date
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__apply_date
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Apply Date"
 msgstr "申请日期"
@@ -437,6 +442,11 @@ msgstr "合计"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__total_amount_currency_percent
 msgid "Apply In Percentage"
 msgstr "申请比例"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__apply_no_suffix
+msgid "Apply Number Suffix"
+msgstr "尾号"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__apply_times
@@ -470,6 +480,7 @@ msgstr "审批备注"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_detail__approval_date_time
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__receive_datetime
 msgid "Approval Datetime"
 msgstr "审批时间"
 
@@ -618,14 +629,21 @@ msgstr "受阻"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__category_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__category_id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__category_id
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Category"
 msgstr "分类"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__category_description
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__category_description
 msgid "Category Description"
 msgstr "分类描述"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__check_datetime
+msgid "Check Date Time"
+msgstr "检查日期"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
@@ -656,6 +674,7 @@ msgstr "颜色"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__company_id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__company_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__company_id
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
@@ -722,11 +741,13 @@ msgstr "合同编号与已存在的合同重复了！"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_payment
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__contract_payment
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__contract_payment
 msgid "Contract Payment"
 msgstr "是否合同资金支付"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_amount
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__contract_amount
 msgid "Contract Total Amount"
 msgstr "合同总额（元）"
 
@@ -765,6 +786,7 @@ msgstr "创建审批阶段"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__create_uid
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__create_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__create_uid
 msgid "Created by"
@@ -779,6 +801,7 @@ msgstr "创建人"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__create_date
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__create_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__create_date
 msgid "Created on"
@@ -811,11 +834,13 @@ msgstr "在此处定义资金类型"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__applicant_unit
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__applicant_unit
 msgid "Department Name"
 msgstr "发起部门"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__name
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__name
 msgid "Description"
 msgstr "描述(标题)"
 
@@ -828,6 +853,7 @@ msgstr "描述(标题)"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__display_name
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__display_name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__display_name
 msgid "Display Name"
@@ -849,6 +875,7 @@ msgstr "下载此App"
 #. module: fund_management
 #: model:ir.model,name:fund_management.model_hr_employee
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__employee_id
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_overdue_view_search
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Employee"
 msgstr "员工"
@@ -913,6 +940,11 @@ msgid "Fun management approval process category"
 msgstr "设置资金管理流程大类"
 
 #. module: fund_management
+#: model:ir.actions.act_window,name:fund_management.action_fund_management_overdue
+msgid "Fun management approval process overdue"
+msgstr "超期流程"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Fund"
 msgstr "资金"
@@ -934,9 +966,11 @@ msgstr "资金相关合同"
 #: model:ir.model,name:fund_management.model_fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__fund_management_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__fund_management_id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__fund_management_id
 #: model:ir.model.fields,field_description:fund_management.field_hr_employee__fund_management_manager_id
 #: model:ir.model.fields,field_description:fund_management.field_res_users__fund_management_manager_id
 #: model:ir.ui.menu,name:fund_management.menu_fund_management_root
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_overdue_view_search
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_activity
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_fund_analysis_tree
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
@@ -972,6 +1006,12 @@ msgid "Fund Management Approval Detail View Tree"
 msgstr "资金审批流程列表"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_overdue_view_form
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_overdue_view_tree
+msgid "Fund Management Approval overdue"
+msgstr "超期流程"
+
+#. module: fund_management
 #: model:ir.model,name:fund_management.model_fund_management_category
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__name
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__category_id
@@ -992,6 +1032,12 @@ msgstr "资金类型"
 #: model:ir.model.fields,field_description:fund_management.field_hr_employee_public__fund_management_manager_id
 msgid "Fund Management Manager"
 msgstr "资金管理人"
+
+#. module: fund_management
+#: model:ir.model,name:fund_management.model_fund_management_overdue
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_overdue_view_search
+msgid "Fund Management Overdue"
+msgstr "超期流程"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__stage_id
@@ -1052,6 +1098,11 @@ msgid "Fund management approval stage Status"
 msgstr "资金管理审批流阶段状态"
 
 #. module: fund_management
+#: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_overdue
+msgid "Fund management process overdue list."
+msgstr "超期流程清单"
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
 msgid "Fund range"
 msgstr "资金范围"
@@ -1094,6 +1145,7 @@ msgid "Green indicates that the next stage can be entered"
 msgstr "标绿表示可进入下阶段"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_overdue_view_search
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Group By"
 msgstr "分组依据"
@@ -1135,6 +1187,7 @@ msgstr "含本次累计申请占比"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__id
 msgid "ID"
@@ -1213,6 +1266,7 @@ msgstr "看板折叠"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__write_uid
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__write_uid
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__write_uid
 msgid "Last Updated by"
@@ -1227,6 +1281,7 @@ msgstr "最后更新人"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__write_date
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__write_date
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__write_date
 msgid "Last Updated on"
@@ -1236,6 +1291,11 @@ msgstr "最后更新日期"
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Late Activities"
 msgstr "后期活动"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__latest_approval_detail_id
+msgid "Latest Approval Detail"
+msgstr "最新审批详情"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_main_attachment_id
@@ -1289,7 +1349,7 @@ msgstr "会议纪要可编辑"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__invisible_meeting_minutes
 msgid "Meeting Minutes Invisible"
-msgstr ""
+msgstr "会议纪要不可见"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__meeting_minute_types
@@ -1312,12 +1372,12 @@ msgstr "该阶段会议纪要类型"
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__meeting_minutes_attach_div_h
 msgid "Meeting Minutes Types Area Height"
-msgstr ""
+msgstr "会议纪要种类行高"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__meeting_minutes_attach_div_right_h
 msgid "Meeting Minutes Types Area Right Height"
-msgstr ""
+msgstr "会议纪要区域高度"
 
 #. module: fund_management
 #: model:ir.model,name:fund_management.model_fund_management_meeting_minutes
@@ -1370,11 +1430,13 @@ msgstr "我的活动截止日"
 #. module: fund_management
 #: model:ir.actions.act_window,name:fund_management.action_fund_management_actions_my_all
 #: model:ir.ui.menu,name:fund_management.menu_fund_management_my_applications
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_overdue_view_search
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "My Applications"
 msgstr "我的申请"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_overdue_view_search
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "My Team"
 msgstr "我的团队"
@@ -1428,6 +1490,7 @@ msgstr "正常表示本阶段正常推进中"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__description
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__description
 msgid "Notes"
 msgstr "备注(申请资金事由等)"
 
@@ -1472,6 +1535,27 @@ msgstr "有分发错误的消息数量"
 #, python-format
 msgid "Numbers computed from your personal applications."
 msgstr "源自您申请的统计数量"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__overdue_description
+msgid "Overdue Description"
+msgstr "超期描述"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__overdue_hours
+msgid "Overdue Hours"
+msgstr "超期小时数"
+
+#. module: fund_management
+#: model:ir.ui.menu,name:fund_management.menu_fund_management_overdue
+msgid "Overdue List"
+msgstr "超期清单"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_category__overdue_reminder_hours
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__overdue_reminder_hours
+msgid "Overdue Reminder Hours Setting"
+msgstr "超期小时数设置"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__party_a_unit
@@ -1572,6 +1656,11 @@ msgid "Ready for Next Stage"
 msgstr "可进入下一阶段"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__receive_employee_id
+msgid "Receive Employee"
+msgstr "接收人"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__receiving_bank
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__receiving_bank
 msgid "Receiving Bank"
@@ -1590,11 +1679,13 @@ msgstr "标红表示本阶段受阻"
 
 #. module: fund_management
 #: model:ir.model.fields.selection,name:fund_management.selection__fund_management__state__refused
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_overdue_view_search
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Refused"
 msgstr "拒绝"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_overdue_view_search
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Refused Applications"
 msgstr "拒绝的申请"
@@ -1606,6 +1697,7 @@ msgstr "拒绝"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__company_currency_id
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__company_currency_id
 msgid "Report Company Currency"
 msgstr "货币"
 
@@ -1633,6 +1725,11 @@ msgstr "限制该阶段只能该部室中具有审批权限的岗位或职位或
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_has_sms_error
 msgid "SMS Delivery error"
 msgstr "短信发送错误"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__sms_created
+msgid "SMS Message Created"
+msgstr "短信已生成"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
@@ -1698,6 +1795,7 @@ msgstr "签订日期"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__stage
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__stage
 msgid "Stage"
 msgstr "阶段"
 
@@ -1713,6 +1811,8 @@ msgstr "开始日期"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__state
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__state
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_overdue_view_search
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "Status"
 msgstr "状态"
@@ -1843,6 +1943,7 @@ msgid "Time Payment"
 msgstr "次付款"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_overdue_view_search
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
 msgid "To Be Approved"
 msgstr "待审批"
@@ -1859,6 +1960,7 @@ msgstr "今日活动"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__total_amount
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__total_amount
 msgid "Total"
 msgstr "总计"
 
@@ -1909,6 +2011,11 @@ msgstr "本站在线消息"
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__website_message_ids
 msgid "Website communication history"
 msgstr "本站在线沟通记录"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__receive_mobile
+msgid "Work Mobile"
+msgstr "手机"
 
 #. module: fund_management
 #. odoo-python
@@ -2124,6 +2231,11 @@ msgstr ""
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
 msgid "次付款)"
+msgstr ""
+
+#. module: fund_management
+#: model:ir.actions.server,name:fund_management.sms_ali_create_fund_management_overdue_daily_cron_ir_actions_server
+msgid "每日自动生成超期未处理记录"
 msgstr ""
 
 #. module: fund_management

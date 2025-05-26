@@ -3,7 +3,7 @@
 import logging
 from typing import Dict, List
 
-from odoo import fields, models, api
+from odoo import fields, models, api, _
 
 _logger = logging.getLogger(__name__)
 
@@ -33,3 +33,28 @@ class FundManagementApprovalDetail(models.Model):
             return user.employee_ids[0].id  # 返回第一个employee记录ID
         else:
             return False  # 如果没有employee记录，则返回False
+
+    def create_overdue_records(self):
+        tgt_applications = self.env['fund.management'].sudo().search([('state', 'in', ['submitted', 'approved', 'refused'])])
+        for tgt_application in tgt_applications:
+
+            if (tgt_application.category_id.overdue_reminder_hours <= 0) or (not tgt_application.category_id.overdue_reminder_hours):
+                continue
+
+            approval_details = self.sudo().search([('fund_management_id', '=', tgt_application.id)], limit=1, order='id DESC')
+            for detail in approval_details:
+                if detail.approval_stage.pipe_end:
+                    continue
+                seconds_lasted = (fields.Datetime.now() - detail.approval_date_time).total_seconds()
+                if seconds_lasted > tgt_application.category_id.overdue_reminder_hours * 3600:
+                    tgt_tbl = 'fund.management.overdue'
+                    tgt_domain = [('fund_management_id', '=', tgt_application.id),
+                                  ('stage', '=', tgt_application.stage.id),
+                                  ('sms_created', '=', False)]
+                    overdue_records = self.env[tgt_tbl].sudo().search(tgt_domain)
+                    if overdue_records:
+                        for overdue_old in overdue_records:
+                            overdue_old.active = False
+
+                    overdue_record = {'fund_management_id': tgt_application.id}
+                    self.env['fund.management.overdue'].sudo().create(overdue_record)

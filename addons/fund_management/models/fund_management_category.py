@@ -32,6 +32,7 @@ class FundManagementCategory(models.Model):
                                             relation="category_meeting_minutes_type_rel",
                                             column1="category_id", column2="meeting_minutes_type_id",
                                             string="Meeting Minutes Type")
+    overdue_reminder_hours = fields.Float(string="Overdue Reminder Hours Setting", default=72, copy=True)
     sequence = fields.Integer(string="sequence", default=0)
 
     @api.model

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="fund_management_overdue_view_search" model="ir.ui.view">
+        <field name="name">fund.management.overdue.view.search</field>
+        <field name="model">fund.management.overdue</field>
+        <field name="arch" type="xml">
+            <search string="Fund Management Overdue">
+                <field string="Fund Management" name="name"
+                       filter_domain="['|', '|', ('employee_id', 'ilike', self), ('name', 'ilike', self), ('category_id', 'ilike', self)]"/>
+                <field name="apply_date"/>
+                <field name="employee_id"/>
+                <filter string="My Applications" name="my_fund_management"
+                        domain="[('employee_id.user_id', '=', uid)]"/>
+                <filter string="My Team" name="my_team_fund_management"
+                        domain="[('employee_id.parent_id.user_id', '=', uid)]"
+                        groups="fund_management.group_fund_management_team_approver"
+                        help="Application of Your Team Member"/>
+                <separator/>
+                <filter string="To Be Approved" name="to_be_approved"
+                        domain="[('state', 'in', ('submitted', 'approved'))]"/>
+                <filter string="Refused" name="refused" domain="[('state', '=', 'refused')]"
+                        help="Refused Applications"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Employee" name="employee" domain="[]" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Status" name="status" domain="[]" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="fund_management_overdue_view_tree" model="ir.ui.view">
+        <field name="name">fund.management.overdue.tree</field>
+        <field name="model">fund.management.overdue</field>
+        <field name="arch" type="xml">
+            <tree string="Fund Management Approval overdue">
+                <field name="apply_no"/>
+                <field name="name"/>
+                <field name="category_id"/>
+                <field name="category_description" optional="hide" />
+                <field name="description" optional="hide" />
+                <field name="overdue_reminder_hours"/>
+                <field name="apply_date" optional="hide"/>
+                <field name="employee_id" optional="hide"/>
+                <field name="applicant_unit" optional="hide"/>
+                <field name="total_amount"/>
+                <field name="contract_payment" optional="hide" />
+                <field name="contract_amount" optional="hide" />
+                <field name="state"/>
+                <field name="stage"/>
+                <field name="latest_approval_detail_id" optional="hide"/>
+                <field name="receive_datetime"/>
+                <field name="check_datetime" optional="hide"/>
+                <field name="overdue_hours" optional="hide"/>
+                <field name="overdue_description"/>
+                <field name="receive_employee_id"/>
+                <field name="receive_mobile"/>
+                <field name="sms_created"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="fund_management_overdue_view_form" model="ir.ui.view">
+        <field name="name">fund.management.overdue.form</field>
+        <field name="model">fund.management.overdue</field>
+        <field name="arch" type="xml">
+            <form string="Fund Management Approval overdue" create="False" edit="False" duplicate="False" delete="False">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="apply_no"/>
+                            <field name="name"/>
+                            <field name="category_id"/>
+                            <field name="category_description"/>
+                            <field name="description"/>
+                            <field name="overdue_reminder_hours"/>
+                            <field name="apply_date"/>
+                            <field name="employee_id"/>
+                            <field name="applicant_unit"/>
+                            <field name="total_amount"/>
+                        </group>
+                        <group>
+                            <field name="contract_payment"/>
+                            <field name="contract_amount"/>
+                            <field name="state"/>
+                            <field name="stage"/>
+                            <field name="latest_approval_detail_id"/>
+                            <field name="receive_datetime"/>
+                            <field name="check_datetime"/>
+                            <field name="overdue_hours"/>
+                            <field name="overdue_description"/>
+                            <field name="receive_employee_id"/>
+                            <field name="receive_mobile"/>
+                            <field name="sms_created"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fund_management_overdue" model="ir.actions.act_window">
+        <field name="name">Fun management approval process overdue</field>
+        <field name="res_model">fund.management.overdue</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="fund_management_overdue_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Fund management process overdue list.
+            </p>
+        </field>
+    </record>
+</odoo>

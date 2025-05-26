@@ -40,4 +40,8 @@
     <menuitem id="menu_fund_management_meeting_minutes_type" name="Meeting Minutes Type" parent="menu_fund_management_configuration"
               action="fund_management_meeting_minutes_type" groups="fund_management.group_fund_management_manager"
               sequence="50"/>
+
+    <menuitem id="menu_fund_management_overdue" name="Overdue List" parent="menu_fund_management_root"
+              action="action_fund_management_overdue"
+              groups="fund_management.group_fund_management_team_approver" sequence="100"/>
 </odoo>
