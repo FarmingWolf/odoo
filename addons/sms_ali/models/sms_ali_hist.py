@@ -143,8 +143,8 @@ def send_sms_ali_batch(self, args: dict, process_type,):
                           f'args["date_sent"]={args["date_sent"]}')
             # 不着急返回return args
 
-        # 2. 等待 10 秒后查询结果
-        UtilClient.sleep(10 * 1000)
+        # 2. 等待 60 * 3 秒后查询结果
+        UtilClient.sleep(60 * 1000 * 3)
         # 3.查询结果
         phone_err_code = []
         phone_err_msg = []
