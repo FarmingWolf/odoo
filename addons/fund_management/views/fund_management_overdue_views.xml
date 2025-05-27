@@ -70,6 +70,7 @@
                 <sheet>
                     <group>
                         <group>
+                            <field name="fund_management_id"/>
                             <field name="apply_no"/>
                             <field name="name"/>
                             <field name="category_id"/>
