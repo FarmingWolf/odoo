@@ -200,7 +200,7 @@
                                 <label for="category_id"/>
                                 <div>
                                     <field name="category_id" required="1" readonly="1"
-                                           options="{'no_create': True, 'no_open': True}"
+                                           options="{'no_create': True}"
                                            class="w-100" placeholder="Please choose"/>
                                     <div class="fst-italic">
                                         <field name="category_description"/>

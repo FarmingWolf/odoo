@@ -35,41 +35,42 @@
         <field name="name">fund.management.category.form</field>
         <field name="model">fund.management.category</field>
         <field name="arch" type="xml">
-            <form string="Fund Management Approval Category" create="True" edit="True" duplicate="True" delete="True">
+            <form string="Fund Management Approval Category" create="editable" edit="editable" duplicate="editable" delete="editable">
+                <field name="editable" invisible="1"/>
                 <sheet>
                     <div class="oe_title">
                         <label for="name"/>
-                        <h1><field name="name" default_focus="True"
+                        <h1><field name="name" default_focus="True" readonly="not editable"
                                    placeholder="e.g. First and mid-term payments for engineering construction projects, final payments for engineering construction projects, first and mid-term payments for service procurement projects, final payments for service procurement projects, etc"/></h1>
                     </div>
 
                     <group>
                         <div>
                             <label for="amount_min" string="Fund range"/>
-                            <field name="amount_min" nolabel="True" class="oe_inline o_input_15ch"/>
+                            <field name="amount_min" nolabel="True" class="oe_inline o_input_15ch" readonly="not editable"/>
                             <span>to</span>
-                            <field name="amount_max" nolabel="True" class="oe_inline o_input_15ch" placeholder="0 means infinity"/>
+                            <field name="amount_max" nolabel="True" class="oe_inline o_input_15ch" placeholder="0 means infinity" readonly="not editable"/>
                         </div>
 
                         <group>
                             <group>
-                                <field name="contract_payment" />
+                                <field name="contract_payment" readonly="not editable"/>
                             </group>
                             <group>
-                                <field name="overdue_reminder_hours" />
+                                <field name="overdue_reminder_hours" readonly="not editable"/>
                             </group>
                         </group>
                     </group>
                     <group>
-                        <field name="meeting_minute_types" widget="many2many_tags" options="{'color_field': 'color'}" />
+                        <field name="meeting_minute_types" widget="many2many_tags" options="{'color_field': 'color'}" readonly="not editable"/>
                     </group>
-                    <button name="action_fund_management_approval_setting" type="object" class="btn btn-success"
+                    <button name="action_fund_management_approval_setting" type="object" class="btn btn-success" invisible="not editable"
                             title="Click to set approval process steps">
                         <span>To set approval steps</span>
                     </button>
                     <notebook>
                         <page string="Approval Stages" invisible="not approval_stages">
-                            <field name="approval_stages"/>
+                            <field name="approval_stages" readonly="not editable"/>
                         </page>
                     </notebook>
                 </sheet>

@@ -40,6 +40,10 @@ class FundManagementApprovalStage(models.Model):
     input_meeting_minutes = fields.Boolean(string="Input Meeting Minutes In This Stage", default=False, copy=False)
 
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+    editable = fields.Boolean(default=False, compute='_compute_editable')
+
+    def _compute_editable(self):
+        self.editable = self.env.user.has_group('fund_management.group_fund_management_manager')
 
     def default_get(self, fields_list):
         defaults = super().default_get(fields_list)
