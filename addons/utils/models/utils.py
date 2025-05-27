@@ -202,41 +202,47 @@ class Utils:
         4. 中文部分：按拼音顺序
         5. 混合字符串按开头部分类型分类，后续部分作为次级排序基准
         """
-        # 判断字符串开头类型
-        if re.match(r'^\d', s):  # 数字开头
+        # 定义特殊字符
+        special_chars = r"\-_()~@#&*"
+
+        # 生成不包含特殊字符的纯净版字符串
+        clean_str = re.sub(f"[{special_chars}]", "", s)
+
+        # 判断纯净字符串的开头类型
+        if re.match(r'^\d', clean_str):  # 数字开头
             type_rank = 0
-        elif re.match(r'^[a-zA-Z]', s):  # 英文开头
+        elif re.match(r'^[a-zA-Z]', clean_str):  # 英文开头
             type_rank = 1
-        else:  # 中文或其他开头
+        else:  # 中文开头
             type_rank = 2
 
-        # 处理数字部分
-        def process_number(seg):
-            return f"{len(seg):03d}_{seg}"  # 按长度排序，同长度按字典序
+        # 主排序键（数字值/小写英文/拼音）
+        if type_rank == 0:
+            main_key = int(re.match(r'^\d+', clean_str).group())
+        elif type_rank == 1:
+            main_key = clean_str.lower()
+        else:
+            main_key = ''.join(lazy_pinyin(clean_str, style=Style.NORMAL))
 
-        # 处理英文部分
-        def process_alpha(seg):
-            return seg.lower()  # 不区分大小写
+        # 检查原字符串是否包含特殊字符
+        has_special = any(c in s for c in special_chars)
 
-        # 处理中文部分
-        def process_chinese(seg):
-            return ''.join(lazy_pinyin(seg, style=Style.NORMAL))
+        # 处理混合字符串中的数字部分（确保数值正确排序）
+        def process_mixed(text):
+            parts = re.split(r'(\d+)', text)
+            processed = []
+            for part in parts:
+                if part.isdigit():
+                    processed.append(f"{int(part):010d}")  # 10位数字，前面补零
+                elif part:
+                    if re.match(r'^[\u4e00-\u9fff]', part):  # 中文
+                        processed.append(''.join(lazy_pinyin(part, style=Style.NORMAL)))
+                    else:  # 英文或其他
+                        processed.append(part.lower())
+            return ''.join(processed)
 
-        # 分割字符串为数字、英文、中文段
-        segments = re.findall(r'(\d+|[a-zA-Z]+|[^\da-zA-Z]+)', s)
-
-        # 处理每个段
-        processed_segments = []
-        for seg in segments:
-            if seg.isdigit():
-                processed_segments.append(('0', process_number(seg)))
-            elif re.fullmatch(r'[a-zA-Z]+', seg):
-                processed_segments.append(('1', process_alpha(seg)))
-            else:
-                processed_segments.append(('2', process_chinese(seg)))
-
-        # 生成排序键：类型排名 + 各段处理结果
-        sort_key = (type_rank, *processed_segments)
+        # 正确的排序键顺序
+        sort_key = (type_rank, process_mixed(clean_str), main_key, has_special, s)
         return sort_key
 
     @staticmethod
@@ -259,6 +265,11 @@ class Utils:
             return 1
 
 def main():
+    str_list = ["B02", "B-01", "B01", "B10", "B05", "B-05-02", "B-05", "B05-01", "B0101", "B101", "梨树地E-01", "梨树地-01",
+                "梨树地01", "梨树地E", "梨树地", "香蕉", "中文100test", "中文50test", "50", "100", "Banana", "apple", "Apple", "第5章", "第10章"]
+    sorted_strings = sorted(str_list, key=Utils.mixed_sort_key)
+    print(sorted_strings)
+
     test_pairs = [
         ("10", "10苹果"),
         ("apple", "apple10"),
@@ -281,15 +292,8 @@ def main():
 
     args = {
         "file_2_customer": "../../../estate_management.zip",
-        "tiered_pricing_info_fn": "c_info_4_ck",
-        "zip_pwd": "491491491Tech+",
-    }
-    ret_val = Utils.get_property_cnt_limit(args)
-    print(ret_val)
-
-    args = {
-        "file_2_customer": "../../../estate_management.zip",
         "customer_name_4_pwd_fn": "c_info_5_ck",
+        "zip_pwd": "491491491Tech+",
     }
     ret_val = Utils.get_customer_name_short(args)
     print(ret_val)
