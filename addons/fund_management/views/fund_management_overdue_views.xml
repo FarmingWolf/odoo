@@ -48,7 +48,7 @@
                 <field name="total_amount" optional="hide" widget='monetary' options="{'currency_field': 'company_currency_id'}" sum="total"/>
                 <field name="contract_payment" optional="hide" />
                 <field name="contract_amount" optional="hide" widget='monetary' options="{'currency_field': 'company_currency_id'}" sum="total"/>
-                <field name="state"/>
+                <field name="approval_decision_txt"/>
                 <field name="stage"/>
                 <field name="latest_approval_detail_id" optional="hide"/>
                 <field name="receive_datetime"/>
@@ -85,7 +85,7 @@
                         <group>
                             <field name="contract_payment"/>
                             <field name="contract_amount"/>
-                            <field name="state"/>
+                            <field name="approval_decision_txt"/>
                             <field name="stage"/>
                             <field name="latest_approval_detail_id"/>
                             <field name="receive_datetime"/>

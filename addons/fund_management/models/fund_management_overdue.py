@@ -42,9 +42,10 @@ class FundManagementOverdue(models.Model):
             ('done', 'Done'),
             ('refused', 'Refused')
         ], related='fund_management_id.state', store=True)
-    stage = fields.Many2one('fund.management.approval.stage', related='fund_management_id.stage', store=True)
     latest_approval_detail_id = fields.Many2one("fund.management.approval.detail", string="Latest Approval Detail",
                                                 compute="_compute_latest_approval_detail", store=True, precompute=True)
+    stage = fields.Many2one('fund.management.approval.stage', related='latest_approval_detail_id.approval_stage', store=True)
+    approval_decision_txt = fields.Char(related='latest_approval_detail_id.approval_decision_txt', store=True)
     receive_datetime = fields.Datetime(related='latest_approval_detail_id.approval_date_time', store=True)
     check_datetime = fields.Datetime(string="Check Date Time", default=fields.Datetime.now)
     overdue_hours = fields.Float(string='Overdue Hours', compute="_compute_overdue_hours", store=True)

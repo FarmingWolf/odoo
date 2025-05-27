@@ -52,9 +52,8 @@ class FundManagementApprovalDetail(models.Model):
                                   ('stage', '=', tgt_application.stage.id),
                                   ('sms_created', '=', False)]
                     overdue_records = self.env[tgt_tbl].sudo().search(tgt_domain)
-                    if overdue_records:
-                        for overdue_old in overdue_records:
-                            overdue_old.active = False
+                    for overdue_old in overdue_records:
+                        overdue_old.active = False
 
                     overdue_record = {'fund_management_id': tgt_application.id}
                     self.env['fund.management.overdue'].sudo().create(overdue_record)

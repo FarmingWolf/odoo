@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='managers']" position="inside">
                 <field name="fund_management_manager_id" context="{'default_company_id': company_id}"
-                       widget="many2one_avatar_user"/>
+                       widget="many2one_avatar_user" domain="[('company_id', '=', company_id)]"/>
             </xpath>
             <xpath expr="//group[@name='managers']" position="attributes">
                 <attribute name="invisible">0</attribute>
