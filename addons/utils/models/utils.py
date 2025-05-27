@@ -2,7 +2,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 # 小额数字到汉字的映射
 import logging
+import re
 
+from pypinyin import lazy_pinyin, Style
 from pyzipper import AESZipFile, zipfile, WZ_AES
 
 _logger = logging.getLogger(__name__)
@@ -189,12 +191,98 @@ class Utils:
             _logger.error(f"读取客户名简拼出错了{e}")
             return name_return
 
+    @staticmethod
+    def mixed_sort_key(s):
+        """
+        最终版混合字符串排序键生成器：
+        完全符合以下规则：
+        1. 总体排序：数字开头的 → 英文开头的 → 中文开头的
+        2. 数字部分：按长度排序，同长度按字典序
+        3. 英文部分：按字母顺序（不区分大小写）
+        4. 中文部分：按拼音顺序
+        5. 混合字符串按开头部分类型分类，后续部分作为次级排序基准
+        """
+        # 判断字符串开头类型
+        if re.match(r'^\d', s):  # 数字开头
+            type_rank = 0
+        elif re.match(r'^[a-zA-Z]', s):  # 英文开头
+            type_rank = 1
+        else:  # 中文或其他开头
+            type_rank = 2
+
+        # 处理数字部分
+        def process_number(seg):
+            return f"{len(seg):03d}_{seg}"  # 按长度排序，同长度按字典序
+
+        # 处理英文部分
+        def process_alpha(seg):
+            return seg.lower()  # 不区分大小写
+
+        # 处理中文部分
+        def process_chinese(seg):
+            return ''.join(lazy_pinyin(seg, style=Style.NORMAL))
+
+        # 分割字符串为数字、英文、中文段
+        segments = re.findall(r'(\d+|[a-zA-Z]+|[^\da-zA-Z]+)', s)
+
+        # 处理每个段
+        processed_segments = []
+        for seg in segments:
+            if seg.isdigit():
+                processed_segments.append(('0', process_number(seg)))
+            elif re.fullmatch(r'[a-zA-Z]+', seg):
+                processed_segments.append(('1', process_alpha(seg)))
+            else:
+                processed_segments.append(('2', process_chinese(seg)))
+
+        # 生成排序键：类型排名 + 各段处理结果
+        sort_key = (type_rank, *processed_segments)
+        return sort_key
+
+    @staticmethod
+    def compare_strings(a, b):
+        """
+        比较两个字符串，按照我们的排序规则
+        返回:
+        - -1 如果 a < b
+        - 0  如果 a == b
+        - 1  如果 a > b
+        """
+        key_a = Utils.mixed_sort_key(a)
+        key_b = Utils.mixed_sort_key(b)
+
+        if key_a < key_b:
+            return -1
+        elif key_a == key_b:
+            return 0
+        else:
+            return 1
 
 def main():
+    test_pairs = [
+        ("10", "10苹果"),
+        ("apple", "apple10"),
+        ("香蕉", "中文100test"),
+        ("50", "100"),
+        ("Banana", "apple"),
+        ("第5章", "第15章"),
+        ("发驾校", "阿布阿")
+    ]
+
+    # 测试比较函数
+    for a, b in test_pairs:
+        result = Utils.compare_strings(a, b)
+        if result == -1:
+            print(f"'{a}' < '{b}'")
+        elif result == 0:
+            print(f"'{a}' == '{b}'")
+        else:
+            print(f"'{a}' > '{b}'")
+
     args = {
         "file_2_customer": "../../../estate_management.zip",
         "tiered_pricing_info_fn": "c_info_4_ck",
-        "zip_pwd": "491491491Tech+E50",
+        "zip_pwd": "491491491Tech+",
     }
     ret_val = Utils.get_property_cnt_limit(args)
     print(ret_val)

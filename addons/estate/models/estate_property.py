@@ -40,8 +40,7 @@ def _get_payment_method_str(record):
         if record.rent_plan_id.payment_period:
             return f"押{'{:.2f}'.format(round(deposit_months, 2)).rstrip('0').rstrip('.')}" \
                    f"付{record.rent_plan_id.payment_period}"
-    else:
-        return ""
+    return ""
 
 
 def _get_property_cnt_limit():
@@ -76,6 +75,7 @@ class EstateProperty(models.Model):
     _name = "estate.property"
     _description = "资产模型"
     _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = "sequence ASC, name ASC"
 
     name = fields.Char('资产名称', required=True, translate=True, tracking=True)
     property_type_id = fields.Many2one("estate.property.type", string="资产类型",
@@ -116,7 +116,7 @@ class EstateProperty(models.Model):
     color = fields.Integer()
 
     def _default_sequence(self):
-        return (self.search([], order="sequence", limit=1).sequence or 0) + 1
+        return (self.search([], order="sequence DESC", limit=1).sequence or 0) + 1
 
     sequence = fields.Integer(string='序号', default=_default_sequence, help="可在列表页面拖拽排序",
                               compute="_compute_sequence", store=True, readonly=False)
@@ -179,16 +179,18 @@ class EstateProperty(models.Model):
     @api.depends("name", 'order_by_name')
     def _compute_sequence(self):
         for record in self:
+            if record.order_by_name and record.name:
+                all_rcds = self.env['estate.property'].search([('company_id', '=', self.company_id.id)], order="sequence ASC")
+                for rcd in all_rcds:
+                    _logger.info(f"compare {record.with_context(lang='zh_CN').name} and {rcd.with_context(lang='zh_CN').name}")
+                    if Utils.compare_strings(record.with_context(lang='zh_CN').name, rcd.with_context(lang='zh_CN').name) < 0:
+                        if record.sequence != rcd.sequence - 1:
+                            record.sequence = rcd.sequence - 1
+                        break
 
-            record.sequence = record.sequence
-
-            all_rcds = self.env['estate.property'].search([('company_id', '=', self.company_id.id)], order="name ASC")
-            i = 0
-            for rcd in all_rcds:
-                if rcd.order_by_name and rcd.sequence != i:
-                    _logger.info(f"重新排序property rcd{rcd.id}.sequence={rcd.sequence}→{i}")
-                    rcd.sequence = i
-                i += 1
+    @api.onchange("order_by_name", "name")
+    def _onchange_sequence(self):
+        self._compute_sequence()
 
     @api.depends("_id")
     def _get_context(self):
@@ -254,7 +256,7 @@ class EstateProperty(models.Model):
                     record.latest_contact_person_tel = False
 
             tmp_str = _get_payment_method_str(record)
-            if record.latest_payment_method != tmp_str:
+            if (record.latest_payment_method != tmp_str) and (record.latest_payment_method or tmp_str):
                 record.latest_payment_method = tmp_str
             if record.latest_deposit != record.deposit_amount:
                 record.latest_deposit = record.deposit_amount
@@ -514,6 +516,14 @@ class EstateProperty(models.Model):
             raise UserError(f'当前版本最多支持{property_limit}条资产条目')
 
         ret = super().create(vals)
+        if ret.order_by_name:
+            ret._compute_sequence()
+
+        return ret
+
+    def write(self, vals):
+
+        ret = super().write(vals)
         return ret
 
     @api.model_create_multi
@@ -525,4 +535,6 @@ class EstateProperty(models.Model):
             raise UserError(f'当前版本最多支持{property_limit}条资产条目')
 
         ret = super().create(vals_list)
+        if ret.order_by_name:
+            ret._compute_sequence()
         return ret
