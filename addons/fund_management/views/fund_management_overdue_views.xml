@@ -34,7 +34,7 @@
         <field name="name">fund.management.overdue.tree</field>
         <field name="model">fund.management.overdue</field>
         <field name="arch" type="xml">
-            <tree string="Fund Management Approval overdue">
+            <tree string="Fund Management Approval overdue" create="False" edit="False" delete="False" import="False" duplicate="False">
                 <field name="company_currency_id" column_invisible="True"/>
                 <field name="apply_no"/>
                 <field name="name"/>
