@@ -18,7 +18,8 @@
         <field name="name">fund.management.procurement.method.tree</field>
         <field name="model">fund.management.procurement.method</field>
         <field name="arch" type="xml">
-            <tree string="Procurement Method">
+            <tree string="Procurement Method" create="editable" edit="editable" duplicate="editable" delete="editable">
+                <field name="editable" column_invisible="1"/>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
             </tree>
@@ -29,14 +30,15 @@
         <field name="name">fund.management.procurement.method.form</field>
         <field name="model">fund.management.procurement.method</field>
         <field name="arch" type="xml">
-            <form string="Procurement Method" create="True" edit="True" duplicate="False" delete="True">
+            <form string="Procurement Method" create="editable" edit="editable" duplicate="editable" delete="editable">
+                <field name="editable" invisible="1"/>
                 <sheet>
                     <group>
                         <group>
-                            <field name="name"/>
+                            <field name="name" readonly="not editable"/>
                         </group>
                         <group>
-                            <field name="sequence"/>
+                            <field name="sequence" readonly="not editable"/>
                         </group>
                     </group>
                 </sheet>

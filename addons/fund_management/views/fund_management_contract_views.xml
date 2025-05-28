@@ -38,27 +38,30 @@
         <field name="name">fund.management.contract.form</field>
         <field name="model">fund.management.contract</field>
         <field name="arch" type="xml">
-            <form string="Fund Contract" create="True" edit="True" duplicate="False" delete="True">
+            <form string="Fund Contract" create="editable" edit="editable" duplicate="editable" delete="editable">
+                <field name="editable" invisible="1"/>
                 <sheet>
                     <group>
                         <group>
-                            <field name="name"/>
-                            <field name="contract_no"/>
-                            <field name="contract_amount"/>
-                            <field name="fund_type"/>
-                            <field name="procurement_method"/>
-                            <field name="account_subject_category"/>
+                            <field name="name" readonly="not editable"/>
+                            <field name="contract_no" readonly="not editable"/>
+                            <field name="contract_amount" readonly="not editable"/>
+                            <field name="fund_type" readonly="not editable" options="{'no_open': True}"/>
+                            <field name="procurement_method" readonly="not editable" options="{'no_open': True}"/>
+                            <field name="account_subject_category" readonly="not editable" options="{'no_open': True}"/>
+                            <field name="create_uid" readonly="1" options="{'no_open': True}"/>
+                            <field name="create_date" readonly="1" widget="date"/>
                         </group>
                         <group>
-                            <field name="receiving_unit"/>
+                            <field name="receiving_unit" options="{'no_open': True}" readonly="not editable"/>
                             <field name="receiving_bank" domain="[('partner_id', '=', receiving_unit)]"
-                                   options="{'no_open': True, 'no_create': True}" readonly="not receiving_unit"/>
+                                   options="{'no_open': True, 'no_create': True}" readonly="(not receiving_unit) or (not editable)"/>
                             <field name="bank_account"/>
-                            <field name="payment_method"/>
-                            <field name="party_a_unit"/>
-                            <field name="date_sign"/>
-                            <field name="date_start"/>
-                            <field name="date_end"/>
+                            <field name="payment_method" readonly="not editable" options="{'no_open': True}"/>
+                            <field name="party_a_unit" options="{'no_open': True}" readonly="not editable"/>
+                            <field name="date_sign" readonly="not editable"/>
+                            <field name="date_start" readonly="not editable"/>
+                            <field name="date_end" readonly="not editable"/>
                         </group>
                     </group>
                 </sheet>

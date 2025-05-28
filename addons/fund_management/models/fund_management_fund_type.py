@@ -17,6 +17,10 @@ class FundManagementFundType(models.Model):
     name = fields.Char('Fund Type', required=True)
     sequence = fields.Integer('sequence', default=1)
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
+    editable = fields.Boolean(default=False, compute='_compute_editable')
+
+    def _compute_editable(self):
+        self.editable = self.env.user.has_group('fund_management.group_fund_management_manager')
 
     _sql_constraints = [
         ('name', 'unique(name, company_id)', _('Type name can not be duplicated'))

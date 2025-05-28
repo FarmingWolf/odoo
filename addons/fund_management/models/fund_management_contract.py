@@ -52,6 +52,21 @@ class FundManagementContract(models.Model):
 
     fund_management_id = fields.One2many('fund.management', required=True,
                                          index=True, string="Fund Management", inverse_name="contract_id")
+    editable = fields.Boolean(default=True, compute='_compute_editable')
+
+    def _compute_editable(self):
+        for record in self:
+            if record.employee_id == self.env.user.employee_id:
+                application_exists = False
+                for fund_management in record.fund_management_id:
+                    if fund_management.stage.sequence:
+                        application_exists = True
+                        break
+
+                self.editable = not application_exists
+            else:
+                self.editable = False
+
     _sql_constraints = [
         ('contract_no', 'unique(contract_no)', _('Contract Number must be unique.')),
         ('name', 'unique(name)', _('Contract Name must be unique.'))

@@ -18,7 +18,8 @@
         <field name="name">fund.management.fund.type.tree</field>
         <field name="model">fund.management.fund.type</field>
         <field name="arch" type="xml">
-            <tree string="Fund Type">
+            <tree string="Fund Type" create="editable" edit="editable" duplicate="editable" delete="editable">
+                <field name="editable" column_invisible="1"/>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
             </tree>
@@ -29,14 +30,15 @@
         <field name="name">fund.management.fund.type.form</field>
         <field name="model">fund.management.fund.type</field>
         <field name="arch" type="xml">
-            <form string="Fund Type" create="True" edit="True" duplicate="False" delete="True">
+            <form string="Fund Type" create="editable" edit="editable" duplicate="editable" delete="editable">
+                <field name="editable" invisible="1"/>
                 <sheet>
                     <group>
                         <group>
-                            <field name="name"/>
+                            <field name="name" readonly="not editable"/>
                         </group>
                         <group>
-                            <field name="sequence"/>
+                            <field name="sequence" readonly="not editable"/>
                         </group>
                     </group>
                 </sheet>

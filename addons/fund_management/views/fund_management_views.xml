@@ -210,13 +210,13 @@
                                 <field name="date" readonly="not is_editable"/>
                                 <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'" invisible="True"/>
                                 <t groups="fund_management.group_fund_management_team_approver">
-                                    <field name="employee_id" groups="!hr.group_hr_user"
-                                           context="{'default_company_id': company_id}" widget="many2one_avatar_employee"
-                                           options="{'relation': 'hr.employee.public', 'no_create': True}"
+                                    <field name="employee_id" groups="!fund_management.group_fund_management_user"
+                                           context="{'default_company_id': company_id}"
+                                           options="{'relation': 'hr.employee.public', 'no_create':True, 'no_open':True, 'no_create_edit':True}"
                                            readonly="1"/>
-                                    <field name="employee_id" groups="hr.group_hr_user"
+                                    <field name="employee_id" groups="fund_management.group_fund_management_user"
                                            context="{'default_company_id': company_id}" widget="many2one_avatar_employee"
-                                           options="{'relation': 'hr.employee', 'no_create': True}"
+                                           options="{'relation': 'hr.employee', 'no_create': True, 'no_open': True, 'no_create_edit': True}"
                                            readonly="1"/>
                                 </t>
                                 <field name="applicant_unit" readonly="1"/>

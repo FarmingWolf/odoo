@@ -15,7 +15,9 @@
         <field name="name">meeting.minutes.type.tree</field>
         <field name="model">fund.management.meeting.minutes.type</field>
         <field name="arch" type="xml">
-            <tree string="meeting_minutes_type_tree" editable="bottom" create="1" edit="1" delete="1" open_form_view="1" multi_edit="1">
+            <tree string="meeting_minutes_type_tree" editable="bottom" create="editable" edit="editable" duplicate="editable"
+                  delete="editable" open_form_view="editable" multi_edit="editable">
+                <field name="editable" column_invisible="1"/>
                 <field name="sequence" widget="handle"/>
                 <field name="name" string="Meeting minutes type name"/>
                 <field name="mandatory"/>
@@ -27,11 +29,12 @@
         <field name="name">meeting.minutes.type.tree</field>
         <field name="model">fund.management.meeting.minutes.type</field>
         <field name="arch" type="xml">
-            <form string="fund_management_meeting_minutes_type_form" create="True" edit="True" duplicate="True" delete="True">
+            <form string="fund_management_meeting_minutes_type_form" edit="editable" duplicate="editable" delete="editable">
+                <field name="editable" invisible="1"/>
                 <sheet>
                     <group>
-                        <field name="name" default_focus="True"/>
-                        <field name="mandatory"/>
+                        <field name="name" default_focus="True" readonly="not editable"/>
+                        <field name="mandatory" readonly="not editable"/>
                     </group>
                 </sheet>
             </form>
