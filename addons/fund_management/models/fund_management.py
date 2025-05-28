@@ -163,7 +163,8 @@ class FundManagement(models.Model):
                 record.invisible_meeting_minutes = False
             else:
                 check_right, tgt_stage = self._check_approval_rights(record)
-                if record.stage and record.stage.input_meeting_minutes and check_right:
+                if (record.stage and record.stage.input_meeting_minutes and
+                        (check_right or ((record.create_uid.id or record.employee_id.user_id.id) == self.env.user.id))):
                     record.invisible_meeting_minutes = False
                 else:
                     record.invisible_meeting_minutes = True
@@ -465,7 +466,7 @@ class FundManagement(models.Model):
                 record.is_editable = True
             else:
                 if record.stage:
-                    if record.stage.input_meeting_minutes or record.stage.sequence == 0:
+                    if record.stage.sequence == 0:
                         record.is_editable = True
                     else:
                         record.is_editable = False
@@ -770,6 +771,11 @@ class FundManagement(models.Model):
         if not self.env.user.has_group('fund_management.group_fund_management_team_approver'):
             _logger.info(f"self.env.user:{self.env.user.name}没有fund_management.group_fund_management_team_approver权限")
             return False, record.stage
+
+        if (record.stage.input_meeting_minutes and
+                ((record.create_uid.id or record.employee_id.user_id.id) == self.env.user.id)):
+            _logger.info(f"经办人录入会议纪要：self.env.user.id={self.env.user.id}")
+            return True, record.stage
 
         # 由于在stage创建时，对非起始stage（sequence!=0）时的部门或职位角色不同时为空做了要求
         if not record.stage.op_department_id:
