@@ -16,10 +16,12 @@ class FundManagementProcurementMethod(models.Model):
     name = fields.Char('Procurement Method', required=True)
     sequence = fields.Integer('sequence', default=1)
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
-    editable = fields.Boolean(default=False, compute='_compute_editable')
+    editable = fields.Boolean(default=lambda self: self._compute_editable(), compute='_compute_editable')
 
     def _compute_editable(self):
-        self.editable = self.env.user.has_group('fund_management.group_fund_management_manager')
+        ret_editable = self.env.user.has_group('fund_management.group_fund_management_manager')
+        self.editable = ret_editable
+        return ret_editable
 
     _sql_constraints = [
         ('name', 'unique(name, company_id)', _('The procurement method can not be duplicated'))

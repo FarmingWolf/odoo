@@ -74,7 +74,7 @@
             <field name="arch" type="xml">
                 <tree string="Approval Stage" create="editable" edit="editable" duplicate="editable" delete="editable">
                     <field name="name"/>
-                    <field name="sequence"/>
+                    <field name="sequence" groups="fund_management.group_fund_management_manager"/>
                     <field name="op_department_id"/>
                     <field name="op_job_id"/>
                     <field name="pipe_end"/>
