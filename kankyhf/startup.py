@@ -64,10 +64,10 @@ update_addons = zip_tgt_folders.copy()
 
 zip_all_addons = True
 tmp_fn = "estate_management.x_pptx"
-# customer_dis_name = "歌华文化集团"
-# customer_name = "GHWH"
-customer_dis_name = "科汇时代中心"
-customer_name = "KH"
+customer_dis_name = "歌华文化集团"
+customer_name = "GHWH"
+# customer_dis_name = "科汇时代中心"
+# customer_name = "KH"
 # 初始化时，仅客户名写入此文件，第一次运行时，客户mac地址写入此文件，压缩包里必须有此文件，如无则判错
 customer_name_info_fn = "c_info_2_ck"
 
@@ -1219,6 +1219,7 @@ stop_server_button.grid(row=5, column=5, pady=(20, 0))
 stop_server_button.config(state=tk.DISABLED)
 close_button = tk.Button(root, text="取消/关闭", command=close_window, width=10, height=3, font=my_font)
 close_button.grid(row=5, column=7, pady=(20, 0))
+root.protocol("WM_DELETE_WINDOW", close_window)  # 拦截关闭事件
 
 # 产品码输入
 
