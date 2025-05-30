@@ -31,6 +31,7 @@
                 <group col="3">
                     <group>
                         <field name="name"/>
+                        <field name="color" widget="color_picker"/>
                     </group>
                     <group>
                         <field name="sequence"/>

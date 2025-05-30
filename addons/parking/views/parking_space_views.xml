@@ -19,8 +19,8 @@
             <tree string="parking_space_tree" editable="bottom">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
-                <field name="parking_space_type_id"/>
                 <field name="parking_lot_id"/>
+                <field name="parking_space_type_id"/>
                 <field name="park_id"/>
             </tree>
         </field>

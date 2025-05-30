@@ -13,6 +13,7 @@ class Park(models.Model):
 
     _name = "park"
     _description = "园区"
+    _order = "name"
 
     name = fields.Char('园区', required=True, translate=True)
     parking_lot_ids = fields.One2many("parking.lot", "park_id", string="停车场")
