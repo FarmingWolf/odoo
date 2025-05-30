@@ -82,11 +82,11 @@ class EstateProperty(models.Model):
                                        default=lambda self: self._get_default_property_type())
     tag_ids = fields.Many2many("estate.property.tag", string="标签")
     sales_person_id = fields.Many2one('res.users', string='销售员', index=True,
-                                      default=lambda self: self.env.user,
+                                      default=lambda self: self.env.user, copy=False,
                                       domain="[('company_id', '=', company_id)]")
-    buyer_id = fields.Many2one('res.partner', string='购买人', index=True, tracking=True,
+    buyer_id = fields.Many2one('res.partner', string='购买人', index=True, tracking=True, copy=False,
                                domain="[('company_id', '=', company_id)]")
-    offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价", tracking=True)
+    offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价", tracking=True, copy=False)
     building_no = fields.Char(string='楼号', group_expand='_read_group_building_nos')
     floor = fields.Char(default=1, string='楼层')
     room_no = fields.Char(string='房间号')
@@ -369,9 +369,9 @@ class EstateProperty(models.Model):
             record.state_color = config.color if config else 0
 
     # property_offer_ids = fields.One2many('estate.property.offer', 'property_id', string="报价")
-    property_offer_count = fields.Integer(compute="_compute_property_offer_count", default=0, string="报价条数")
+    property_offer_count = fields.Integer(compute="_compute_property_offer_count", default=0, string="报价条数", copy=False)
 
-    ads_img_ids = fields.One2many(comodel_name="estate.property.ads.img", inverse_name="property_id")
+    ads_img_ids = fields.One2many(comodel_name="estate.property.ads.img", inverse_name="property_id", copy=False)
 
     @api.depends("offer_ids")
     def _compute_property_offer_count(self):
@@ -538,3 +538,16 @@ class EstateProperty(models.Model):
         if ret.order_by_name:
             ret._compute_sequence()
         return ret
+
+    def copy(self, default=None):
+
+        if default is None:
+            default = {}
+
+        default.update({
+            'name': self.name + "(复制)",
+            'sequence': self.sequence + 1,
+            'room_no': self.room_no + "(复制)" if self.room_no else "",
+            'description': self.description + "(复制)" if self.description else "",
+        })
+        return super().copy(default)

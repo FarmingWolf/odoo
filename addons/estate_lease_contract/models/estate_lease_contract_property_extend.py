@@ -81,45 +81,45 @@ class EstateLeaseContractPropertyExtend(models.Model):
                         record.rental_plan_rel_id = rcd.rental_plan_id.id
                         _logger.info(f"设置合同-资产-租金方案历史rent_plan_id={record.rent_plan_id}")
 
-    default_rental_plan = fields.Many2one('estate.lease.contract.rental.plan',
+    default_rental_plan = fields.Many2one('estate.lease.contract.rental.plan', copy=False,
                                           string="根据context contract找到的租金计划", store=False,
                                           default=_get_default_rent_plan, compute="_get_default_rent_plan")
     # 该字段用于存储合同-资产-租金方案关系，理论上只能有一条
     rental_plan_rel_id = fields.Many2one('estate.lease.contract.rental.plan.rel', string="合同-资产-租金方案关系",
-                                         default=_get_default_rent_plan, compute="_get_default_rent_plan")
-    rent_plan_id = fields.Many2one('estate.lease.contract.rental.plan', string="租金方案",
+                                         default=_get_default_rent_plan, compute="_get_default_rent_plan", copy=False)
+    rent_plan_id = fields.Many2one('estate.lease.contract.rental.plan', string="租金方案", copy=False,
                                    default=lambda self: self._get_default_rent_plan())
     property_rental_detail_ids = fields.One2many('estate.lease.contract.property.rental.detail', 'property_id',
-                                                 string="租金明细")
+                                                 string="租金明细", copy=False)
     management_fee_plan_id = fields.One2many(comodel_name='estate.lease.contract.property.management.fee.plan',
                                              inverse_name="estate_lease_contract_property",
-                                             string="物业费方案")
+                                             string="物业费方案", copy=False)
     property_manage_fee_detail_ids = fields.One2many('estate.lease.contract.property.manage.fee.detail', 'property_id',
-                                                     string="物业费明细")
+                                                     string="物业费明细", copy=False)
     business_method_id = fields.Char(string="经营性质", readonly=True, compute="_get_rent_plan_info")
     business_type_id = fields.Char(string="经营业态", readonly=True, compute="_get_rent_plan_info")
     main_category = fields.Char(string="主品类", readonly=True, compute="_get_rent_plan_info")
-    billing_method = fields.Char(string='计费方式', readonly=True, compute="_get_rent_plan_info")
+    billing_method = fields.Char(string='计费方式', readonly=True, compute="_get_rent_plan_info", copy=False)
     billing_method_fixed_price_invisible = fields.Boolean(string="计费方式固定金额组不可见",
-                                                          compute="_compute_billing_method_group_invisible")
+                                                          compute="_compute_billing_method_group_invisible", copy=False)
     billing_method_percentage_invisible = fields.Boolean(string="计费方式纯抽成组不可见",
-                                                         compute="_compute_billing_method_group_invisible")
+                                                         compute="_compute_billing_method_group_invisible", copy=False)
     billing_method_progress_invisible = fields.Boolean(string="计费方式递增率组不可见",
-                                                       compute="_compute_billing_method_group_invisible")
+                                                       compute="_compute_billing_method_group_invisible", copy=False)
     billing_method_fixed_price_percentage_higher_invisible = \
         fields.Boolean(string="计费方式保底抽成取高组不可见",
-                       compute="_compute_billing_method_group_invisible")
-    deposit_months = fields.Float(string="押金月数", default=0, tracking=True)
-    deposit_amount = fields.Float(string="押金(元)", default=0, tracking=True)
-    tax_amount = fields.Float(string="房产税(元)", default=0, tracking=True)
+                       compute="_compute_billing_method_group_invisible", copy=False)
+    deposit_months = fields.Float(string="押金月数", default=0, tracking=True, copy=False)
+    deposit_amount = fields.Float(string="押金(元)", default=0, tracking=True, copy=False)
+    tax_amount = fields.Float(string="房产税(元)", default=0, tracking=True, copy=False)
     # 物业费信息
-    management_fee_name_description = fields.Char(string="方案描述", readonly=True,
+    management_fee_name_description = fields.Char(string="方案描述", readonly=True, copy=False,
                                                   compute="_get_property_management_fee_info")
     # 本页面设置固定金额方案（生成新方案并保存至rental_plan）
     set_rent_plan_on_this_page = fields.Boolean(string="固定金额方案", compute="_compute_set_rent_plan_on_this_page",
-                                                readonly=False, store=True, default=False)
+                                                readonly=False, store=True, default=False, copy=False)
     set_rent_plan_plan_name = fields.Char(string="固定租金方案", store=False, compute="_compute_set_rent_plan_plan_name",
-                                          readonly=False)
+                                          readonly=False, copy=False)
     set_rent_plan_business_method_id = fields.Selection(string="经营性质",
                                                         selection=[('direct_sale', '直营'), ('franchisee', '加盟'),
                                                                    ('agent', '代理'), ('direct_and_agent', '直营+代理'),
@@ -495,10 +495,10 @@ class EstateLeaseContractPropertyExtend(models.Model):
                                               help="勾选表示租金包含物业费，不勾选则表示租金不包含物业费")
     rent_amount_monthly_auto = fields.Float(string="月租金（元）", readonly=True, compute="_get_rent_plan_info",
                                             help="=租金单价（元/天/㎡）×计租面积（㎡）×一年天数÷12")
-    rent_amount_monthly_adjust = fields.Float(string="手调月租金（元）", help="可手动调整此金额。若调整后不为0，则系统以此为准。")
+    rent_amount_monthly_adjust = fields.Float(string="手调月租金（元）", help="可手动调整此金额。若调整后不为0，则系统以此为准。", copy=False)
     rent_amount_yearly_adjust = fields.Float(string="手调年租金（元）", help="请通过点击后方单选框明确本字段用于系统计算或仅显示。",
-                                             default=lambda self: self.rent_amount_yearly_adjust * 12)
-    rent_amount_yearly_adjust_4_view = fields.Boolean(string="手调年租金仅用于页面显示", default=False,
+                                             default=lambda self: self.rent_amount_yearly_adjust * 12, copy=False)
+    rent_amount_yearly_adjust_4_view = fields.Boolean(string="手调年租金仅用于页面显示", default=False, copy=False,
                                                       help="勾选则表示手调年租金仅用于页面显示而不参与系统自动计算；"
                                                            "不勾选则表示手调年租金不仅用于系统自动计算租金，还用于页面显示。"
                                                            "当合同约定月租金与年租金有明显较大差额时可勾选此项。")
