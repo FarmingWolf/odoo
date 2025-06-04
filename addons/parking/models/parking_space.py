@@ -6,8 +6,9 @@ from dateutil.utils import today
 
 from addons.utils.models.utils import Utils
 from odoo import fields, models, api
-from odoo.api import ondelete
+from odoo.api import ondelete, _logger
 from odoo.exceptions import UserError, ValidationError
+from odoo.http import request
 from odoo.tools import float_compare
 
 
@@ -15,7 +16,7 @@ class ParkingSpace(models.Model):
 
     _name = "parking.space"
     _description = "园区停车位"
-    _order = "park_id, parking_lot_id, parking_space_type_id, sequence, name"
+    _order = "park_id ASC, parking_lot_id ASC, parking_space_type_id ASC, sequence ASC, name ASC"
 
     name = fields.Char('园区停车位', required=True, translate=True)
     sequence = fields.Integer("排序", default=1, compute='_compute_sequence', store=True)
@@ -23,6 +24,9 @@ class ParkingSpace(models.Model):
     parking_space_type_id = fields.Many2one("parking.space.type", string="停车位类型", store=True, ondelete="restrict")
     parking_lot_id = fields.Many2one("parking.lot", string="园区停车场", ondelete="restrict")
     color = fields.Integer(related="parking_space_type_id.color")
+    vehicle_bound = fields.One2many('parking.space.vehicle.rel', inverse_name="parking_space_id", string="当前绑定车辆",
+                                    domain=[('end_date', '>=', fields.Date.today())])
+    reserved = fields.Boolean("固定车位", default=False)
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
     @api.depends("name", "park_id", "parking_space_type_id","parking_lot_id")
@@ -68,3 +72,40 @@ class ParkingSpace(models.Model):
     @api.onchange("park_id", "parking_space_type_id","parking_lot_id", "name")
     def _onchange_sequence(self):
         self._compute_sequence()
+
+    def copy(self, default=None):
+
+        if default is None:
+            default = {}
+
+        default.update({
+            'name': self.name + "(复制)",
+            'sequence': self.sequence + 1
+        })
+        return super().copy(default)
+
+    def action_bind_parking_space_vehicle(self):
+
+        default_parking_space_id = self.env.context.get('default_parking_space_id')
+        _logger.info(f"default_parking_space_id={default_parking_space_id}")
+        tgt_rel_ids = False
+        tgt_domain = []
+        if default_parking_space_id:
+            tgt_domain = [('parking_space_id', '=', default_parking_space_id)]
+            date_today = datetime.today()
+            # tgt_domain.append(('start_date', '<=', date_today))
+            tgt_domain.append(('end_date', '>=', date_today))
+            tgt_domain.append(('active', '=', True))
+            tgt_rel_ids = self.env['parking.space.vehicle.rel'].search(tgt_domain).ids
+
+        action = {
+            'name': "车位绑定车辆",
+            'type': 'ir.actions.act_window',
+            'res_model': 'parking.space.vehicle.rel',
+            'view_mode': 'tree,form',
+            'res_id': tgt_rel_ids,
+            'context': {'default_parking_space_id': default_parking_space_id, 'from_parking_space_page': True},
+            'target': 'new',
+            'domain': tgt_domain,
+        }
+        return action

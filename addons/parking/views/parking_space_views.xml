@@ -16,12 +16,17 @@
         <field name="name">parking.space.tree</field>
         <field name="model">parking.space</field>
         <field name="arch" type="xml">
-            <tree string="parking_space_tree" editable="bottom">
+            <tree string="parking_space_tree">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="parking_lot_id"/>
-                <field name="parking_space_type_id"/>
-                <field name="park_id"/>
+                <field name="parking_space_type_id" optional="hide"/>
+                <field name="park_id" optional="hide"/>
+                <field name="reserved" groups="parking.parking_group_manager"/>
+                <field name="reserved" readonly="1" groups="!parking.parking_group_manager"/>
+                <button type="object" name="action_bind_parking_space_vehicle" string="绑定车辆"
+                        context="{'default_parking_space_id': id}" invisible="not reserved"/>
+                <field name="vehicle_bound" widget="many2many_tags" nolabel="1" readonly="True"/>
             </tree>
         </field>
     </record>
@@ -32,14 +37,21 @@
         <field name="model">parking.space</field>
         <field name="arch" type="xml">
             <form string="parking_space_form">
+                <header>
+                    <button type="object" name="action_bind_parking_space_vehicle" string="绑定车辆"
+                            context="{'default_parking_space_id': id}" invisible="not reserved"/>
+                </header>
                 <group>
                     <group>
                         <field name="name"/>
-                        <field name="parking_space_type_id"/>
+                        <field name="reserved" groups="parking.parking_group_manager"/>
+                        <field name="reserved" readonly="1" groups="!parking.parking_group_manager"/>
+                        <field name="parking_space_type_id" options="{'no_open': True}"/>
                     </group>
                     <group>
-                        <field name="park_id"/>
-                        <field name="parking_lot_id"/>
+                        <field name="park_id" options="{'no_open': True}"/>
+                        <field name="parking_lot_id" options="{'no_open': True}"/>
+                        <field name="vehicle_bound" readonly="1" widget="many2many_tags"/>
                     </group>
                 </group>
             </form>

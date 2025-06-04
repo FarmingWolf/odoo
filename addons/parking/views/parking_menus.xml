@@ -1,12 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <menuitem id="parking_menu_root" groups="parking_group_user" name="停车位管理">
-        <menuitem id="parking_first_level_menu_list" groups="parking_group_manager" name="园区和停车场">
-            <menuitem id="parking_menu_action" action="parking_action"/>
+    <menuitem id="parking_menu_root" groups="parking_group_user" name="车位车辆管理">
+        <menuitem name="Vehicles" id="park_vehicles" sequence="0" groups="parking_group_user">
+            <menuitem id="park_vehicle_menu" name="Vehicles"  action="park_vehicle_action" groups="parking_group_user" sequence="0"/>
+            <menuitem id="park_vehicle_assignation_menu" name="Vehicle Assignation Log"  action="park_vehicle_assignation_log_action" groups="parking_group_user" sequence="10"/>
+            <menuitem id="park_vehicle_tag_menu"  action="park_vehicle_tag_action" sequence="20" groups="base.group_no_one"/>
+
+            <menuitem name="Models"  id="park_models_configuration" sequence="30" groups="parking_group_manager">
+                <menuitem action="park_vehicle_model_brand_action" id="park_vehicle_model_brand_menu" sequence="1"/>
+                <menuitem action="park_vehicle_model_action" id="park_vehicle_model_menu" sequence="5"/>
+                <menuitem action="park_vehicle_model_category_action" id="park_vehicle_model_category_menu" sequence="10"/>
+            </menuitem>
+
+            <menuitem id="park_config_settings_menu" name="Settings" sequence="60" action="parking_config_settings_action" groups="base.group_system"/>
         </menuitem>
-        <menuitem id="parking_menu_settings" groups="parking_group_user" name="车场与车位">
-            <menuitem id="parking_lot_menu" action="parking_lot_action"/>
-            <menuitem id="parking_space_menu" action="parking_space_action"/>
+        <menuitem id="parking_menu_settings" groups="parking_group_user" name="车场与车位" sequence="10" >
+            <menuitem id="parking_space_menu" action="parking_space_action" sequence="1"/>
+            <menuitem id="parking_space_vehicle_menu" action="parking_space_vehicle_rel_action" sequence="5"/>
         </menuitem>
+        <menuitem id="parking_first_level_park_menu_list" groups="parking_group_user" name="园区与车场" sequence="20">
+            <menuitem id="parking_lot_menu" action="parking_lot_action" groups="parking_group_user" sequence="1"/>
+            <menuitem id="parking_first_level_menu_list" groups="parking_group_manager" name="园区与车场" action="parking_action" sequence="10"/>
+        </menuitem>
+
     </menuitem>
+
 </odoo>

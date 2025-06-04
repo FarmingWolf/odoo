@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="park_vehicle_assignation_log_action" model="ir.actions.act_window">
+        <field name="name">车辆租约记录</field>
+        <field name="res_model">park.vehicle.assignation.log</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="context">{'search_default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                车辆租约记录。
+            </p>
+        </field>
+    </record>
+
+    <record id="park_vehicle_assignation_log_view_tree" model="ir.ui.view">
+        <field name="name">park.vehicle.assignation.log.tree</field>
+        <field name="model">park.vehicle.assignation.log</field>
+        <field name="arch" type="xml">
+            <tree string="park_vehicle_assignation_log_tree" create="False" edit="False" delete="False" open_form_view="False">
+                <field name="name"/>
+                <field name="driver_id"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="lease_contract_nm"/>
+                <field name="parking_space_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="park_vehicle_assignation_log_view_form" model="ir.ui.view">
+        <field name="name">park.vehicle.assignation.log.form</field>
+        <field name="model">park.vehicle.assignation.log</field>
+        <field name="arch" type="xml">
+            <form string="park_vehicle_assignation_log_form">
+                <group>
+                    <field name="name"/>
+                    <field name="driver_id"/>
+                    <field name="date_start"/>
+                    <field name="date_end"/>
+                    <field name="lease_contract_nm"/>
+                    <field name="parking_space_id"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+</odoo>

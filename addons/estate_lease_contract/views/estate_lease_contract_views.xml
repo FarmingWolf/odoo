@@ -510,10 +510,31 @@
                             </sheet>
                         </page>
                         <page string="停车位">
-                            <group>
-                                <field name="parking_space_count"/>
+                            <group col="2">
+                                <group string="分配车位※注意：如果将车位绑定到固定车位，那么将以绑定车位时设置的日期作为车辆的入场有效期！">
+                                    <group>
+                                        <field name="parking_space_count"/>
+                                        <field name="parking_space_domain" invisible="1"/>
+                                    </group>
+                                    <field name="parking_space_ids" domain="[('id', 'in', parking_space_domain)]" readonly="bind_vehicle">
+                                        <tree>
+                                            <field name="name"/>
+                                            <field name="parking_lot_id"/>
+                                            <field name="parking_space_type_id" optional="hide"/>
+                                            <field name="park_id" optional="hide"/>
+                                            <field name="reserved" readonly="1"/>
+                                            <field name="vehicle_bound" widget="many2many_tags" nolabel="1" readonly="True"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                                <group string="绑定车辆※注意：如果不绑定固定车位，而直接在下方选择车辆，即将车辆直接绑定到合同，那么将以合同的开始结束日期作为车辆的入场有效期！">
+                                    <group>
+                                        <field name="bind_vehicle"/>
+                                        <field name="vehicle_bound_cnt"/>
+                                    </group>
+                                    <field name="vehicle_ids" widget="many2many_tags" placeholder="选择车辆" readonly="not bind_vehicle"/>
+                                </group>
                             </group>
-                            <field name="parking_space_ids"/>
                         </page>
                         <page string="注册地址">
                             <group col="2">
@@ -799,6 +820,7 @@
                 <field name="days_free"/>
                 <field name="state" optional="hide"/>
                 <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}"/>
+                <field name="vehicle_ids" widget="many2many_tags"/>
                 <field name="renter_id"/>
                 <field name="renter_company_id" column_invisible="1"/>
                 <field name="sales_person_id" groups="estate_lease_contract.contract_brokerage_fee_manage"/>
@@ -882,6 +904,8 @@
                 <field name="street2"/>
                 <field name="registered_capital"/>
                 <field name="industry_id" string="行业类型"/>
+                <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}" optional="hide"/>
+                <field name="vehicle_ids" widget="many2many_tags" optional="hide"/>
                 <field name="registration_addr" string="工商注册地址" widget="many2many_tags" options="{'color_field': 'sequence'}"/>
                 <field name="date_start" string="起始时间"/>
                 <field name="date_rent_end" string="结束时间"/>
@@ -913,6 +937,7 @@
                 <field name="date_rent_end"/>
                 <field name="state"/>
                 <field name="parking_space_ids" widget="many2many_tags" string="车位" options="{'color_field': 'color'}"/>
+                <field name="vehicle_ids" widget="many2many_tags" optional="hide"/>
                 <field name="renter_id"/>
                 <field name="renter_company_id" column_invisible="1"/>
                 <field name="sales_person_id" groups="estate_lease_contract.contract_brokerage_fee_manage"/>
@@ -942,6 +967,7 @@
                 <field name="lease_deposit"/>
                 <field name="rent_amount_year"/>
                 <field name="parking_space_count"/>
+                <field name="vehicle_bound_cnt"/>
                 <field name="renter_id"/>
                 <field name="sales_person_id" groups="estate_lease_contract.contract_brokerage_fee_manage"/>
                 <field name="brokerage_fee" groups="estate_lease_contract.contract_brokerage_fee_manage" sum="中介费合计"/>
@@ -962,10 +988,11 @@
                                         </i>
                                     </div>
                                     <div>
-                                        <t t-if="record.parking_space_count != 0">
-                                            <i class="fa fa-car me-2 o_event_fontsize_09" title="车位（个）"/>
-                                            <field name="parking_space_count" help="车位（个）"/>
-                                            <span>　</span>
+                                        <t t-if="record.parking_space_count != 0 or record.vehicle_bound_cnt != 0">
+                                            <i class="fa fa-car me-2 o_event_fontsize_09" title="车位,车辆"/>
+                                            <field name="parking_space_count"/>
+                                            <span>,</span>
+                                            <field name="vehicle_bound_cnt"/>
                                         </t>
                                         <t t-if="record.registration_addr_count != 0">
                                             <i class="fa fa-address-card-o me-2 o_event_fontsize_09" title="注册地址（个）"/>
@@ -1101,6 +1128,55 @@ action = model.automatic_set_party_a_status()
         <field name="state">code</field>
         <field name="code">
 action = model.terminate_tgt_contract(env.context)
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_vehicle_view_tree" model="ir.ui.view">
+        <field name="name">estate.lease.contract.vehicle.tree</field>
+        <field name="model">estate.lease.contract</field>
+        <field name="arch" type="xml">
+            <tree string="入驻车辆清单" create="false" delete="false" edit="false" import="false">
+                <field name="vehicle_ids">
+                    <tree>
+                        <field name="license_plate" readonly="1"/>
+                        <field name="driver_id" widget="many2one_avatar" readonly="1" optional="show"/>
+                        <field name="driver_mobile" readonly="1" optional="show"/>
+                        <field name="driver_phone" readonly="1" optional="hide"/>
+                        <field name="model_id" widget="many2one_avatar" readonly="1" optional="hide"/>
+                        <field name="category_id" optional="hide"/>
+                        <field name="future_driver_id"  widget="many2one_avatar" readonly="1" optional="hide"/>
+                        <field name="log_drivers" column_invisible="True"/>
+                        <field name="vin_sn" readonly="1" optional="hide"/>
+                        <field name="co2" string="CO2 Emissions g/km" optional="hide"  readonly="1"/>
+                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" readonly="1"/>
+                        <field name="state_id" widget="badge" readonly="1" optional="hide"/>
+                        <field name="contract_renewal_due_soon" column_invisible="1"/>
+                        <field name="contract_renewal_overdue" column_invisible="1"/>
+                        <field name="contract_renewal_total" column_invisible="1"/>
+                        <field name="vehicle_properties"/>
+                        <field name="contract_state" widget="badge" decoration-info="contract_state == 'open'"
+                            decoration-danger="contract_state == 'expired'" optional="hide"/>
+                        <field name="activity_exception_decoration" widget="activity_exception"/>
+                    </tree>
+                </field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_lease_contract_action_vehicles" model="ir.actions.act_window">
+        <field name="name">查看入驻车辆</field>
+        <field name="res_model">estate.lease.contract</field>
+        <field name="views">[False, "tree"]</field>
+        <field name="view_id" ref="estate_lease_contract_vehicle_view_tree"/>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="context">{
+            'contract_read_only': True,
+            'menu_root': 'estate.lease.contract',}
+        </field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                查看入驻车辆。
+            </p>
         </field>
     </record>
 

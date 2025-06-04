@@ -3,7 +3,11 @@
 # 小额数字到汉字的映射
 import logging
 import re
+from collections import defaultdict
+from datetime import datetime, date
+from typing import Union, List, Dict, Optional
 
+from attr.validators import instance_of
 from pypinyin import lazy_pinyin, Style
 from pyzipper import AESZipFile, zipfile, WZ_AES
 
@@ -264,9 +268,121 @@ class Utils:
         else:
             return 1
 
-def main():
-    str_list = ["B02", "B-01", "B01", "B10", "B05", "B-05-02", "B-05", "B05-01", "B0101", "B101", "梨树地E-01", "梨树地-01",
-                "梨树地01", "梨树地E", "梨树地", "香蕉", "中文100test", "中文50test", "50", "100", "Banana", "apple", "Apple", "第5章", "第10章"]
+    @staticmethod
+    def check_overlap_rules(info_msg, start_date_key="start_date", end_date_key="end_date"):
+        # 日期转换函数
+        def convert_date(in_date):
+            if isinstance(in_date, str):
+                fmt_str = "%Y/%m/%d"
+                if '/' in in_date:
+                    fmt_str = "%Y/%m/%d"
+                elif '-' in in_date:
+                    fmt_str = "%Y-%m-%d"
+                elif '年' in in_date:
+                    fmt_str = "%Y年%m月%d日"
+                return datetime.strptime(in_date, fmt_str)
+            elif isinstance(in_date, datetime) or isinstance(in_date, date):
+                return in_date
+            raise ValueError("日期必须是datetime对象或'YYYY/MM/DD'格式字符串")
+
+        # Step 1: 构建事件列表
+        events = []
+        for idx, item in enumerate(info_msg):
+            start = convert_date(item[start_date_key])
+            end = convert_date(item[end_date_key])
+            # +1 表示进入区间，idx 标记来源对象
+            events.append((start, +1, idx))
+            # -1 表示离开区间，使用 end + 1 天表示闭区间
+            events.append((end, -1, idx))
+
+        # Step 2: 排序事件点
+        # 先按时间排序，时间相同则先处理离开事件（-1）
+        events.sort(key=lambda x: (x[0], -x[1]))
+
+        active_intervals = set()  # 当前活跃的区间的索引集合
+        violations = []
+
+        # Step 3: 遍历事件点
+        for time_point, delta, idx in events:
+            if delta == +1:
+                active_intervals.add(idx)
+            else:
+                active_intervals.discard(idx)
+
+            current_count = len(active_intervals)
+            if current_count > 2:
+                violation_time = time_point.strftime("%Y/%m/%d")
+                violating_objs = [info_msg[i] for i in active_intervals]
+                _logger.info(f"violating_objs={violating_objs}")
+                violations.append({
+                    "time": violation_time,
+                    "overlapping_objects": violating_objs
+                })
+
+        return violations
+
+    @staticmethod
+    def find_closest_date_object(data: List[Dict[str, date]], today: date = date.today(),
+                                 start_date_key="start_date", end_date_key="end_date") -> Optional[Dict[str, date]]:
+        """
+        查找满足条件的对象：
+        1. 如果存在 date_start <= today <= date_end，直接返回该对象；
+        2. 否则，返回 date_start 或 date_end 距离 today 最近的对象；
+           如果多个对象的最小距离相同，优先返回 date_start 更近的（未来的数据优先）。
+
+        :param data: 包含 date_start 和 date_end 的字典列表
+        :param today: 目标日期，默认为今天
+        :param start_date_key: 数组中的开始日期键
+        :param end_date_key: 数组中的结束日期键
+        :return: 符合条件的字典对象，如果没有数据则返回 None
+        """
+        if not data:
+            return None
+
+        # 1. 检查是否存在 date_start <= today <= date_end 的对象
+        for obj in data:
+            if not obj[start_date_key] or not obj[end_date_key]:
+                continue
+            if obj[start_date_key] <= today <= obj[end_date_key]:
+                return obj
+
+        # 2. 如果没有满足条件的对象，计算最小距离
+        closest_obj = None
+        min_distance = float("inf")
+
+        for obj in data:
+            if not obj[start_date_key] or not obj[end_date_key]:
+                continue
+            # 计算 date_start 和 today 的距离（带符号，正数表示未来）
+            distance_start = (obj[start_date_key] - today).days
+            # 计算 date_end 和 today 的距离（带符号，正数表示未来）
+            distance_end = (obj[end_date_key] - today).days
+            # 当前对象的最小绝对距离（date_start 或 date_end）
+            current_min_abs_distance = min(abs(distance_start), abs(distance_end))
+
+            # 如果找到更小的绝对距离，更新最近对象
+            if current_min_abs_distance < min_distance:
+                min_distance = current_min_abs_distance
+                closest_obj = obj
+            # 如果绝对距离相同，优先选择 date_start 更近的（未来的优先）
+            elif current_min_abs_distance == min_distance:
+                # 比较 date_start 的距离（带符号，正数表示未来）
+                current_start_distance = distance_start
+                closest_start_distance = (closest_obj[start_date_key] - today).days
+                # 如果当前对象的 date_start 更接近 today（未来的优先）
+                if abs(current_start_distance) == abs(closest_start_distance):
+                    if current_start_distance > closest_start_distance:
+                        closest_obj = obj
+                elif abs(current_start_distance) < abs(closest_start_distance):
+                    closest_obj = obj
+
+        return closest_obj
+
+def unit_test():
+    str_list = ["B02", "B-01", "B01", "B10", "B05", "B-05-02", "B-05", "B05-01", "B0101", "B101", "梨树地E-01",
+                "梨树地-01",
+                "梨树地01", "梨树地E", "梨树地", "香蕉", "中文100test", "中文50test", "50", "100", "Banana", "apple",
+                "Apple", "第5章", "第10章"]
     sorted_strings = sorted(str_list, key=Utils.mixed_sort_key)
     print(sorted_strings)
 
@@ -306,6 +422,61 @@ def main():
     print("491491491Tech+" + ret_val)
     ret_val = Utils.get_property_cnt_limit(args)
     print(ret_val)
+
+def test_check_overlapping_intervals():
+    arr1 = [
+        {"start_date": "2025/6/1", "end_date": "2025/6/10"},
+        {"start_date": "2025/6/2", "end_date": "2025/6/8"},
+        {"start_date": "2025/6/2", "end_date": "2025/6/8"},
+        {"start_date": "2025/6/11", "end_date": "2025/6/15"},
+        {"start_date": "2025/6/11", "end_date": "2025/6/15"},
+        {"start_date": "2025/6/13", "end_date": "2025/6/20"},
+        {"start_date": "2025/6/21", "end_date": "2025/6/30"}
+    ]
+    arr21 = [
+        {"start_date": "2025/6/1", "end_date": "2025/6/10"},
+        {"start_date": "2025/6/2", "end_date": "2025/6/8"},
+        {"start_date": "2025/6/11", "end_date": "2025/6/15"},
+        {"start_date": "2025/6/12", "end_date": "2025/6/16"},
+        {"start_date": "2025/6/16", "end_date": "2025/6/18"},
+        {"start_date": "2025/6/16", "end_date": "2025/6/20"},
+        {"start_date": "2025/6/18", "end_date": "2025/6/20"},
+    ]
+    arr22 = [
+        {"start_date": "2025/6/1", "end_date": "2025/6/10"},
+        {"start_date": "2025/6/2", "end_date": "2025/6/8"},
+        {"start_date": "2025/6/11", "end_date": "2025/6/15"},
+        {"start_date": "2025/6/11", "end_date": "2025/6/15"},
+        {"start_date": "2025/6/11", "end_date": "2025/6/15"},
+        {"start_date": "2025/6/18", "end_date": "2025/6/20"},
+    ]
+    arr3 = [
+        {"start_date": "2025/6/1", "end_date": "2025/6/10"},
+        {"start_date": "2025/6/11", "end_date": "2025/6/15"},
+        {"start_date": "2025/6/16", "end_date": "2025/6/20"},
+        {"start_date": "2025/6/1", "end_date": "2025/6/30"},
+        {"start_date": "2025/6/1", "end_date": "2025/6/30"},
+    ]
+
+    print(Utils.check_overlap_rules(arr1))
+    print(Utils.check_overlap_rules(arr21))
+    print(Utils.check_overlap_rules(arr22))
+    print(Utils.check_overlap_rules(arr3))
+
+def test_find_closest_date_object():
+    data = [
+        {"a": "abc", "start_date": date(2023, 1, 1), "end_date": date(2023, 12, 31)},  # 2023 年区间（过去）
+        {"a": "abb", "start_date": date(2024, 1, 1), "end_date": date(2024, 4, 30)},  # 2024 上半年（过去）
+        {"a": "abd", "start_date": date(2024, 6, 1), "end_date": date(2024, 12, 31)},  # 2024 下半年（未来）
+        {"a": "abe", "start_date": date(2025, 1, 1), "end_date": date(2025, 12, 31)},  # 2025 年区间（未来）
+    ]
+    today = date(2024, 5, 16)
+    print(Utils.find_closest_date_object(data, today))
+    today = date(2025, 6, 3)
+    print(Utils.find_closest_date_object(data, today))
+
+def main():
+    test_check_overlapping_intervals()
 
 if __name__ == "__main__":
     main()

@@ -1139,11 +1139,28 @@ class EstateLeaseContract(models.Model):
     pledge_account_bank_account_name = fields.Char("押金户银行账户名", related="pledge_account.bank_account_name")
     pledge_account_bank_account_id = fields.Char("押金户银行账号", related="pledge_account.bank_account_id")
 
+    def _default_parking_space_domain(self):
+        current_id = self._context.get('active_id', False)
+        domain = [('state', '!=', 'invalid')]
+        if current_id:
+            _logger.info(f"current_id={current_id}")
+            domain.append(('id', '!=', current_id))
+        space_in_use = self.search(domain).mapped('parking_space_ids.id')
+        space_not_used = self.env['parking.space'].search([('id', 'not in', space_in_use)]).mapped('id')
+        return space_not_used
+
+    parking_space_domain = fields.Many2many('parking.space', copy=False, store=False, default=_default_parking_space_domain)
+
     parking_space_ids = fields.Many2many('parking.space', 'contract_parking_space_rel', 'contract_id',
-                                         'parking_space_id',
-                                         string='停车位', copy=True, tracking=True)
+                                         'parking_space_id', string='停车位', copy=True, tracking=True)
 
     parking_space_count = fields.Integer(default=0, string="分配停车位数量", compute="_calc_parking_space_cnt")
+
+    bind_vehicle = fields.Boolean(default=False, string="直接绑定车辆")
+    vehicle_ids = fields.Many2many('park.vehicle', 'contract_vehicle_rel', 'contract_id', 'vehicle_id',
+                                   string='车辆', copy=True, tracking=True)
+    vehicle_bound_cnt = fields.Integer(default=0, string="绑定车辆台数", compute="_calc_vehicle_bound_cnt")
+    assignation_logs = fields.One2many('park.vehicle.assignation.log', inverse_name="lease_contract_id", string="车辆签约记录")
 
     @api.depends("parking_space_ids")
     def _calc_parking_space_cnt(self):
@@ -1151,6 +1168,11 @@ class EstateLeaseContract(models.Model):
             record.parking_space_count = 0
             if record.parking_space_ids:
                 record.parking_space_count = len(record.parking_space_ids)
+
+    @api.depends("vehicle_ids")
+    def _calc_vehicle_bound_cnt(self):
+        for record in self:
+            record.vehicle_bound_cnt = len(record.vehicle_ids) if record.vehicle_ids else 0
 
     invoicing_address = fields.Char('发票邮寄地址', translate=True, copy=True)
     invoicing_email = fields.Char('电子发票邮箱', translate=True, copy=True)
@@ -1256,6 +1278,107 @@ class EstateLeaseContract(models.Model):
              ('date_rent_end', '>=', self_record.date_rent_end), ])
 
         return property_current_contract
+
+    @api.onchange('parking_space_ids')
+    def _onchange_parking_space_ids(self):
+        spot_lst = []
+        for record in self.parking_space_ids:
+            if record.reserved:
+                if not record.vehicle_bound:
+                    spot_lst.append({'车位': record.name})
+
+        if spot_lst:
+            raise UserError(f"如下车位是固定车位：：{str(spot_lst)}请先绑定车牌，然后重新添加至合同中，否则合同数据无法正确保存！")
+
+    def _check_reserved_parking_spot(self):
+        for record in self:
+            record._onchange_parking_space_ids()
+            vehicles = []
+            for parking_space in record.parking_space_ids:
+                if parking_space.reserved:
+                    for vehicle in parking_space.vehicle_bound.park_vehicle_id:
+                        if vehicle not in record.vehicle_ids:
+                            vehicles.append(vehicle.id)
+
+            _logger.info(f"通过车位绑定的车辆：{vehicles}")
+            if vehicles:
+                for vehicle in record.vehicle_ids:
+                    vehicles.append(vehicle.id)
+                record.vehicle_ids = vehicles
+
+    def _create_vehicle_assignation_record(self):
+        for record in self:
+            # 通过车位绑定的车辆，已经由车位车辆关系表生成assignation_log，所以这里只需要针对“直接绑定车辆”
+            if record.bind_vehicle:
+                for vehicle in record.vehicle_ids:
+                    bound_by_spot = False
+                    for spot in record.parking_space_ids:
+                        if vehicle.id in spot.vehicle_bound.ids:
+                            bound_by_spot = True
+                            break
+                    if not bound_by_spot:
+                        assignation_record = {
+                            'vehicle_id': vehicle.id,
+                            'date_start': record.date_start,
+                            'date_end': record.date_rent_end,
+                            'lease_contract_nm': record.name,
+                            'lease_contract_id': record.id,
+                        }
+                        assignation_log = self.env['park.vehicle.assignation.log'].create(assignation_record)
+                        # record.assignation_logs |= assignation_log.id
+
+    def _write_back_contract_2_assignation(self):
+        for record in self:
+            # 通过车位绑定的车辆，必须有parking_space_vehicle_rel记录，否则有问题
+            if not record.bind_vehicle:
+                for spot in record.parking_space_ids:
+                    for vehicle_rel in spot.vehicle_bound:
+                        if vehicle_rel.assignation_log_id:
+                            if vehicle_rel.assignation_log_id.lease_contract_nm != record.name:
+                                vehicle_rel.assignation_log_id.lease_contract_nm = record.name
+                            if vehicle_rel.assignation_log_id.lease_contract_id != record.id:
+                                vehicle_rel.assignation_log_id.lease_contract_id = record.id
+                            if vehicle_rel.assignation_log_id.date_start != vehicle_rel.start_date:
+                                vehicle_rel.assignation_log_id.date_start = vehicle_rel.start_date
+                            if vehicle_rel.assignation_log_id.date_end != vehicle_rel.end_date:
+                                vehicle_rel.assignation_log_id.date_end = vehicle_rel.end_date
+                        else:
+                            _logger.error(f"合同id{record.id}通过车位{spot.name}绑定的车辆{vehicle_rel.park_vehicle_id.name}没有assignation_log_id")
+
+    def _write_vehicle_assignation_record(self):
+        for record in self:
+            if record.bind_vehicle:
+                for vehicle in record.vehicle_ids:
+                    # 通过车位绑定的车辆，已经由车位车辆关系表更新assignation_log，所以这里只需要针对“直接绑定车辆”
+                    bound_by_spot = False
+                    for spot in record.parking_space_ids:
+                        if vehicle.id in spot.vehicle_bound.park_vehicle_id.ids:
+                            bound_by_spot = True
+                            break
+                    if not bound_by_spot:
+                        search_domain = [('lease_contract_id', '=', record.id), ('vehicle_id', '=', vehicle.id)]
+                        # 理论上同一合同、同一车辆，只能有一条记录
+                        assignation_log = self.env['park.vehicle.assignation.log'].search(search_domain, limit=1)
+                        if not assignation_log:
+                            assignation_record = {
+                                'vehicle_id': vehicle.id,
+                                'date_start': record.date_start,
+                                'date_end': record.date_rent_end,
+                                'lease_contract_nm': record.name,
+                                'lease_contract_id': record.id,
+                            }
+                            assignation_log = self.env['park.vehicle.assignation.log'].create(assignation_record)
+                            # record.assignation_logs |= assignation_log.id
+                        else:
+                            for vehicle_assignation in assignation_log:
+                                if vehicle_assignation.date_start != record.date_start:
+                                    vehicle_assignation.date_start = record.date_start
+                                if vehicle_assignation.date_end != record.date_rent_end:
+                                    vehicle_assignation.date_end = record.date_rent_end
+                                if vehicle_assignation.lease_contract_nm != record.name:
+                                    vehicle_assignation.lease_contract_nm = record.name
+
+                # 反过来删除解除绑定的车辆(产出绑定关系表而不是绑定关系的历史表)，而关系表通过vehicle_ids的many2many关系自动被删除了
 
     @api.depends("property_ids")
     def _calc_rent_total_info(self):
@@ -2130,6 +2253,13 @@ class EstateLeaseContract(models.Model):
 
         records = super().create(vals)
 
+        # 检查通过车位绑定的车辆
+        records._check_reserved_parking_spot()
+        # 生成直接绑定的车辆的assignation_log记录
+        records._create_vehicle_assignation_record()
+        # 回写通过车位绑定的车辆的assignation_log记录的lease_contract_nm和lease_contract_id
+        records._write_back_contract_2_assignation()
+
         self._insert_contract_property_rental_plan_rel(records)
         self._insert_contract_registration_addr_rel(records)
 
@@ -2187,9 +2317,13 @@ class EstateLeaseContract(models.Model):
         res = super().write(vals)
         _logger.info(f"write2 vals=：{vals}")
         for record in self:
+
+            record._check_reserved_parking_spot()
+            record._write_vehicle_assignation_record()
+            record._write_back_contract_2_assignation()
+
             _logger.info(f"write2 management fee record=个数："
                          f"{len(record.property_management_fee_plan_ids)}-{record.property_management_fee_plan_ids}")
-
             # 创建物业费明细与物业费实收明细之间的关联关系
             record._bind_manage_fee_detail_fee_maintenance()
             # 物业费方案处理

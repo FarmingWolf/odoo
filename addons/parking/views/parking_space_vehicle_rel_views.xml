@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="parking_space_vehicle_rel_action" model="ir.actions.act_window">
+        <field name="name">已绑定车位的车辆</field>
+        <field name="res_model">parking.space.vehicle.rel</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="context">{'search_default_active': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                绑定车位与车辆。
+            </p>
+        </field>
+    </record>
+
+    <record id="parking_space_vehicle_rel_view_tree" model="ir.ui.view">
+        <field name="name">parking.space.vehicle.rel.tree</field>
+        <field name="model">parking.space.vehicle.rel</field>
+        <field name="arch" type="xml">
+            <tree string="parking_space_vehicle_rel_tree" create="True" edit="True" delete="True" editable="bottom" open_form_view="False">
+                <field name="parking_space_id" readonly="context.get('from_parking_space_page')" options="{'no_open': True}"/>
+                <field name="park_vehicle_id"/>
+                <field name="vehicle_owner_id" optional="hide"/>
+                <field name="vehicle_owner_mobile_phone" optional="hide"/>
+                <field name="start_date" widget="daterange" options="{'end_date_field': 'end_date'}" nolabel="1"/>
+                <field name="end_date" column_invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="parking_space_vehicle_rel_view_form" model="ir.ui.view">
+        <field name="name">parking.space.vehicle.rel.form</field>
+        <field name="model">parking.space.vehicle.rel</field>
+        <field name="arch" type="xml">
+            <form string="parking_space_vehicle_rel_form">
+                <group>
+                    <field name="parking_space_id" readonly="context.get('from_parking_space_page')" options="{'no_open': True}"/>
+                    <field name="park_vehicle_id"/>
+                    <field name="vehicle_owner_id"/>
+                    <field name="vehicle_owner_mobile_phone"/>
+                    <field name="start_date" widget="daterange" options="{'end_date_field': 'end_date'}"/>
+                    <field name="end_date" invisible="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+</odoo>

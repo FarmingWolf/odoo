@@ -565,21 +565,36 @@ class EstateLeaseContractPropertyExtend(models.Model):
                     record.latest_payment_method = tmp_v8
 
             else:
-                record.business_method_id = ""
-                record.business_type_id = ""
-                record.main_category = ""
-                record.billing_method = ""
-                record.billing_progress_method_id = ""
-                record.period_percentage_id = ""
-                record.turnover_percentage_id = ""
-                record.payment_period = 0
-                record.rent_price = 0
-                record.rent_amount_monthly_auto = 0
-                record.payment_date = ""
-                record.compensation_method = ""
-                record.compensation_period = ""
-                record.latest_payment_method = ""
-                record.including_management_fee = True
+                if record.business_method_id:
+                    record.business_method_id = ""
+                if record.business_type_id:
+                    record.business_type_id = ""
+                if record.main_category:
+                    record.main_category = ""
+                if record.billing_method:
+                    record.billing_method = ""
+                if record.billing_progress_method_id:
+                    record.billing_progress_method_id = ""
+                if record.period_percentage_id:
+                    record.period_percentage_id = ""
+                if record.turnover_percentage_id:
+                    record.turnover_percentage_id = ""
+                if record.payment_period:
+                    record.payment_period = 0
+                if record.rent_price:
+                    record.rent_price = 0
+                if record.rent_amount_monthly_auto:
+                    record.rent_amount_monthly_auto = 0
+                if record.payment_date:
+                    record.payment_date = ""
+                if record.compensation_method:
+                    record.compensation_method = ""
+                if record.compensation_period:
+                    record.compensation_period = ""
+                if record.latest_payment_method:
+                    record.latest_payment_method = ""
+                if not record.including_management_fee:
+                    record.including_management_fee = True
 
     @api.model
     def _format_m2m_values(self, records):

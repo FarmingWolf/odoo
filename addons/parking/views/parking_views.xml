@@ -28,7 +28,7 @@
         <field name="name">park.form</field>
         <field name="model">park</field>
         <field name="arch" type="xml">
-            <form string="park_form">
+            <form string="parking_form">
                 <group>
                     <field name="name"/>
                     <field name="parking_lot_ids">
