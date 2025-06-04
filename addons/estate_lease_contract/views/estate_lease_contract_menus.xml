@@ -31,7 +31,7 @@
         </menuitem>
         <menuitem id="estate_lease_contract_menu_settled" name="入驻企业及车辆" sequence="37" groups="estate_lease_contract_group_user">
             <menuitem id="estate_lease_contract_menu_party_b" name="入驻企业花名册" sequence="10" action="estate_lease_contract_party_a_status_action" groups="estate_lease_contract_group_manager,estate_lease_contract_group_b_party" />
-            <menuitem id="estate_lease_contract_menu_vehicles" name="入驻车辆" sequence="20" action="estate_lease_contract_action_vehicles" groups="estate_lease_contract_group_user" />
+            <menuitem id="estate_lease_contract_menu_vehicles" name="入驻车辆" sequence="20" action="parking.park_vehicle_assignation_log_action" groups="estate_lease_contract_group_user" />
         </menuitem>
     </menuitem>
 </odoo>

@@ -13,5 +13,5 @@ class ParkVehicleTag(models.Model):
     color = fields.Integer('Color')
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
-    _sql_constraints = [('name_uniq', 'unique (name)', "Tag name already exists!")]
+    _sql_constraints = [('name_uniq', 'unique (name, company_id)', "Tag name already exists!")]
 

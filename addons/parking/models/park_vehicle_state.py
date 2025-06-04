@@ -14,4 +14,4 @@ class ParkVehicleState(models.Model):
 
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
 
-    _sql_constraints = [('park_vehicle_state_name_unique', 'unique(name)', 'State name already exists')]
+    _sql_constraints = [('park_vehicle_state_name_unique', 'unique(name, company_id)', 'State name already exists')]
