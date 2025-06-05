@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+from datetime import date
 
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
@@ -50,3 +51,14 @@ class ParkVehicleAssignationLog(models.Model):
         record = super().create(vals_list)
         record._check_period_duplicate()
         return record
+
+    @staticmethod
+    def get_vehicles_cnt(company_id, env):
+        s_domain = [('date_start', '<=', date.today()),
+                    ('date_end', '>=', date.today())]
+
+        vehicles_cnt_by_company = env['park.vehicle.assignation.log'].sudo()._read_group(s_domain,
+                                                                                         ['company_id'],
+                                                                                         ['vehicle_id:count_distinct'])
+
+        return vehicles_cnt_by_company

@@ -10,7 +10,6 @@ from dateutil.relativedelta import relativedelta
 from addons.estate_dashboard.services.service import EstateDashboardService
 from odoo import models, fields, api
 from odoo.tools import date_utils, config
-from odoo.tools.safe_eval import dateutil
 
 _logger = logging.getLogger(__name__)
 
@@ -64,27 +63,29 @@ def _need_create_sms_rcd(self, rule):
             return False, rcd_send_date
 
 
-def _set_template_property_rent_ratio_common(json_data):
+def _set_template_property_rent_ratio_common(json_data, vehicles_cnt=0):
     hist_sent_content_params = {
         "park_n": json_data['company_name'],
         "p_cnt": json_data['estate_property_quantity'],
-        "area_cnt": round(json_data['estate_property_area_quantity'], 2),
+        "area_cnt": round(json_data['estate_property_area_quantity']),
         "on_rent_p": json_data['estate_property_lease_quantity'],
-        "ratio_p": round(json_data['ratio_property_quantity'] * 100, 2),
-        "on_rent_area": round(json_data['estate_property_area_lease_quantity'], 2),
-        "ratio_area": round(json_data['ratio_property_area_quantity'] * 100, 2),
+        "ratio_p": round(json_data['ratio_property_quantity'] * 100),
+        "on_rent_area": round(json_data['estate_property_area_lease_quantity']),
+        "ratio_area": round(json_data['ratio_property_area_quantity'] * 100),
+        "cars_cnt": vehicles_cnt,
     }
-    hist_text_content = f"截至今日{json_data['company_name']}" \
-                        f"总房间数{json_data['estate_property_quantity']}，" \
-                        f"总面积{round(json_data['estate_property_area_quantity'], 2)}㎡，" \
-                        f"在租房间数{json_data['estate_property_lease_quantity']}" \
-                        f"占比{round(json_data['ratio_property_quantity'] * 100, 2)}%，" \
-                        f"在租面积{round(json_data['estate_property_area_lease_quantity'], 2)}㎡" \
-                        f"占比{round(json_data['ratio_property_area_quantity'] * 100, 2)}%。"
+    hist_text_content = (f"截至今日{json_data['company_name']}"
+                         f"总房间数{json_data['estate_property_quantity']}，"
+                         f"总面积{round(json_data['estate_property_area_quantity'])}㎡，"
+                         f"在租房间数{json_data['estate_property_lease_quantity']}"
+                         f"占比{round(json_data['ratio_property_quantity'] * 100)}%，"
+                         f"在租面积{round(json_data['estate_property_area_lease_quantity'])}㎡"
+                         f"占比{round(json_data['ratio_property_area_quantity'] * 100)}%"
+                         f"在册车辆{vehicles_cnt}台")
     return hist_sent_content_params, hist_text_content
 
 
-def _set_template_property_rent_ratio_491(json_data):
+def _set_template_property_rent_ratio_491(json_data, vehicles_cnt=0):
     room_cnt = 0
     area_cnt = 0
     not_rent = 0
@@ -110,23 +111,25 @@ def _set_template_property_rent_ratio_491(json_data):
                 woods_not_rent_area += record.property_rent_area
 
     wood_info = "无空置" if woods_not_rent_pieces == 0 else f"空置{woods_not_rent_pieces}块，空置面积{woods_not_rent_area}㎡"
+    # 添加在册车辆台数统计
+    wood_info += "在册车辆" + str(vehicles_cnt) + "台"
 
     ratio_out_area = not_rent_area / area_cnt if area_cnt != 0 else 0
 
     hist_sent_content_params = {
         "room_cnt": room_cnt,
-        "area_cnt": round(area_cnt, 2),
+        "area_cnt": round(area_cnt),
         "not_rent": not_rent,
-        "not_rent_area": round(not_rent_area, 2),
-        "ratio_out_area": round(ratio_out_area * 100, 2),
+        "not_rent_area": round(not_rent_area),
+        "ratio_out_area": round(ratio_out_area * 100),
         "woods_pieces": woods_pieces,
-        "woods_area": round(woods_area, 2),
+        "woods_area": round(woods_area),
         "wood_info": wood_info,
     }
 
-    hist_text_content = f"截至今日491空间房间总数{room_cnt}，总面积{round(area_cnt, 2)}㎡，空置{not_rent}间，" \
-                        f"空置面积{round(not_rent_area, 2)}㎡，空置率{round(ratio_out_area * 100, 2)}%；" \
-                        f"此外，林地{woods_pieces}块，面积{round(woods_area, 2)}㎡，{wood_info}。"
+    hist_text_content = f"截至今日491空间房间总数{room_cnt}，总面积{round(area_cnt)}㎡，空置{not_rent}间，" \
+                        f"空置面积{round(not_rent_area)}㎡，空置率{round(ratio_out_area * 100)}%；" \
+                        f"此外，林地{woods_pieces}块，面积{round(woods_area)}㎡，{wood_info}。"
     return hist_sent_content_params, hist_text_content
 
 
@@ -251,6 +254,9 @@ class SmsAli(models.Model):
 
     def create_sms_rcd_by_rules(self):
         sms_rules = self.env['sms.ali'].sudo().search([('active', '=', True)], order="company_id, tgt_partner_id")
+        properties_info_by_company = {}
+        vehicles_cnt_by_company = {}
+
         for rule in sms_rules:
             # 先看本条是否要做成短信数据
             need_create, send_date = _need_create_sms_rcd(self, rule)
@@ -314,15 +320,31 @@ class SmsAli(models.Model):
                             })
 
             elif rule.sms_send_period in ('daily', 'weekly', 'monthly'):
-                if "资产出租率汇报" in rule.sms_template_name:
-                    _logger.info(f"开始处理资产出租率汇报短信，company={hist_company_id}")
-                    json_ret = EstateDashboardService.get_statistics_svc(company_id=hist_company_id,
-                                                                         env=self.env(su=True))
+                if "资产出租率" in rule.sms_template_name:
+                    if hist_company_id not in properties_info_by_company:
+                        _logger.info(f"开始处理资产出租率汇报短信，company={hist_company_id}")
+                        json_ret = EstateDashboardService.get_statistics_svc(company_id=hist_company_id,
+                                                                             env=self.env(su=True))
+                        properties_info_by_company[hist_company_id] = json_ret
+                    else:
+                        json_ret = properties_info_by_company[hist_company_id]
+
+                    if not vehicles_cnt_by_company:
+                        vehicles_cnt_by_company = self.env['park.vehicle.assignation.log'].get_vehicles_cnt(company_id=hist_company_id,
+                                                                                                            env=self.env(su=True))
+                        _logger.info(f"vehicles_cnt_by_company={vehicles_cnt_by_company}")
+
+                    tgt_company_vehicles_cnt = 0
+                    for vehicles_cnt in vehicles_cnt_by_company:
+                        if hist_company_id == vehicles_cnt[0].id:
+                            tgt_company_vehicles_cnt = vehicles_cnt[1]
+                            break
+
                     if '491' in rule.sms_template_name:
-                        hist_sent_content_params, hist_text_content = _set_template_property_rent_ratio_491(json_ret)
+                        hist_sent_content_params, hist_text_content = _set_template_property_rent_ratio_491(json_ret, tgt_company_vehicles_cnt)
                     else:
                         json_ret["company_name"] = rule.company_id.name
-                        hist_sent_content_params, hist_text_content = _set_template_property_rent_ratio_common(json_ret)
+                        hist_sent_content_params, hist_text_content = _set_template_property_rent_ratio_common(json_ret, tgt_company_vehicles_cnt)
 
                     # 写入hist
                     self.env['sms.ali.hist'].sudo().create({
