@@ -4,7 +4,7 @@
         <field name="name">资产出租每日状态明细</field>
         <field name="res_model">estate.lease.contract.property.daily.status</field>
         <field name="view_mode">tree,form</field>
-        <field name="context">{'search_default_active': True}</field>
+        <field name="context">{'search_default_active': True, 'search_default_status_date': (context_today() + relativedelta(days=-2)).strftime('%Y%m%d)}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">日报尚未生成。</p>
         </field>
@@ -39,16 +39,108 @@ action = model.automatic_daily_calc_status()
                 <field name="contract_date_start" readonly="1"/>
                 <field name="contract_date_rent_start" readonly="1"/>
                 <field name="contract_date_rent_end" readonly="1"/>
+
                 <field name="property_rental_receivable_today" readonly="1"/>
                 <field name="property_rental_receivable_week" readonly="1"/>
                 <field name="property_rental_receivable_month" readonly="1"/>
                 <field name="property_rental_receivable_quarter" readonly="1"/>
                 <field name="property_rental_receivable_year" readonly="1"/>
+
                 <field name="property_rental_received_today" readonly="1"/>
                 <field name="property_rental_received_week" readonly="1"/>
                 <field name="property_rental_received_month" readonly="1"/>
                 <field name="property_rental_received_quarter" readonly="1"/>
                 <field name="property_rental_received_year" readonly="1"/>
+
+                <field name="property_rental_receivable_tomorrow" readonly="1" optional="hide"/>
+                <field name="property_rental_receivable_week_next" readonly="1" optional="hide"/>
+                <field name="property_rental_receivable_month_next" readonly="1" optional="hide"/>
+                <field name="property_rental_receivable_quarter_next" readonly="1" optional="hide"/>
+                <field name="property_rental_receivable_year_next" readonly="1" optional="hide"/>
+
+                <field name="property_rent_deposit_received_today" readonly="1" optional="hide"/>
+                <field name="property_rent_deposit_received_week" readonly="1" optional="hide"/>
+                <field name="property_rent_deposit_received_month" readonly="1" optional="hide"/>
+                <field name="property_rent_deposit_received_quarter" readonly="1" optional="hide"/>
+                <field name="property_rent_deposit_received_year" readonly="1" optional="hide"/>
+
+                <field name="property_tax_received_today" readonly="1" optional="hide"/>
+                <field name="property_tax_received_week" readonly="1" optional="hide"/>
+                <field name="property_tax_received_month" readonly="1" optional="hide"/>
+                <field name="property_tax_received_quarter" readonly="1" optional="hide"/>
+                <field name="property_tax_received_year" readonly="1" optional="hide"/>
+
+                <field name="property_rent_fee_water_receivable_today" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_water_receivable_week" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_water_receivable_month" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_water_receivable_quarter" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_water_receivable_year" readonly="1" optional="hide"/>
+
+                <field name="property_rent_fee_water_receivable_tomorrow" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_water_receivable_week_next" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_water_receivable_month_next" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_water_receivable_quarter_next" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_water_receivable_year_next" readonly="1" optional="hide"/>
+
+                <field name="property_rent_fee_water_received_today" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_water_received_week" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_water_received_month" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_water_received_quarter" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_water_received_year" readonly="1" optional="hide"/>
+
+                <field name="property_rent_fee_electricity_receivable_today" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_receivable_week" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_receivable_month" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_receivable_quarter" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_receivable_year" readonly="1" optional="hide"/>
+
+                <field name="property_rent_fee_electricity_receivable_tomorrow" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_receivable_week_next" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_receivable_month_next" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_receivable_quarter_next" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_receivable_year_next" readonly="1" optional="hide"/>
+
+                <field name="property_rent_fee_electricity_received_today" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_received_week" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_received_month" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_received_quarter" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_received_year" readonly="1" optional="hide"/>
+
+                <field name="property_rent_fee_electricity_maintenance_receivable_today" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_maintenance_receivable_week" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_maintenance_receivable_month" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_maintenance_receivable_quarter" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_maintenance_receivable_year" readonly="1" optional="hide"/>
+
+                <field name="property_rent_fee_electricity_maintenance_receivable_tomorrow" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_maintenance_receivable_week_next" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_maintenance_receivable_month_next" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_maintenance_receivable_quarter_nx" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_maintenance_receivable_year_next" readonly="1" optional="hide"/>
+
+                <field name="property_rent_fee_electricity_maintenance_received_today" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_maintenance_received_week" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_maintenance_received_month" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_maintenance_received_quarter" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_electricity_maintenance_received_year" readonly="1" optional="hide"/>
+
+                <field name="property_rent_fee_maintenance_receivable_today" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_maintenance_receivable_week" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_maintenance_receivable_month" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_maintenance_receivable_quarter" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_maintenance_receivable_year" readonly="1" optional="hide"/>
+
+                <field name="property_rent_fee_maintenance_receivable_tomorrow" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_maintenance_receivable_week_next" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_maintenance_receivable_month_next" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_maintenance_receivable_quarter_next" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_maintenance_receivable_year_next" readonly="1" optional="hide"/>
+
+                <field name="property_rent_fee_maintenance_received_today" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_maintenance_received_week" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_maintenance_received_month" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_maintenance_received_quarter" readonly="1" optional="hide"/>
+                <field name="property_rent_fee_maintenance_received_year" readonly="1" optional="hide"/>
             </tree>
         </field>
     </record>
@@ -104,10 +196,22 @@ action = model.automatic_daily_calc_status()
         <field name="name">estate.property.status.view.search</field>
         <field name="model">estate.lease.contract.property.daily.status</field>
         <field name="arch" type="xml">
-            <search string="按日期筛选">
+            <search string="筛选条件">
                 <field name="status_date"/>
                 <field name="property_id"/>
                 <separator/>
+                <filter string="合同签订月份" name="contract_date_sign_month" date="contract_date_sign"/>
+                <filter string="合同开始月份" name="contract_date_start_month" date="contract_date_start"/>
+                <filter string="计租开始月份" name="contract_date_rent_start_month" date="contract_date_rent_start"/>
+                <filter string="状态日期月份" name="status_date_month" date="status_date"/>
+                <separator/>
+                <group expand='1' string='按资产分组'>
+                    <filter string='按资产分组' name="group_by_property_id" context="{'group_by': 'property_id'}"/>
+                    <filter string='按合同分组' name="group_by_contract_id" context="{'group_by': 'contract_id'}"/>
+                </group>
+                <searchpanel>
+                    <field string='资产文件夹' name="property_id" context="{'group_by': 'property_id'}"/>
+                </searchpanel>
             </search>
         </field>
     </record>
