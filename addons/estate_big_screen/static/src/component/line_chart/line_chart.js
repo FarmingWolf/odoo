@@ -3,7 +3,7 @@
 import { loadBundle } from "@web/core/assets";
 import { registry } from "@web/core/registry";
 import { getColor, hexToRGBA } from "@web/core/colors/colors";
-import { Component, onWillStart, useEffect, useRef } from "@odoo/owl";
+import { Component, onWillStart, useEffect, useRef, onMounted, onWillUnmount } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 import { cookie } from "@web/core/browser/cookie";
 
@@ -25,8 +25,53 @@ export class LineChart extends Component {  // 类名更新为 LineChart
         onWillStart(async () => {
             await chartLoader; // 等待全局加载完成
         });
+
+        const renderOrUpdateChart = () => {
+            if (this.chart) {
+                this.chart.destroy();
+            }
+            this.renderChart();
+        };
+
         // onWillStart(async () => await loadBundle("web.chartjs_lib"));
         useEffect(() => this.renderChart());
+        // useEffect(
+        //     () => {
+        //         renderOrUpdateChart();
+        //         return () => {
+        //             if (this.chart) {
+        //                 this.chart.destroy();
+        //             }
+        //         };
+        //     },
+        //     // 明确指定依赖项数组
+        //     () => [this.props.data]
+        // );
+
+        const handleFullscreenChange = () => {
+            setTimeout(() => {
+                if (this.chart) {
+                    this.chart.resize();
+                }
+            }, 100);
+        };
+        onMounted(() => {
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.addEventListener('msfullscreenchange', handleFullscreenChange);
+            debugger
+            // renderOrUpdateChart();
+        });
+
+        onWillUnmount(() => {
+            document.removeEventListener('fullscreenchange', handleFullscreenChange);
+            document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.removeEventListener('msfullscreenchange', handleFullscreenChange);
+            debugger
+            if (this.chart) {
+                this.chart.destroy();
+            }
+        });
     }
 
     // 保留原有的图表渲染方法（需删除Bar相关逻辑或拆分为单独组件）

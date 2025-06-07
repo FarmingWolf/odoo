@@ -530,3 +530,28 @@ tbody.fade-in {
         display: none;
     }
 }
+
+.fullscreen-toggle {
+    position: fixed;
+    top: 7px;
+    left: 1850px;
+    z-index: 10000; /* 比覆盖层更高 */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: #ffffff; /* Default color */
+    transition: color 0.2s;
+    opacity: 0.7;
+}
+
+.fullscreen-toggle:hover {
+    color: #ffffff; /* Darker on hover */
+    opacity: 1;
+}
+
+.fullscreen-toggle svg {
+    display: block;
+    width: 46px;
+    height: 46px;
+}

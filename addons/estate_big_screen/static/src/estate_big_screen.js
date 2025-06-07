@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import {Component, onMounted, onWillUnmount, useEffect, useState, reactive, onWillStart} from "@odoo/owl";
+import {Component, onMounted, onWillStart, onWillUnmount, useEffect, useState} from "@odoo/owl";
 import {useService} from "@web/core/utils/hooks";
 import {registry} from "@web/core/registry";
 import {Layout} from "@web/search/layout";
@@ -16,14 +16,28 @@ class EstateBigScreen extends Component {
     static components = { Layout, ClockComponent, PieChartCard, LineChart, DoughnutChart, ScrollingDataGrid, SharedInfoComponent };
 
     setup() {
+
+        this.state = useState({
+            showLineCharts: false,
+            isFullscreen: false
+        });
+
         this.display = {
-            controlPanel: false,
+            controlPanel: false
         };
+        this.checkFullscreenState();
+
+        document.addEventListener('fullscreenchange', this.checkFullscreenState.bind(this));
+        document.addEventListener('webkitfullscreenchange', this.checkFullscreenState.bind(this));
+        document.addEventListener('msfullscreenchange', this.checkFullscreenState.bind(this));
+
         onMounted(() => {
             console.log("Component onMounted, statistics state:", {
                 isReady: this.statistics.isReady,
                 data: this.statistics.pie_chart_ratio_conventional_area_quantity
             });
+            // 默认打开全屏模式
+            this.enterFullscreen();
         });
         onMounted(() => {
             // 进入页面时隐藏导航栏
@@ -58,13 +72,31 @@ class EstateBigScreen extends Component {
                 }, {passive: false});
             }
         });
+        onMounted(() => {
+            const handleFullscreenChange = () => {
+                this.checkFullscreenState();
+                // 全屏切换时重新检查数据状态
+                if (this.lineChartStatistics.isReady) {
+                    this.state.showLineCharts = true;
+                }
+            };
 
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.addEventListener('msfullscreenchange', handleFullscreenChange);
+
+        });
         onWillUnmount(() => {
             // 离开页面时恢复导航栏
             document.querySelector('.o_main_navbar')?.classList.remove('d-none');
             document.querySelector('.o_sub_menu')?.classList.remove('d-none');
         });
 
+        onWillUnmount(() => {
+            document.removeEventListener('fullscreenchange', handleFullscreenChange);
+            document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.removeEventListener('msfullscreenchange', handleFullscreenChange);
+        });
         this.statistics = useState(useService("estate_big_screen.statistics"));
         this.lineChartStatistics = useState(useService("estate_big_screen.lineChartDataService"));
 
@@ -81,14 +113,16 @@ class EstateBigScreen extends Component {
             this.showPropertyDashboard = await this.userService.hasGroup("estate_big_screen.estate_group_big_screen");
         });
 
-        this.state = useState({
-            showLineCharts: false,
-        });
-
         useEffect(() => {
-            if (this.lineChartStatistics.isReady) {
-                this.state.showLineCharts = true;
-            }
+            // if (this.lineChartStatistics.isReady) {
+            //     this.state.showLineCharts = true;
+            // }
+            // 增强检查
+            this.state.showLineCharts = this.lineChartStatistics.isReady &&
+                this.lineChartStatistics.average_price_lst?.length > 0 &&
+                this.lineChartStatistics.rent_ratio_lst?.length > 0 &&
+                this.lineChartStatistics.rental_received_lst?.length > 0 &&
+                this.lineChartStatistics.rental_receivable_lst?.length > 0;
         });
     }
 
@@ -141,48 +175,121 @@ class EstateBigScreen extends Component {
     // 计租面积环形图数据
     get doughnutChtRatioConvAreaQ() {
         // {labels: ['A', 'B', 'C'], values: [30, 50, 20]}
-        debugger;
+        // debugger;
+        if (!this._doughnutCache) {
+            this._doughnutCache = {};
+        }
+
+        const cacheKey = 'area_' + this.statistics?.isReady;
+        if (this._doughnutCache[cacheKey]) {
+            return this._doughnutCache[cacheKey];
+        }
         if (!this.statistics?.isReady || !this.statistics?.pie_chart_ratio_conventional_area_quantity) {
             console.log("Statistics not ready:", {
                 isReady: this.statistics?.isReady,
                 data: this.statistics?.pie_chart_ratio_conventional_area_quantity
             });
-            return {
+            const result = {
                 labels: ['在租(㎡)', '空置(㎡)'],
                 values: [0, 0],
                 isLoading: true
             };
+            this._doughnutCache[cacheKey] = result;
+            return result;
         }
         console.log("Statistics data loaded:", this.statistics.pie_chart_ratio_conventional_area_quantity);
-        return {
+        const result =  {
             labels: ['在租(㎡)', '空置(㎡)'],
             values:
                 [this.statistics.pie_chart_ratio_conventional_area_quantity['在租(㎡)'] || 0,
                 this.statistics.pie_chart_ratio_conventional_area_quantity['空置(㎡)'] || 0],
             isLoading: false
         };
+
+        this._doughnutCache[cacheKey] = result;
+        return result;
     }
     // 房屋间数环形图数据
     get doughnutChtRatioConvQ() {
-        debugger;
+        // debugger;
         // {labels: ['A', 'B', 'C'], values: [30, 50, 20]}
+        if (!this._doughnutCache) {
+            this._doughnutCache = {};
+        }
+
+        const cacheKey = 'count_' + this.statistics?.isReady;
+        if (this._doughnutCache[cacheKey]) {
+            return this._doughnutCache[cacheKey];
+        }
+
         if (!this.statistics?.isReady || !this.statistics?.pie_chart_ratio_conventional_quantity) {
-            return {
+            const result =  {
                 labels: ['在租间数', '空置间数'],
                 values: [0, 0],
                 isLoading: true
             };
+
+            this._doughnutCache[cacheKey] = result;
+            return result;
         }
-        return {
+        const result = {
             labels: ['在租间数', '空置间数'],
             values:
                 [this.statistics.pie_chart_ratio_conventional_quantity['在租间数'] || 0,
                 this.statistics.pie_chart_ratio_conventional_quantity['空置间数'] || 0],
             isLoading: false
         };
+        this._doughnutCache[cacheKey] = result;
+        return result;
+
+    }
+    checkFullscreenState() {
+        this.state.isFullscreen = !!(
+            document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.msFullscreenElement
+        );
     }
 
+    toggleFullscreen() {
+        if (this.state.isFullscreen) {
+            this.exitFullscreen();
+        } else {
+            this.enterFullscreen();
+        }
+        setTimeout(() => {
+            this.state.showLineCharts = this.lineChartStatistics.isReady &&
+                this.lineChartStatistics.average_price_lst?.length > 0 &&
+                this.lineChartStatistics.rent_ratio_lst?.length > 0 &&
+                this.lineChartStatistics.rental_received_lst?.length > 0 &&
+                this.lineChartStatistics.rental_receivable_lst?.length > 0;
+        }, 300);
+    }
+
+    enterFullscreen() {
+        const element = document.documentElement;
+        if (element.requestFullscreen) {
+            element.requestFullscreen().catch(err => {
+                console.error('Error attempting to enable fullscreen:', err);
+            });
+        } else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen();
+        } else if (element.msRequestFullscreen) {
+            element.msRequestFullscreen();
+        }
+    }
+
+    exitFullscreen() {
+        if (this.state.isFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    }
     goBack() {
+        this.exitFullscreen();
         window.history.back();
     }
 

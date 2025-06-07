@@ -50,14 +50,18 @@ export const statisticsService = {
     start(env, services) {
         const service = new StatisticsService(env, services);
 
+        if (!service.initialized) {
+            service.initialize();
+        }
+
         return new Proxy(service, {
             get(target, prop) {
                 if (prop === 'destroy') return target[prop];
                 // 当访问任何属性时自动初始化
-                debugger;
-                if (!target.initialized) {
-                    target.initialize();
-                }
+                // debugger;
+                // if (!target.initialized) {
+                //     target.initialize();
+                // }
                 // 返回整个 statistics 对象或特定属性
                 if (prop === 'statistics') {
                     return target.statistics;
