@@ -109,3 +109,34 @@ class ParkingSpace(models.Model):
             'domain': tgt_domain,
         }
         return action
+
+    @staticmethod
+    def get_parking_space_cnt(company_id, env, reserved=False):
+
+        search_domain = [('company_id', '=', company_id)]
+        if reserved:
+            search_domain.append(('reserved', '=', True))
+
+        spots_cnt = env['parking.space'].sudo().search_count(search_domain)
+
+        return spots_cnt
+
+    @staticmethod
+    def get_parking_space_reserved_bound(company_id, env):
+
+        reserved_spots = env['parking.space'].sudo().search([('company_id', '=', company_id), ('reserved', '=', True)])
+        spots_bound = 0
+        vehicle_bound = 0
+        for spot in reserved_spots:
+            if len(spot.vehicle_bound) > 0:
+                spots_bound += 1
+                vehicle_bound += len(spot.vehicle_bound)
+
+        return spots_bound, vehicle_bound
+
+    @staticmethod
+    def get_parking_spaces_with_type(company_id, env):
+        search_domain = [('company_id', '=', company_id)]
+        spaces_cnt_by_type = env['parking.space'].sudo()._read_group(search_domain,
+                                                                     ['parking_space_type_id'], ['vehicle_id'])
+        return spaces_cnt_by_type

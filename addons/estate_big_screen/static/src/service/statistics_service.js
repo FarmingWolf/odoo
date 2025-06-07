@@ -178,7 +178,42 @@ export const companyName4BigScreenSvc = {
     },
 };
 
+export const parkingSpacesVehiclesSvc = {
+    dependencies: ["rpc"],
+    start(env, { rpc }) {
+        const parkingSpacesVehicles = reactive({
+            isReady: false,
+            vehicles_cnt: 0,
+            spaces_cnt: 0,
+            spaces_reserved_cnt: 0,
+            spaces_reserved_bound_cnt: 0,
+            spaces_reserved_vehicles_bound: 0,
+        });
+
+        async function loadParkingSpacesVehicles() {
+            try {
+                const vehicles_today = await rpc("/estate_big_screen/get_park_vehicles_registered_today");
+                const parking_spaces_vehicles = await rpc("/estate_big_screen/get_parking_spaces");
+                parkingSpacesVehicles.vehicles_cnt = vehicles_today ? vehicles_today : 0;
+                parkingSpacesVehicles.spaces_cnt = parking_spaces_vehicles ? parking_spaces_vehicles['parking_spaces_cnt'] : 0;
+                parkingSpacesVehicles.spaces_reserved_cnt = parking_spaces_vehicles ? parking_spaces_vehicles['parking_spaces_reserved_cnt'] : 0;
+                parkingSpacesVehicles.spaces_reserved_bound_cnt = parking_spaces_vehicles ? parking_spaces_vehicles['parking_spaces_reserved_bound_cnt'] : 0;
+                parkingSpacesVehicles.spaces_reserved_vehicles_bound = parking_spaces_vehicles ? parking_spaces_vehicles['parking_spaces_reserved_bound_vehicles_cnt'] : 0;
+                parkingSpacesVehicles.isReady = true;
+            } catch (error) {
+                console.error("Failed to load company_nm_4_big_screen", error);
+
+            }
+        }
+
+        loadParkingSpacesVehicles().then(r => {});
+        return parkingSpacesVehicles;
+
+    }
+}
+
 registry.category("services").add("estate_big_screen.statistics", statisticsService);
 registry.category("services").add("estate_big_screen.lineChartDataService", lineChartDataService);
 registry.category("services").add("estate_big_screen.outOfRentProperties", outOfRentProperties);
 registry.category("services").add("estate_big_screen.companyName4BigScreenSvc", companyName4BigScreenSvc);
+registry.category("services").add("estate_big_screen.parkingSpacesVehiclesSvc", parkingSpacesVehiclesSvc);

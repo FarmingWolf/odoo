@@ -117,3 +117,29 @@ class EstateBigScreen(http.Controller):
 
         _logger.info(f"company_nm={company_nm}")
         return {company_id: company_nm}
+
+    @http.route('/estate_big_screen/get_park_vehicles_registered_today', type='json', auth='user')
+    def get_park_vehicles_registered_today(self):
+
+        vehicles_cnt = request.env['park.vehicle.assignation.log'].get_vehicles_cnt(request.env.user.company_id.id,
+                                                                                    request.env)
+        company_vehicle_cnt = 0
+        for vehicle_cnt in vehicles_cnt:
+            if request.env.user.company_id.id == vehicle_cnt[0].id:
+                company_vehicle_cnt = vehicle_cnt[1]
+                break
+        return company_vehicle_cnt
+
+    @http.route('/estate_big_screen/get_parking_spaces', type='json', auth='user')
+    def get_parking_spaces(self):
+
+        spaces = request.env['parking.space'].get_parking_space_cnt(request.env.user.company_id.id, request.env, False)
+        spaces_reserved = request.env['parking.space'].get_parking_space_cnt(request.env.user.company_id.id,
+                                                                             request.env, True)
+        spots_bound, vehicle_bound = request.env['parking.space'].get_parking_space_reserved_bound(request.env.user.company_id.id,
+                                                                                                   request.env)
+
+        return {"parking_spaces_cnt": spaces,
+                "parking_spaces_reserved_cnt": spaces_reserved,
+                "parking_spaces_reserved_bound_cnt": spots_bound,
+                "parking_spaces_reserved_bound_vehicles_cnt": vehicle_bound}

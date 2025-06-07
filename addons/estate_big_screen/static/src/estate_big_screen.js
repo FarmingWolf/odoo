@@ -106,6 +106,9 @@ class EstateBigScreen extends Component {
         // 公司名称
         this.companyNM4BigScreen = useState(useService("estate_big_screen.companyName4BigScreenSvc"));
 
+        // 车位车辆信息
+        this.parking_spaces_vehicles = useState(useService("estate_big_screen.parkingSpacesVehiclesSvc"));
+
         this.userService = useService("user");
         this.showPropertyDashboard = false;
 
