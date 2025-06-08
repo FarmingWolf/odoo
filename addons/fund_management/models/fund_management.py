@@ -786,7 +786,12 @@ class FundManagement(models.Model):
                 if this_employee_job_id == record.stage.op_job_id.id or \
                         self._get_employee().job_id.name == record.stage.op_job_id.name:
                     _logger.info(f"record.stage={record.stage.name}不要求部门，只要求职位角色")
-                    return True, record.stage
+                    # 不要求部门时，为防止越级提前审批，需要保障提交人与审批人在同一部门，或者提交人所在部门的管理者是审批人
+                    if (record.employee_id.department_id.id == this_employee_dep_id or
+                            record.employee_id.department_id.manager_id.id == self.env.user.employee_id.id):
+                        return True, record.stage
+                    _logger.info(f"但是当前用户部门:{this_employee_dep_id}不同于提交者部门:{record.employee_id.department_id.id}，"
+                                 f"当前用户employee:{self.env.user.employee_id.id}也不是其部门管理员。")
                 else:
                     _logger.info(f"职位不一致:this_employee_job_id={this_employee_job_id}"
                                  f"name={self._get_employee().job_id.name};"
@@ -821,7 +826,12 @@ class FundManagement(models.Model):
                             if same_level_stage.op_job_id.id == this_employee_job_id or \
                                     same_level_stage.op_job_id.name == self._get_employee().job_id.name:
                                 _logger.info(f"同级别节点：{same_level_stage.op_job_id.name}仅要求职位角色")
-                                return True, same_level_stage
+                                # 不要求部门只要求角色时，为防止高级别跨级提前审批
+                                if (record.employee_id.department_id.id == this_employee_dep_id or
+                                        record.employee_id.department_id.manager_id.id == self.env.user.employee_id.id):
+                                    return True, same_level_stage
+                                _logger.info(f"但是当前用户部门:{this_employee_dep_id}不同于提交者部门:{record.employee_id.department_id.id}，"
+                                             f"当前用户employee:{self.env.user.employee_id.id}也不是其部门管理员。")
                     else:
                         if same_level_stage.op_department_id.id == this_employee_dep_id:
                             if not same_level_stage.op_job_id:
