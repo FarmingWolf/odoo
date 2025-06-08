@@ -158,15 +158,15 @@
                                 </div>
                             </div>
 
-                            <div class="big-item chartBackgroundImgDivContainer" style="top: 240px !important; left: 647px !important;" >
+                            <div class="big-item chartBackgroundImgDivContainer" style="top: 240px !important; left: 595px !important;" >
                                 <div class="item-content chartBackgroundImgDiv">
                                     <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>
                                 </div>
                             </div>
-                            <div class="big-item chartFrontContentDivContainer" style="top: 270px !important; left: 670px !important; z-index: 1110;" >
+                            <div class="big-item chartFrontContentDivContainer" style="top: 270px !important; left: 625px !important; z-index: 1110;" >
                                 <div class="item-content chartBackgroundImgDiv">
                                     <div class="d-flex justify-content-center only-text-title">
-                                        <span>车位·车辆</span>
+                                        <span>车位</span>
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center only-text">
                                         <div><span>车位总数：</span></div>
@@ -177,38 +177,36 @@
                                         <div class="float-end"><t t-esc="parking_spaces_vehicles.spaces_reserved_cnt"/></div>
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center only-text">
-                                        <div><span>在册车辆：</span></div>
-                                        <div class="float-end"><t t-esc="parking_spaces_vehicles.vehicles_cnt"/></div>
+                                        <div><span>其他车位：</span></div>
+                                        <div class="float-end"><t t-esc="parking_spaces_vehicles.spaces_cnt - parking_spaces_vehicles.spaces_reserved_cnt"/></div>
                                     </div>
                                 </div>
                             </div>
 
-    <!--                        <div class="big-item chartBackgroundImgDivContainer" style="top: 430px !important; left: 340px !important;" >-->
-    <!--                            <div class="item-content chartBackgroundImgDiv">-->
-    <!--                                <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>-->
-    <!--&lt;!&ndash;                                <div class="d-flex justify-content-center only-text-title">&ndash;&gt;-->
-    <!--&lt;!&ndash;                                    <span>间数(套)</span>&ndash;&gt;-->
-    <!--&lt;!&ndash;                                </div>&ndash;&gt;-->
-    <!--&lt;!&ndash;                                <t t-if="statistics.conventional_cnt">&ndash;&gt;-->
-    <!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
-    <!--&lt;!&ndash;                                        <div><span>房屋总间数：</span></div>&ndash;&gt;-->
-    <!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="statistics.conventional_cnt.toLocaleString()"/></div>&ndash;&gt;-->
-    <!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
-    <!--&lt;!&ndash;                                </t>&ndash;&gt;-->
-    <!--&lt;!&ndash;                                <t t-if="statistics.conventional_cnt_on_rent">&ndash;&gt;-->
-    <!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
-    <!--&lt;!&ndash;                                        <div><span>在租总间数：</span></div>&ndash;&gt;-->
-    <!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="statistics.conventional_cnt_on_rent.toLocaleString()"/></div>&ndash;&gt;-->
-    <!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
-    <!--&lt;!&ndash;                                </t>&ndash;&gt;-->
-    <!--&lt;!&ndash;                                <t t-if="statistics.conventional_cnt and statistics.conventional_cnt_on_rent">&ndash;&gt;-->
-    <!--&lt;!&ndash;                                    <div class="d-flex justify-content-between align-items-center only-text">&ndash;&gt;-->
-    <!--&lt;!&ndash;                                        <div><span>空置总间数：</span></div>&ndash;&gt;-->
-    <!--&lt;!&ndash;                                        <div class="float-end"><t t-esc="(statistics.conventional_cnt - statistics.conventional_cnt_on_rent).toLocaleString()"/></div>&ndash;&gt;-->
-    <!--&lt;!&ndash;                                    </div>&ndash;&gt;-->
-    <!--&lt;!&ndash;                                </t>&ndash;&gt;-->
-    <!--                            </div>-->
-    <!--                        </div>-->
+                            <div class="big-item chartBackgroundImgDivContainer" style="top: 240px !important; left: 1167px !important;" >
+                                <div class="item-content chartBackgroundImgDiv">
+                                    <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>
+                                </div>
+                            </div>
+                            <div class="big-item chartFrontContentDivContainer" style="top: 270px !important; left: 1190px !important; z-index: 1110;" >
+                                <div class="item-content chartBackgroundImgDiv">
+                                    <div class="d-flex justify-content-center only-text-title">
+                                        <span>车辆</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center only-text">
+                                        <div><span>注册车辆：</span></div>
+                                        <div class="float-end"><t t-esc="parking_spaces_vehicles.vehicles_cnt"/></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center only-text">
+                                        <div><span>长租车辆：</span></div>
+                                        <div class="float-end"><t t-esc="parking_spaces_vehicles.vehicles_long_term_cnt"/></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center only-text">
+                                        <div><span>短租车辆：</span></div>
+                                        <div class="float-end"><t t-esc="parking_spaces_vehicles.vehicles_short_term_cnt"/></div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="big-item chartTitleDiv" style="z-index: 1011; top: 697px !important;">
                                 <div class="item-content chartTitle">

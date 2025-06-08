@@ -143,3 +143,14 @@ class EstateBigScreen(http.Controller):
                 "parking_spaces_reserved_cnt": spaces_reserved,
                 "parking_spaces_reserved_bound_cnt": spots_bound,
                 "parking_spaces_reserved_bound_vehicles_cnt": vehicle_bound}
+
+    @http.route('/estate_big_screen/get_long_term_vehicle_cnt', type='json', auth='user')
+    def get_long_term_vehicle_cnt(self, long_term):
+
+        if not long_term:
+            long_term = int(request.env['ir.config_parameter'].sudo().get_param('long_term_days'))
+
+        vehicles_cnt_with_term = (request.env['park.vehicle.assignation.log'].
+                                  get_vehicles_cnt_by_term(request.env.user.company_id.id, request.env, long_term))
+
+        return vehicles_cnt_with_term

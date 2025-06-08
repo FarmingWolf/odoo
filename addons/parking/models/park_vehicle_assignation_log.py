@@ -62,3 +62,21 @@ class ParkVehicleAssignationLog(models.Model):
                                                                                          ['vehicle_id:count_distinct'])
 
         return vehicles_cnt_by_company
+
+    @staticmethod
+    def get_vehicles_cnt_by_term(company_id, env, long_term=1):
+        s_domain = [('date_start', '<=', date.today()), ('date_end', '>=', date.today()),
+                    ('company_id', '=', company_id)]
+
+        long_term_vehicles = env['park.vehicle.assignation.log'].sudo().search(s_domain)
+        vehicles_cnt = len(long_term_vehicles)
+        long_term_cnt = 0
+        for v in long_term_vehicles:
+            if (v.date_end - v.date_start).days >= long_term:
+                long_term_cnt += 1
+
+        return {
+            "vehicles_cnt": vehicles_cnt,
+            "long_term_cnt": long_term_cnt,
+            "short_term_cnt": vehicles_cnt - long_term_cnt
+        }

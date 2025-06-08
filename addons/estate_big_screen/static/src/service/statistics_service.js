@@ -2,6 +2,7 @@
 
 import {registry} from "@web/core/registry";
 import {reactive} from "@odoo/owl";
+import {jsonrpc} from "../../../../web/static/src/core/network/rpc_service";
 
 export class StatisticsService {
 
@@ -184,6 +185,8 @@ export const parkingSpacesVehiclesSvc = {
         const parkingSpacesVehicles = reactive({
             isReady: false,
             vehicles_cnt: 0,
+            vehicles_long_term_cnt: 0,
+            vehicles_short_term_cnt: 0,
             spaces_cnt: 0,
             spaces_reserved_cnt: 0,
             spaces_reserved_bound_cnt: 0,
@@ -192,9 +195,12 @@ export const parkingSpacesVehiclesSvc = {
 
         async function loadParkingSpacesVehicles() {
             try {
-                const vehicles_today = await rpc("/estate_big_screen/get_park_vehicles_registered_today");
+                // const vehicles_today = await rpc("/estate_big_screen/get_park_vehicles_registered_today");
                 const parking_spaces_vehicles = await rpc("/estate_big_screen/get_parking_spaces");
-                parkingSpacesVehicles.vehicles_cnt = vehicles_today ? vehicles_today : 0;
+                const vehicles_with_term = await jsonrpc("/estate_big_screen/get_long_term_vehicle_cnt", {long_term: 0});
+                parkingSpacesVehicles.vehicles_cnt = vehicles_with_term ? vehicles_with_term['vehicles_cnt'] : 0;
+                parkingSpacesVehicles.vehicles_long_term_cnt = vehicles_with_term ? vehicles_with_term['long_term_cnt'] : 0;
+                parkingSpacesVehicles.vehicles_short_term_cnt = vehicles_with_term ? vehicles_with_term['short_term_cnt'] : 0;
                 parkingSpacesVehicles.spaces_cnt = parking_spaces_vehicles ? parking_spaces_vehicles['parking_spaces_cnt'] : 0;
                 parkingSpacesVehicles.spaces_reserved_cnt = parking_spaces_vehicles ? parking_spaces_vehicles['parking_spaces_reserved_cnt'] : 0;
                 parkingSpacesVehicles.spaces_reserved_bound_cnt = parking_spaces_vehicles ? parking_spaces_vehicles['parking_spaces_reserved_bound_cnt'] : 0;
