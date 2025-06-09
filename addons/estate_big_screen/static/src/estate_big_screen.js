@@ -25,12 +25,6 @@ class EstateBigScreen extends Component {
         this.display = {
             controlPanel: false
         };
-        this.checkFullscreenState();
-
-        document.addEventListener('fullscreenchange', this.checkFullscreenState.bind(this));
-        document.addEventListener('webkitfullscreenchange', this.checkFullscreenState.bind(this));
-        document.addEventListener('msfullscreenchange', this.checkFullscreenState.bind(this));
-
         onMounted(() => {
             console.log("Component onMounted, statistics state:", {
                 isReady: this.statistics.isReady,
@@ -72,31 +66,7 @@ class EstateBigScreen extends Component {
                 }, {passive: false});
             }
         });
-        onMounted(() => {
-            const handleFullscreenChange = () => {
-                this.checkFullscreenState();
-                // 全屏切换时重新检查数据状态
-                if (this.lineChartStatistics.isReady) {
-                    this.state.showLineCharts = true;
-                }
-            };
-
-            document.addEventListener('fullscreenchange', handleFullscreenChange);
-            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-            document.addEventListener('msfullscreenchange', handleFullscreenChange);
-
-        });
-        onWillUnmount(() => {
-            // 离开页面时恢复导航栏
-            document.querySelector('.o_main_navbar')?.classList.remove('d-none');
-            document.querySelector('.o_sub_menu')?.classList.remove('d-none');
-        });
-
-        onWillUnmount(() => {
-            document.removeEventListener('fullscreenchange', handleFullscreenChange);
-            document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-            document.removeEventListener('msfullscreenchange', handleFullscreenChange);
-        });
+        this._doughnutCache = useState({})
         this.statistics = useState(useService("estate_big_screen.statistics"));
         this.lineChartStatistics = useState(useService("estate_big_screen.lineChartDataService"));
 
@@ -126,6 +96,49 @@ class EstateBigScreen extends Component {
                 this.lineChartStatistics.rent_ratio_lst?.length > 0 &&
                 this.lineChartStatistics.rental_received_lst?.length > 0 &&
                 this.lineChartStatistics.rental_receivable_lst?.length > 0;
+        });
+        this.checkFullscreenState();
+
+        document.addEventListener('fullscreenchange', this.checkFullscreenState.bind(this));
+        document.addEventListener('webkitfullscreenchange', this.checkFullscreenState.bind(this));
+        document.addEventListener('msfullscreenchange', this.checkFullscreenState.bind(this));
+
+        onMounted(() => {
+            const checkFullscreenState = () => {
+                this.state.isFullscreen = !!(
+                    document.fullscreenElement ||
+                    document.webkitFullscreenElement ||
+                    document.msFullscreenElement
+                );
+                if (this.lineChartStatistics.isReady) {
+                    this.state.showLineCharts = true;
+                }
+            };
+            document.addEventListener('fullscreenchange', checkFullscreenState);
+            document.addEventListener('webkitfullscreenchange', checkFullscreenState);
+            document.addEventListener('msfullscreenchange', checkFullscreenState);
+
+        });
+        onWillUnmount(() => {
+            // 离开页面时恢复导航栏
+            document.querySelector('.o_main_navbar')?.classList.remove('d-none');
+            document.querySelector('.o_sub_menu')?.classList.remove('d-none');
+        });
+
+        onWillUnmount(() => {
+            const checkFullscreenState = () => {
+                this.state.isFullscreen = !!(
+                    document.fullscreenElement ||
+                    document.webkitFullscreenElement ||
+                    document.msFullscreenElement
+                );
+                if (this.lineChartStatistics.isReady) {
+                    this.state.showLineCharts = true;
+                }
+            };
+            document.removeEventListener('fullscreenchange', checkFullscreenState);
+            document.removeEventListener('webkitfullscreenchange', checkFullscreenState);
+            document.removeEventListener('msfullscreenchange', checkFullscreenState);
         });
     }
 
@@ -252,6 +265,9 @@ class EstateBigScreen extends Component {
             document.webkitFullscreenElement ||
             document.msFullscreenElement
         );
+        if (this.lineChartStatistics.isReady) {
+            this.state.showLineCharts = true;
+        }
     }
 
     toggleFullscreen() {
