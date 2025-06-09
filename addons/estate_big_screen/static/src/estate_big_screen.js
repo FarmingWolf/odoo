@@ -19,53 +19,13 @@ class EstateBigScreen extends Component {
 
         this.state = useState({
             showLineCharts: false,
-            isFullscreen: false
+            isFullscreen: false,
+            initialized: false
         });
 
         this.display = {
             controlPanel: false
         };
-        onMounted(() => {
-            console.log("Component onMounted, statistics state:", {
-                isReady: this.statistics.isReady,
-                data: this.statistics.pie_chart_ratio_conventional_area_quantity
-            });
-            // 默认打开全屏模式
-            this.enterFullscreen();
-        });
-        onMounted(() => {
-            // 进入页面时隐藏导航栏
-            document.querySelector('.o_main_navbar')?.classList.add('d-none');
-            document.querySelector('.o_sub_menu')?.classList.add('d-none');
-            // 新增移动端触摸控制逻辑
-            if (window.innerWidth <= 768) {
-                const overlay = document.querySelector('.mobile-touch-overlay');
-                const scrollContainer = document.querySelector('.dv-full-screen-container');
-                let startX, startY;
-
-                overlay?.addEventListener('touchstart', function(e) {
-                    startX = e.touches[0].clientX;
-                    startY = e.touches[0].clientY;
-                }, {passive: true});
-
-                overlay?.addEventListener('touchmove', function(e) {
-                    if (e.target.closest('.mobile-back-button')) return;
-
-                    if (!startX || !startY) return;
-
-                    const x = e.touches[0].clientX;
-                    const y = e.touches[0].clientY;
-
-                    // 同时处理水平和垂直滚动
-                    scrollContainer.scrollLeft += startX - x;
-                    scrollContainer.scrollTop += startY - y;
-
-                    startX = x;
-                    startY = y;
-                    e.preventDefault();
-                }, {passive: false});
-            }
-        });
         this._doughnutCache = useState({})
         this.statistics = useState(useService("estate_big_screen.statistics"));
         this.lineChartStatistics = useState(useService("estate_big_screen.lineChartDataService"));
@@ -87,59 +47,69 @@ class EstateBigScreen extends Component {
         });
 
         useEffect(() => {
-            // if (this.lineChartStatistics.isReady) {
-            //     this.state.showLineCharts = true;
-            // }
-            // 增强检查
-            this.state.showLineCharts = this.lineChartStatistics.isReady &&
-                this.lineChartStatistics.average_price_lst?.length > 0 &&
-                this.lineChartStatistics.rent_ratio_lst?.length > 0 &&
-                this.lineChartStatistics.rental_received_lst?.length > 0 &&
-                this.lineChartStatistics.rental_receivable_lst?.length > 0;
-        });
-        this.checkFullscreenState();
+            if (!this.state.initialized && this.lineChartStatistics.isReady) {
+                this.state.showLineCharts = this.lineChartStatistics.average_price_lst?.length > 0 &&
+                    this.lineChartStatistics.rent_ratio_lst?.length > 0 &&
+                    this.lineChartStatistics.rental_received_lst?.length > 0 &&
+                    this.lineChartStatistics.rental_receivable_lst?.length > 0;
 
-        document.addEventListener('fullscreenchange', this.checkFullscreenState.bind(this));
-        document.addEventListener('webkitfullscreenchange', this.checkFullscreenState.bind(this));
-        document.addEventListener('msfullscreenchange', this.checkFullscreenState.bind(this));
-
-        onMounted(() => {
-            const checkFullscreenState = () => {
-                this.state.isFullscreen = !!(
-                    document.fullscreenElement ||
-                    document.webkitFullscreenElement ||
-                    document.msFullscreenElement
-                );
-                if (this.lineChartStatistics.isReady) {
-                    this.state.showLineCharts = true;
+                if (this.state.showLineCharts) {
+                    this.state.initialized = true;
                 }
-            };
-            document.addEventListener('fullscreenchange', checkFullscreenState);
-            document.addEventListener('webkitfullscreenchange', checkFullscreenState);
-            document.addEventListener('msfullscreenchange', checkFullscreenState);
-
+            }
         });
+
+        onMounted(async () => {
+            console.log("Component onMounted, statistics state:", {
+                isReady: this.statistics.isReady,
+                data: this.statistics.pie_chart_ratio_conventional_area_quantity
+            });
+            this.enterFullscreen();
+            // 进入页面时隐藏导航栏
+            document.querySelector('.o_main_navbar')?.classList.add('d-none');
+            document.querySelector('.o_sub_menu')?.classList.add('d-none');
+            // 新增移动端触摸控制逻辑
+            if (window.innerWidth <= 768) {
+                this.setupMobileTouchControls();
+            }
+        });
+
         onWillUnmount(() => {
             // 离开页面时恢复导航栏
             document.querySelector('.o_main_navbar')?.classList.remove('d-none');
             document.querySelector('.o_sub_menu')?.classList.remove('d-none');
-        });
 
-        onWillUnmount(() => {
-            const checkFullscreenState = () => {
-                this.state.isFullscreen = !!(
-                    document.fullscreenElement ||
-                    document.webkitFullscreenElement ||
-                    document.msFullscreenElement
-                );
-                if (this.lineChartStatistics.isReady) {
-                    this.state.showLineCharts = true;
-                }
-            };
-            document.removeEventListener('fullscreenchange', checkFullscreenState);
-            document.removeEventListener('webkitfullscreenchange', checkFullscreenState);
-            document.removeEventListener('msfullscreenchange', checkFullscreenState);
+            document.removeEventListener('fullscreenchange', this.checkFullscreenState);
+            document.removeEventListener('webkitfullscreenchange', this.checkFullscreenState);
+            document.removeEventListener('msfullscreenchange', this.checkFullscreenState);
         });
+    }
+    setupMobileTouchControls() {
+        const overlay = document.querySelector('.mobile-touch-overlay');
+        const scrollContainer = document.querySelector('.dv-full-screen-container');
+        let startX, startY;
+
+        overlay?.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, {passive: true});
+
+        overlay?.addEventListener('touchmove', function(e) {
+            if (e.target.closest('.mobile-back-button')) return;
+
+            if (!startX || !startY) return;
+
+            const x = e.touches[0].clientX;
+            const y = e.touches[0].clientY;
+
+            // 同时处理水平和垂直滚动
+            scrollContainer.scrollLeft += startX - x;
+            scrollContainer.scrollTop += startY - y;
+
+            startX = x;
+            startY = y;
+            e.preventDefault();
+        }, {passive: false});
     }
 
     // 租金单价
@@ -265,9 +235,6 @@ class EstateBigScreen extends Component {
             document.webkitFullscreenElement ||
             document.msFullscreenElement
         );
-        if (this.lineChartStatistics.isReady) {
-            this.state.showLineCharts = true;
-        }
     }
 
     toggleFullscreen() {
@@ -276,13 +243,6 @@ class EstateBigScreen extends Component {
         } else {
             this.enterFullscreen();
         }
-        setTimeout(() => {
-            this.state.showLineCharts = this.lineChartStatistics.isReady &&
-                this.lineChartStatistics.average_price_lst?.length > 0 &&
-                this.lineChartStatistics.rent_ratio_lst?.length > 0 &&
-                this.lineChartStatistics.rental_received_lst?.length > 0 &&
-                this.lineChartStatistics.rental_receivable_lst?.length > 0;
-        }, 300);
     }
 
     enterFullscreen() {
@@ -299,7 +259,7 @@ class EstateBigScreen extends Component {
     }
 
     exitFullscreen() {
-        if (this.state.isFullscreen) {
+        if (document.isFullscreen) {
             document.exitFullscreen();
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
