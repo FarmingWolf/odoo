@@ -59,6 +59,8 @@
                                     <field name="name"/>
                                     <field name="expected_price"/>
 <!--                                    <field name="property_offer_count"/>-->
+                                    <field name="rent_area" string="面积（㎡）" sum="总面积（㎡）"/>
+                                    <field name="building_area" string="建筑面积（㎡）" sum="总建筑面积（㎡）" optional="hide"/>
                                     <field name="state"/>
                                 </tree>
                             </field>

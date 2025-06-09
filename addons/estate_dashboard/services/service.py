@@ -6,6 +6,7 @@ _logger = logging.getLogger(__name__)
 
 def compute_company_statistics(latest_property_details):
     estate_property_quantity = 0
+    property_building_area = 0.0
     estate_property_lease_quantity = 0
     estate_property_area_quantity = 0.0
     estate_property_area_lease_quantity = 0.0
@@ -136,6 +137,7 @@ def compute_company_statistics(latest_property_details):
 
     for record_detail in latest_property_details:
         estate_property_quantity += 1
+        property_building_area += float(record_detail.property_building_area)
         estate_property_area_quantity += float(record_detail.property_rent_area)
         # 常规计租面积与非常规计租面积（林地等，在资产类型中有设置计租与否）
         if (not record_detail.property_id.property_type_id) or \
@@ -292,6 +294,7 @@ def compute_company_statistics(latest_property_details):
 
     return {
         'estate_property_quantity': estate_property_quantity,
+        'property_building_area': round(property_building_area, 2),
         'estate_property_area_quantity': round(estate_property_area_quantity, 2),
         'estate_property_lease_quantity': estate_property_lease_quantity,
         'estate_property_area_lease_quantity': round(estate_property_area_lease_quantity, 2),

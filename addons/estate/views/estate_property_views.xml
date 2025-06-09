@@ -34,8 +34,9 @@
                 <field name="state" />
                 <field name="property_type_id" string="资产类型"/>
                 <field name="rent_area" string="面积（㎡）" sum="总面积（㎡）"/>
-                <field name="expected_price" string="期待价格（元/天/㎡）"/>
-                <field name="selling_price" string="实际价格（元/天/㎡）"/>
+                <field name="building_area" string="建筑面积（㎡）" sum="总建筑面积（㎡）" optional="hide"/>
+                <field name="expected_price" string="期待价格（元/天/㎡）" optional="hide"/>
+                <field name="selling_price" string="实际价格（元/天/㎡）" optional="hide"/>
                 <field name="building_no"/>
                 <field name="floor"/>
                 <field name="room_no"/>
@@ -59,6 +60,7 @@
                 <field name="last_rent_date_e"/>
                 <field name="date_availability"/>
                 <field name="rent_area" string="面积（㎡）" sum="总面积（㎡）"/>
+                <field name="building_area" string="建筑面积（㎡）" sum="总建筑面积（㎡）" optional="hide"/>
                 <field name="property_type_id" string="资产类型"/>
             </tree>
         </field>

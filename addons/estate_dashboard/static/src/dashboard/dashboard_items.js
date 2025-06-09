@@ -15,6 +15,15 @@ const items = [
         })
     },
     {
+        id: "estate_property_building_area",
+        description: "建筑面积（㎡）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "建筑面积（㎡）",
+            value: data.property_building_area,
+        })
+    },
+    {
         id: "estate_conventional_area_quantity",
         description: "房屋计租总面积（㎡）",
         Component: NumberCard,
