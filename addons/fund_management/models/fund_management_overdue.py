@@ -101,8 +101,8 @@ class FundManagementOverdue(models.Model):
                 # 基本原则是管控住平级企业间数据隔离
                 # 如果有部门要求，那么该条件自然带入到搜索条件中，所以这里看无部门要求的stage
                 if not record.stage.op_department_id:
-                    # 无部门要求指的是：经办人与审批人在同一条部门路径上
-                    if not tgt_employee.department_id.complete_name in record.employee_id.department_id.complete_name:
+                    # 无部门要求指的是：经办人与审批人在同一条部门路径上，而审批人必须得有部门，否则不符常规
+                    if tgt_employee.department_id.complete_name and (tgt_employee.department_id.complete_name not in record.employee_id.department_id.complete_name):
                         continue
 
                     if record.stage.op_job_id:

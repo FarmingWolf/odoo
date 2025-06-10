@@ -22,7 +22,7 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">fund_management.contract_payment_application</field>
         <field name="report_file">fund_management.contract_payment_application</field>
-        <field name="binding_model_id" ref="fund_management.model_fund_management"/>
+        <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>
         <field name="print_report_name">'合同资金支付申请单'</field>
         <field name="paperformat_id" ref="paperformat_fund_management_application"/>
@@ -34,7 +34,7 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">fund_management.no_contract_payment_application</field>
         <field name="report_file">fund_management.no_contract_payment_application</field>
-        <field name="binding_model_id" ref="fund_management.model_fund_management"/>
+        <field name="binding_model_id" eval="False"/>
         <field name="binding_type">report</field>
         <field name="print_report_name">'无合同资金支付申请单'</field>
         <field name="paperformat_id" ref="paperformat_fund_management_application"/>

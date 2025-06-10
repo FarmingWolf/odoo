@@ -127,6 +127,24 @@ class FundManagementApprovalStage(models.Model):
         #     if not self.pipe_end:  # 貌似来自write的时候，self.search并没有找到刚添加的数据
         #         raise ValidationError(f"最后阶段必须设置结束标志位：{last_name}(序号:{last_sequence})")
 
+    def _check_op_job_id(self):
+        """
+        如果本节点不要求部门，那么本节点要求的职位名称不能和其他不要求部门的节点的职位名称相同
+        """
+        for record in self:
+            if record.op_department_id:
+                continue
+
+            if record.op_job_id:
+                domain = [('company_id', '=', self.env.user.company_id.id), ('category_id', '=', record.category_id.id),
+                          ('op_job_id.name', '=', record.op_job_id.name), ('op_department_id', '=', False),
+                          ('id', '!=', record.id)]
+                tgt_cnt = self.search_count(domain)
+                if tgt_cnt > 0:
+                    raise ValidationError(f"如果本节点不要求部门，那么本节点要求的职位名称不能和其他不要求部门的节点的职位名称相同。"
+                                          f"请联系管理员修改相应职位的名称，以确保不同部门的职位名称在文字上有区别，"
+                                          f"否则在没有部门要求的情况下，相同的职位名称在不同节点将引起流程混乱。")
+
     def copy(self, default=None):
 
         if default is None:
@@ -156,12 +174,14 @@ class FundManagementApprovalStage(models.Model):
 
         record = super().create(vals_list)
         record._check_pipe_end("from_create")
+        record._check_op_job_id()
         return record
 
     @api.model
     def write(self, vals):
         res = super().write(vals)
         self._check_pipe_end("from_write")
+        self._check_op_job_id()
 
         for record in self:
             if record.sequence > 0:

@@ -790,6 +790,12 @@ class FundManagement(models.Model):
                     if (record.employee_id.department_id.id == this_employee_dep_id or
                             record.employee_id.department_id.manager_id.id == self.env.user.employee_id.id):
                         return True, record.stage
+
+                    # 此外，由于发起者不同而导致同一category的流程由不同审批者处理的情况，需判断发起人与审批人是否在同一条部门路径上
+                    # 这种情况下的避免跨级审批的逻辑校验由不同节点的审批者的job_id不同来实现
+                    if (self._get_employee().department_id.complete_name and
+                            self._get_employee().department_id.complete_name in record.employee_id.department_id.complete_name):
+                        return True, record.stage
                     _logger.info(f"但是当前用户部门:{this_employee_dep_id}不同于提交者部门:{record.employee_id.department_id.id}，"
                                  f"当前用户employee:{self.env.user.employee_id.id}也不是其部门管理员。")
                 else:
@@ -829,6 +835,11 @@ class FundManagement(models.Model):
                                 # 不要求部门只要求角色时，为防止高级别跨级提前审批
                                 if (record.employee_id.department_id.id == this_employee_dep_id or
                                         record.employee_id.department_id.manager_id.id == self.env.user.employee_id.id):
+                                    return True, same_level_stage
+                                # 此外，由于发起者不同而导致同一category的流程由不同审批者处理的情况，需判断发起人与审批人是否在同一条部门路径上
+                                # 这种情况下的避免跨级审批的逻辑校验由不同节点的审批者的job_id不同来实现
+                                if (self._get_employee().department_id.complete_name and
+                                        self._get_employee().department_id.complete_name in record.employee_id.department_id.complete_name):
                                     return True, same_level_stage
                                 _logger.info(f"但是当前用户部门:{this_employee_dep_id}不同于提交者部门:{record.employee_id.department_id.id}，"
                                              f"当前用户employee:{self.env.user.employee_id.id}也不是其部门管理员。")

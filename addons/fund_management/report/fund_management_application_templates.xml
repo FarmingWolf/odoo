@@ -192,7 +192,7 @@
                                         </div>
                                         <div class="grid-item-left"
                                              style="column-span: 1; width: 20%;padding-top: 10px;text-align: left; padding-left: 0;">
-                                            <span><t t-esc="doc.total_amount_currency or '　'" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
+                                            <span><t t-esc="doc.total_amount_currency or 0" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
                                             </span>
                                         </div>
 
@@ -251,7 +251,7 @@
                                         <div class="grid-item-left"
                                              style="column-span: 1; width: 20%;padding-top: 15px;text-align: left; padding-left: 0;">
                                             <span>
-                                                <t t-esc="doc.total_hist_include_this or '　'" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
+                                                <t t-esc="doc.total_hist_include_this or 0" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
                                             </span>
                                         </div>
 
@@ -263,7 +263,7 @@
                                         <div class="grid-item-left"
                                              style="column-span: 1; width: 20%;padding-top: 15px;border-right: none;text-align: left; padding-left: 0;">
                                             <span>
-                                                <t t-esc="doc.contract_amount - doc.total_hist_include_this or '　'" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
+                                                <t t-esc="(doc.contract_amount - doc.total_hist_include_this) or 0" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
                                             </span>
                                         </div>
                                     </div>
@@ -597,7 +597,7 @@
                                         </div>
                                         <div class="grid-item-right"
                                              style="column-span: 1; width: 35%;padding-top: 15px;text-align: left; padding-left: 0;">
-                                            <span><t t-esc="doc.total_amount_currency or '　'" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
+                                            <span><t t-esc="doc.total_amount_currency or 0" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
                                             </span>
                                         </div>
                                     </div>
