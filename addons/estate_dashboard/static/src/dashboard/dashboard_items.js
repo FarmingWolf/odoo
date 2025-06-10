@@ -51,6 +51,15 @@ const items = [
         })
     },
     {
+        id: "estate_conventional_area_vacant_quantity",
+        description: "空置房屋面积（㎡）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "空置房屋面积（㎡）",
+            value: data.conventional_area - data.conventional_area_on_rent,
+        })
+    },
+    {
         id: "estate_conventional_price_avg",
         description: "在租房屋平均单价（元/天/㎡）",
         Component: NumberCard,
@@ -96,6 +105,15 @@ const items = [
         })
     },
     {
+        id: "estate_unconventional_area_quantity_other",
+        description: "公共配套等面积（㎡）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "公共配套等面积（㎡）",
+            value: (data.unconventional_area).toFixed(2),
+        })
+    },
+    {
         id: "estate_unconventional_lease_quantity",
         description: "林地等在租地块数量",
         Component: NumberCard,
@@ -111,6 +129,24 @@ const items = [
         props: (data) => ({
             title: "林地等在租面积（亩）",
             value: (data.unconventional_area_on_rent / 666.667).toFixed(2),
+        })
+    },
+    {
+        id: "estate_unconventional_area_lease_quantity_other",
+        description: "公共配套等在租面积（㎡）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "公共配套等在租面积（㎡）",
+            value: (data.unconventional_area_on_rent).toFixed(2),
+        })
+    },
+    {
+        id: "estate_unconventional_area_vacant_quantity_other",
+        description: "公共配套等空置面积（㎡）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "公共配套等空置面积（㎡）",
+            value: (data.unconventional_area - data.unconventional_area_on_rent).toFixed(2),
         })
     },
     {
@@ -151,10 +187,10 @@ const items = [
     },
     {
         id: "estate_property_area_quantity",
-        description: "资产计租总面积（㎡）",
+        description: "资产总面积（㎡）",
         Component: NumberCard,
         props: (data) => ({
-            title: "计租总面积（㎡）",
+            title: "资产总面积（㎡）",
             value: data.estate_property_area_quantity,
         })
     },
@@ -174,6 +210,15 @@ const items = [
         props: (data) => ({
             title: "在租资产面积（㎡）",
             value: data.estate_property_area_lease_quantity,
+        })
+    },
+    {
+        id: "estate_property_area_vacant_quantity",
+        description: "空置资产面积（㎡）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "空置资产面积（㎡）",
+            value: data.estate_property_area_quantity - data.estate_property_area_lease_quantity,
         })
     },
     {
