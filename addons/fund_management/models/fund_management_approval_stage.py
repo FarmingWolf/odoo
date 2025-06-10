@@ -138,7 +138,7 @@ class FundManagementApprovalStage(models.Model):
             if record.op_job_id:
                 domain = [('company_id', '=', self.env.user.company_id.id), ('category_id', '=', record.category_id.id),
                           ('op_job_id.name', '=', record.op_job_id.name), ('op_department_id', '=', False),
-                          ('id', '!=', record.id)]
+                          ('id', '!=', record.id), ('name', '!=', record.name)]
                 tgt_cnt = self.search_count(domain)
                 if tgt_cnt > 0:
                     raise ValidationError(f"如果本节点不要求部门，那么本节点要求的职位名称不能和其他不要求部门的节点的职位名称相同。"
@@ -181,9 +181,9 @@ class FundManagementApprovalStage(models.Model):
     def write(self, vals):
         res = super().write(vals)
         self._check_pipe_end("from_write")
-        self._check_op_job_id()
 
         for record in self:
+            record._check_op_job_id()
             if record.sequence > 0:
                 if not record.pipe_end:
                     if (not record.op_department_id) and (not record.op_job_id):

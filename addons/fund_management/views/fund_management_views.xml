@@ -460,7 +460,8 @@
         <field name="arch" type="xml">
             <search string="Fund">
                 <field string="Fund Management" name="name"
-                       filter_domain="['|', '|', ('employee_id', 'ilike', self), ('name', 'ilike', self), ('category_id', 'ilike', self)]"/>
+                       filter_domain="['|', '|', '|', ('employee_id', 'ilike', self), ('name', 'ilike', self),
+                       ('category_id', 'ilike', self), ('apply_no', 'ilike', self)]"/>
                 <field name="date"/>
                 <field name="employee_id"/>
                 <filter string="My Applications" name="my_fund_management"
