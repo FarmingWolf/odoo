@@ -442,7 +442,7 @@
                                     <t t-if="statistics.conventional_area">
                                         <div class="d-flex flex-column align-items-center only-text">
                                             <div style="font-size: 1.3em !important; font-weight: bold;"><t t-esc="statistics.conventional_area.toLocaleString()"/></div>
-                                            <div><span>资产总面积(㎡)</span></div>
+                                            <div><span>出租总面积(㎡)</span></div>
                                         </div>
                                     </t>
                                 </div>
