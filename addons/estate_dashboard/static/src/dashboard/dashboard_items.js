@@ -5,6 +5,35 @@ import {PieChartCard} from "./pie_chart_card/pie_chart_card";
 import {registry} from "@web/core/registry";
 
 const items = [
+
+    {
+        id: "estate_property_area_quantity",
+        description: "资产总面积（㎡）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "资产总面积（㎡）",
+            value: data.estate_property_area_quantity,
+        })
+    },
+    {
+        id: "estate_property_area_lease_quantity",
+        description: "在租资产面积（㎡）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "在租资产面积（㎡）",
+            value: data.estate_property_area_lease_quantity,
+        })
+    },
+    {
+        id: "estate_property_area_vacant_quantity",
+        description: "空置资产面积（㎡）",
+        Component: NumberCard,
+        props: (data) => ({
+            title: "空置资产面积（㎡）",
+            value: (data.estate_property_area_quantity - data.estate_property_area_lease_quantity).toFixed(2),
+        })
+    },
+
     {
         id: "estate_conventional_quantity",
         description: "房屋间数",
@@ -20,7 +49,7 @@ const items = [
         Component: NumberCard,
         props: (data) => ({
             title: "建筑面积（㎡）",
-            value: data.property_building_area,
+            value: (data.property_building_area).toFixed(2),
         })
     },
     {
@@ -56,7 +85,7 @@ const items = [
         Component: NumberCard,
         props: (data) => ({
             title: "空置房屋面积（㎡）",
-            value: data.conventional_area - data.conventional_area_on_rent,
+            value: (data.conventional_area - data.conventional_area_on_rent).toFixed(2),
         })
     },
     {
@@ -186,39 +215,12 @@ const items = [
         })
     },
     {
-        id: "estate_property_area_quantity",
-        description: "资产总面积（㎡）",
-        Component: NumberCard,
-        props: (data) => ({
-            title: "资产总面积（㎡）",
-            value: data.estate_property_area_quantity,
-        })
-    },
-    {
         id: "estate_property_lease_quantity",
         description: "在租资产数量（房屋+地块）",
         Component: NumberCard,
         props: (data) => ({
             title: "在租资产数量（房屋+地块）",
             value: data.estate_property_lease_quantity,
-        })
-    },
-    {
-        id: "estate_property_area_lease_quantity",
-        description: "在租资产面积（㎡）",
-        Component: NumberCard,
-        props: (data) => ({
-            title: "在租资产面积（㎡）",
-            value: data.estate_property_area_lease_quantity,
-        })
-    },
-    {
-        id: "estate_property_area_vacant_quantity",
-        description: "空置资产面积（㎡）",
-        Component: NumberCard,
-        props: (data) => ({
-            title: "空置资产面积（㎡）",
-            value: data.estate_property_area_quantity - data.estate_property_area_lease_quantity,
         })
     },
     {
