@@ -97,7 +97,8 @@ class EstateProperty(models.Model):
     announced_price = fields.Float(string="报价（元/天/㎡）", default=0.0, tracking=True)
     selling_price = fields.Float(string="实际价格（元/天/㎡）", copy=False, default=0.0, tracking=True)
     bedrooms = fields.Integer(default=0)
-    building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", help="实用面积+花园面积", tracking=True)
+    building_area = fields.Float(default=0.0, string="总建筑面积（㎡）", tracking=True)
+    input_building_area = fields.Boolean(string="建筑面积录入", compute="_compute_input_building_area", store=False)
     living_area = fields.Float(default=0.0, string="使用面积（㎡）", tracking=True)
     unit_building_area = fields.Float(default=0.0, string="套内建筑面积（㎡）", tracking=True)
     unit_living_area = fields.Float(default=0.0, string="套内使用面积（㎡）", tracking=True)
@@ -149,6 +150,20 @@ class EstateProperty(models.Model):
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
     latitude = fields.Float(string="latitude")
     longitude = fields.Float(string="longitude")
+
+    @api.depends("rent_area", "company_id")
+    def _compute_input_building_area(self):
+        tgt_str = self._fields['input_building_area'].string.strip()
+        self_employee = self.env.user.employee_id
+        editable_input = False
+        for record in self:
+            if self_employee:
+                for tag in self.env.user.employee_id.category_ids:
+                    if tgt_str in tag.name:
+                        editable_input = True
+                        break
+
+            record.input_building_area = editable_input
 
     def _get_default_property_type(self):
         default_types = self.env["estate.property.type"].search([('name', 'ilike', '办公')], limit=1)

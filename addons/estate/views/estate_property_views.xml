@@ -143,8 +143,16 @@
                         </group>
                     </group>
                     <group col="2">
-                        <group>
-                            <field name="rent_area" string="面积（㎡）"/>
+                        <group col="1">
+                            <group col="2">
+                                <group>
+                                    <field name="rent_area" string="面积（㎡）"/>
+                                </group>
+                                <group>
+                                    <field name="input_building_area" invisible="1"/>
+                                    <field name="building_area" invisible="not input_building_area"/>
+                                </group>
+                            </group>
                         </group>
                         <group>
                             <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" />
