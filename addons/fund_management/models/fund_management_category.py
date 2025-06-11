@@ -35,6 +35,7 @@ class FundManagementCategory(models.Model):
     overdue_reminder_hours = fields.Float(string="Overdue Reminder Hours Setting", default=72, copy=True)
     sequence = fields.Integer(string="sequence", default=0)
     editable = fields.Boolean(default=lambda self: self._compute_editable(), compute='_compute_editable')
+    fund_management_ids = fields.One2many("fund.management", 'category_id', string="process used")
 
     def _compute_editable(self):
         ret_editable = self.env.user.has_group('fund_management.group_fund_management_manager')

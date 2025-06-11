@@ -27,6 +27,7 @@
                 <field name="amount_min"/>
                 <field name="amount_max"/>
                 <field name="meeting_minute_types" widget="many2many_tags" options="{'color_field': 'color'}" />
+                <field name="fund_management_ids" />
             </tree>
         </field>
     </record>
@@ -71,6 +72,9 @@
                     <notebook>
                         <page string="Approval Stages" invisible="not approval_stages">
                             <field name="approval_stages" readonly="not editable"/>
+                        </page>
+                        <page string="Process Used" invisible="not fund_management_ids" groups="group_fund_management_user">
+                            <field name="fund_management_ids" readonly="1"/>
                         </page>
                     </notebook>
                 </sheet>
