@@ -163,7 +163,7 @@
                                     <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>
                                 </div>
                             </div>
-                            <div class="big-item chartFrontContentDivContainer" style="top: 270px !important; left: 625px !important; z-index: 1110;" >
+                            <div class="big-item chartFrontContentDivContainer" style="top: 260px !important; left: 615px !important; z-index: 1110;" >
                                 <div class="item-content chartBackgroundImgDiv">
                                     <div class="d-flex justify-content-center only-text-title">
                                         <span>车位</span>
@@ -188,7 +188,7 @@
                                     <img src="/estate_big_screen/static/img/number_background.png" width="171" height="178" rotatetype="" rotatetime=""/>
                                 </div>
                             </div>
-                            <div class="big-item chartFrontContentDivContainer" style="top: 270px !important; left: 1190px !important; z-index: 1110;" >
+                            <div class="big-item chartFrontContentDivContainer" style="top: 260px !important; left: 1185px !important; z-index: 1110;" >
                                 <div class="item-content chartBackgroundImgDiv">
                                     <div class="d-flex justify-content-center only-text-title">
                                         <span>车辆</span>
