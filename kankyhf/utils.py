@@ -1,10 +1,11 @@
 import asyncio
 import os
+import sys
 from datetime import datetime, timedelta
 
 import tkinter as tk
-
-import win32file
+if sys.platform == 'win32':
+    import win32file
 from pyzipper import AESZipFile, zipfile, WZ_AES
 
 
@@ -97,9 +98,10 @@ def remove_temp_files(in_out_zip_fld, in_customer_name_info_fn):
 
 def set_file_attributes(in_fn):
     if os.path.exists(in_fn):
-        file_attributes = win32file.GetFileAttributes(in_fn)
-        new_attributes = file_attributes | win32file.FILE_ATTRIBUTE_HIDDEN
-        win32file.SetFileAttributes(in_fn, new_attributes)
+        if sys.platform == 'win32':
+            file_attributes = win32file.GetFileAttributes(in_fn)
+            new_attributes = file_attributes | win32file.FILE_ATTRIBUTE_HIDDEN
+            win32file.SetFileAttributes(in_fn, new_attributes)
 
 
 def unzip_tgt_file(in_args):

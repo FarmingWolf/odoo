@@ -17,7 +17,6 @@ from tkinter.font import Font
 import psutil
 import pyzipper
 import requests
-import win32file
 import tkinter as tk
 from tkinter import ttk, simpledialog, font
 from datetime import datetime, timedelta
@@ -28,11 +27,19 @@ from utils import Tooltip, check_trial_period, start_countdown_trial_period, add
 action_type = "zip"
 # action_type = "unzip"
 """
-
+--windows:
 pyinstaller -F startup.py -i ./img/491logo.png --noconsole
 xcopy /d /y .\dist\startup.exe .\
 del startup.py
 del utils.py
+
+--linux:
+pyinstaller -F startup.py -i ./img/491logo.png --noconsole
+move ./dist/startup ./startup
+chmod +x ./startup
+rm startup.py
+rm utils.py
+
 
 """
 
@@ -106,7 +113,8 @@ _logger = logging.getLogger(__name__)
 _logger.setLevel(logging.DEBUG)
 # 1.创建一个把日志信息存储到文件中的处理器
 # 要加编码，不然后可能会乱码
-logFileNM = os.getcwd() + r".\start.log"
+# logFileNM = os.getcwd() + r".\start.log"
+logFileNM = os.path.join(os.getcwd(), "start.log")
 fh = logging.FileHandler(logFileNM, encoding="utf-8")
 fh.setFormatter(logging.Formatter(fmt="%(asctime)s %(filename)s %(funcName)s %(lineno)d行 %(levelname)s "
                                       "%(message)s ", datefmt="%Y/%m/%d/%X"))
@@ -115,8 +123,12 @@ _logger.addHandler(fh)
 
 # 进度条
 root = tk.Tk()
-root.geometry("900x450")
-root.wm_attributes('-disabled', False)  # 禁用最大化功能
+if sys.platform == 'win32':
+    root.geometry("900x450")
+    root.wm_attributes('-disabled', False)  # 禁用最大化功能
+else:
+    root.geometry("900x500")
+
 root.resizable(width=False, height=False)  # 允许调整窗口大小
 my_font = font.Font(size=16, weight='bold')
 customer_info_label = tk.Label(root, text="", font=my_font)
@@ -176,28 +188,51 @@ main_process = 0
 def get_mac_address():
     try:
         mac_lst = []
-        # 使用 ipconfig /all 命令获取网络信息
-        command_output = subprocess.check_output(["ipconfig", "/all"]).decode(client_env_code_page)
-        _logger.debug(f"command_output={command_output}")
-        block_s = False
-        lines = command_output.splitlines()
-        for cmd_line in lines:
-            # 查找包含 Physical Address 或者 物理地址 的行
-            if '网适配器' in cmd_line:
-                block_s = True
+        if sys.platform == "win32":
+            # 使用 ipconfig /all 命令获取网络信息
+            command_output = subprocess.check_output(["ipconfig", "/all"]).decode(client_env_code_page)
+            _logger.debug(f"command_output={command_output}")
+            block_s = False
+            lines = command_output.splitlines()
+            for cmd_line in lines:
+                # 查找包含 Physical Address 或者 物理地址 的行
+                if '网适配器' in cmd_line:
+                    block_s = True
 
-            if block_s:
-                mac_address_search = re.search(r'Physical Address.*: (.*)', cmd_line)
-                if not mac_address_search:
-                    # 如果没有找到, 尝试另一种可能的格式
-                    mac_address_search = re.search(r'物理地址.*: (.*)', cmd_line)
+                if block_s:
+                    mac_address_search = re.search(r'Physical Address.*: (.*)', cmd_line)
+                    if not mac_address_search:
+                        # 如果没有找到, 尝试另一种可能的格式
+                        mac_address_search = re.search(r'物理地址.*: (.*)', cmd_line)
 
-                if mac_address_search:
-                    # 清除可能存在的空格，并返回MAC地址
-                    mac_lst.append(mac_address_search.group(1).strip())
-                    block_s = False
+                    if mac_address_search:
+                        # 清除可能存在的空格，并返回MAC地址
+                        mac_lst.append(mac_address_search.group(1).strip())
+                        block_s = False
+        else:
+            # Linux/Unix 使用 ip link 或 ifconfig
+            try:
+                # 优先尝试现代 Linux 的 ip link 命令
+                command_output = subprocess.check_output(["ip", "link"]).decode('utf-8')
+                _logger.debug(f"Linux (ip link) command_output={command_output}")
+                mac_addresses = re.findall(r'link/ether ([\da-fA-F:]{17})', command_output)
+                mac_lst.extend(mac_addresses)
 
-        return mac_lst
+            except FileNotFoundError:
+                # 回退到传统的 ifconfig
+                command_output = subprocess.check_output(["ifconfig"]).decode('utf-8')
+                _logger.debug(f"Linux (ifconfig) command_output={command_output}")
+                mac_addresses = re.findall(r'ether ([\da-fA-F:]{17})', command_output)
+                mac_lst.extend(mac_addresses)
+
+        # 统一 MAC 地址格式（大写字母+冒号分隔）
+        formatted_mac_lst = []
+        for mac in mac_lst:
+            mac = mac.upper().replace('-', ':')  # 统一格式
+            if re.match(r'^([0-9A-F]{2}:){5}[0-9A-F]{2}$', mac):
+                formatted_mac_lst.append(mac)
+
+        return list(set(formatted_mac_lst))  # 去重后返回
 
     except Exception as ex:
         _logger.error(f"发生未知错误：{ex}{ex.with_traceback}")
@@ -787,20 +822,15 @@ def unzip_files(in_root, in_label, in_bar):
 
 
 def start_em_server(in_root, in_label, in_bar):
-    module_path = '..\\'
+    module_path = '..\\' if sys.platform == "win32" else '..'
 
     # cmd_1 = f'cd /d D:\\users\\Admin\\Documents\\GitHub\\farmingwolf\\"'
-    cmd_1 = f'cd /d {module_path}'
+    cmd_1 = f'cd /d {module_path}' if sys.platform == "win32" else f'cd {module_path}'
     _logger.info(f"cmd_1={cmd_1}")
 
-    """cmd_2 = f"python ../odoo-bin -c ../debian/odoo.conf -r 491oddevadm -w 491491491 --addons-path=addons 
-            f"-d postgres " \
-            f"-u utils,parking,estate_registration_addr,estate,estate_lease_contract,event_option,event_extend," \
-            f"operation_contract,accounting_subject,business_items,operation_contract_event_settle_account,wechat," \
-            f"contacts,estate_dashboard --dev xml --log-handler odoo.tools.convert:DEBUG"
-    """
+    command_1 = ['cmd', '/c', cmd_1] if sys.platform == "win32" else ['bash', '-c', cmd_1]
     # 调用Windows命令提示符执行命令
-    result = subprocess.run(['cmd', '/c', cmd_1], capture_output=True, text=True)
+    result = subprocess.run(command_1, capture_output=True, text=True)
     # 打印输出结果
     _logger.info(f"result={result}")
     _logger.info(f"result.returncode={result.returncode}")
@@ -808,12 +838,22 @@ def start_em_server(in_root, in_label, in_bar):
     if result.returncode != 0:
         _logger.info(result.stderr)
 
-    command = ['cmd', '/c', "python ../odoo-bin "]
+    if sys.platform == "win32":
+        command = ['cmd', '/c', "python ../odoo-bin "]
+    else:
+        command = ["../venv/bin/python", "../odoo-bin"]
     command.extend(['-c', em_server_conf_file])
-    command.extend(['-w', '491491491'])
-    command.extend(['-r', '491oddevadm'])
+    if sys.platform == "win32":
+        command.extend(['-w', '491491491'])
+        command.extend(['-r', '491oddevadm'])
+    else:
+        command.extend(['-w', '491491491techdbadmin'])
+        command.extend(['-r', 'odoo'])
     command.extend(['--addons-path', '../addons'])
-    command.extend(['-d', 'postgres'])
+    if sys.platform == "win32":
+        command.extend(['-d', 'postgres'])
+    else:
+        command.extend(['-d', 'odoo_prod'])
     # em_addons = f"utils,parking,estate_registration_addr,estate,estate_lease_contract,event_option,event_extend," \
     #             f"operation_contract,accounting_subject,business_items,operation_contract_event_settle_account," \
     #             f"wechat,contacts,estate_dashboard,sms_ali,website_estate,project,ocr_partner,fund_management"
@@ -825,10 +865,17 @@ def start_em_server(in_root, in_label, in_bar):
     _logger.debug(f"command={command}")
     try:
         global web_server_process
-        web_server_process = subprocess.Popen(command, creationflags=subprocess.CREATE_NO_WINDOW)
         _logger.info("启动服务执行中……")
-        start_event.set()
-        web_server_process.wait()
+        if sys.platform == "win32":
+            web_server_process = subprocess.Popen(command, creationflags=subprocess.CREATE_NO_WINDOW)
+            start_event.set()
+            web_server_process.wait()
+        else:
+            with open('subprocess_output.log','w') as f:
+                web_server_process = subprocess.Popen(command, stdout=f, stderr=subprocess.STDOUT, text=True,
+                                                      stdin=subprocess.PIPE, start_new_session=True)
+                start_event.set()
+                web_server_process.wait()
     except Exception as e:
         _logger.info(f"启动错误:{e}{e.with_traceback}")
         traceback.print_exc()
@@ -1225,7 +1272,10 @@ root.protocol("WM_DELETE_WINDOW", close_window)  # 拦截关闭事件
 
 # 创建一个标签用于显示进度文本
 product_code_label = tk.Label(root, text="产品编码：", font=my_font)
-product_code_label.grid(row=6, column=2, pady=(30, 20))
+if sys.platform == "win32":
+    product_code_label.grid(row=6, column=2, pady=(30, 20))
+else:
+    product_code_label.grid(row=6, column=2, padx=(20, 0), pady=(20, 0))
 
 if action_type == "zip":
     text_default = "系统自动生成"
