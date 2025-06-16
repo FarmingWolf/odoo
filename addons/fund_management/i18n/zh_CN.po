@@ -410,6 +410,11 @@ msgid "Applicant"
 msgstr "申请人"
 
 #. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
+msgid "Applicant Unit"
+msgstr "申请单位"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__apply_no
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__apply_no
 msgid "Application NO."

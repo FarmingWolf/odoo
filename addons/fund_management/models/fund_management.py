@@ -58,7 +58,7 @@ class FundManagement(models.Model):
         domain=[('filter_for_fund_management', '=', True)],
         tracking=True
     )
-    applicant_unit = fields.Char(comodel_name='hr.department', related="employee_id.department_id.name")
+    applicant_unit = fields.Char(comodel_name='hr.department', related="employee_id.department_id.name", store=True, readonly=False)
     company_id = fields.Many2one(
         comodel_name='res.company',
         string="Company",

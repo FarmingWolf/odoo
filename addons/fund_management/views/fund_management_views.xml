@@ -460,9 +460,10 @@
         <field name="arch" type="xml">
             <search string="Fund">
                 <field string="Fund Management" name="name"
-                       filter_domain="['|', '|', '|', ('employee_id', 'ilike', self), ('name', 'ilike', self),
-                       ('category_id', 'ilike', self), ('apply_no', 'ilike', self)]"/>
+                       filter_domain="['|', '|', '|', '|', ('employee_id', 'ilike', self), ('applicant_unit', 'ilike', self),
+                       ('name', 'ilike', self), ('category_id', 'ilike', self), ('apply_no', 'ilike', self)]"/>
                 <field name="date"/>
+                <field name="applicant_unit"/>
                 <field name="employee_id"/>
                 <filter string="My Applications" name="my_fund_management"
                         domain="[('employee_id.user_id', '=', uid)]"/>
@@ -490,6 +491,7 @@
                 <filter invisible="1" string="Future Activities" name="activities_upcoming_all"
                         domain="[('my_activity_date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
                 <group expand="0" string="Group By">
+                    <filter string="Applicant Unit" name="applicant_unit" domain="[]" context="{'group_by': 'applicant_unit'}"/>
                     <filter string="Employee" name="employee" domain="[]" context="{'group_by': 'employee_id'}"/>
                     <filter string="Category" name="product" domain="[]" context="{'group_by': 'category_id'}"/>
                     <filter string="Status" name="status" domain="[]" context="{'group_by': 'state'}"/>
