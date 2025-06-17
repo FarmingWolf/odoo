@@ -40,7 +40,8 @@ class FundManagementOverdue(models.Model):
             ('submitted', 'Submitted'),
             ('approved', 'Approved'),
             ('done', 'Done'),
-            ('refused', 'Refused')
+            ('refused', 'Refused'),
+            ('stopped', 'Stopped')
         ], related='fund_management_id.state', store=True)
     latest_approval_detail_id = fields.Many2one("fund.management.approval.detail", string="Latest Approval Detail",
                                                 compute="_compute_latest_approval_detail", store=True, precompute=True)

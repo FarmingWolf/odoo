@@ -29,18 +29,18 @@ class FundManagementMeetingMinutes(models.Model):
     category_id = fields.Many2one(string="Fund Management Category", related="fund_management_id.category_id")
     stage_id = fields.Many2one(string="Fund Management Stage", related="fund_management_id.stage")
     type_domain = fields.Many2many(string="Meeting Minutes Type By Stage", related="stage_id.meeting_minute_types")
-    type = fields.Many2one(string="Attachment Type", comodel_name="fund.management.meeting.minutes.type")
+    type = fields.Many2one(string="Attachment Type", comodel_name="fund.management.meeting.minutes.type", required=True)
+    type_name_show = fields.Char(string="Type Name Show", related="type.name_show")
     company_id = fields.Many2one(comodel_name='res.company', default=lambda self: self.env.user.company_id, store=True)
     nb_attachment = fields.Integer(string="Number of Attachments", compute='_compute_nb_attachment')
     attachment_ids = fields.Many2many('ir.attachment', string="Attachment", copy=False)
 
     @api.onchange("type")
     def _onchange_type(self):
-        for record in self:
-            if record.type:
-                if record.type not in record.name:
-                    tmp_str = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y%m%d%H%M%S')
-                    record.name = str(self.type.name) + _("Meeting Minutes") + tmp_str
+        if self.type:
+            if self.type.name not in self.name:
+                tmp_str = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y%m%d%H%M%S')
+                self.name = str(self.type.name) + _("Meeting Minutes") + tmp_str
 
     @api.depends("attachment_ids")
     def _compute_nb_attachment(self):

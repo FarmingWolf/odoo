@@ -16,7 +16,16 @@ export class ApprovalComment extends Component {
         console.log("this.props", this.props);
         console.log("context.action_type", this.props.action.context.action_type);
         console.log("active_id", this.props.action.context.res_id);
-        const defaultValue = this.props.action.context.action_type === "action_agree" ? "同意" : "驳回";
+
+        let defaultValue = "同意";
+        if (this.props.action.context.action_type === "action_agree") {
+            defaultValue = "同意";
+        } else if (this.props.action.context.action_type === "action_reject") {
+            defaultValue = "驳回";
+        } else {
+            defaultValue = "一键叫停";
+        }
+
         this.state = useState({
             actionType: this.props.action.context.action_type,
             inputValue: defaultValue,
@@ -34,7 +43,16 @@ export class ApprovalComment extends Component {
     }
 
     get buttonText() {
-        return this.state.actionType === "action_agree" ? "同意" : "驳回";
+
+        let defaultValue = "同意";
+        if (this.state.actionType === "action_agree") {
+            defaultValue = "同意";
+        } else if (this.state.actionType === "action_reject") {
+            defaultValue = "驳回";
+        } else {
+            defaultValue = "一键叫停";
+        }
+        return defaultValue;
     }
 
     confirm_button_disable(){

@@ -136,7 +136,8 @@ class FundManagement(models.Model):
             ('submitted', 'Submitted'),
             ('approved', 'Approved'),
             ('done', 'Done'),
-            ('refused', 'Refused')
+            ('refused', 'Refused'),
+            ('stopped', 'Stopped')
         ],
         string="Status",
         compute='_compute_state', store=True, readonly=True,
@@ -145,6 +146,10 @@ class FundManagement(models.Model):
         default='draft',
     )
 
+    stage = fields.Many2one('fund.management.approval.stage', ondelete='restrict', copy=False, tracking=True,
+                            domain=lambda self: self._get_stage_domain(),
+                            default=lambda self: self._get_default_stage_id())
+    stage_sequence = fields.Integer("Approval Stage Sequence NO.", related="stage.sequence")
     invisible_meeting_minutes = fields.Boolean("Meeting Minutes Invisible", compute="_compute_invisible_meeting_minutes")
     meeting_minutes_editable = fields.Boolean("Meeting Minutes Editable", related="stage.input_meeting_minutes")
     meeting_minute_types = fields.Many2many(string="Meeting Minute Types", related="category_id.meeting_minute_types")
@@ -156,6 +161,20 @@ class FundManagement(models.Model):
                                                 compute="_compute_meeting_minutes_attach_div_h", store=True)
     meeting_minutes_attach_div_right_h = fields.Float(string="Meeting Minutes Types Area Right Height",
                                                       compute="_compute_meeting_minutes_attach_div_h", store=True)
+
+    @api.onchange('stage')
+    def _onchange_stage(self):
+
+        default_list = []
+        _logger.info(f"self.stage={self.stage};self.stage.meeting_minute_types={self.stage.meeting_minute_types}")
+        for default_type in self.stage.meeting_minute_types:
+            meeting_minutes = {
+                "fund_management_id": self.id,
+                "type": default_type.id,
+            }
+            default_list.append((0, 0, meeting_minutes))
+
+        self.meeting_minutes_attach = default_list
 
     def _compute_invisible_meeting_minutes(self):
         for record in self:
@@ -205,10 +224,6 @@ class FundManagement(models.Model):
         self._get_view()
         return stage_domain
 
-    stage = fields.Many2one('fund.management.approval.stage', ondelete='restrict', copy=False, tracking=True,
-                            domain=lambda self: self._get_stage_domain(),
-                            default=lambda self: self._get_default_stage_id())
-    stage_sequence = fields.Integer("Approval Stage Sequence NO.", related="stage.sequence")
     contract_id = fields.Many2one(string='Contract ID', comodel_name="fund.management.contract", ondelete="restrict")
     contract_no = fields.Char(string='Contract NO.', related="contract_id.contract_no", store=True)
     contract_name = fields.Char(string='Contract Name', related="contract_id.name", store=True)
@@ -540,7 +555,7 @@ class FundManagement(models.Model):
         return res
 
     def _get_default_stage_id(self):
-        _logger.debug(f"self.env.context={self.env.context}")
+        _logger.info(f"self.env.context={self.env.context}")
         default_category_id = None
         if "default_category_id" in self.env.context:
             default_category_id = self.env.context.get('default_category_id')
@@ -551,7 +566,7 @@ class FundManagement(models.Model):
 
         if not default_category_id:
             default_category_id = self.category_id.id
-            _logger.debug(f"self.category_id={default_category_id}")
+            _logger.info(f"self.category_id={default_category_id}")
 
         if not default_category_id:
             _logger.error("default_category_id is None!!!")
@@ -560,7 +575,9 @@ class FundManagement(models.Model):
                                                                        ('category_id', '=', default_category_id)],
                                                                       limit=1)
         if stage_ids:
-            return stage_ids[0]
+            ret_stage = stage_ids[0]
+            _logger.info(f"ret_stage={ret_stage}")
+            return ret_stage
         else:
             _logger.error("can't get default stage!!!")
             return False
@@ -580,6 +597,11 @@ class FundManagement(models.Model):
                 for meeting_minutes_created in record.meeting_minutes_attach:
                     if meeting_minutes_type == meeting_minutes_created.type:
                         type_exists = True
+                        # 检查初始化页面，附件类型ID为空时上传附件导致的附件res_id为空
+                        for attachment in meeting_minutes_created.attachment_ids:
+                            if not attachment.res_id:
+                                _logger.info(f"回填附件的res_id:{meeting_minutes_created.id}")
+                                attachment.res_id = meeting_minutes_created.id
                         break
                 if not type_exists:
                     meeting_minutes = {
@@ -758,6 +780,37 @@ class FundManagement(models.Model):
                     self.write({'stage': record.stage})
                     return
 
+    def action_stop_confirm(self, context):
+        _logger.info(f"context={context}")
+        res_id = context.get('active_id')
+        comment = context.get('comment')
+        self_rcd = self.search([('id', '=', res_id)])
+        self_rcd.action_stop(comment)
+
+    def action_stop(self, comment):
+        # 一键叫停
+        for record in self:
+            # 理论上一键叫停对象流程已经提交
+            if not record.stage.sequence:
+                return
+
+            check_right, tgt_stage = self._check_stop_rights(record)
+            if not check_right:
+                raise UserError(_("Current state: %(state_name)s. You can not process this stage: %(stage_name)s") %
+                                {'state_name': record.state, 'stage_name': record.stage.name})
+
+            # 先创建当前阶段的一键叫停记录
+            self._create_approval_detail(record, False, False, tgt_stage, comment, is_stop=True)
+            # 更新本记录：stopped，并将stage置为初始stage
+            all_stages = self.env['fund.management.approval.stage'].search([('company_id', '=', record.company_id.id),
+                                                                            ('category_id', '=', record.category_id.id),
+                                                                            ('sequence', '=', 0)])
+            for each_stage in all_stages:
+                if each_stage.sequence == 0:
+                    record.stage = each_stage
+                    self.write({'stage': record.stage, 'state': 'stopped'})
+                    return
+
     def _check_approval_rights(self, record):
 
         this_employee_dep_id = self._get_employee().department_id.id
@@ -772,10 +825,12 @@ class FundManagement(models.Model):
             _logger.info(f"self.env.user:{self.env.user.name}没有fund_management.group_fund_management_team_approver权限")
             return False, record.stage
 
-        if (record.stage.input_meeting_minutes and
-                ((record.create_uid.id or record.employee_id.user_id.id) == self.env.user.id)):
-            _logger.info(f"经办人录入会议纪要：self.env.user.id={self.env.user.id}")
-            return True, record.stage
+        # 20250617 看起来经办人录入会议纪要的情况在下边的部门、岗位的判断中应该能处理，所以暂且取消此处逻辑，待观察
+        # 此处逻辑的问题：当有多个阶段，多个岗位可以录入会议纪要，那么经办人都具有权限了
+        # if (record.stage.input_meeting_minutes and
+        #         ((record.create_uid.id or record.employee_id.user_id.id) == self.env.user.id)):
+        #     _logger.info(f"经办人录入会议纪要：self.env.user.id={self.env.user.id}")
+        #     return True, record.stage
 
         # 由于在stage创建时，对非起始stage（sequence!=0）时的部门或职位角色不同时为空做了要求
         if not record.stage.op_department_id:
@@ -856,7 +911,25 @@ class FundManagement(models.Model):
             _logger.info(f"同级别节点中无符合要求的节点，或无同级别节点")
             return False, record.stage
 
-    def _create_approval_detail(self, record, approval_or_reject, is_cancel, tgt_stage, comment):
+    def _check_stop_rights(self, record):
+
+        if not record.stage:
+            default_stage = record._get_default_stage_id()
+            record.stage = default_stage
+            _logger.error(f"record.stage is None, set it as {default_stage}")
+
+        if not self.env.user.has_group('fund_management.group_fund_management_user'):
+            _logger.info(f"self.env.user:{self.env.user.name}没有fund_management.group_fund_management_user")
+            return False, record.stage
+
+        # 任何没有完成审批的流程都可以一键叫停
+        if record.state in ['draft', 'done', 'stopped']:
+            return False, record.stage
+
+        _logger.info(f"可以一键叫停, 当前 state={record.state}, stage={record.stage}")
+        return True, record.stage
+
+    def _create_approval_detail(self, record, approval_or_reject, is_cancel, tgt_stage, comment, is_stop=False):
 
         _logger.debug(f"datetime.now()[{datetime.now()}]")
         date_time = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y-%m-%d %H:%M:%S')
@@ -872,6 +945,10 @@ class FundManagement(models.Model):
         else:
             approval_decision_txt = "驳回"
             approval_comment = comment if comment else "驳回"
+
+        if is_stop:
+            approval_decision_txt = "一键叫停"
+            approval_comment = comment if comment else "一键叫停"
 
         if record.stage.sequence == 0:
             rcd_exists = self.env['fund.management.approval.detail'].browse(

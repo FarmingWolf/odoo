@@ -16,6 +16,7 @@ class FundManagementMeetingMinutesType(models.Model):
 
     name = fields.Char(string='Meeting Minutes Type', required=True,
                        help="Please do not include spaces in the category name")
+    name_show = fields.Char(string="Meeting Minutes Type Show", compute="_compute_name_show",)
     sequence = fields.Integer(string="Sequence", required=True, default=0, copy=False)
     color = fields.Integer()
     active = fields.Boolean(default=True)
@@ -27,6 +28,13 @@ class FundManagementMeetingMinutesType(models.Model):
         ret_editable = self.env.user.has_group('fund_management.group_fund_management_manager')
         self.editable = ret_editable
         return ret_editable
+
+    def _compute_name_show(self):
+        for record in self:
+            if record.mandatory:
+                record.name_show = record.name + "（必传）"
+            else:
+                record.name_show = record.name + "（非必传）"
 
     _sql_constraints = [
         ('name', 'unique(name, company_id)', 'Meeting minutes type name duplicated!')
