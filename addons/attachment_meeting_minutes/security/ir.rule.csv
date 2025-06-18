@@ -1,0 +1,3 @@
+id,name,model_id:id,domain_force
+meeting_minutes_company_rule,Restrict Attachment Meeting Minutes by Company,model_meeting_minutes,"[('company_id','=',user.company_id.id)]"
+meeting_minutes_type_company_rule,Restrict Attachment Meeting Minutes Type by Company,model_meeting_minutes_type,"[('company_id','=',user.company_id.id)]"

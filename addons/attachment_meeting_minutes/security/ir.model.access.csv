@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_meeting_minutes_user,meeting.minutes.user,model_meeting_minutes,attachment_meeting_minutes.group_meeting_minutes_user,1,1,1,1
+access_meeting_minutes_manager,meeting.minutes.manager,model_meeting_minutes,attachment_meeting_minutes.group_meeting_minutes_manager,1,1,1,1
+access_meeting_minutes_type_user,meeting.minutes.type.user,model_meeting_minutes_type,attachment_meeting_minutes.group_meeting_minutes_user,1,0,0,0
+access_meeting_minutes_type_manager,meeting.minutes.type.manager,model_meeting_minutes_type,attachment_meeting_minutes.group_meeting_minutes_manager,1,1,1,1

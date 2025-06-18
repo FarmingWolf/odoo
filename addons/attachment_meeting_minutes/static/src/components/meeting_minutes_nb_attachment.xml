@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="attachment_meeting_minutes.AttachmentNumber">
+        <div>
+            <t t-if="meeting_minutes_nb_attachment > 0" class="text-center" t-out="meeting_minutes_nb_attachment">
+                <span class="fa fa-paperclip pe-1 align-middle"/>
+            </t>
+        </div>
+    </t>
+</templates>

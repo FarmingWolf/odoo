@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="meeting_minutes_view_tree" model="ir.ui.view">
+        <field name="name">meeting.minutes.view.tree</field>
+        <field name="model">meeting.minutes</field>
+        <field name="arch" type="xml">
+            <tree string="meeting_minutes_tree" create="True" edit="True" delete="True" editable="bottom" import="False" open_form_view="True">
+                <field name="company_id" column_invisible="1"/>
+                <field name="subject"/>
+                <field name="type"/>
+                <field name="meeting_time"/>
+                <field name="meeting_time_end" optional="hide"/>
+                <field name="department_id"/>
+                <field name="employee_id" optional="hide"/>
+                <field name="nb_attachment" widget="meeting_minutes_nb_attachment" nolabel="1" readonly="True" sum="文件数合计"/>
+                <field name="attachment_id" widget="many2many_binary"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="meeting_minutes_view_form" model="ir.ui.view">
+        <field name="name">meeting.minutes.view.form</field>
+        <field name="model">meeting.minutes</field>
+        <field name="arch" type="xml">
+            <form string="meeting_minutes_form" create="True" edit="True" duplicate="True" delete="True">
+                <sheet>
+                    <group cols="1">
+                        <group cols="1">
+                            <field name="subject"/>
+                            <field name="type"/>
+                        </group>
+                        <group cols="1">
+                            <field name="meeting_time"/>
+                            <field name="department_id" no_open="True"/>
+                        </group>
+                        <group cols="1">
+                            <field name="attachment_id" widget="many2many_binary"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="o_attachment_preview o_center_attachment"
+                     groups="attachment_meeting_minutes.group_meeting_minutes_user"/>
+                <div class="oe_chatter" groups="attachment_meeting_minutes.group_meeting_minutes_manager">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="meeting_minutes_view_search" model="ir.ui.view">
+        <field name="name">meeting.minutes.view.search</field>
+        <field name="model">meeting.minutes</field>
+        <field name="arch" type="xml">
+            <search string="Attachments">
+                <field string="会议纪要附件" name="name"
+                       filter_domain="['|', '|', '|', '|', ('employee_id', 'ilike', self), ('department_id', 'ilike', self),
+                       ('type', 'ilike', self), ('subject', 'ilike', self)]"/>
+                <field name="subject"/>
+                <field name="type"/>
+                <field name="department_id"/>
+                <field name="employee_id"/>
+                <filter string="我上传的" name="my_meeting_minutes"
+                        domain="[('employee_id.user_id', '=', uid)]"/>
+                <separator/>
+                <filter string="会议时间" name="meeting_time" date="meeting_time"/>
+                <separator/>
+                <filter string="已归档" name="active" domain="[('active', '=', False)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="单位" name="department_id" domain="[]" context="{'group_by': 'department_id'}"/>
+                    <filter string="上传人" name="employee_id" domain="[]" context="{'group_by': 'employee_id'}"/>
+                    <filter string="分类" name="type" domain="[]" context="{'group_by': 'type'}"/>
+                    <filter string="会议时间" name="meeting_time" domain="[]" context="{'group_by': 'meeting_time'}"/>
+                </group>
+                <searchpanel>
+                    <field string='单位' name="department_id" context="{'group_by': 'department_id'}"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record id="meeting_minutes_action" model="ir.actions.act_window">
+        <field name="name">会议纪要管理</field>
+        <field name="res_model">meeting.minutes</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="meeting_minutes_view_search"/>
+        <field name="context">{'search_default_active': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                点击“新建”按钮，上传会议纪要。
+            </p>
+        </field>
+    </record>
+</odoo>
