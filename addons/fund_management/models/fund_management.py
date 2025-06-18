@@ -154,7 +154,8 @@ class FundManagement(models.Model):
     meeting_minutes_editable = fields.Boolean("Meeting Minutes Editable", compute="_compute_meeting_minutes_editable")
     meeting_minute_types = fields.Many2many(string="Meeting Minute Types", related="category_id.meeting_minute_types")
 
-    meeting_minute_help_msg = fields.Char(string="Operation Hint Message", compute="_compute_meeting_minute_help_msg")
+    meeting_minute_help_msg = fields.Char(string="Operation Hint Message", compute="_compute_meeting_minute_help_msg",
+                                          default=lambda self: self._onchange_stage())
     meeting_minutes_attach_link = fields.Many2many(string="Meeting minutes attachment files link", comodel_name='meeting.minutes',
                                                    column1='fund_management_id', column2='meeting_minutes_id', tracking=True)
 
@@ -178,6 +179,8 @@ class FundManagement(models.Model):
             self.meeting_minute_help_msg = _("Please select to upload %(msg_list)s") % {'msg_list': str(default_list)}
         else:
             self.meeting_minute_help_msg = False
+
+        self.meeting_minutes_editable = self.stage.input_meeting_minutes
 
     @api.depends('stage')
     def _compute_meeting_minute_help_msg(self):
@@ -605,19 +608,20 @@ class FundManagement(models.Model):
                 default_stage = record._get_default_stage_id()
                 record.stage = default_stage
 
-            # 根据category中的meeting_minutes_type生成meeting_minutes的预备list
-            for meeting_minutes_type in record.meeting_minute_types:
-                type_exists = False
-                for meeting_minutes_created in record.meeting_minutes_attach_link:
-                    if meeting_minutes_type == meeting_minutes_created.type:
-                        type_exists = True
-                        break
-                if not type_exists:
-                    meeting_minutes = {
-                        "fund_management_id": record.id,
-                        "type": meeting_minutes_type.id,
-                    }
-                    self.env["fund.management.meeting.minutes"].create(meeting_minutes)
+            # 不再需要插入fund.management.meeting.minutes，二通过many2many字段引用独立的会议纪要模块
+            # # 根据category中的meeting_minutes_type生成meeting_minutes的预备list
+            # for meeting_minutes_type in record.meeting_minute_types:
+            #     type_exists = False
+            #     for meeting_minutes_created in record.meeting_minutes_attach_link:
+            #         if meeting_minutes_type == meeting_minutes_created.type:
+            #             type_exists = True
+            #             break
+            #     if not type_exists:
+            #         meeting_minutes = {
+            #             "fund_management_id": record.id,
+            #             "type": meeting_minutes_type.id,
+            #         }
+            #         self.env["fund.management.meeting.minutes"].create(meeting_minutes)
         return
 
     def action_submit_fund_management(self):

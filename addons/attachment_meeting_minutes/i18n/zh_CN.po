@@ -1,0 +1,441 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* attachment_meeting_minutes
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 17.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-06-18 16:03+0000\n"
+"PO-Revision-Date: 2025-06-18 16:03+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes_type__active
+msgid "Active"
+msgstr "有效"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__activity_ids
+msgid "Activities"
+msgstr "活动"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "活动异常标识"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__activity_state
+msgid "Activity State"
+msgstr "活动状态"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "活动类型图标"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__analytic_distribution
+msgid "Analytic Distribution"
+msgstr "分析分布"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__analytic_distribution_search
+msgid "Analytic Distribution Search"
+msgstr "分析分布查询"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__analytic_precision
+msgid "Analytic Precision"
+msgstr "分析精度"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__message_attachment_count
+msgid "Attachment Count"
+msgstr "附件数"
+
+#. module: attachment_meeting_minutes
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_view_search
+msgid "Attachments"
+msgstr "附件"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes_type__color
+msgid "Color"
+msgstr "颜色"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes_type__company_id
+msgid "Company"
+msgstr "公司"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__create_uid
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes_type__create_uid
+msgid "Created by"
+msgstr "创建人"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__create_date
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes_type__create_date
+msgid "Created on"
+msgstr "创建日期"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__display_name
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes_type__display_name
+msgid "Display Name"
+msgstr "显示名"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__message_follower_ids
+msgid "Followers"
+msgstr "关注者"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "关注者（合作方）"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,help:attachment_meeting_minutes.field_meeting_minutes__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Font awesome 图标 例如： fa-tasks"
+
+#. module: attachment_meeting_minutes
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_view_search
+msgid "Group By"
+msgstr "分组"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__has_message
+msgid "Has Message"
+msgstr "有消息"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__id
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes_type__id
+msgid "ID"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__activity_exception_icon
+msgid "Icon"
+msgstr "图标"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,help:attachment_meeting_minutes.field_meeting_minutes__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "显示异常活动的图标"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,help:attachment_meeting_minutes.field_meeting_minutes__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "如果勾选，则新消息需要您的注意"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,help:attachment_meeting_minutes.field_meeting_minutes__message_has_error
+#: model:ir.model.fields,help:attachment_meeting_minutes.field_meeting_minutes__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "如果勾选，有些消息存在分发错误"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__message_is_follower
+msgid "Is Follower"
+msgstr "关注者"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__write_uid
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes_type__write_uid
+msgid "Last Updated by"
+msgstr "最后更新者"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__write_date
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes_type__write_date
+msgid "Last Updated on"
+msgstr "最后更新日期"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__message_main_attachment_id
+msgid "Main Attachment"
+msgstr "主附件"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model,name:attachment_meeting_minutes.model_meeting_minutes_type
+msgid "Meeting minutes type"
+msgstr "会议纪要类型"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__message_has_error
+msgid "Message Delivery error"
+msgstr "消息分发错误"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__message_ids
+msgid "Messages"
+msgstr "消息"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "我的活动截止日"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "下一个活动的日历事件"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "下一活动的截止日"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__activity_summary
+msgid "Next Activity Summary"
+msgstr "下一活动概要"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__activity_type_id
+msgid "Next Activity Type"
+msgstr "下一活动类型"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__message_needaction_counter
+msgid "Number of Actions"
+msgstr "动作数量"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__message_has_error_counter
+msgid "Number of errors"
+msgstr "错误数量"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,help:attachment_meeting_minutes.field_meeting_minutes__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "需要注意的消息数"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,help:attachment_meeting_minutes.field_meeting_minutes__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "存在分发错误的消息数"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__rating_ids
+msgid "Ratings"
+msgstr "评级"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__activity_user_id
+msgid "Responsible User"
+msgstr "责任人"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "SMS发送错误"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,help:attachment_meeting_minutes.field_meeting_minutes__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"基于活动的状态\n"
+"过期: 已超过最后期限\n"
+"今日: 活动日期是今日\n"
+"计划: 未来的活动."
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,help:attachment_meeting_minutes.field_meeting_minutes__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "记录中异常活动的类型"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__website_message_ids
+msgid "Website Messages"
+msgstr "网站消息"
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,help:attachment_meeting_minutes.field_meeting_minutes__website_message_ids
+msgid "Website communication history"
+msgstr "网站沟通记录"
+
+#. module: attachment_meeting_minutes
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_view_form
+msgid "meeting_minutes_form"
+msgstr "会议纪要表单"
+
+#. module: attachment_meeting_minutes
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_view_tree
+msgid "meeting_minutes_tree"
+msgstr "会议纪要列表"
+
+#. module: attachment_meeting_minutes
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_type_view_form
+msgid "meeting_minutes_type_form"
+msgstr "会议纪要类型表单"
+
+#. module: attachment_meeting_minutes
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_type_view_tree
+msgid "meeting_minutes_type_tree"
+msgstr "会议纪要类型列表"
+
+#. module: attachment_meeting_minutes
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_view_search
+msgid "上传人"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__meeting_time
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_view_search
+msgid "会议时间"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model,name:attachment_meeting_minutes.model_meeting_minutes
+#: model:ir.ui.menu,name:attachment_meeting_minutes.menu_meeting_minutes_root
+msgid "会议纪要"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__subject
+msgid "会议纪要主题"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.ui.menu,name:attachment_meeting_minutes.menu_meeting_minutes_management_type
+msgid "会议纪要分类"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.actions.act_window,name:attachment_meeting_minutes.meeting_minutes_action
+#: model:ir.ui.menu,name:attachment_meeting_minutes.menu_meeting_minutes_management
+msgid "会议纪要管理"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.actions.act_window,name:attachment_meeting_minutes.meeting_minutes_type_action
+msgid "会议纪要类型"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_view_search
+msgid "会议纪要附件"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__meeting_time_end
+msgid "会议结束时间"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__company_id
+msgid "公司"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__type
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_view_search
+msgid "分类"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes_type__name
+msgid "分类名"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.constraint,message:attachment_meeting_minutes.constraint_meeting_minutes_type_name
+msgid "分类名不能重复!"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__department_id
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_view_search
+msgid "单位"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__name
+msgid "名称"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__employee_id
+msgid "员工"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_view_search
+msgid "已归档"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_view_search
+msgid "我上传的"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,help:attachment_meeting_minutes.field_meeting_minutes__department_id
+msgid "指定单位专用。如不指定，则所有单位都可以使用。"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes_type__sequence
+msgid "排序"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__attachment_id
+msgid "文件"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__nb_attachment
+msgid "文件数"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_view_tree
+msgid "文件数合计"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__active
+msgid "有效"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model_terms:ir.actions.act_window,help:attachment_meeting_minutes.meeting_minutes_action
+msgid "点击“新建”按钮，上传会议纪要。"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model_terms:ir.actions.act_window,help:attachment_meeting_minutes.meeting_minutes_type_action
+msgid "点击“新建”按钮，定义会议纪要分类名。"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:res.groups,name:attachment_meeting_minutes.group_meeting_minutes_user
+msgid "用户：查看和引用"
+msgstr ""
+
+#. module: attachment_meeting_minutes
+#: model:res.groups,name:attachment_meeting_minutes.group_meeting_minutes_manager
+msgid "管理员"
+msgstr ""

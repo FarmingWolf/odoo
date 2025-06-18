@@ -131,19 +131,21 @@ class FundManagementApprovalStage(models.Model):
         """
         如果本节点不要求部门，那么本节点要求的职位名称不能和其他不要求部门的节点的职位名称相同
         """
-        for record in self:
-            if record.op_department_id:
-                continue
-
-            if record.op_job_id:
-                domain = [('company_id', '=', self.env.user.company_id.id), ('category_id', '=', record.category_id.id),
-                          ('op_job_id.name', '=', record.op_job_id.name), ('op_department_id', '=', False),
-                          ('id', '!=', record.id), ('name', '!=', record.name)]
-                tgt_cnt = self.search_count(domain)
-                if tgt_cnt > 0:
-                    raise ValidationError(f"如果本节点不要求部门，那么本节点要求的职位名称不能和其他不要求部门的节点的职位名称相同。"
-                                          f"请联系管理员修改相应职位的名称，以确保不同部门的职位名称在文字上有区别，"
-                                          f"否则在没有部门要求的情况下，相同的职位名称在不同节点将引起流程混乱。")
+        # 业务上的确需要相同岗位审批不同节点，取消这段逻辑
+        pass
+        # for record in self:
+        #     if record.op_department_id:
+        #         continue
+        #
+        #     if record.op_job_id:
+        #         domain = [('company_id', '=', self.env.user.company_id.id), ('category_id', '=', record.category_id.id),
+        #                   ('op_job_id.name', '=', record.op_job_id.name), ('op_department_id', '=', False),
+        #                   ('id', '!=', record.id), ('name', '!=', record.name)]
+        #         tgt_cnt = self.search_count(domain)
+        #         if tgt_cnt > 0:
+        #             raise ValidationError(f"在不要求部门的多个节点中，岗位角色名称和阶段名称必须同时相同。这种情况一般是终端组织内部节点。"
+        #                                   f"请斟酌岗位角色名相同的节点，使其阶段名称相同，以确保业务上能够理解该设置，"
+        #                                   f"避免相同的职位在不同名称的审批节点引起流程混乱。")
 
     def copy(self, default=None):
 

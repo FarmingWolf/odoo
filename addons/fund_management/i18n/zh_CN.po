@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-11 05:06+0000\n"
-"PO-Revision-Date: 2025-06-11 05:06+0000\n"
+"POT-Creation-Date: 2025-06-18 15:58+0000\n"
+"PO-Revision-Date: 2025-06-18 15:58+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -569,6 +569,11 @@ msgid "Approval Stages"
 msgstr "流程步骤详情"
 
 #. module: fund_management
+#: model:ir.actions.server,name:fund_management.action_stop_svr_action
+msgid "Approval Stop"
+msgstr "一键叫停"
+
+#. module: fund_management
 #: model:ir.ui.menu,name:fund_management.menu_fund_management_approve
 msgid "Approve"
 msgstr "审批"
@@ -666,6 +671,11 @@ msgstr "点击拒绝"
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_category_view_form
 msgid "Click to set approval process steps"
 msgstr "点击设置审批流程步骤"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Click to stop"
+msgstr "点击一键叫停"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__color
@@ -818,6 +828,17 @@ msgstr "创建日期"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__currency_id
 msgid "Currency"
 msgstr "货币"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid ""
+"Current state: %(state_name)s. You can not process this stage: "
+"%(stage_name)s"
+msgstr ""
+"流程当前状态: %(state_name)s. 你不能处理这个审批节点: "
+"%(stage_name)s"
 
 #. module: fund_management
 #: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_payment_method
@@ -1209,7 +1230,7 @@ msgstr "含本次累计申请占比"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__id
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_exception_icon
@@ -1323,6 +1344,7 @@ msgstr "主附件"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__mandatory
+#: model:ir.model.fields,field_description:fund_management.field_meeting_minutes_type__mandatory
 msgid "Mandatory"
 msgstr "必传"
 
@@ -1355,6 +1377,7 @@ msgstr "会议纪要类型"
 #: code:addons/fund_management/models/fund_management_meeting_minutes.py:0
 #: code:addons/fund_management/models/fund_management_meeting_minutes.py:0
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__name
+#: model:ir.ui.menu,name:fund_management.menu_fund_management_attachments
 #, python-format
 msgid "Meeting Minutes"
 msgstr "会议纪要"
@@ -1365,6 +1388,11 @@ msgid "Meeting Minutes Editable"
 msgstr "会议纪要可编辑"
 
 #. module: fund_management
+#: model:ir.ui.menu,name:fund_management.menu_fund_management_attachments_list
+msgid "Meeting Minutes Files"
+msgstr "会议纪要文件"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__invisible_meeting_minutes
 msgid "Meeting Minutes Invisible"
 msgstr "会议纪要不可见"
@@ -1373,7 +1401,7 @@ msgstr "会议纪要不可见"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__meeting_minute_types
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__meeting_minute_types
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__name
-#: model:ir.ui.menu,name:fund_management.menu_fund_management_meeting_minutes_type
+#: model:ir.ui.menu,name:fund_management.menu_fund_management_attachments_type
 msgid "Meeting Minutes Type"
 msgstr "会议纪要类型"
 
@@ -1386,6 +1414,12 @@ msgstr "该流程分类所属会议纪要类型"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__type_domain
 msgid "Meeting Minutes Type By Stage"
 msgstr "该阶段会议纪要类型"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes_type__name_show
+#: model:ir.model.fields,field_description:fund_management.field_meeting_minutes_type__name_show
+msgid "Meeting Minutes Type Show"
+msgstr "会议纪要类型"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__meeting_minutes_attach_div_h
@@ -1408,7 +1442,13 @@ msgid "Meeting minutes attachment"
 msgstr "会议纪要附件"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__meeting_minutes_attach_link
+msgid "Meeting minutes attachment files link"
+msgstr "会议纪要附件"
+
+#. module: fund_management
 #: model:ir.model,name:fund_management.model_fund_management_meeting_minutes_type
+#: model:ir.model,name:fund_management.model_meeting_minutes_type
 msgid "Meeting minutes type"
 msgstr "会议纪要类型"
 
@@ -1555,6 +1595,11 @@ msgid "Numbers computed from your personal applications."
 msgstr "源自您申请的统计数量"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__meeting_minute_help_msg
+msgid "Operation Hint Message"
+msgstr "操作提示信息"
+
+#. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__overdue_description
 msgid "Overdue Description"
 msgstr "超期描述"
@@ -1638,6 +1683,13 @@ msgid ""
 "Please keep the contract name consistent with the contract name of "
 "historical applications:%(contract_name)s"
 msgstr "请确保合同名称与上次申请录入的合同名称保持一致！上次录入合同名称:%(contract_name)s"
+
+#. module: fund_management
+#. odoo-python
+#: code:addons/fund_management/models/fund_management.py:0
+#, python-format
+msgid "Please select to upload %(msg_list)s"
+msgstr "请选择上传 %(msg_list)s"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
@@ -1855,6 +1907,16 @@ msgstr ""
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
+msgid "Stop"
+msgstr "一键叫停"
+
+#. module: fund_management
+#: model:ir.model.fields.selection,name:fund_management.selection__fund_management__state__stopped
+msgid "Stopped"
+msgstr "一键叫停"
+
+#. module: fund_management
+#: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Submit"
 msgstr "提交"
 
@@ -1990,6 +2052,11 @@ msgstr "总计"
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_fund_analysis_tree
 msgid "Total Amount"
 msgstr "金额总计"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__type_name_show
+msgid "Type Name Show"
+msgstr "类型名"
 
 #. module: fund_management
 #. odoo-python

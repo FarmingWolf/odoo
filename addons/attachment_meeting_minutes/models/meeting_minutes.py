@@ -56,7 +56,7 @@ class MeetingMinutes(models.Model):
             raise ValidationError('当前用户尚无管理权限. 请联系管理员.')
         return employee
 
-    employee_id = fields.Many2one(comodel_name='hr.employee', string="员工", default=_default_employee_id,
+    employee_id = fields.Many2one(comodel_name='hr.employee', string="上传者", default=_default_employee_id,
                                   store=True, check_company=True)
     active = fields.Boolean(string='有效', default=True)
     attachment_id = fields.Many2many('ir.attachment', string="文件", copy=False, required=True)
