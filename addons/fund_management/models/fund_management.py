@@ -151,8 +151,12 @@ class FundManagement(models.Model):
                             default=lambda self: self._get_default_stage_id())
     stage_sequence = fields.Integer("Approval Stage Sequence NO.", related="stage.sequence")
     invisible_meeting_minutes = fields.Boolean("Meeting Minutes Invisible", compute="_compute_invisible_meeting_minutes")
-    meeting_minutes_editable = fields.Boolean("Meeting Minutes Editable", related="stage.input_meeting_minutes")
+    meeting_minutes_editable = fields.Boolean("Meeting Minutes Editable", compute="_compute_meeting_minutes_editable")
     meeting_minute_types = fields.Many2many(string="Meeting Minute Types", related="category_id.meeting_minute_types")
+
+    meeting_minute_help_msg = fields.Char(string="Operation Hint Message", compute="_compute_meeting_minute_help_msg")
+    meeting_minutes_attach_link = fields.Many2many(string="Meeting minutes attachment files link", comodel_name='meeting.minutes',
+                                                   column1='fund_management_id', column2='meeting_minutes_id', tracking=True)
 
     meeting_minutes_attach = fields.One2many(string="Meeting minutes attachment", inverse_name="fund_management_id",
                                              comodel_name="fund.management.meeting.minutes")
@@ -168,13 +172,22 @@ class FundManagement(models.Model):
         default_list = []
         _logger.info(f"self.stage={self.stage};self.stage.meeting_minute_types={self.stage.meeting_minute_types}")
         for default_type in self.stage.meeting_minute_types:
-            meeting_minutes = {
-                "fund_management_id": self.id,
-                "type": default_type.id,
-            }
-            default_list.append((0, 0, meeting_minutes))
+            default_list.append(default_type.name_show)
 
-        self.meeting_minutes_attach = default_list
+        if default_list:
+            self.meeting_minute_help_msg = _("Please select to upload %(msg_list)s") % {'msg_list': str(default_list)}
+        else:
+            self.meeting_minute_help_msg = False
+
+    @api.depends('stage')
+    def _compute_meeting_minute_help_msg(self):
+        for record in self:
+            record._onchange_stage()
+
+    def _compute_meeting_minutes_editable(self):
+        for record in self:
+            check_right, tgt_stage = self._check_approval_rights(record)
+            record.meeting_minutes_editable = record.stage.input_meeting_minutes & check_right
 
     def _compute_invisible_meeting_minutes(self):
         for record in self:
@@ -188,7 +201,7 @@ class FundManagement(models.Model):
                 else:
                     record.invisible_meeting_minutes = True
 
-    @api.depends("meeting_minutes_attach")
+    @api.depends("meeting_minutes_attach_link")
     def _compute_meeting_minutes_attach_div_h(self):
         for record in self:
             record.meeting_minutes_attach_div_h = len(record.meeting_minute_types) * 4.56
@@ -477,12 +490,13 @@ class FundManagement(models.Model):
 
     def _compute_is_editable(self):
         for record in self:
+            check_right, tgt_stage = self._check_approval_rights(record)
             if record.state == "draft":
-                record.is_editable = True
+                record.is_editable = True & check_right
             else:
                 if record.stage:
                     if record.stage.sequence == 0:
-                        record.is_editable = True
+                        record.is_editable = True & check_right
                     else:
                         record.is_editable = False
                 else:
@@ -530,11 +544,11 @@ class FundManagement(models.Model):
             for expense in self:
                 expense.employee_id = self.env.user.with_company(expense.company_id).employee_id
 
-    @api.depends('meeting_minutes_attach')
+    @api.depends('meeting_minutes_attach_link')
     def _compute_nb_attachment(self):
         for record in self:
             tmp_cnt = 0
-            for meeting_minutes in record.meeting_minutes_attach:
+            for meeting_minutes in record.meeting_minutes_attach_link:
                 tmp_cnt += meeting_minutes.nb_attachment
             record.nb_attachment = tmp_cnt
 
@@ -594,14 +608,9 @@ class FundManagement(models.Model):
             # 根据category中的meeting_minutes_type生成meeting_minutes的预备list
             for meeting_minutes_type in record.meeting_minute_types:
                 type_exists = False
-                for meeting_minutes_created in record.meeting_minutes_attach:
+                for meeting_minutes_created in record.meeting_minutes_attach_link:
                     if meeting_minutes_type == meeting_minutes_created.type:
                         type_exists = True
-                        # 检查初始化页面，附件类型ID为空时上传附件导致的附件res_id为空
-                        for attachment in meeting_minutes_created.attachment_ids:
-                            if not attachment.res_id:
-                                _logger.info(f"回填附件的res_id:{meeting_minutes_created.id}")
-                                attachment.res_id = meeting_minutes_created.id
                         break
                 if not type_exists:
                     meeting_minutes = {
@@ -1321,6 +1330,9 @@ class FundManagement(models.Model):
             if not record.contract_payment:
                 comp_tgt = record.total_amount_currency
 
+            if comp_tgt == 0:
+                return False
+
             if record.category_id.amount_max:
                 if record.category_id.amount_min <= comp_tgt < record.category_id.amount_max:
                     return True
@@ -1438,8 +1450,8 @@ class FundManagement(models.Model):
                     continue
 
                 type_exists = False
-                _logger.info(f"rcd.meeting_minutes_attach={rcd.meeting_minutes_attach}")
-                for meeting_minutes_created in rcd.meeting_minutes_attach:
+                _logger.info(f"rcd.meeting_minutes_attach={rcd.meeting_minutes_attach_link}")
+                for meeting_minutes_created in rcd.meeting_minutes_attach_link:
                     if m_m_type == meeting_minutes_created.type and meeting_minutes_created.nb_attachment > 0:
                         type_exists = True
                         break

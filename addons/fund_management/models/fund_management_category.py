@@ -28,8 +28,8 @@ class FundManagementCategory(models.Model):
 
     approval_stages = fields.One2many(comodel_name='fund.management.approval.stage', inverse_name='category_id',
                                       string="Approval Stages")
-    meeting_minute_types = fields.Many2many(comodel_name="fund.management.meeting.minutes.type",
-                                            relation="category_meeting_minutes_type_rel",
+    meeting_minute_types = fields.Many2many(comodel_name="meeting.minutes.type",
+                                            relation="category_meeting_minutes_type_relation",
                                             column1="category_id", column2="meeting_minutes_type_id",
                                             string="Meeting Minutes Type")
     overdue_reminder_hours = fields.Float(string="Overdue Reminder Hours Setting", default=72, copy=True)

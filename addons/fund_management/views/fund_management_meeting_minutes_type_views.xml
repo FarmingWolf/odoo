@@ -40,4 +40,25 @@
             </form>
         </field>
     </record>
+
+    <record id="fund_management_meeting_minutes_type_view_tree_inherit" model="ir.ui.view">
+        <field name="name">meeting.minutes.type.inherit.tree</field>
+        <field name="model">meeting.minutes.type</field>
+        <field name="inherit_id" ref="attachment_meeting_minutes.meeting_minutes_type_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="mandatory"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="fund_management_meeting_minutes_type_view_form_inherit" model="ir.ui.view">
+        <field name="name">meeting.minutes.type.inherit.form</field>
+        <field name="model">meeting.minutes.type</field>
+        <field name="inherit_id" ref="attachment_meeting_minutes.meeting_minutes_type_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="mandatory"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>

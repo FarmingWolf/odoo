@@ -6,4 +6,7 @@
     <menuitem id="menu_meeting_minutes_management" name="会议纪要管理" parent="menu_meeting_minutes_root"
               action="meeting_minutes_action"
               groups="attachment_meeting_minutes.group_meeting_minutes_user" sequence="1"/>
+    <menuitem id="menu_meeting_minutes_management_type" name="会议纪要分类" parent="menu_meeting_minutes_root"
+              action="meeting_minutes_type_action"
+              groups="attachment_meeting_minutes.group_meeting_minutes_manager" sequence="10"/>
 </odoo>

@@ -104,3 +104,12 @@ class MeetingMinutes(models.Model):
             ])
             obsolete_attachments.unlink()
         return res
+
+    @api.model
+    def create(self, vals):
+        res = super().create(vals)
+        for record in res:
+            for attachment in record.attachment_id:
+                if not attachment.res_id:
+                    attachment.res_id = record.id
+        return res

@@ -75,8 +75,8 @@ class FundManagementApprovalStage(models.Model):
                                                         related="category_id.meeting_minute_types")
     # dynamic domain should be set in views not here
     meeting_minute_types = fields.Many2many(
-        string="Meeting Minutes Type", comodel_name="fund.management.meeting.minutes.type", copy=False,
-        relation="stage_meeting_minutes_type_rel", column1="stage_id", column2="meeting_minutes_type_id")
+        string="Meeting Minutes Type", comodel_name="meeting.minutes.type", copy=False,
+        relation="stage_meeting_minutes_type_relation", column1="stage_id", column2="meeting_minutes_type_id")
 
     _sql_constraints = [
         ('sequence', 'unique(name, sequence, company_id, category_id)',

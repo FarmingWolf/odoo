@@ -5,7 +5,7 @@
         <field name="name">meeting.minutes.type.view.tree</field>
         <field name="model">meeting.minutes.type</field>
         <field name="arch" type="xml">
-            <tree string="meeting_minutes_type_tree" create="True" edit="True" delete="True" import="False" open_form_view="True">
+            <tree string="meeting_minutes_type_tree" create="True" edit="True" delete="True" import="False" editable="bottom" open_form_view="True">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
             </tree>

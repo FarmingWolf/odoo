@@ -299,20 +299,22 @@
                     </div>
                     <notebook invisible="invisible_meeting_minutes">
                         <page string="Attachment List" readonly="(not is_editable) and (not meeting_minutes_editable)">
-                            <field name="meeting_minutes_attach" mode="tree,form">
+                            <div class="oe_title" invisible="(not meeting_minute_help_msg) or (not meeting_minutes_editable)">
+                                <h1><field name="meeting_minute_help_msg"/></h1>
+                            </div>
+                            <field name="meeting_minutes_attach_link" mode="tree,form" readonly="(not is_editable) and (not meeting_minutes_editable)">
                                 <tree delete="False" create="False" edit="True">
-                                    <field name="type" string="Attachment Type"/>
-                                    <field name="attachment_ids" widget="many2many_binary"/>
+                                    <field name="name" string="Attachment Type" readonly="1"/>
+                                    <field name="attachment_id" widget="many2many_binary" readonly="1"/>
                                 </tree>
-                                <form delete="False" create="False" edit="True">
+                                <form delete="False" create="False" edit="False">
                                     <group>
-                                        <field name="name" invisible="1"/>
-                                        <field name="type_domain" invisible="1"/>
-                                        <field name="type" domain="[('id', 'in', type_domain)]"
-                                               options="{'no_create': True, 'no_open': True}" readonly="1"/>
-                                        <field name="attachment_ids" widget="many2many_binary"
-                                               options="{'no_create': True}"
-                                               readonly="not parent.meeting_minutes_editable"/>
+                                        <field name="subject"/>
+                                        <field name="type"/>
+                                    </group>
+                                    <group>
+                                        <field name="meeting_time"/>
+                                        <field name="attachment_id" widget="many2many_binary"/>
                                     </group>
                                 </form>
                             </field>

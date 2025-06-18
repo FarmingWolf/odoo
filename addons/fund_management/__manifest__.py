@@ -15,7 +15,7 @@
 最高领导层增加一键叫停：流程直接打回至初始状态；
     """,
     'website': 'https://www.491tech.com/',
-    'depends': ['account', 'web_tour', 'hr', 'accounting_subject'],
+    'depends': ['account', 'web_tour', 'hr', 'accounting_subject', 'attachment_meeting_minutes'],
     'data': [
         'security/fund_management_security.xml',
         'security/ir.model.access.csv',
