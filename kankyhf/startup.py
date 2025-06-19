@@ -62,6 +62,8 @@ zip_tgt_folders = [
     'website_estate',
     'project',
     'ocr_partner',
+    'attachment_meeting_minutes',
+    'contract_expense',
     'fund_management',
     'estate_big_screen',
     'hr_attendance',
