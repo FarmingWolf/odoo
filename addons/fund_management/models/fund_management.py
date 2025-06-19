@@ -20,7 +20,7 @@ class FundManagement(models.Model):
     @api.model
     def _default_employee_id(self):
         employee = self.env.user.employee_id
-        if not employee and not self.env.user.has_group('fund_management.group_fund_management_team_approver'):
+        if not employee or not self.env.user.has_group('fund_management.group_fund_management_team_approver'):
             raise ValidationError(_('The current user has no related employee. Please, create one.'))
         return employee
 
