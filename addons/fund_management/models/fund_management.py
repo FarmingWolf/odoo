@@ -39,7 +39,7 @@ class FundManagement(models.Model):
         if self._default_employee_id().department_id:
             department_nm = self._default_employee_id().department_id.name
             for word in words_to_del:
-                department_name = department_nm.replace(word, "")
+                department_nm = department_nm.replace(word, "")
 
             department_name_first_letter = Utils.get_first_letter(department_nm)
             prefix_str.append(department_name_first_letter)
