@@ -189,7 +189,7 @@
                                     <field name="company_currency_id" class="mw-25 ms-0" groups="base.group_multi_currency"
                                            options="{'no_create': True}" readonly="not editable" invisible="1"/>
                                 </div>
-                                <field name="fund_type" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="fund_type" readonly="not editable" options="{'no_create': True, 'no_open': True}"/>
                                 <field name="procurement_method" readonly="not editable" options="{'no_create': True, 'no_open': True}"/>
                                 <field name="account_subject" readonly="not editable" options="{'no_create': True, 'no_open': True}"/>
                                 <field name="receiving_unit" readonly="not editable" options="{'no_create': True, 'no_open': True}"/>

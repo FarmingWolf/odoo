@@ -29,7 +29,8 @@ class ContractExpense(models.Model):
     @api.model
     def _default_employee_id(self):
         employee = self.env.user.employee_id
-        if not employee or not self.env.user.has_group('contract_expense.group_contract_expense_user'):
+        if not employee or (not self.env.user.has_group('contract_expense.group_contract_expense_apply')
+                            and not self.env.user.has_group('contract_expense.group_contract_expense_lawyer')):
             raise ValidationError(f'当前用户没有合同权限：{employee.name}')
         return employee
 
@@ -123,6 +124,15 @@ class ContractExpense(models.Model):
 
         self.meeting_minutes_editable = self.stage.input_meeting_minutes
         self._get_contract_no()
+
+    @api.onchange('fund_type')
+    def _onchange_fund_type(self):
+        if not self.contract_no:
+            self._get_contract_no()
+        else:
+            tmp_lst = self.contract_no.split('-')
+            tmp_lst[1] = Utils.get_first_letter(self.fund_type.name)
+            self.contract_no = '-'.join(tmp_lst)
 
     def _get_default_category(self):
 
@@ -559,7 +569,17 @@ class ContractExpense(models.Model):
 
         if not self.env.user.has_group('contract_expense.group_contract_expense_user'):
             _logger.info(f"self.env.user:{self.env.user.name}没有contract_expense.group_contract_expense_user权限")
-            return False, record.stage
+            if not self.env.user.has_group('contract_expense.group_contract_expense_lawyer'):
+                _logger.info(f"也没有contract_expense.group_contract_expense_lawyer权限")
+                if not self.env.user.has_group('contract_expense.group_contract_expense_apply'):
+                    _logger.info(f"也没有contract_expense.group_contract_expense_apply权限")
+                    return False, record.stage
+                else:
+                    if record.employee_id != self.env.user.employee_id:
+                        return False, record.stage
+                    else:
+                        if not record.stage.input_meeting_minutes:
+                            return False, record.stage
 
         # 由于在stage创建时，对非起始stage（sequence!=0）时的部门或职位角色不同时为空做了要求
         if not record.stage.op_department_id:

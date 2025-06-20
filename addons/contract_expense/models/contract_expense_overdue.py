@@ -94,7 +94,8 @@ class ContractExpenseOverdue(models.Model):
             tgt_employees = self.env['hr.employee'].sudo().search(s_domain, order='id DESC')
             for tgt_employee in tgt_employees:
                 # 找寻具有本stage权限的employee
-                if not tgt_employee.user_id.has_group('contract_expense.group_contract_expense_user'):
+                if (not tgt_employee.user_id.has_group('contract_expense.group_contract_expense_user')
+                and not tgt_employee.user_id.has_group('contract_expense.group_contract_expense_lawyer')):
                     continue
 
                 # 基本原则是管控住平级企业间数据隔离

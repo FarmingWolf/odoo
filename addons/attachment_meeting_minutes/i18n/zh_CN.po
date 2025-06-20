@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-18 16:03+0000\n"
-"PO-Revision-Date: 2025-06-18 16:03+0000\n"
+"POT-Creation-Date: 2025-06-20 08:09+0000\n"
+"PO-Revision-Date: 2025-06-20 08:09+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 #. module: attachment_meeting_minutes
 #: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__message_needaction
 msgid "Action Needed"
-msgstr ""
+msgstr "需应对"
 
 #. module: attachment_meeting_minutes
 #: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes_type__active
@@ -301,6 +301,11 @@ msgid "上传人"
 msgstr ""
 
 #. module: attachment_meeting_minutes
+#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__employee_id
+msgid "上传者"
+msgstr ""
+
+#. module: attachment_meeting_minutes
 #: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__meeting_time
 #: model_terms:ir.ui.view,arch_db:attachment_meeting_minutes.meeting_minutes_view_search
 msgid "会议时间"
@@ -373,11 +378,6 @@ msgstr ""
 #. module: attachment_meeting_minutes
 #: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__name
 msgid "名称"
-msgstr ""
-
-#. module: attachment_meeting_minutes
-#: model:ir.model.fields,field_description:attachment_meeting_minutes.field_meeting_minutes__employee_id
-msgid "员工"
 msgstr ""
 
 #. module: attachment_meeting_minutes

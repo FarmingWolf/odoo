@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-18 15:58+0000\n"
-"PO-Revision-Date: 2025-06-18 15:58+0000\n"
+"POT-Creation-Date: 2025-06-20 08:07+0000\n"
+"PO-Revision-Date: 2025-06-20 08:07+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -305,6 +305,7 @@ msgid "Account Subject Category"
 msgstr "科目类别"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__message_needaction
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_needaction
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_needaction
 msgid "Action Needed"
@@ -318,24 +319,28 @@ msgid "Active"
 msgstr "激活"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__activity_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__activity_ids
 msgid "Activities"
 msgstr "活动"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__activity_exception_decoration
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_exception_decoration
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__activity_exception_decoration
 msgid "Activity Exception Decoration"
 msgstr "活动异常"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__activity_state
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_state
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__activity_state
 msgid "Activity State"
 msgstr "活动状态"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__activity_type_icon
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_type_icon
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__activity_type_icon
 msgid "Activity Type Icon"
@@ -386,18 +391,21 @@ msgid "An error occurred during the upload"
 msgstr "上传时发生错误"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__analytic_distribution
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__analytic_distribution
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__analytic_distribution
 msgid "Analytic Distribution"
 msgstr "分配分析"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__analytic_distribution_search
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__analytic_distribution_search
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__analytic_distribution_search
 msgid "Analytic Distribution Search"
 msgstr "分配分析检索"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__analytic_precision
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__analytic_precision
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__analytic_precision
 msgid "Analytic Precision"
@@ -604,6 +612,7 @@ msgid "Attachment"
 msgstr "附件"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__message_attachment_count
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_attachment_count
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_attachment_count
 msgid "Attachment Count"
@@ -718,6 +727,12 @@ msgid "Contract Amount"
 msgstr "合同金额"
 
 #. module: fund_management
+#: model:ir.model,name:fund_management.model_contract_expense
+msgid "Contract Expense"
+msgstr "支出类合同"
+
+#. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_expense_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_id
 msgid "Contract ID"
 msgstr "合同名称"
@@ -836,9 +851,7 @@ msgstr "货币"
 msgid ""
 "Current state: %(state_name)s. You can not process this stage: "
 "%(stage_name)s"
-msgstr ""
-"流程当前状态: %(state_name)s. 你不能处理这个审批节点: "
-"%(stage_name)s"
+msgstr "流程当前状态: %(state_name)s. 你不能处理这个审批节点: %(stage_name)s"
 
 #. module: fund_management
 #: model_terms:ir.actions.act_window,help:fund_management.action_fund_management_payment_method
@@ -901,6 +914,9 @@ msgid "Download our App"
 msgstr "下载此App"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense_fund_type__editable
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense_payment_method__editable
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense_procurement_method__editable
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_approval_stage__editable
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__editable
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__editable
@@ -946,18 +962,21 @@ msgstr ""
 "                等等……"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__message_follower_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_follower_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_follower_ids
 msgid "Followers"
 msgstr "关注者"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__message_partner_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_partner_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "关注者（合作者）"
 
 #. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_contract_expense__activity_type_icon
 #: model:ir.model.fields,help:fund_management.field_fund_management__activity_type_icon
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
@@ -1003,6 +1022,7 @@ msgstr "资金相关合同"
 
 #. module: fund_management
 #: model:ir.model,name:fund_management.model_fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__fund_management_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__fund_management_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_meeting_minutes__fund_management_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__fund_management_id
@@ -1084,6 +1104,7 @@ msgid "Fund Management Stage"
 msgstr "资金管理审批阶段"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_expense_fund_type
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__fund_type
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__fund_type
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_fund_type__name
@@ -1190,6 +1211,7 @@ msgid "Group By"
 msgstr "分组依据"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__has_message
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__has_message
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__has_message
 msgid "Has Message"
@@ -1233,24 +1255,29 @@ msgid "ID"
 msgstr ""
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__activity_exception_icon
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_exception_icon
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__activity_exception_icon
 msgid "Icon"
 msgstr "图标"
 
 #. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_contract_expense__activity_exception_icon
 #: model:ir.model.fields,help:fund_management.field_fund_management__activity_exception_icon
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__activity_exception_icon
 msgid "Icon to indicate an exception activity."
 msgstr "异常活动的图标"
 
 #. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_contract_expense__message_needaction
 #: model:ir.model.fields,help:fund_management.field_fund_management__message_needaction
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__message_needaction
 msgid "If checked, new messages require your attention."
 msgstr "新消息需要您的关注"
 
 #. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_contract_expense__message_has_error
+#: model:ir.model.fields,help:fund_management.field_contract_expense__message_has_sms_error
 #: model:ir.model.fields,help:fund_management.field_fund_management__message_has_error
 #: model:ir.model.fields,help:fund_management.field_fund_management__message_has_sms_error
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__message_has_error
@@ -1281,6 +1308,7 @@ msgid "Is Editable By Current User"
 msgstr "当前用户可编辑"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__message_is_follower
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_is_follower
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_is_follower
 msgid "Is Follower"
@@ -1337,6 +1365,7 @@ msgid "Latest Approval Detail"
 msgstr "最新审批详情"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__message_main_attachment_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_main_attachment_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_main_attachment_id
 msgid "Main Attachment"
@@ -1468,18 +1497,21 @@ msgid "Meeting minutes types used in Fund Management Category。"
 msgstr "资金管理分类用会议纪要类型"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__message_has_error
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_has_error
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_has_error
 msgid "Message Delivery error"
 msgstr "消息分发错误"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__message_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_ids
 msgid "Messages"
 msgstr "消息"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__my_activity_date_deadline
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__my_activity_date_deadline
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__my_activity_date_deadline
 msgid "My Activity Deadline"
@@ -1505,24 +1537,28 @@ msgid "Name and sequence number can not be duplicated in the category!"
 msgstr "同一大类流程阶段序号不能重复"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__activity_calendar_event_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_calendar_event_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
 msgstr "下一活动日历"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__activity_date_deadline
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_date_deadline
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__activity_date_deadline
 msgid "Next Activity Deadline"
 msgstr "下一活动截止日"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__activity_summary
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_summary
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__activity_summary
 msgid "Next Activity Summary"
 msgstr "下一活动概要"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__activity_type_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_type_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__activity_type_id
 msgid "Next Activity Type"
@@ -1558,6 +1594,7 @@ msgid "Notes..."
 msgstr "申请资金事由等备注……"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__message_needaction_counter
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_needaction_counter
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_needaction_counter
 msgid "Number of Actions"
@@ -1570,18 +1607,21 @@ msgid "Number of Attachments"
 msgstr "附件数量"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__message_has_error_counter
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_has_error_counter
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_has_error_counter
 msgid "Number of errors"
 msgstr "错误数量"
 
 #. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_contract_expense__message_needaction_counter
 #: model:ir.model.fields,help:fund_management.field_fund_management__message_needaction_counter
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__message_needaction_counter
 msgid "Number of messages requiring action"
 msgstr "需要应对的消息数量"
 
 #. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_contract_expense__message_has_error_counter
 #: model:ir.model.fields,help:fund_management.field_fund_management__message_has_error_counter
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__message_has_error_counter
 msgid "Number of messages with delivery error"
@@ -1632,6 +1672,7 @@ msgstr "收款方"
 
 #. module: fund_management
 #: model:ir.model,name:fund_management.model_fund_management_payment_method
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_expense_payment_method
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__payment_method
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__payment_method
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_payment_method__name
@@ -1703,6 +1744,7 @@ msgstr "流程应用"
 
 #. module: fund_management
 #: model:ir.model,name:fund_management.model_fund_management_procurement_method
+#: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_expense_procurement_method
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__procurement_method
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__procurement_method
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_procurement_method__name
@@ -1718,6 +1760,7 @@ msgid "Public Employee"
 msgstr "公共员工"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__rating_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__rating_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__rating_ids
 msgid "Ratings"
@@ -1777,6 +1820,7 @@ msgid "Report Company Currency"
 msgstr "货币"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__activity_user_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_user_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__activity_user_id
 msgid "Responsible User"
@@ -1796,6 +1840,7 @@ msgid ""
 msgstr "限制该阶段只能该部室中具有审批权限的岗位或职位或角色的人员处理。"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__message_has_sms_error
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_has_sms_error
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_has_sms_error
 msgid "SMS Delivery error"
@@ -1892,6 +1937,7 @@ msgid "Status"
 msgstr "状态"
 
 #. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_contract_expense__activity_state
 #: model:ir.model.fields,help:fund_management.field_fund_management__activity_state
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__activity_state
 msgid ""
@@ -2013,6 +2059,11 @@ msgid ""
 msgstr "本阶段任务处理中。点击可更改任务阶段状态。"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__this_editable
+msgid "This Editable"
+msgstr "可编辑"
+
+#. module: fund_management
 #. odoo-python
 #: code:addons/fund_management/models/fund_management.py:0
 #, python-format
@@ -2067,6 +2118,7 @@ msgid "Type name can not be duplicated"
 msgstr "类型名称不能重复"
 
 #. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_contract_expense__activity_exception_decoration
 #: model:ir.model.fields,help:fund_management.field_fund_management__activity_exception_decoration
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__activity_exception_decoration
 msgid "Type of the exception activity on record."
@@ -2090,12 +2142,14 @@ msgid "View All Stages"
 msgstr "查看流程全部阶段"
 
 #. module: fund_management
+#: model:ir.model.fields,field_description:fund_management.field_contract_expense__website_message_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__website_message_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__website_message_ids
 msgid "Website Messages"
 msgstr "本站在线消息"
 
 #. module: fund_management
+#: model:ir.model.fields,help:fund_management.field_contract_expense__website_message_ids
 #: model:ir.model.fields,help:fund_management.field_fund_management__website_message_ids
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__website_message_ids
 msgid "Website communication history"
@@ -2283,6 +2337,11 @@ msgid "发起日期:"
 msgstr ""
 
 #. module: fund_management
+#: model:ir.model,name:fund_management.model_contract_expense_fund_type
+msgid "合同支出资金类型"
+msgstr ""
+
+#. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
 msgid "合同资金支付审批单"
 msgstr ""
@@ -2290,6 +2349,11 @@ msgstr ""
 #. module: fund_management
 #: model:ir.actions.report,name:fund_management.action_print_contract_payment_application
 msgid "合同资金支付申请单"
+msgstr ""
+
+#. module: fund_management
+#: model:ir.model,name:fund_management.model_contract_expense_procurement_method
+msgid "合同采购方式"
 msgstr ""
 
 #. module: fund_management
@@ -2320,6 +2384,11 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:fund_management.contract_payment_application
 #: model_terms:ir.ui.view,arch_db:fund_management.no_contract_payment_application
 msgid "审批阶段"
+msgstr ""
+
+#. module: fund_management
+#: model:ir.model,name:fund_management.model_contract_expense_payment_method
+msgid "支付方式"
 msgstr ""
 
 #. module: fund_management

@@ -1,0 +1,1406 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* contract_expense
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 17.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-06-20 08:10+0000\n"
+"PO-Revision-Date: 2025-06-20 08:10+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_category_view_form
+msgid "<span>至</span>"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_category_view_form
+msgid "<span>设置审批节点步骤</span>"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__message_needaction
+msgid "Action Needed"
+msgstr "需应对"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__active
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__active
+msgid "Active"
+msgstr "有效"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__activity_ids
+msgid "Activities"
+msgstr "活动"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "异常活动标识"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__activity_state
+msgid "Activity State"
+msgstr "活动状态"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "活动类型图标"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__analytic_distribution
+msgid "Analytic Distribution"
+msgstr "分析分布"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__analytic_distribution_search
+msgid "Analytic Distribution Search"
+msgstr "分析分布查询"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__analytic_precision
+msgid "Analytic Precision"
+msgstr "分析决策"
+
+#. module: contract_expense
+#: model:ir.model.fields.selection,name:contract_expense.selection__contract_expense__state__approved
+msgid "Approved"
+msgstr "审批中"
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_ir_attachment
+msgid "Attachment"
+msgstr "附件"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__message_attachment_count
+msgid "Attachment Count"
+msgstr "附件数"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__category_id
+msgid "Category"
+msgstr "分类"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__category_description
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__category_description
+msgid "Category Description"
+msgstr "分类描述"
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "Click to approve"
+msgstr "点击审批同意"
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "Click to reject"
+msgstr "点击驳回"
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "Click to stop"
+msgstr "点击一键叫停"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__company_id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__company_id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__company_id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__company_id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_fund_type__company_id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_payment_method__company_id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_procurement_method__company_id
+msgid "Company"
+msgstr "公司"
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_graph
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_pivot
+msgid "Contract Analysis"
+msgstr "合同分析"
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__contract_expense_id
+msgid "Contract Expense"
+msgstr "支出类合同"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_hr_employee_public__contract_expense_manager_id
+msgid "Contract Expense Manager"
+msgstr "支出类合同管理员"
+
+#. module: contract_expense
+#: model_terms:ir.actions.act_window,help:contract_expense.contract_expense_actions_all
+msgid ""
+"Create a new fund management application to submit for approval process."
+msgstr ""
+"创建新流程提交审批。"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__create_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__create_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__create_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__create_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__create_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_fund_type__create_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__create_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_payment_method__create_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_procurement_method__create_uid
+msgid "Created by"
+msgstr "制单人"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__create_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__create_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__create_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__create_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__create_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_fund_type__create_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__create_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_payment_method__create_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_procurement_method__create_date
+msgid "Created on"
+msgstr "创建时间"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__applicant_unit
+msgid "Department Name"
+msgstr "部门名称"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__display_name
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__display_name
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__display_name
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__display_name
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__display_name
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_fund_type__display_name
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__display_name
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_payment_method__display_name
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_procurement_method__display_name
+msgid "Display Name"
+msgstr "显示名"
+
+#. module: contract_expense
+#: model:ir.model.fields.selection,name:contract_expense.selection__contract_expense__state__done
+msgid "Done"
+msgstr "完成"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__editable
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__editable
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__editable
+msgid "Editable"
+msgstr "可编辑"
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_hr_employee
+msgid "Employee"
+msgstr "员工"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_hr_employee__filter_for_contract_expense
+msgid "Filter For Contract Expense"
+msgstr "合同过滤"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__message_follower_ids
+msgid "Followers"
+msgstr "关注者"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "关注者（合作方）"
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Font awesome 图标 如： fa-tasks"
+
+#. module: contract_expense
+#: model:ir.actions.act_window,name:contract_expense.contract_expense_actions_all
+msgid "Fund Analysis"
+msgstr "资金分析"
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "Group By"
+msgstr "分组"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__has_message
+msgid "Has Message"
+msgstr "有消息"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_fund_type__id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_payment_method__id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_procurement_method__id
+msgid "ID"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__activity_exception_icon
+msgid "Icon"
+msgstr "图标"
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "异常活动图标"
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "勾选，则新消息需要您的关注"
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense__message_has_error
+#: model:ir.model.fields,help:contract_expense.field_contract_expense__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "勾选，则部分消息存在分发错误"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__invisible_meeting_minutes
+msgid "Invisible Meeting Minutes"
+msgstr "会议纪要可见性"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__message_is_follower
+msgid "Is Follower"
+msgstr "是否关注者"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_ir_attachment__public
+#: model:ir.model.fields,field_description:contract_expense.field_mrp_document__public
+#: model:ir.model.fields,field_description:contract_expense.field_product_document__public
+msgid "Is public document"
+msgstr "公共文档"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__write_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__write_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__write_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__write_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__write_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_fund_type__write_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__write_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_payment_method__write_uid
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_procurement_method__write_uid
+msgid "Last Updated by"
+msgstr "最后更新者"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__write_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__write_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__write_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__write_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__write_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_fund_type__write_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__write_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_payment_method__write_date
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_procurement_method__write_date
+msgid "Last Updated on"
+msgstr "最后更新日期"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__message_main_attachment_id
+msgid "Main Attachment"
+msgstr "主附件"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__meeting_minutes_editable
+msgid "Meeting Minutes Editable"
+msgstr "附件可编辑及"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__message_has_error
+msgid "Message Delivery error"
+msgstr "消息分发错误"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__message_ids
+msgid "Messages"
+msgstr "消息"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "我的活动截止日"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "下一活动日历事件"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "下一活动截止日"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__activity_summary
+msgid "Next Activity Summary"
+msgstr "下一活动简介"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__activity_type_id
+msgid "Next Activity Type"
+msgstr "下一活动类型"
+
+#. module: contract_expense
+#: model_terms:ir.actions.act_window,help:contract_expense.contract_expense_actions_all
+msgid "No data yet!"
+msgstr "尚无数据！"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__message_needaction_counter
+msgid "Number of Actions"
+msgstr "动作数量"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__message_has_error_counter
+msgid "Number of errors"
+msgstr "错误数量"
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "需关注的消息数"
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "有分发错误的消息数"
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_hr_employee_public
+msgid "Public Employee"
+msgstr "公共员工"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__rating_ids
+msgid "Ratings"
+msgstr "评级"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__receive_employee_id
+msgid "Receive Employee"
+msgstr "接收人"
+
+#. module: contract_expense
+#: model:ir.model.fields.selection,name:contract_expense.selection__contract_expense__state__refused
+msgid "Refused"
+msgstr "拒绝"
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "Reject"
+msgstr "驳回"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__activity_user_id
+msgid "Responsible User"
+msgstr "责任人"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "SMS分发错误"
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_hr_employee__contract_expense_manager_id
+#: model:ir.model.fields,help:contract_expense.field_res_users__contract_expense_manager_id
+msgid ""
+"Select the user responsible for approving \"Contract Expense\" of this employee.\n"
+"If empty, the approval is done by an Administrator or Approver (determined in settings/users)."
+msgstr ""
+"选择该员工 \"支出类合同\" 的审批人\n"
+"若置空，则有管理员或审批人执行。 (在用户设置中确定)."
+
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"基于活动的状态\n"
+"超期: 已超过期限\n"
+"今日: 活动日是今日\n"
+"计划: 未来活动。"
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "Stop"
+msgstr "一键叫停"
+
+#. module: contract_expense
+#: model:ir.model.fields.selection,name:contract_expense.selection__contract_expense__state__stopped
+msgid "Stopped"
+msgstr "一键叫停"
+
+#. module: contract_expense
+#: model:ir.model.fields.selection,name:contract_expense.selection__contract_expense__state__submitted
+msgid "Submitted"
+msgstr "已提交"
+
+#. module: contract_expense
+#. odoo-python
+#: code:addons/contract_expense/models/contract_expense.py:0
+#, python-format
+msgid ""
+"This application has been rejected at stage [%(stage_name)s], Please reject "
+"it !"
+msgstr ""
+"本申请已经在 [%(stage_name)s] 阶段被驳回, 请继续驳回！"
+
+#. module: contract_expense
+#: model:ir.model.fields.selection,name:contract_expense.selection__contract_expense__state__draft
+msgid "To Submit"
+msgstr "待提交"
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "记录中的活动异常类型"
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_res_users
+msgid "User"
+msgstr "用户"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__website_message_ids
+msgid "Website Messages"
+msgstr "在线消息"
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense__website_message_ids
+msgid "Website communication history"
+msgstr "在线沟通历史"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__receive_mobile
+msgid "Work Mobile"
+msgstr "工作手机"
+
+#. module: contract_expense
+#. odoo-python
+#: code:addons/contract_expense/models/contract_expense.py:0
+#: code:addons/contract_expense/models/contract_expense.py:0
+#, python-format
+msgid "You can not process this stage: %(stage_name)s"
+msgstr "您不能处理本节点： %(stage_name)s"
+
+#. module: contract_expense
+#. odoo-python
+#: code:addons/contract_expense/models/contract_expense.py:0
+#, python-format
+msgid ""
+"You have %(err_msg)s this application, and you can not approve it again!"
+msgstr ""
+"您已经 %(err_msg)s 本申请, 不能再同意！"
+
+#. module: contract_expense
+#. odoo-python
+#: code:addons/contract_expense/models/contract_expense.py:0
+#, python-format
+msgid ""
+"You have %(err_msg)s this application, and you can not cancel it again!"
+msgstr ""
+"您已经 %(err_msg)s 本流程, 不能再取消!"
+
+#. module: contract_expense
+#. odoo-python
+#: code:addons/contract_expense/models/contract_expense.py:0
+#, python-format
+msgid ""
+"You have %(err_msg)s this application, and you can not reject it again!"
+msgstr ""
+"您已经 %(err_msg)s 本流程, 不能再驳回!"
+
+#. module: contract_expense
+#. odoo-python
+#: code:addons/contract_expense/models/contract_expense.py:0
+#: code:addons/contract_expense/models/contract_expense.py:0
+#: code:addons/contract_expense/models/contract_expense.py:0
+#, python-format
+msgid "approved"
+msgstr "审批中"
+
+#. module: contract_expense
+#. odoo-python
+#: code:addons/contract_expense/models/contract_expense.py:0
+#: code:addons/contract_expense/models/contract_expense.py:0
+#: code:addons/contract_expense/models/contract_expense.py:0
+#, python-format
+msgid "rejected"
+msgstr "已驳回"
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_fund_type__sequence
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_payment_method__sequence
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_procurement_method__sequence
+msgid "sequence"
+msgstr "序号"
+
+#. module: contract_expense
+#: model:ir.actions.server,name:contract_expense.action_stop_svr_action
+msgid "一键叫停"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "乙方"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__meeting_minute_types
+msgid "会议纪要种类"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__meeting_minute_types_by_category
+msgid "会议纪要等附件种类"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__meeting_minutes_attach_link
+msgid "会议纪要等附件链接"
+msgstr ""
+
+#. module: contract_expense
+#. odoo-python
+#: code:addons/contract_expense/models/contract_expense.py:0
+#, python-format
+msgid "你不能处理这个节点: %(stage_name)s"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "保存(不提交)"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__company_id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__company_id
+msgid "公司"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.actions.act_window,help:contract_expense.action_contract_expense_procurement_method
+msgid "公开招标、邀请招标、三方比价等."
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__key_content
+msgid "关键条款内容"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.ui.menu,name:contract_expense.menu_contract_expense_applications
+msgid "创建/申请"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.actions.act_window,help:contract_expense.contract_expense_approval_stage_action
+msgid "创建审批节点"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.actions.act_window,help:contract_expense.action_contract_expense_category
+msgid "创建支出类合同审批流程种类。一般情况下，根据金额范围确定流程种类和审批节点。"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__employee_id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__employee_id
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "制单人"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__contract_expense_id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__contract_expense_ids
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_category_view_form
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "合同"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "合同关键内容"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "合同分类"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__name
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__name
+msgid "合同名称"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.constraint,message:contract_expense.constraint_contract_expense_name
+msgid "合同名称不能重复！"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__stage_id
+msgid "合同审批节点"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_contract_expense_fund_type
+msgid "合同支出资金类型"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "合同检索"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__category_id
+msgid "合同流程分类"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__name
+msgid "合同流程类别"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense__key_content
+msgid "合同的关键条款内容，如：合同支付节奏、支付条件等"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_hr_employee__contract_expense_manager_id
+#: model:ir.model.fields,field_description:contract_expense.field_res_users__contract_expense_manager_id
+msgid "合同管理"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__category_id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__category_id
+msgid "合同类别"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__contract_no
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__contract_no
+msgid "合同编号"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__contract_no_suffix
+msgid "合同编号后缀"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_contract_expense_procurement_method
+msgid "合同采购方式"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__contract_amount
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__contract_amount
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "合同金额"
+msgstr ""
+
+#. module: contract_expense
+#. odoo-python
+#: code:addons/contract_expense/models/contract_expense.py:0
+#, python-format
+msgid "合同金额应在合同类别规定的金额范围内！"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_tree
+msgid "合计"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.actions.server,name:contract_expense.action_agree_svr_action
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "同意"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__name
+msgid "名称"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.constraint,message:contract_expense.constraint_contract_expense_payment_method_name
+#: model:ir.model.constraint,message:contract_expense.constraint_contract_expense_procurement_method_name
+msgid "名称不能重复"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense_category__amount_min
+msgid "含最小金额，不含最大金额，如： 0 ≤ X<50000 最大金额为0时，代表无最大金额限制。"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.actions.act_window,help:contract_expense.action_contract_expense_payment_method
+msgid "定义支付方式."
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.actions.act_window,help:contract_expense.action_contract_expense_fund_type
+msgid "定义资金类型."
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.actions.act_window,help:contract_expense.action_contract_expense_procurement_method
+msgid "定义采购方式."
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__approved_by_id
+msgid "审批人"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__approved_by_nm
+msgid "审批人姓名"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense_approval_stage__op_department_id
+msgid "审批人需在此部门"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__approval_decision
+msgid "审批决定 Y/N"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__op_job_id
+msgid "审批岗位/职位/角色"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__approval_comments
+msgid "审批意见"
+msgstr ""
+
+#. module: contract_expense
+#. odoo-javascript
+#: code:addons/contract_expense/static/src/components/contract_expense_approval_comment.xml:0
+#, python-format
+msgid "审批意见:"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__approval_date_time
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__receive_datetime
+msgid "审批时间"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__approval_decision_txt
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__approval_decision_txt
+msgid "审批结果"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.actions.act_window,name:contract_expense.contract_expense_approval_stage_action
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__approval_stage
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__approval_stages
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__stage
+msgid "审批节点"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__approval_stage_id
+msgid "审批节点ID"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_approval_stage_view_tree
+msgid "审批节点列表"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__approval_stage_nm
+msgid "审批节点名"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__approval_detail_ids
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_detail__contract_expense_id
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "审批详情"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__op_department_id
+msgid "审批部门"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_category_view_form
+msgid "审批阶段"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.ui.menu,name:contract_expense.menu_contract_expense_approve
+msgid "审核/审批"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "已完成"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__sequence
+msgid "序号"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__date_start
+msgid "开始日期"
+msgstr ""
+
+#. module: contract_expense
+#. odoo-python
+#: code:addons/contract_expense/models/contract_expense.py:0
+#, python-format
+msgid "当前状态: %(state_name)s。 您不能处理这个节点: %(stage_name)s"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__stage
+msgid "当前阶段"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "待审批"
+msgstr ""
+
+#. module: contract_expense
+#: model:res.groups,name:contract_expense.group_contract_expense_lawyer
+msgid "律师：审核并回传"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "我的合同"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "提交"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_contract_expense_payment_method
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__payment_method
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_payment_method__name
+msgid "支付方式"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_payment_method_view_tree
+msgid "支付方式列表"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_payment_method_view_form
+msgid "支付方式表单"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.ui.menu,name:contract_expense.menu_contract_expense_payment_method
+msgid "支付方法"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_contract_expense_approval_stage
+msgid "支付类合同按审批流种类设置节点"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_contract_expense_category
+msgid "支付类合同流程类别（一般情况下，影响因素有合同金额等字段）"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.actions.act_window,name:contract_expense.action_contract_expense_actions_applications_all
+#: model:ir.actions.act_window,name:contract_expense.action_contract_expense_actions_to_be_approved
+#: model:ir.ui.menu,name:contract_expense.menu_contract_expense_root
+msgid "支出类合同"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_tree
+msgid "支出类合同列表"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_contract_expense_approval_detail
+msgid "支出类合同审批明细"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_approval_stage_view_form
+msgid "支出类合同审批流节点表单"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_category_view_tree
+msgid "支出类合同流程分类列表"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_category_view_form
+msgid "支出类合同流程分类表单"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.actions.act_window,name:contract_expense.action_contract_expense_category
+msgid "支出类合同流程种类"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "支出类合同表单"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_contract_expense_attachment
+msgid "支出类合同附件"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__receiving_unit
+msgid "收款方"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__receiving_bank
+msgid "收款方银行"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__bank_account
+msgid "收款方银行账号"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_category_view_form
+msgid "最大值0代表无限制"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__amount_max
+msgid "最大金额(To)"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__amount_min
+msgid "最小金额(From)"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__latest_approval_detail_id
+msgid "最新审批详情"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__input_meeting_minutes
+msgid "本节点输入附件（如会议纪要等）"
+msgstr ""
+
+#. module: contract_expense
+#. odoo-python
+#: code:addons/contract_expense/models/contract_expense.py:0
+#, python-format
+msgid "本阶段 [%(stage_name)s] 有必须上传的附件而未上传:%(err_lst)s。%(msg_attach)s"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__legend_blocked
+msgid "标红"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__legend_done
+msgid "标绿"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__legend_normal
+msgid "正常"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.actions.act_window,help:contract_expense.action_contract_expense_actions_applications_all
+msgid "没有数据!"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.actions.act_window,help:contract_expense.action_contract_expense_actions_to_be_approved
+msgid "没有数据！"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.ui.menu,name:contract_expense.menu_contract_expense_categories
+msgid "流程分类"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__pipe_end
+msgid "流程结束标识"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense__stage_sequence
+#: model:ir.model.fields,help:contract_expense.field_contract_expense_approval_stage__sequence
+msgid "流程节点根据序号从小到大流转。 最小节点序号必须为0！建议节点序号以10为单位增加。"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_approval_stage_view_form
+msgid "添加节点描述，帮助使用者理解"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_category_view_form
+msgid "点击创建审批节点步骤"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__state
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__state
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "状态"
+msgstr ""
+
+#. module: contract_expense
+#: model:res.groups,name:contract_expense.group_contract_expense_user
+msgid "用户：查看和引用"
+msgstr ""
+
+#. module: contract_expense
+#: model:res.groups,name:contract_expense.group_contract_expense_apply
+msgid "用户：申请制单"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__department_id
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "甲方"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__party_a_unit
+msgid "甲方单位"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__date_apply
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__apply_date
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "申请日期"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__attachment_ids
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "直接上传本地附件"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__fold
+msgid "看板折叠"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__sms_created
+msgid "短信做成"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__date_sign
+msgid "签约日期"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "签订日期"
+msgstr ""
+
+#. module: contract_expense
+#: model:res.groups,name:contract_expense.group_contract_expense_manager
+msgid "管理员"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.constraint,message:contract_expense.constraint_contract_expense_fund_type_name
+msgid "类型名不能重复"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense_approval_stage__legend_blocked
+msgid "红色标识本节点受阻"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__date_end
+msgid "结束日期"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_res_partner
+msgid "继承partner"
+msgstr "联系人"
+
+#. module: contract_expense
+#: model:ir.model.fields,help:contract_expense.field_contract_expense_approval_stage__legend_done
+msgid "绿色表示可进入下一节点"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.actions.act_window,help:contract_expense.action_contract_expense_payment_method
+msgid "网银转账、支票、现金等."
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_approval_stage_view_form
+msgid "节点信息"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__name
+msgid "节点名"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.constraint,message:contract_expense.constraint_contract_expense_approval_stage_sequence
+msgid "节点名称和序号不可重复！"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__stage_sequence
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__sequence
+msgid "节点序号"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_approval_stage__description
+msgid "节点描述"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__type_domain
+msgid "节点附件"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_search
+msgid "被拒绝"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.actions.act_window,name:contract_expense.action_contract_expense_payment_method
+msgid "设置合同支付方式"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.actions.act_window,name:contract_expense.action_contract_expense_fund_type
+msgid "设置合同资金类型"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.actions.act_window,name:contract_expense.action_contract_expense_procurement_method
+msgid "设置合同采购方式"
+msgstr ""
+
+#. module: contract_expense
+#. odoo-python
+#: code:addons/contract_expense/models/contract_expense.py:0
+#, python-format
+msgid "请上传附件 %(msg_list)s"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "请输入合同名称……"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "请输入合同支付节奏、支付条件等关键条款内容"
+msgstr ""
+
+#. module: contract_expense
+#. odoo-javascript
+#: code:addons/contract_expense/static/src/components/contract_expense_approval_comment.xml:0
+#, python-format
+msgid "请输入审批意见..."
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "请选择合同类别以确定审批流程"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.actions.act_window,help:contract_expense.action_contract_expense_fund_type
+msgid "财政专项资金、集体资金等."
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__company_currency_id
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__company_currency_id
+msgid "货币"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__account_subject
+msgid "资金科目"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__fund_type
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_fund_type__name
+#: model:ir.ui.menu,name:contract_expense.menu_contract_expense_types
+msgid "资金类型"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_type_view_tree
+msgid "资金类型列表"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_type_view_form
+msgid "资金类型表单"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__overdue_reminder_hours
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__overdue_hours
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__overdue_reminder_hours
+msgid "超期小时数"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model,name:contract_expense.model_contract_expense_overdue
+msgid "超期未处理合同"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__check_datetime
+msgid "超期检查时间"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_overdue__overdue_description
+msgid "超期详情"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.actions.client,name:contract_expense.contract_expense_approval_dialog
+msgid "输入审批意见"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "选择附件链接"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.ui.menu,name:contract_expense.menu_contract_expense_configuration
+msgid "配置"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__procurement_method
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_procurement_method__name
+#: model:ir.ui.menu,name:contract_expense.menu_contract_expense_procurement_method
+msgid "采购方式"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_procurement_method_view_tree
+msgid "采购方式列表"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_procurement_method_view_form
+msgid "采购方式表单"
+msgstr ""
+
+#. module: contract_expense
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_category_view_form
+msgid "金额范围"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__attachment_ids
+msgid "附件"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__meeting_minute_help_msg
+msgid "附件信息提示"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__nb_attachment
+msgid "附件数"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_attachment__type
+msgid "附件类别"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense__attachment_types
+#: model:ir.model.fields,field_description:contract_expense.field_contract_expense_category__meeting_minute_types
+#: model_terms:ir.ui.view,arch_db:contract_expense.contract_expense_view_form
+msgid "附件类型"
+msgstr ""
+
+#. module: contract_expense
+#: model:ir.actions.server,name:contract_expense.action_reject_svr_action
+msgid "驳回"
+msgstr ""
+
+#. module: contract_expense
+#: model:res.groups,name:contract_expense.group_contract_expense_advanced_user
+msgid "高级用户：一键叫停等"
+msgstr ""
