@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree & Kanban view for "All My Expenses" with header -->
+    <menuitem id="menu_contract_expense_root" name="支出类合同" sequence="2"/>
+
+    <menuitem id="menu_contract_expense_approve" name="审核/审批" sequence="10" parent="menu_contract_expense_root"
+              action="action_contract_expense_actions_to_be_approved"
+              groups="contract_expense.group_contract_expense_user"/>
+
+    <menuitem id="menu_contract_expense_applications" name="创建/申请" sequence="20" parent="menu_contract_expense_root"
+              action="action_contract_expense_actions_applications_all"
+              groups="contract_expense.group_contract_expense_user, not contract_expense.group_contract_expense_lawyer"/>
+    
+    <menuitem id="menu_contract_expense_configuration" name="配置" sequence="30" parent="menu_contract_expense_root"
+              groups="contract_expense.group_contract_expense_manager"/>
+    <menuitem id="menu_contract_expense_categories" name="流程分类" sequence="10" parent="menu_contract_expense_configuration"
+              action="action_contract_expense_category" groups="contract_expense.group_contract_expense_manager"/>
+    <menuitem id="menu_contract_expense_types" name="资金类型" sequence="20" parent="menu_contract_expense_configuration"
+              action="action_contract_expense_fund_type" groups="contract_expense.group_contract_expense_manager"/>
+    <menuitem id="menu_contract_expense_procurement_method" name="采购方式" sequence="30" parent="menu_contract_expense_configuration"
+              action="action_contract_expense_procurement_method" groups="contract_expense.group_contract_expense_manager"/>
+    <menuitem id="menu_contract_expense_payment_method" name="支付方法" sequence="40" parent="menu_contract_expense_configuration"
+              action="action_contract_expense_payment_method" groups="contract_expense.group_contract_expense_manager"/>
+
+</odoo>

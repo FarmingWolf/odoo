@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="fund_type_financial_special_funds" model="contract.expense.fund.type">
+            <field name="name">财政专项资金</field>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="fund_type_pooling_funds" model="contract.expense.fund.type">
+            <field name="name">集体资金</field>
+            <field name="sequence">2</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_contract_expense_fund_type" model="ir.actions.act_window">
+        <field name="name">设置合同资金类型</field>
+        <field name="res_model">contract.expense.fund.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                定义资金类型.
+            </p>
+            <p>
+                财政专项资金、集体资金等.
+            </p>
+        </field>
+    </record>
+
+    <record id="contract_expense_type_view_tree" model="ir.ui.view">
+        <field name="name">contract.expense.fund.type.tree</field>
+        <field name="model">contract.expense.fund.type</field>
+        <field name="arch" type="xml">
+            <tree string="资金类型列表" create="editable" edit="editable" duplicate="editable" delete="editable">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="contract_expense_type_view_form" model="ir.ui.view">
+        <field name="name">contract.expense.fund.type.form</field>
+        <field name="model">contract.expense.fund.type</field>
+        <field name="arch" type="xml">
+            <form string="资金类型表单" create="editable" edit="editable" duplicate="editable" delete="editable">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

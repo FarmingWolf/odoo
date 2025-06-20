@@ -1,0 +1,10 @@
+id,name,model_id:id,domain_force
+contract_expense_rule,Restrict Contract Expense by Company,model_contract_expense,"[('company_id','=',user.company_id.id)]"
+contract_expense_fund_type_company_rule,Restrict Contract Expense Fund Type by Company,model_contract_expense_fund_type,"[('company_id','=',user.company_id.id)]"
+contract_expense_payment_method_company_rule,Restrict Contract Expense Payment Method by Company,model_contract_expense_payment_method,"[('company_id','=',user.company_id.id)]"
+contract_expense_procurement_method_company_rule,Restrict Contract Expense procurement Method by Company,model_contract_expense_procurement_method,"[('company_id','=',user.company_id.id)]"
+contract_expense_category_company_rule,Restrict Contract Expense Category by Company,model_contract_expense_category,"[('company_id','=',user.company_id.id)]"
+contract_expense_approval_stage_company_rule,Restrict Contract Expense Approval Stage by Company,model_contract_expense_approval_stage,"[('company_id','=',user.company_id.id)]"
+contract_expense_approval_detail_company_rule,Restrict Contract Expense Approval Detail by Company,model_contract_expense_approval_detail,"[('company_id','=',user.company_id.id)]"
+contract_expense_overdue_company_rule,Restrict Contract Expense overdue by Company,model_contract_expense_overdue,"[('company_id','=',user.company_id.id)]"
+contract_expense_attachment_company_rule,Restrict Contract Expense attachment by Company,model_contract_expense_attachment,"[('company_id','=',user.company_id.id)]"

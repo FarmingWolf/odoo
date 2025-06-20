@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_contract_expense_payment_method" model="ir.actions.act_window">
+        <field name="name">设置合同支付方式</field>
+        <field name="res_model">contract.expense.payment.method</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                定义支付方式.
+            </p>
+            <p>
+                网银转账、支票、现金等.
+            </p>
+        </field>
+    </record>
+
+    <record id="contract_expense_payment_method_view_tree" model="ir.ui.view">
+        <field name="name">contract.expense.payment.method.tree</field>
+        <field name="model">contract.expense.payment.method</field>
+        <field name="arch" type="xml">
+            <tree string="支付方式列表" create="editable" edit="editable" duplicate="editable" delete="editable">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="contract_expense_payment_method_view_form" model="ir.ui.view">
+        <field name="name">contract.expense.payment.method.form</field>
+        <field name="model">contract.expense.payment.method</field>
+        <field name="arch" type="xml">
+            <form string="支付方式表单" create="editable" edit="editable" duplicate="editable" delete="editable">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

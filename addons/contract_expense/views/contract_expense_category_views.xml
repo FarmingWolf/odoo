@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_contract_expense_category" model="ir.actions.act_window">
+        <field name="name">支出类合同流程种类</field>
+        <field name="res_model">contract.expense.category</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                创建支出类合同审批流程种类。一般情况下，根据金额范围确定流程种类和审批节点。
+            </p>
+        </field>
+    </record>
+
+    <record id="contract_expense_category_view_tree" model="ir.ui.view">
+        <field name="name">contract.expense.category.tree</field>
+        <field name="model">contract.expense.category</field>
+        <field name="arch" type="xml">
+            <tree string="支出类合同流程分类列表">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="amount_min"/>
+                <field name="amount_max"/>
+                <field name="meeting_minute_types" widget="many2many_tags" options="{'color_field': 'color'}" />
+                <field name="contract_expense_ids" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="contract_expense_category_view_form" model="ir.ui.view">
+        <field name="name">contract.expense.category.form</field>
+        <field name="model">contract.expense.category</field>
+        <field name="arch" type="xml">
+            <form string="支出类合同流程分类表单" create="editable" edit="editable" duplicate="editable" delete="editable">
+                <field name="editable" invisible="1"/>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" default_focus="True" readonly="not editable"/></h1>
+                    </div>
+
+                    <group>
+                        <div>
+                            <label for="amount_min" string="金额范围"/>
+                            <field name="amount_min" nolabel="True" class="oe_inline o_input_15ch" readonly="not editable"/>
+                            <span>至</span>
+                            <field name="amount_max" nolabel="True" class="oe_inline o_input_15ch" placeholder="最大值0代表无限制" readonly="not editable"/>
+                        </div>
+
+                        <group>
+                            <field name="overdue_reminder_hours" readonly="not editable"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="meeting_minute_types" widget="many2many_tags" options="{'color_field': 'color'}" readonly="not editable"/>
+                    </group>
+                    <button name="action_contract_expense_approval_setting" type="object" class="btn btn-success" invisible="not editable"
+                            title="点击创建审批节点步骤">
+                        <span>设置审批节点步骤</span>
+                    </button>
+                    <notebook>
+                        <page string="审批阶段" invisible="not approval_stages">
+                            <field name="approval_stages" readonly="not editable"/>
+                        </page>
+                        <page string="合同" invisible="not contract_expense_ids" groups="contract_expense.group_contract_expense_user">
+                            <field name="contract_expense_ids" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

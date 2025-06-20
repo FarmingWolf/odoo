@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="contract_expense_approval_stage_view_form" model="ir.ui.view">
+            <field name="name">contract.expense.approval.stage.view.form</field>
+            <field name="model">contract.expense.approval.stage</field>
+            <field name="arch" type="xml">
+                <form string="支出类合同审批流节点表单">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="company_id" invisible="1"/>
+                                <field name="name"/>
+                                <field name="op_department_id" options="{'no_open': True}"/>
+                                <field name="op_job_id" options="{'no_open': True}"/>
+                                <field name="input_meeting_minutes"/>
+                            </group>
+                            <group>
+                                <field name="fold"/>
+                                <field name="sequence"/>
+                                <field name="pipe_end"/>
+                                <field name="meeting_minute_types_by_category" invisible="1"/>
+                                <field name="meeting_minute_types" widget="many2many_tags" options="{'color_field': 'color', 'no_create': True}"
+                                       invisible="not input_meeting_minutes" domain="[('id', 'in', meeting_minute_types_by_category)]"/>
+                            </group>
+                        </group>
+                        <group string="节点信息">
+                            <field name="description" placeholder="添加节点描述，帮助使用者理解" nolabel="1" colspan="2"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="contract_expense_approval_stage_view_tree" model="ir.ui.view">
+            <field name="name">contract.expense.approval.stage.view.tree</field>
+            <field name="model">contract.expense.approval.stage</field>
+            <field name="arch" type="xml">
+                <tree string="审批节点列表" create="editable" edit="editable" duplicate="editable" delete="editable">
+                    <field name="name"/>
+                    <field name="sequence" groups="contract_expense.group_contract_expense_manager"/>
+                    <field name="op_department_id"/>
+                    <field name="op_job_id"/>
+                    <field name="pipe_end"/>
+                    <field name="input_meeting_minutes"/>
+                    <field name="meeting_minute_types" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="contract_expense_approval_stage_action" model="ir.actions.act_window">
+            <field name="name">审批节点</field>
+            <field name="res_model">contract.expense.approval.stage</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    创建审批节点
+                </p>
+            </field>
+        </record>
+</data>
+</odoo>

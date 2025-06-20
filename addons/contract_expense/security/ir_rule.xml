@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="ir_rule_contract_expense_user" model="ir.rule">
+            <field name="name">支出类合同用户</field>
+            <field name="model_id" ref="model_contract_expense"/>
+            <field name="domain_force">['|', '|',
+                ('employee_id.user_id', '=', user.id),
+                ('department_id.manager_id.user_id', '=', user.id),
+                ('department_id.complete_name', 'ilike', str(user.employee_id.department_id.complete_name) + '%')]</field>
+            <field name="groups" eval="[(4, ref('contract_expense.group_contract_expense_user'))]"/>
+        </record>
+        <record id="ir_rule_contract_expense_manager" model="ir.rule">
+            <field name="name">支出类合同管理员</field>
+            <field name="model_id" ref="model_contract_expense"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('contract_expense.group_contract_expense_manager'))]"/>
+        </record>
+
+</odoo>

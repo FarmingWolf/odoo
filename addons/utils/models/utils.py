@@ -8,8 +8,9 @@ from datetime import datetime, date
 from typing import Union, List, Dict, Optional
 
 from attr.validators import instance_of
-from pypinyin import lazy_pinyin, Style
+from pypinyin import lazy_pinyin, Style, pinyin
 from pyzipper import AESZipFile, zipfile, WZ_AES
+from win32verstamp import null_byte
 
 _logger = logging.getLogger(__name__)
 
@@ -378,6 +379,10 @@ class Utils:
 
         return closest_obj
 
+    def get_first_letter(hans):
+        # style=Style.FIRST_LETTER 表示只获取拼音的首字母
+        return ''.join([item[0][0].upper() for item in pinyin(hans, style=Style.FIRST_LETTER)])
+
 def unit_test():
     str_list = ["B02", "B-01", "B01", "B10", "B05", "B-05-02", "B-05", "B05-01", "B0101", "B101", "梨树地E-01",
                 "梨树地-01",
@@ -476,7 +481,7 @@ def test_find_closest_date_object():
     print(Utils.find_closest_date_object(data, today))
 
 def main():
-    test_check_overlapping_intervals()
+    print(Utils.get_first_letter(""))
 
 if __name__ == "__main__":
     main()

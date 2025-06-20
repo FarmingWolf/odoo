@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="hr_employee_view_form_inherit_contract_expense" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.management</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='managers']" position="inside">
+                <field name="contract_expense_manager_id" context="{'default_company_id': company_id}"
+                       widget="many2one_avatar_user" domain="[('company_id', '=', company_id)]"/>
+            </xpath>
+            <xpath expr="//group[@name='managers']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="contract_expense_view_tree" model="ir.ui.view">
+        <field name="name">contract.expense.tree</field>
+        <field name="model">contract.expense</field>
+        <field name="arch" type="xml">
+            <tree string="支出类合同列表" decoration-info="state == 'draft'">
+                <field name="editable" column_invisible="True"/>
+                <field name="company_id" column_invisible="True"/>
+                <field name="company_currency_id" column_invisible="True"/>
+                <field name="contract_no" optional="show" readonly="1"/>
+                <field name="date_sign" optional="hide" readonly="not editable"/>
+                <field name="date_start" optional="show" readonly="not editable"/>
+                <field name="date_end" optional="hide" readonly="not editable"/>
+                <field name="category_id" optional="hide" readonly="not editable" column_invisible="1"/>
+                <field name="account_subject" optional="hide" readonly="not editable" column_invisible="1"/>
+                <field name="name" readonly="not editable"/>
+                <field name="employee_id" widget="many2one_avatar_user" readonly="not editable"/>
+                <field name="department_id" readonly="True"/>
+                <field name="contract_amount" sum="合计" widget='monetary' readonly="not editable"
+                       options="{'currency_field': 'company_currency_id'}" decoration-bf="1"/>
+                <field name="receiving_unit" readonly="True"/>
+                <field name="stage"/>
+                <field name="state" optional="hide" readonly="True" decoration-info="state in ['submitted']"
+                       decoration-success="state == 'done'" decoration-warning="state == 'approved'"
+                       decoration-danger="state in ['refused', 'stopped']" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_contract_expense_to_be_approved_tree" model="ir.ui.view">
+        <field name="name">contract.expense.tree</field>
+        <field name="model">contract.expense</field>
+        <field name="inherit_id" ref="contract_expense_view_tree"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="create">False</attribute>
+                <attribute name="edit">False</attribute>
+                <attribute name="delete">False</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="contract_expense_approval_dialog" model="ir.actions.client">
+        <field name="name">输入审批意见</field>
+        <field name="tag">contract_expense.approval_comment_dialog</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_agree_svr_action" model="ir.actions.server">
+        <field name="name">同意</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_contract_expense"/>
+        <field name="binding_model_id" eval="False"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.action_agree_confirm(env.context)
+        </field>
+    </record>
+
+    <record id="action_reject_svr_action" model="ir.actions.server">
+        <field name="name">驳回</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_contract_expense"/>
+        <field name="binding_model_id" eval="False"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.action_reject_confirm(env.context)
+        </field>
+    </record>
+
+
+    <record id="action_stop_svr_action" model="ir.actions.server">
+        <field name="name">一键叫停</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_contract_expense"/>
+        <field name="binding_model_id" eval="False"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.action_stop_confirm(env.context)
+        </field>
+    </record>
+
+    <record id="contract_expense_view_form" model="ir.ui.view">
+        <field name="name">contract.expense.view.form</field>
+        <field name="model">contract.expense</field>
+        <field name="arch" type="xml">
+            <form string="支出类合同表单">
+                <header>
+                    <field name="state" invisible="1"/>
+                    <field name="stage_sequence" invisible="1"/>
+                    <button name="action_save_contract_expense" string="保存(不提交)" type="object"
+                            class="o_expense_submit" data-hotkey="v" invisible="(state != 'draft') and (stage_sequence != 0)"/>
+                    <button name="action_submit_contract_expense" string="提交" type="object" class="o_expense_submit"
+                            data-hotkey="s"
+                            invisible="((state != 'draft') and (stage_sequence != 0)) or state == 'stopped'"/>
+
+                    <div invisible="state in ('draft', 'done', 'stopped')">
+                        <button name="%(contract_expense_approval_dialog)d" type="action" class="btn btn-success"
+                                string="同意"
+                                context="{'action_type': 'action_agree', 'res_id': id}"
+                                title="Click to approve"
+                                invisible="((state == 'refused') and (not meeting_minutes_editable)) or stage_sequence == 0"/>
+                        <span>　</span>
+                        <button name="%(contract_expense_approval_dialog)d" type="action" class="btn btn-danger"
+                                string="Reject"
+                                context="{'action_type': 'action_reject', 'res_id': id}"
+                                title="Click to reject" invisible="1"/>
+                        <span>　</span>
+                        <button name="%(contract_expense_approval_dialog)d" type="action" class="btn btn-danger"
+                                string="Stop" context="{'action_type': 'action_stop', 'res_id': id}"
+                                title="Click to stop" invisible="1"
+                                groups="contract_expense.group_contract_expense_advanced_user"/>
+                    </div>
+                    <field name="stage" widget="statusbar" domain="[('category_id', '=', category_id)]"/>
+                </header>
+                <sheet>
+                    <div class="d-flex" style="width: 100%;">
+                        <div class="d-flex" style="width: 50%;">
+                            <div class="oe_title flex-grow-1" style="max-width:100%;!important">
+                                <label for="contract_no"/>
+                                <h2><field name="contract_no" readonly="not editable"/></h2>
+                            </div>
+                        </div>
+                        <div class="d-flex" style="width: 50%; padding-left:16px;!important">
+                            <div class="oe_title flex-grow-1" style="max-width:100%;!important">
+                                <label for="name"/>
+                                <div class="d-flex align-items-center">
+                                    <h2 class="flex-grow-1 mb-0">
+                                        <field name="name" placeholder="请输入合同名称……" readonly="not editable"/>
+                                    </h2>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <field name="editable" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="company_currency_id" invisible="1"/>
+                        <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'"
+                               invisible="True"/>
+                        <field name="id" invisible="1"/>
+                        <group cols="2">
+                            <group cols="1">
+                                <label for="category_id"/>
+                                <div>
+                                    <field name="category_id" required="1" readonly="1"
+                                           options="{'no_create': True, 'no_open': True}"
+                                           class="w-100" placeholder="请选择合同类别以确定审批流程"/>
+                                    <div class="fst-italic">
+                                        <field name="category_description"/>
+                                    </div>
+                                </div>
+                                <field name="editable" invisible="1"/>
+                                <field name="date_sign" readonly="not editable"/>
+                                <field name="date_start" readonly="not editable"/>
+                                <field name="date_end" readonly="not editable"/>
+                                <field name="company_id" groups="base.group_multi_company" readonly="state != 'draft'" invisible="True"/>
+                                <field name="employee_id"  context="{'default_company_id': company_id}"
+                                       options="{'relation': 'hr.employee.public', 'no_create':True, 'no_open':True, 'no_create_edit':True}"
+                                       readonly="1"/>
+                                <field name="department_id" readonly="1" options="{'no_create': True, 'no_open': True}" invisible="1"/>
+                                <field name="party_a_unit" readonly="1" options="{'no_create': True, 'no_open': True}"/>
+                            </group>
+                            <group cols="1">
+                                <label for="contract_amount" string="合同金额" readonly="not editable"/>
+                                <div class="o_row">
+                                    <field name="contract_amount" widget='monetary'
+                                           options="{'currency_field': 'company_currency_id'}"
+                                           readonly="not editable"/>
+                                    <field name="company_currency_id" class="mw-25 ms-0" groups="base.group_multi_currency"
+                                           options="{'no_create': True}" readonly="not editable" invisible="1"/>
+                                </div>
+                                <field name="fund_type" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="procurement_method" readonly="not editable" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="account_subject" readonly="not editable" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="receiving_unit" readonly="not editable" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="receiving_bank" domain="[('partner_id', '=', receiving_unit)]"
+                                       options="{'no_open': True, 'no_create': True}" readonly="(not receiving_unit) or (not editable)"/>
+                                <field name="bank_account"/>
+                                <field name="payment_method" readonly="not editable" options="{'no_create': True, 'no_open': True}"/>
+                            </group>
+                        </group>
+                    </div>
+                    <div>
+                        <div class="d-flex">
+                            <div class="oe_title flex-grow-1">
+                                <label for="key_content" string="合同关键内容"/>
+                                <h2><field name="key_content" placeholder="请输入合同支付节奏、支付条件等关键条款内容" readonly="not editable"/></h2>
+                            </div>
+                        </div>
+
+                        <field name="invisible_meeting_minutes" invisible="1"/>
+                        <field name="meeting_minutes_editable" invisible="1"/>
+                    </div>
+                    <notebook invisible="invisible_meeting_minutes">
+                        <page string="直接上传本地附件" readonly="(not editable) and (not meeting_minutes_editable)">
+                            <div class="oe_title" invisible="(not meeting_minute_help_msg) or (not meeting_minutes_editable)">
+                                <h3><field name="meeting_minute_help_msg" decoration-danger="1"/></h3>
+                            </div>
+                            <field name="attachment_ids" mode="tree,form" readonly="(not editable) and (not meeting_minutes_editable)">
+                                <tree create="True" edit="True" delete="True" editale="bottom">
+                                    <field name="type_domain" column_invisible="1"/>
+                                    <field name="type" string="附件类型"/>
+                                    <field name="attachment_ids" widget="many2many_binary"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="type_domain" invisible="1"/>
+                                        <field name="type" options="{'no_create': True, 'no_open': True}"/>
+                                    </group>
+                                    <group>
+                                        <field name="attachment_ids" widget="many2many_binary"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="选择附件链接" readonly="(not editable) and (not meeting_minutes_editable)" invisible="1">
+                            <div class="oe_title" invisible="(not meeting_minute_help_msg) or (not meeting_minutes_editable)">
+                                <h2><field name="meeting_minute_help_msg"/></h2>
+                            </div>
+                            <field name="meeting_minutes_attach_link" mode="tree,form" readonly="(not editable) and (not meeting_minutes_editable)">
+                                <tree delete="False" create="False" edit="True">
+                                    <field name="name" string="附件类型" readonly="1"/>
+                                    <field name="attachment_id" widget="many2many_binary" readonly="1"/>
+                                </tree>
+                                <form delete="False" create="False" edit="False">
+                                    <group>
+                                        <field name="subject"/>
+                                        <field name="type"/>
+                                    </group>
+                                    <group>
+                                        <field name="meeting_time"/>
+                                        <field name="attachment_id" widget="many2many_binary"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                    <group string="审批详情" name="approval_details_info" invisible="not approval_detail_ids">
+                        <field name="approval_detail_ids" string="" readonly="1" mode="tree, form">
+                            <tree string="审批详情" create="False" edit="False" delete="False">
+                                <field name="company_id" column_invisible="1"/>
+                                <field name="approval_decision" column_invisible="1"/>
+                                <field name="contract_expense_id" column_invisible="1"/>
+                                <field name="approval_stage_nm"/>
+                                <field name="approval_decision_txt"/>
+                                <field name="approved_by_id" column_invisible="1"/>
+                                <field name="approved_by_nm"/>
+                                <field name="approval_comments"/>
+                                <field name="approval_date_time"/>
+                            </tree>
+                            <form>
+                                <group cols="2">
+                                    <group>
+                                        <field name="approval_stage_nm"/>
+                                        <field name="approval_decision_txt"/>
+                                        <field name="approval_comments"/>
+                                    </group>
+                                    <group>
+                                        <field name="approved_by_nm"/>
+                                        <field name="approval_date_time"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+                </sheet>
+                <div class="o_attachment_preview o_center_attachment"
+                     groups="contract_expense.group_contract_expense_manager"/>
+                <div class="oe_chatter" groups="contract_expense.group_contract_expense_manager">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="contract_expense_view_pivot" model="ir.ui.view">
+        <field name="name">contract.expense.pivot</field>
+        <field name="model">contract.expense</field>
+        <field name="arch" type="xml">
+            <pivot string="Contract Analysis" sample="1">
+                <field name="employee_id" type="row"/>
+                <field name="date_apply" interval="month" type="col"/>
+                <field name="contract_amount" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="contract_expense_view_graph" model="ir.ui.view">
+        <field name="name">contract.expense.graph</field>
+        <field name="model">contract.expense</field>
+        <field name="arch" type="xml">
+            <graph string="Contract Analysis" sample="1">
+                <field name="date_apply"/>
+                <field name="employee_id"/>
+                <field name="contract_amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="contract_expense_view_search" model="ir.ui.view">
+        <field name="name">contract.expense.view.search</field>
+        <field name="model">contract.expense</field>
+        <field name="arch" type="xml">
+            <search string="合同检索">
+                <field string="合同" name="name"
+                       filter_domain="['|', '|', '|', '|', ('employee_id', 'ilike', self), ('department_id', 'ilike', self),
+                       ('name', 'ilike', self), ('category_id', 'ilike', self), ('contract_no', 'ilike', self)]"/>
+                <field name="department_id"/>
+                <field name="receiving_unit"/>
+                <field name="employee_id"/>
+                <field name="date_apply"/>
+                <field name="date_sign"/>
+                <field name="date_start"/>
+                <filter string="我的合同" name="my_contract_expense"
+                        domain="[('employee_id.user_id', '=', uid)]"/>
+                <separator/>
+                <filter string="待审批" name="to_be_approved"
+                        domain="[('state', 'in', ('submitted', 'approved', 'refused'))]"/>
+                <filter string="被拒绝" name="refused" domain="[('state', '=', 'refused')]"/>
+                <filter string="已完成" name="done" domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter string="申请日期" name="date_apply" date="date_apply"/>
+                <filter string="签订日期" name="date_sign" date="date_sign"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="甲方" name="department_id" domain="[]" context="{'group_by': 'department_id'}"/>
+                    <filter string="制单人" name="employee" domain="[]" context="{'group_by': 'employee_id'}"/>
+                    <filter string="乙方" name="party_b_unit" domain="[]" context="{'group_by': 'receiving_unit'}"/>
+                    <filter string="合同分类" name="category" domain="[]" context="{'group_by': 'category_id'}"/>
+                    <filter string="状态" name="status" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="申请日期" name="contract_expense_apply_month" domain="[]" context="{'group_by': 'date_apply'}"/>
+                    <filter string="签订日期" name="contract_expense_month" domain="[]" context="{'group_by': 'date_sign'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_contract_expense_actions_applications_all" model="ir.actions.act_window">
+        <field name="name">支出类合同</field>
+        <field name="res_model">contract.expense</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="contract_expense_view_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_expense_receipt">
+                没有数据!
+            </p>
+        </field>
+    </record>
+
+    <record id="action_contract_expense_actions_to_be_approved" model="ir.actions.act_window">
+        <field name="name">支出类合同</field>
+        <field name="res_model">contract.expense</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_id" ref="view_contract_expense_to_be_approved_tree"/>
+        <field name="search_view_id" ref="contract_expense_view_search"/>
+        <field name="context">{'search_default_to_be_approved': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_expense_receipt">
+                没有数据！
+            </p>
+        </field>
+    </record>
+
+    <record id="contract_expense_actions_all" model="ir.actions.act_window">
+        <field name="name">Fund Analysis</field>
+        <field name="res_model">contract.expense</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="search_view_id" ref="contract_expense_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">
+                No data yet!
+            </p>
+            <p>
+                Create a new fund management application to submit for approval process.
+            </p>
+        </field>
+    </record>
+
+    <record id="contract_expense_actions_all_graph" model="ir.actions.act_window.view">
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="contract_expense.contract_expense_view_graph"/>
+        <field name="act_window_id" ref="contract_expense_actions_all"/>
+    </record>
+
+    <record id="contract_expense_actions_all_pivot" model="ir.actions.act_window.view">
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="contract_expense.contract_expense_view_pivot"/>
+        <field name="act_window_id" ref="contract_expense_actions_all"/>
+    </record>
+
+    <record id="contract_expense_actions_all_tree" model="ir.actions.act_window.view">
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="contract_expense_view_tree"/>
+        <field name="act_window_id" ref="contract_expense_actions_all"/>
+    </record>
+
+</odoo>

@@ -627,6 +627,8 @@ class FundManagement(models.Model):
     def action_submit_fund_management(self):
         self.action_save_fund_management()
         self.action_agree('', from_action_submit=True)
+        if self.date != fields.Date.context_today(self):
+            self.date = fields.Date.context_today(self)
 
     def action_agree_confirm(self, context):
         _logger.info(f"context={context}")

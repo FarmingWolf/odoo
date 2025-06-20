@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<templates xml:space="preserve">
+
+    <t t-name="contract_expense.ApprovalComment">
+        <Dialog title="'审批意见'">
+            <div class="p-4">
+                <div class="mb-3">
+                    <label class="form-label">审批意见:</label>
+                    <textarea class="form-control approval-comment-textarea"
+                              t-on-input="(ev) => this.onInputChange(ev)"
+                              t-att-value="state.inputValue"
+                              placeholder="请输入审批意见..."
+                            />
+                </div>
+            </div>
+            <t t-set-slot="footer">
+                <button class="btn"
+                        t-att-class="state.actionType === 'action_agree' ? 'btn-success' : 'btn-danger'"
+                        t-on-click="() => this.onClickApproval()"
+                        t-att-disabled="this.confirm_button_disable()">
+                    <span t-esc="buttonText"/>
+                </button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

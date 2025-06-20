@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_contract_expense_procurement_method" model="ir.actions.act_window">
+        <field name="name">设置合同采购方式</field>
+        <field name="res_model">contract.expense.procurement.method</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                定义采购方式.
+            </p>
+            <p>
+                公开招标、邀请招标、三方比价等.
+            </p>
+        </field>
+    </record>
+
+    <record id="contract_expense_procurement_method_view_tree" model="ir.ui.view">
+        <field name="name">contract.expense.procurement.method.tree</field>
+        <field name="model">contract.expense.procurement.method</field>
+        <field name="arch" type="xml">
+            <tree string="采购方式列表" create="editable" edit="editable" duplicate="editable" delete="editable">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="contract_expense_procurement_method_view_form" model="ir.ui.view">
+        <field name="name">contract.expense.procurement.method.form</field>
+        <field name="model">contract.expense.procurement.method</field>
+        <field name="arch" type="xml">
+            <form string="采购方式表单" create="editable" edit="editable" duplicate="editable" delete="editable">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
