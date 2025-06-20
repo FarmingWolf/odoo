@@ -281,7 +281,7 @@
                                 <field name="contract_expense_id" string="Contract Name" invisible="not contract_payment" readonly="not is_editable" required="contract_payment"/>
                                 <field name="contract_no" invisible="not contract_payment" readonly="1"/>
                                 <field name="contract_amount" invisible="not contract_payment" widget='monetary' readonly="1"/>
-                                <field name="contract_expense_fund_type" readonly="(not is_editable) or contract_expense_id or contract_payment" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="contract_expense_fund_type" readonly="(not is_editable) or contract_expense_id or contract_payment" options="{'no_create': True}"/>
                                 <field name="contract_expense_procurement_method" invisible="not contract_payment" readonly="(not is_editable) or contract_expense_id or contract_payment" options="{'no_create': True, 'no_open': True}"/>
                                 <field name="account_subject_category" readonly="(not is_editable) or contract_expense_id or contract_payment" options="{'no_create': True, 'no_open': True}"/>
                                 <field name="receiving_unit" readonly="(not is_editable) or contract_expense_id or contract_payment" options="{'no_create': True, 'no_open': True}"/>

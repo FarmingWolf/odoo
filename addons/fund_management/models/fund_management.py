@@ -28,21 +28,60 @@ class FundManagement(models.Model):
         return employee
 
     def _get_default_apply_no(self):
-        prefix_str = "FM-"
-        department_name_first_letter = ""
-        department_nm = self._default_employee_id().name
-        if department_nm:
+        prefix_str = ["FM"]
+
+        fund_type_first_letter = "ZJ"
+        if self.contract_expense_fund_type:
+            fund_type_first_letter = Utils.get_first_letter(self.contract_expense_fund_type.name)
+
+        prefix_str.append(fund_type_first_letter)
+
+        if self._default_employee_id().department_id:
+            department_nm = self._default_employee_id().department_id.name
             for word in words_to_del:
                 department_name = department_nm.replace(word, "")
 
             department_name_first_letter = Utils.get_first_letter(department_nm)
+            prefix_str.append(department_name_first_letter)
+
         formatted_date = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y%m%d-%H%M%S')
+        prefix_str.append(formatted_date)
+
         random_number = '{:03d}'.format(random.randint(0, 999))
-        str_ret = prefix_str + department_name_first_letter + '-' + formatted_date + '-' + random_number
+        prefix_str.append(random_number)
+
+        str_ret = '-'.join(prefix_str)
+        self.apply_no = str_ret
+
         return str_ret
 
     apply_no = fields.Char(string="Application NO.", default=_get_default_apply_no, required=True, store=True,
                            compute="_compute_apply_no")
+
+    @api.onchange("category_id", "contract_expense_id")
+    def _onchange_category_id(self):
+        _logger.info(f"category_id={self.category_id};contract_expense_id={self.contract_expense_id}")
+        self._onchange_contract_expense_fund_type()
+
+    @api.onchange("contract_expense_fund_type")
+    def _onchange_contract_expense_fund_type(self):
+        _logger.info(f"self.contract_expense_fund_type={self.contract_expense_fund_type}")
+        if not self.apply_no:
+            self._get_default_apply_no()
+        else:
+            if self.contract_expense_fund_type:
+                this_fund_type = self.contract_expense_fund_type
+            else:
+                if self.contract_expense_id:
+                    this_fund_type = self.contract_expense_id.fund_type
+                else:
+                    this_fund_type = False
+            _logger.info(f"this_fund_type={this_fund_type}")
+            if this_fund_type:
+                tmp_lst = self.apply_no.split('-')
+                tmp_lst[1] = Utils.get_first_letter(this_fund_type.name)
+                self.apply_no = '-'.join(tmp_lst)
+
 
     def _compute_apply_no(self):
         for record in self:

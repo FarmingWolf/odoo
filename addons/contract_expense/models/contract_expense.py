@@ -138,33 +138,33 @@ class ContractExpense(models.Model):
 
         self._invalidate_cache(['stage'])
 
-        default_category_id = self.category_id.id if self.category_id else False
+        default_ce_category_id = self.category_id.id if self.category_id else False
 
-        if not default_category_id:
-            default_category_id = self._get_category_from_context_session(default_category_id)
+        if not default_ce_category_id:
+            default_ce_category_id = self._get_category_from_context_session(default_ce_category_id)
 
-        if default_category_id:
-            return default_category_id
+        if default_ce_category_id:
+            return default_ce_category_id
 
         if self._ids:  # 如果没有从上下文中获取到，尝试从当前记录获取
             record = self.browse(self._ids[0])
-            default_category_id = record.category_id.id
+            default_ce_category_id = record.category_id.id
 
-        if default_category_id:
-            return default_category_id
+        if default_ce_category_id:
+            return default_ce_category_id
 
         _logger.debug(f"record={self}")
 
-        if not default_category_id:
-            default_category_id = self.category_id.id
+        if not default_ce_category_id:
+            default_ce_category_id = self.category_id.id
 
-        if not default_category_id:
-            default_category_id = self.env['contract.expense.category'].search([], limit=1).id
+        if not default_ce_category_id:
+            default_ce_category_id = self.env['contract.expense.category'].search([], limit=1).id
 
-        if not default_category_id:
+        if not default_ce_category_id:
             raise UserError('请先创建合同流程分类！')
 
-        return default_category_id
+        return default_ce_category_id
 
     @api.depends_context('lang')
     @api.depends('category_id')
@@ -178,16 +178,16 @@ class ContractExpense(models.Model):
             else:
                 expense.category_description = ''
 
-    def _get_category_from_context_session(self, default_category_id):
+    def _get_category_from_context_session(self, default_ce_category_id):
 
-        if 'default_category_id' in self.env.context:
-            default_category_id = self.env.context.get('default_category_id')
+        if 'default_ce_category_id' in self.env.context:
+            default_ce_category_id = self.env.context.get('default_ce_category_id')
 
-        if not default_category_id:
-            if request and request.session and 'default_category_id' in request.session:
-                default_category_id = request.session.get('default_category_id')
+        if not default_ce_category_id:
+            if request and request.session and 'default_ce_category_id' in request.session:
+                default_ce_category_id = request.session.get('default_ce_category_id')
 
-        return default_category_id
+        return default_ce_category_id
 
     @api.depends('stage')
     def _compute_meeting_minute_help_msg(self):
@@ -328,26 +328,26 @@ class ContractExpense(models.Model):
 
     def _get_default_stage_id(self):
         _logger.info(f"self.env.context={self.env.context}")
-        default_category_id = None
-        if "default_category_id" in self.env.context:
-            default_category_id = self.env.context.get('default_category_id')
+        default_ce_category_id = None
+        if "default_ce_category_id" in self.env.context:
+            default_ce_category_id = self.env.context.get('default_ce_category_id')
 
-        if not default_category_id:
+        if not default_ce_category_id:
             for record in self:
-                default_category_id = record.category_id.id
+                default_ce_category_id = record.category_id.id
 
-        if not default_category_id:
-            default_category_id = self.category_id.id
-            _logger.info(f"self.category_id={default_category_id}")
+        if not default_ce_category_id:
+            default_ce_category_id = self.category_id.id
+            _logger.info(f"self.category_id={default_ce_category_id}")
 
-        if not default_category_id:
-            _logger.error("default_category_id is None!!! Choose the 1st record!")
-            default_category_id = self.env['contract.expense.category'].search([],limit=1).id
-            if not default_category_id:
+        if not default_ce_category_id:
+            _logger.error("default_ce_category_id is None!!! Choose the 1st record!")
+            default_ce_category_id = self.env['contract.expense.category'].search([],limit=1).id
+            if not default_ce_category_id:
                 raise ValidationError('请先创建合同流程分类')
 
         stage_id = self.env['contract.expense.approval.stage'].search([('company_id', '=', self.env.user.company_id.id),
-                                                                       ('category_id', '=', default_category_id)],
+                                                                       ('category_id', '=', default_ce_category_id)],
                                                                        limit=1).id
         if stage_id:
             return stage_id
