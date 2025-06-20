@@ -3,6 +3,9 @@ import logging
 import random
 import re
 from datetime import datetime
+
+from addons.contract_expense.models.contract_expense import words_to_del
+from addons.utils.models.utils import Utils
 from odoo import api, fields, Command, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.http import request
@@ -26,10 +29,16 @@ class FundManagement(models.Model):
 
     def _get_default_apply_no(self):
         prefix_str = "FM-"
+        department_name_first_letter = ""
+        department_nm = self._default_employee_id().name
+        if department_nm:
+            for word in words_to_del:
+                department_name = department_nm.replace(word, "")
 
+            department_name_first_letter = Utils.get_first_letter(department_nm)
         formatted_date = fields.Datetime.context_timestamp(self, datetime.now()).strftime('%Y%m%d-%H%M%S')
         random_number = '{:03d}'.format(random.randint(0, 999))
-        str_ret = prefix_str + formatted_date + '-' + random_number
+        str_ret = prefix_str + department_name_first_letter + '-' + formatted_date + '-' + random_number
         return str_ret
 
     apply_no = fields.Char(string="Application NO.", default=_get_default_apply_no, required=True, store=True,
@@ -240,12 +249,15 @@ class FundManagement(models.Model):
         self._get_view()
         return stage_domain
 
+    # fund.management.contract是老方法，已经迁移至contract.expense
     contract_id = fields.Many2one(string='Contract ID', comodel_name="fund.management.contract", ondelete="restrict")
-    contract_no = fields.Char(string='Contract NO.', related="contract_id.contract_no", store=True)
-    contract_name = fields.Char(string='Contract Name', related="contract_id.name", store=True)
-    contract_amount = fields.Float(string="Contract Total Amount", related="contract_id.contract_amount", store=True)
+    contract_expense_id = fields.Many2one(string='Contract ID', comodel_name="contract.expense", ondelete="restrict",
+                                          domain="[('state', '=', 'done')]")
+    contract_no = fields.Char(string='Contract NO.', related="contract_expense_id.contract_no", store=True)
+    contract_name = fields.Char(string='Contract Name', related="contract_expense_id.name", store=True)
+    contract_amount = fields.Float(string="Contract Total Amount", related="contract_expense_id.contract_amount", store=True)
     party_b_id = fields.Many2one('res.partner', string='Payee', index=True, copy=True, store=True,
-                                 related="contract_id.receiving_unit", domain="[('company_id', '=', company_id)]")
+                                 related="contract_expense_id.receiving_unit", domain="[('company_id', '=', company_id)]")
     # Amount fields
     total_amount_currency = fields.Monetary(
         string="Apply In Currency",
@@ -267,14 +279,14 @@ class FundManagement(models.Model):
         default=0
     )
 
-    @api.onchange("contract_id")
-    def _onchange_contract_id(self):
-        if self.contract_name != self.contract_id.name:
-            self.contract_name = self.contract_id.name
-        if self.contract_no != self.contract_id.contract_no:
-            self.contract_no = self.contract_id.contract_no
+    @api.onchange("contract_expense_id")
+    def _onchange_contract_expense_id(self):
+        if self.contract_name != self.contract_expense_id.name:
+            self.contract_name = self.contract_expense_id.name
+        if self.contract_no != self.contract_expense_id.contract_no:
+            self.contract_no = self.contract_expense_id.contract_no
 
-        self._set_contract_fields(self.contract_id)
+        self._set_contract_fields(self.contract_expense_id)
 
 
     @api.onchange('total_amount_currency')
@@ -284,28 +296,29 @@ class FundManagement(models.Model):
     def _set_contract_fields(self, rcd):
         if self.contract_amount != rcd.contract_amount:
             self.contract_amount = rcd.contract_amount
-        if self.fund_type != rcd.fund_type:
-            self.fund_type = rcd.fund_type
-        if self.procurement_method != rcd.procurement_method:
-            self.procurement_method = rcd.procurement_method
-        if self.account_subject_category != rcd.account_subject_category:
-            self.account_subject_category = rcd.account_subject_category
+        if self.contract_expense_fund_type != rcd.fund_type:
+            self.contract_expense_fund_type = rcd.fund_type
+        if self.contract_expense_procurement_method != rcd.procurement_method:
+            self.contract_expense_procurement_method = rcd.procurement_method
+        if self.account_subject_category != rcd.account_subject:
+            self.account_subject_category = rcd.account_subject
         if self.receiving_unit != rcd.receiving_unit:
             self.receiving_unit = rcd.receiving_unit
         if self.receiving_bank != rcd.receiving_bank:
             self.receiving_bank = rcd.receiving_bank
         if self.bank_account != rcd.bank_account:
             self.bank_account = rcd.bank_account
-        if self.payment_method != rcd.payment_method:
-            self.payment_method = rcd.payment_method
+        if self.contract_expense_payment_method != rcd.payment_method:
+            self.contract_expense_payment_method = rcd.payment_method
 
+    # 迁移至contract.expense之后，在这里不会再发生contract_no的change事件
     @api.onchange('contract_no')
     def _onchange_contract_no(self):
         contract_domain = [('contract_no', '=', self.contract_no)]
         contract_rcd = self.env['fund.management.contract'].search(contract_domain, limit=1)
         for rcd in contract_rcd:
-            if self.contract_id.id != rcd.id:
-                self.contract_id = rcd
+            if self.contract_expense_id.id != rcd.id:
+                self.contract_expense_id = rcd
             if self.contract_name != rcd.name:
                 self.contract_name = rcd.name
 
@@ -319,16 +332,16 @@ class FundManagement(models.Model):
         #
         #     self._set_contract_fields(rcd)
 
-    @api.depends('contract_id', 'contract_no')
+    @api.depends('contract_expense_id', 'contract_no')
     def _compute_apply_times(self):
         for record in self:
-            # 如果 contract_id 未设置，直接返回默认值
-            if (not record.contract_id) and (not record.contract_no):
+            # 如果 contract_expense_id 未设置，直接返回默认值
+            if (not record.contract_expense_id) and (not record.contract_no):
                 record.apply_times = 1
                 continue
             # 搜索同一合同的历史记录，按创建时间倒序排列
             domain = [('state', 'in', ['submitted', 'approved', 'done']),
-                      '|', '&', ('contract_id', '=', self.contract_id.id), ('contract_id', '!=', False),
+                      '|', '&', ('contract_expense_id', '=', self.contract_expense_id.id), ('contract_expense_id', '!=', False),
                            '&', ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
             hist_records = self.search(domain, order="create_date DESC")
 
@@ -357,11 +370,11 @@ class FundManagement(models.Model):
         store=True, readonly=True,
     )
 
-    @api.depends('contract_id', 'contract_no')
+    @api.depends('contract_expense_id', 'contract_no')
     def _compute_total_amt_cur_hist_accu(self):
         for record in self:
             search_domain = [('state', 'in', ['submitted', 'approved', 'done']),
-                             '|', '&', ('contract_id', '=', self.contract_id.id), ('contract_id', '!=', False),
+                             '|', '&', ('contract_expense_id', '=', self.contract_expense_id.id), ('contract_expense_id', '!=', False),
                                   '&', ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
             records = self.search(search_domain)
             apply_hist_amt = 0
@@ -419,6 +432,21 @@ class FundManagement(models.Model):
         string="Payment Method",
         store=True,
     )
+    contract_expense_fund_type = fields.Many2one(
+        comodel_name='contract.expense.fund.type',
+        string="Fund Type",
+        store=True,
+    )
+    contract_expense_procurement_method = fields.Many2one(
+        comodel_name='contract.expense.procurement.method',
+        string="Procurement Method",
+        store=True,
+    )
+    contract_expense_payment_method = fields.Many2one(
+        comodel_name='contract.expense.payment.method',
+        string="Payment Method",
+        store=True,
+    )
     account_subject_category = fields.Many2one(
         comodel_name='accounting.subject.subject',
         string="Account Subject Category",
@@ -461,7 +489,7 @@ class FundManagement(models.Model):
         compute='_compute_total_amt_cur_hist_accu_per_include_this', readonly=True,
     )
 
-    @api.depends('contract_id', 'contract_no', 'total_amount_currency')
+    @api.depends('contract_expense_id', 'contract_no', 'total_amount_currency')
     def _compute_total_amt_cur_hist_accu_include_this(self):
         for record in self:
             record.total_hist_include_this = record.total_amt_cur_hist_accu + record.total_amount_currency
@@ -1354,11 +1382,11 @@ class FundManagement(models.Model):
     def _record_check(self):
         for rcd in self:
             if rcd.contract_payment:
-                if not rcd.contract_id:  # 如果已经选择了合同ID，那么这三个要素一定存在了
+                if not rcd.contract_expense_id:  # 如果已经选择了合同ID，那么这三个要素一定存在了
                     if (not rcd.contract_no) or (not rcd.contract_amount) or (not rcd.contract_name):
                         raise UserError(_("Please input Contract Info!"))
                 else:
-                    self._set_contract_fields(rcd.contract_id)
+                    self._set_contract_fields(rcd.contract_expense_id)
 
                 if rcd.total_amount_currency + rcd.total_amt_cur_hist_accu > rcd.contract_amount:
                     raise UserError(_("The current application amount plus the cumulative historical "
@@ -1366,7 +1394,7 @@ class FundManagement(models.Model):
 
                 # 判断是否存在本合同的审批中的流程
                 search_domain = [('state', 'in', ['submitted', 'approved', 'done']),
-                                 '|', '&', ('contract_id', '=', self.contract_id.id), ('contract_id', '!=', False),
+                                 '|', '&', ('contract_expense_id', '=', self.contract_expense_id.id), ('contract_expense_id', '!=', False),
                                       '&', ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
                 records = self.search(search_domain)
                 for record in records:
@@ -1470,6 +1498,7 @@ class FundManagement(models.Model):
                 raise UserError(_("Mandatory Meeting Minutes at this stage [%(stage_name)s] "
                                   "are not uploaded:%(err_lst)s") % {'stage_name': rcd.stage.name, 'err_lst': err_lst})
 
+    # 这是老方法，且未发现被使用，新方法迁移至contract.expense
     def _create_or_update_contract(self, rcd):
         if rcd.contract_id:
             contracts = self.env['fund.management.contract'].search([('id', '=', rcd.contract_id.id)])
@@ -1478,10 +1507,10 @@ class FundManagement(models.Model):
                     contract.contract_no = rcd.contract_no
                 if contract.contract_amount != rcd.contract_amount:
                     contract.contract_amount = rcd.contract_amount
-                if contract.fund_type != rcd.fund_type:
-                    contract.fund_type = rcd.fund_type
-                if contract.procurement_method != rcd.procurement_method:
-                    contract.procurement_method = rcd.procurement_method
+                if contract.contract_expense_fund_type != rcd.fund_type:
+                    contract.contract_expense_fund_type = rcd.fund_type
+                if contract.contract_expense_procurement_method != rcd.procurement_method:
+                    contract.contract_expense_procurement_method = rcd.procurement_method
                 if contract.account_subject_category != rcd.account_subject_category:
                     contract.account_subject_category = rcd.account_subject_category
                 if contract.receiving_unit != rcd.receiving_unit:
@@ -1490,8 +1519,8 @@ class FundManagement(models.Model):
                     contract.receiving_bank = rcd.receiving_bank
                 if contract.bank_account != rcd.bank_account:
                     contract.bank_account = rcd.bank_account
-                if contract.payment_method != rcd.payment_method:
-                    contract.payment_method = rcd.payment_method
+                if contract.contract_expense_payment_method != rcd.payment_method:
+                    contract.contract_expense_payment_method = rcd.payment_method
                 if contract.party_a_unit != rcd.party_a_unit:
                     contract.party_a_unit = rcd.party_a_unit
                 if contract.date_sign != rcd.date_sign:
@@ -1504,13 +1533,13 @@ class FundManagement(models.Model):
             contract_rcd = {
                 "contract_no": rcd.contract_no,
                 "contract_amount": rcd.contract_amount,
-                "fund_type": rcd.fund_type.id,
-                "procurement_method": rcd.procurement_method.id,
+                "contract_expense_fund_type": rcd.fund_type.id,
+                "contract_expense_procurement_method": rcd.procurement_method.id,
                 "account_subject_category": rcd.account_subject_category.id,
                 "receiving_unit": rcd.receiving_unit.id,
                 "receiving_bank": rcd.receiving_bank.id,
                 "bank_account": rcd.bank_account,
-                "payment_method": rcd.payment_method.id,
+                "contract_expense_payment_method": rcd.payment_method.id,
                 "party_a_unit": rcd.party_a_unit.id,
                 "date_sign": rcd.date_sign,
                 "date_start": rcd.date_start,

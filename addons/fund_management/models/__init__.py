@@ -8,7 +8,11 @@ from . import fund_management_approval_stage
 from . import fund_management_overdue
 from . import fund_management_approval_detail
 from . import fund_management_fund_type
+from . import contract_expense_fund_type
 from . import fund_management_procurement_method
+from . import contract_expense_procurement_method
 from . import fund_management_payment_method
+from . import contract_expense_payment_method
+from . import contract_expense
 from . import fund_management_contract
 from . import fund_management
