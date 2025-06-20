@@ -4,7 +4,7 @@ import random
 import re
 from datetime import datetime
 
-from addons.contract_expense.models.contract_expense import words_to_del
+from ...contract_expense.models.contract_expense import words_to_del
 from addons.utils.models.utils import Utils
 from odoo import api, fields, Command, models, _
 from odoo.exceptions import UserError, ValidationError
