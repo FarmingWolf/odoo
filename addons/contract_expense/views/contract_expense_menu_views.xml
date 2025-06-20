@@ -5,11 +5,11 @@
 
     <menuitem id="menu_contract_expense_approve" name="审核/审批" sequence="10" parent="menu_contract_expense_root"
               action="action_contract_expense_actions_to_be_approved"
-              groups="contract_expense.group_contract_expense_user"/>
+              groups="contract_expense.group_contract_expense_user,contract_expense.group_contract_expense_lawyer"/>
 
     <menuitem id="menu_contract_expense_applications" name="创建/申请" sequence="20" parent="menu_contract_expense_root"
               action="action_contract_expense_actions_applications_all"
-              groups="contract_expense.group_contract_expense_user, not contract_expense.group_contract_expense_lawyer"/>
+              groups="contract_expense.group_contract_expense_apply"/>
     
     <menuitem id="menu_contract_expense_configuration" name="配置" sequence="30" parent="menu_contract_expense_root"
               groups="contract_expense.group_contract_expense_manager"/>

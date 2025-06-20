@@ -7,7 +7,7 @@
                 ('employee_id.user_id', '=', user.id),
                 ('department_id.manager_id.user_id', '=', user.id),
                 ('department_id.complete_name', 'ilike', str(user.employee_id.department_id.complete_name) + '%')]</field>
-            <field name="groups" eval="[(4, ref('contract_expense.group_contract_expense_user'))]"/>
+            <field name="groups" eval="[(4, ref('contract_expense.group_contract_expense_apply')), (4, ref('contract_expense.group_contract_expense_lawyer'))]"/>
         </record>
         <record id="ir_rule_contract_expense_manager" model="ir.rule">
             <field name="name">支出类合同管理员</field>

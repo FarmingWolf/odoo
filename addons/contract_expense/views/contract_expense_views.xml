@@ -31,7 +31,8 @@
                 <field name="account_subject" optional="hide" readonly="not editable" column_invisible="1"/>
                 <field name="name" readonly="not editable"/>
                 <field name="employee_id" widget="many2one_avatar_user" readonly="not editable"/>
-                <field name="department_id" readonly="True"/>
+                <field name="department_id" readonly="True" column_invisible="1"/>
+                <field name="party_a_unit" readonly="True"/>
                 <field name="contract_amount" sum="合计" widget='monetary' readonly="not editable"
                        options="{'currency_field': 'company_currency_id'}" decoration-bf="1"/>
                 <field name="receiving_unit" readonly="True"/>
