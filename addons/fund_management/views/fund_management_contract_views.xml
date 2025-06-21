@@ -17,6 +17,7 @@
         <field name="arch" type="xml">
             <tree string="Fund Contract">
                 <field name="name"/>
+                <field name="company_id" column_invisible="1"/>
                 <field name="contract_no"/>
                 <field name="contract_amount"/>
                 <field name="fund_type"/>
@@ -53,6 +54,7 @@
                             <field name="create_date" readonly="1" widget="date"/>
                         </group>
                         <group>
+                            <field name="company_id" invisible="1"/>
                             <field name="receiving_unit" options="{'no_open': True}" readonly="not editable"/>
                             <field name="receiving_bank" domain="[('partner_id', '=', receiving_unit)]"
                                    options="{'no_open': True, 'no_create': True}" readonly="(not receiving_unit) or (not editable)"/>

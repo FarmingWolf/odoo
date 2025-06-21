@@ -63,6 +63,11 @@ class FundManagement(models.Model):
         _logger.info(f"category_id={self.category_id};contract_expense_id={self.contract_expense_id}")
         self._onchange_contract_expense_fund_type()
 
+    @api.onchange("contract_expense_id")
+    def _onchange_contract_expense_id(self):
+        if self.receiving_unit != self.contract_expense_id.receiving_unit:
+            self.receiving_unit = self.contract_expense_id.receiving_unit
+
     @api.onchange("contract_expense_fund_type")
     def _onchange_contract_expense_fund_type(self):
         _logger.info(f"self.contract_expense_fund_type={self.contract_expense_fund_type}")
@@ -495,6 +500,7 @@ class FundManagement(models.Model):
         comodel_name='res.partner',
         string="Receiving Unit",
         store=True,
+        domain="[('company_id', '=', company_id)]"
     )
 
     receiving_bank = fields.Many2one(

@@ -28,6 +28,7 @@ class MeetingMinutes(models.Model):
                                     help='指定单位专用。如不指定，则所有单位都可以使用。',
                                     domain=lambda self: self._get_department_domain(),
                                     default=lambda self: self.env.user.employee_id.department_id)
+    department_nm = fields.Char(string="单位", related="department_id.name")
 
     def _get_department_domain(self):
         domain = [('company_id', '=', self.env.user.company_id.id)]

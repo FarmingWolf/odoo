@@ -50,6 +50,18 @@
                 <field name="industry_id" invisible="not is_company" options="{'no_create': True}" string="行业类型"/>
                 <field name="registered_capital" invisible="not is_company"/>
             </xpath>
+            <xpath expr="//page[@name='sales_purchases']" position="after">
+                <page string="银行账号" name="accounting" invisible="not is_company and parent_id" groups="estate_lease_contract.contract_brokerage_partner_bank_manage">
+                    <field name="bank_ids" nolabel="1" colspan="2" context="{'default_partner_id': id}" widget="auto_save_res_partner">
+                        <tree>
+                            <field name="sequence" widget="handle"/>
+                            <field name="acc_number"/>
+                            <field name="bank_id"/>
+                            <field name="acc_holder_name" column_invisible="True"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
         </field>
     </record>
 </odoo>

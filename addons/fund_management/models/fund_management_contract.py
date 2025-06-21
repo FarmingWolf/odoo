@@ -36,7 +36,8 @@ class FundManagementContract(models.Model):
     fund_type = fields.Many2one(comodel_name='fund.management.fund.type', string="Fund Type", required=True, tracking=True)
     procurement_method = fields.Many2one(comodel_name='fund.management.procurement.method', string="Procurement Method", required=True, tracking=True)
     account_subject_category = fields.Many2one(comodel_name='accounting.subject.subject', string="Account Subject Category", required=True, tracking=True)
-    receiving_unit = fields.Many2one(comodel_name='res.partner', string="Receiving Unit", required=True, tracking=True)
+    receiving_unit = fields.Many2one(comodel_name='res.partner', string="Receiving Unit", required=True, tracking=True,
+                                     domain="[('company_id', '=', company_id)]")
     receiving_bank = fields.Many2one(comodel_name="res.partner.bank", string="Receiving Bank", required=True, tracking=True)
     bank_account = fields.Char(string="Bank Account Number", related="receiving_bank.acc_number", required=True, tracking=True)
     payment_method = fields.Many2one(comodel_name='fund.management.payment.method', string="Payment Method", required=True, tracking=True)

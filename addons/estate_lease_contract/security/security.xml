@@ -29,4 +29,9 @@
         <field name="category_id" ref="base.module_category_real_estate_brokerage"/>
     </record>
 
+    <record id="contract_brokerage_partner_bank_manage" model="res.groups">
+        <field name="name">客户银行账号管理</field>
+        <field name="category_id" ref="base.module_category_real_estate_brokerage"/>
+    </record>
+
 </odoo>

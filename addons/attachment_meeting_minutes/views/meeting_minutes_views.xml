@@ -11,7 +11,9 @@
                 <field name="type"/>
                 <field name="meeting_time" optional="show"/>
                 <field name="meeting_time_end" optional="hide"/>
-                <field name="department_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}" optional="show"/>
+                <field name="department_nm" groups="!attachment_meeting_minutes.group_meeting_minutes_manager" optional="show"/>
+                <field name="department_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}"
+                       optional="show" groups="attachment_meeting_minutes.group_meeting_minutes_manager"/>
                 <field name="employee_id" optional="hide"/>
                 <field name="nb_attachment" widget="meeting_minutes_nb_attachment" nolabel="1" readonly="True" sum="文件数合计" optional="hide"/>
                 <field name="attachment_id" widget="many2many_binary" optional="show"/>
@@ -32,7 +34,9 @@
                         </group>
                         <group cols="1">
                             <field name="meeting_time"/>
-                            <field name="department_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}"/>
+                            <field name="department_nm" groups="!attachment_meeting_minutes.group_meeting_minutes_manager"/>
+                            <field name="department_id" options="{'no_open': True, 'no_quick_create': True, 'no_create': True, 'no_create_edit': True}"
+                                   groups="attachment_meeting_minutes.group_meeting_minutes_manager"/>
                         </group>
                         <group cols="1">
                             <field name="attachment_id" widget="many2many_binary"/>

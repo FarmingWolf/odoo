@@ -51,7 +51,7 @@ class ContractExpense(models.Model):
     account_subject = fields.Many2one(comodel_name='accounting.subject.subject', string="资金科目", required=True, tracking=True)
 
     receiving_unit = fields.Many2one(comodel_name='res.partner', string="收款方", required=True, tracking=True,
-                                     domain="['|', ('company_id', '=', company_id), ('company_id', '=', False)]")
+                                     domain="[('company_id', '=', company_id)]")
     receiving_bank = fields.Many2one(comodel_name="res.partner.bank", string="收款方银行", required=True, tracking=True)
     bank_account = fields.Char(string="收款方银行账号", related="receiving_bank.acc_number", required=True, tracking=True)
     payment_method = fields.Many2one(comodel_name='contract.expense.payment.method', string="支付方式", required=True,
