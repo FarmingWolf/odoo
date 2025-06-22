@@ -1591,7 +1591,7 @@ msgstr "备注(申请资金事由等)"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Notes..."
-msgstr "申请资金事由等备注……"
+msgstr "请输入申请资金事由等备注……"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_contract_expense__message_needaction_counter

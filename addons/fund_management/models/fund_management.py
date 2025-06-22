@@ -58,16 +58,6 @@ class FundManagement(models.Model):
     apply_no = fields.Char(string="Application NO.", default=_get_default_apply_no, required=True, store=True,
                            compute="_compute_apply_no")
 
-    @api.onchange("category_id", "contract_expense_id")
-    def _onchange_category_id(self):
-        _logger.info(f"category_id={self.category_id};contract_expense_id={self.contract_expense_id}")
-        self._onchange_contract_expense_fund_type()
-
-    @api.onchange("contract_expense_id")
-    def _onchange_contract_expense_id(self):
-        if self.receiving_unit != self.contract_expense_id.receiving_unit:
-            self.receiving_unit = self.contract_expense_id.receiving_unit
-
     @api.onchange("contract_expense_fund_type")
     def _onchange_contract_expense_fund_type(self):
         _logger.info(f"self.contract_expense_fund_type={self.contract_expense_fund_type}")
@@ -86,7 +76,6 @@ class FundManagement(models.Model):
                 tmp_lst = self.apply_no.split('-')
                 tmp_lst[1] = Utils.get_first_letter(this_fund_type.name)
                 self.apply_no = '-'.join(tmp_lst)
-
 
     def _compute_apply_no(self):
         for record in self:
@@ -271,7 +260,7 @@ class FundManagement(models.Model):
     def _get_view(self, view_id=None, view_type='form', **options):
         default_category_id = self._get_default_category()
 
-        _logger.debug(f"进入_get_view default_category_id={default_category_id}")
+        _logger.info(f"进入_get_view default_category_id={default_category_id}")
 
         arch, view = super()._get_view(view_id=view_id, view_type=view_type, **options)
         if view_type == 'form':
@@ -332,7 +321,6 @@ class FundManagement(models.Model):
 
         self._set_contract_fields(self.contract_expense_id)
 
-
     @api.onchange('total_amount_currency')
     def _onchange_total_amount_currency(self):
         self.total_hist_include_this = self.total_amt_cur_hist_accu + self.total_amount_currency
@@ -342,6 +330,7 @@ class FundManagement(models.Model):
             self.contract_amount = rcd.contract_amount
         if self.contract_expense_fund_type != rcd.fund_type:
             self.contract_expense_fund_type = rcd.fund_type
+            _logger.info(f"contract_expense_fund_type={self.contract_expense_fund_type}")
         if self.contract_expense_procurement_method != rcd.procurement_method:
             self.contract_expense_procurement_method = rcd.procurement_method
         if self.account_subject_category != rcd.account_subject:
@@ -354,27 +343,6 @@ class FundManagement(models.Model):
             self.bank_account = rcd.bank_account
         if self.contract_expense_payment_method != rcd.payment_method:
             self.contract_expense_payment_method = rcd.payment_method
-
-    # 迁移至contract.expense之后，在这里不会再发生contract_no的change事件
-    @api.onchange('contract_no')
-    def _onchange_contract_no(self):
-        contract_domain = [('contract_no', '=', self.contract_no)]
-        contract_rcd = self.env['fund.management.contract'].search(contract_domain, limit=1)
-        for rcd in contract_rcd:
-            if self.contract_expense_id.id != rcd.id:
-                self.contract_expense_id = rcd
-            if self.contract_name != rcd.name:
-                self.contract_name = rcd.name
-
-            self._set_contract_fields(rcd)
-
-        # search_domain = [('state', 'in', ['submitted', 'approved', 'done']), ('contract_no', '=', self.contract_no), ('contract_no', '!=', False)]
-        # rcd_hist = self.search(search_domain, order="state ASC, create_date DESC", limit=1)
-        # for rcd in rcd_hist:
-        #     if self.contract_name != rcd.contract_name:
-        #         self.contract_name = rcd.contract_name
-        #
-        #     self._set_contract_fields(rcd)
 
     @api.depends('contract_expense_id', 'contract_no')
     def _compute_apply_times(self):
@@ -478,40 +446,40 @@ class FundManagement(models.Model):
     )
     contract_expense_fund_type = fields.Many2one(
         comodel_name='contract.expense.fund.type',
-        string="Fund Type",
-        store=True,
+        string="Fund Type", required=True,
+        store=True, default=lambda self: self._get_default_contract_expense_fund_type()
     )
     contract_expense_procurement_method = fields.Many2one(
         comodel_name='contract.expense.procurement.method',
-        string="Procurement Method",
-        store=True,
+        string="Procurement Method", required=True,
+        store=True, default=lambda self: self._get_default_contract_expense_procurement_method()
     )
     contract_expense_payment_method = fields.Many2one(
         comodel_name='contract.expense.payment.method',
-        string="Payment Method",
-        store=True,
+        string="Payment Method", required=True,
+        store=True, default=lambda self: self._get_default_contract_expense_payment_method()
     )
     account_subject_category = fields.Many2one(
         comodel_name='accounting.subject.subject',
         string="Account Subject Category",
-        store=True,
+        store=True, required=True,
     )
     receiving_unit = fields.Many2one(
         comodel_name='res.partner',
         string="Receiving Unit",
-        store=True,
+        store=True, required=True,
         domain="[('company_id', '=', company_id)]"
     )
 
     receiving_bank = fields.Many2one(
         comodel_name="res.partner.bank",
         string="Receiving Bank",
-        store=True,
+        store=True, required=True,
     )
     bank_account = fields.Char(
         string="Bank Account Number",
         related="receiving_bank.acc_number",
-        store=True,
+        store=True, required=True,
     )
 
     is_multiple_currency = fields.Boolean(
@@ -550,19 +518,27 @@ class FundManagement(models.Model):
 
     @api.onchange("category_id")
     def _onchange_category_id(self):
-        stage_ids = self.env['fund.management.approval.stage'].search([('company_id', '=', self.env.user.company_id.id),
-                                                                       ('category_id', '=', self.category_id.id)],
-                                                                      limit=1)
+        stage_id = self.env['fund.management.approval.stage'].search([('company_id', '=', self.env.user.company_id.id),
+                                                                      ('category_id', '=', self.category_id.id)],
+                                                                      limit=1).id
 
-        _logger.debug(f"stage_ids={stage_ids}")
-        if stage_ids:
-            self.stage = stage_ids[0]
+        _logger.info(f"stage_ids={stage_id}")
+        self.stage = stage_id
 
         if self.category_id.id:
             if request and request.session:
                 request.session['default_category_id'] = self.category_id.id
         # 强制刷新
         self._get_view()
+
+    def _get_default_contract_expense_payment_method(self):
+        return self.env['contract.expense.payment.method'].search([], limit=1).id
+
+    def _get_default_contract_expense_procurement_method(self):
+        return self.env['contract.expense.procurement.method'].search([], limit=1).id
+
+    def _get_default_contract_expense_fund_type(self):
+        return self.env['contract.expense.fund.type'].search([], limit=1).id
 
     def _compute_is_editable(self):
         for record in self:
@@ -1554,6 +1530,7 @@ class FundManagement(models.Model):
                     contract.contract_amount = rcd.contract_amount
                 if contract.contract_expense_fund_type != rcd.fund_type:
                     contract.contract_expense_fund_type = rcd.fund_type
+                    _logger.info(f"contract_expense_fund_type={self.contract_expense_fund_type}")
                 if contract.contract_expense_procurement_method != rcd.procurement_method:
                     contract.contract_expense_procurement_method = rcd.procurement_method
                 if contract.account_subject_category != rcd.account_subject_category:
