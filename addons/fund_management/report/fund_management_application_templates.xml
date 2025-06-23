@@ -328,7 +328,7 @@
                             </div>
                         </div>
                         <div class="enter_exit_form_div" t-attf-style="height: {{doc.meeting_minutes_attach_div_h}}px;">
-                            <div class="grid-line" style="border-bottom: 2px solid black;" >
+                            <div class="grid-line">
                                 <div class="grid-item-left" style="width: 20%;height:100%;">
                                     <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
                                        <div t-attf-style="height: {{doc.meeting_minutes_attach_div_right_h}}%; padding-top: 5px;">
@@ -447,6 +447,49 @@
                             </div>
                         </div>
 
+                        <div class="enter_exit_form_div" style="height: 3.67%;">
+                            <div class="grid-line"
+                                 style="display: flex; justify-content: space-between; align-items: center;">
+                                <!-- 支付日期 -->
+                                <div class="grid-item-left"
+                                     style="width: 42%; display: flex; justify-content: flex-start;">
+                                    <div style="margin-top: 8px;">
+                                        <span>支付日期</span>
+                                    </div>
+                                </div>
+                                <!-- 空白区域 -->
+                                <div class="grid-item-right" style="width: 51%; ">
+                                    <span>　</span>
+                                </div>
+
+                                <!-- 上传银行回单 -->
+                                <div class="grid-item-left"
+                                     style="width: 45%; height: 100%; border-left: 1px solid #000; display: flex; justify-content: flex-start;">
+                                    <div style="margin-top: 8px;">
+                                        <span>上传银行回单</span>
+                                    </div>
+                                </div>
+                                <!-- 空白区域 -->
+                                <div class="grid-item-right" style="width: 50%; ">
+                                    <span>　</span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="enter_exit_form_div" style="height: 3.67%;border-bottom: 2px solid black;">
+                            <div class="grid-line">
+                                <div class="grid-item-left" style="width: 20%;height:100%;">
+                                    <div style="margin-top: 8px">
+                                        <span>备注</span>
+                                    </div>
+                                </div>
+                                <div class="grid-item-left" style="column-span: 1; width: 80%;border-right: none; ">
+                                    <span>　</span>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="enter_exit_form_div" style="height: 4%; page-break-before:always;">
                             <div class="grid-line" style="border-top: 1px solid black;">
                                 <div class="grid-item-left" style="column-span: 1; width: 20%; border-right: none;">
@@ -498,7 +541,7 @@
                                                     <t t-esc="detail.approval_comments or '　'"/>
                                                 </td>
                                                 <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
-                                                    <t t-esc="detail.approval_date_time or '　'"/>
+                                                    <t t-esc="context_timestamp(detail.approval_date_time).strftime('%Y-%m-%d %H:%M:%S') or '　'"/>
                                                 </td>
                                             </tr>
                                         </t>
@@ -749,137 +792,122 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="enter_exit_form_div" style="height: 17%;">
-                            <div class="grid-line">
-                                <div class="grid-item-left" style="width: 20%; height:100%;">
-                                    <div style="margin-top: 70px">
-                                        <span>相关材料</span>
-                                    </div>
-                                </div>
-                                <div class="grid-item-right" style="column-span: 4; width: 80%;border-top: none;">
-                                    <!-- 第一行 -->
-                                    <div class="grid-line"
-                                         style="width: 100%; height: 33%; display: flex; align-items: center;">
-                                        <div class="grid-item-left"
-                                             style="width: 100%; padding-top: 10px;border-right: none; text-align: left;">
-                                            <span>
-                                                <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
-                                                    <t t-if="'发票' in each_attach.type.name">
-                                                        <t t-if="each_attach.nb_attachment != 0">
-                                                            <input type="checkbox" checked="1"/>
-                                                        </t>
-                                                        <t t-else="">
-                                                            <input type="checkbox"/>
-                                                        </t>
-
-                                                        <span>发票　<t t-esc="each_attach.nb_attachment"/>　张</span>
-                                                        <t t-if="each_attach.nb_attachment != 0">
-                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
-                                                                <t t-esc="each_attachment_file.name"/>
-                                                            </t>
-                                                        </t>
-                                                    </t>
-                                                </t>
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <!-- 第二行 -->
-                                    <div class="grid-line"
-                                         style="width: 100%; height: 33%; display: flex; align-items: center;">
-                                        <div class="grid-item-left"
-                                             style="width: 100%; padding-top: 10px;border-right: none; text-align: left;">
-                                            <span>
-                                                <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
-                                                    <t t-if="'企业会议纪要' in each_attach.type.name">
-                                                        <t t-if="each_attach.nb_attachment != 0">
-                                                            <input type="checkbox" checked="1"/>
-                                                        </t>
-                                                        <t t-else="">
-                                                            <input type="checkbox"/>
-                                                        </t>
-
-                                                        <span>企业会议纪要编号　</span>
-                                                        <t t-if="each_attach.nb_attachment != 0">
-                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
-                                                                <t t-esc="each_attachment_file.name"/>
-                                                            </t>
-                                                        </t>
-                                                    </t>
-                                                </t>
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <!-- 第三行 -->
-                                    <div class="grid-line"
-                                         style="width: 100%; height: 34%; display: flex; align-items: center;">
-                                        <div class="grid-item-left"
-                                             style="width: 100%; padding-top: 10px;border-right: none; text-align: left;">
-                                            <span>
-                                                <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
-                                                    <t t-if="'乡会议纪要' in each_attach.type.name">
-                                                        <t t-if="each_attach.nb_attachment != 0">
-                                                            <input type="checkbox" checked="1"/>
-                                                        </t>
-                                                        <t t-else="">
-                                                            <input type="checkbox"/>
-                                                        </t>
-
-                                                        <span>乡会议纪要编号　</span>
-                                                        <t t-if="each_attach.nb_attachment != 0">
-                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
-                                                                <t t-esc="each_attachment_file.name"/>
-                                                            </t>
-                                                        </t>
-                                                    </t>
-                                                </t>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="enter_exit_form_div" style="height: 7.34%;">
-                            <div class="grid-line">
-                                <div class="grid-item-left" style="width: 20%; height:100%;">
-                                    <div style="margin-top: 15px">
-                                        <span>企业财务<br/>审核意见</span>
-                                    </div>
-                                </div>
-                                <div class="grid-item-left"
-                                     style="column-span: 1; width: 80%; border-right: none; position: relative;">
-                                    <span style="position: absolute; left: 0; top: 0; padding: 2px;">【同意】</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="enter_exit_form_div" style="height: 7.34%;">
+                        <div class="enter_exit_form_div" t-attf-style="height: {{doc.meeting_minutes_attach_div_h}}px;">
                             <div class="grid-line">
                                 <div class="grid-item-left" style="width: 20%;height:100%;">
-                                    <div style="margin-top: 15px">
-                                        <span>主管副总经理<br/>审核意见</span>
-                                    </div>
+                                    <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
+                                       <div t-attf-style="height: {{doc.meeting_minutes_attach_div_right_h}}%; padding-top: 5px;">
+                                           <t t-if="each_attach_type_index == ((len(doc.meeting_minute_types) + 1) // 2) - 1">
+                                               <span>相关材料</span>
+                                           </t>
+                                       </div>
+                                    </t>
                                 </div>
-                                <div class="grid-item-left"
-                                     style="column-span: 1; width: 80%; border-right: none; position: relative;">
-                                    <span style="position: absolute; left: 0; top: 0; padding: 2px;">【同意】</span>
-                                </div>
-                            </div>
-                        </div>
+                                <div class="grid-item-right" style="column-span: 4; width: 80%;border-top: none;border-bottom: none;">
+                                    <t t-set="line_words" t-value="46"/>
+                                    <t t-set="line_height" t-value="30"/>
+                                    <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
+                                        <t t-set="attachment_exists" t-value="0"/>
+                                        <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
 
-                        <div class="enter_exit_form_div" style="height: 7.34%;">
-                            <div class="grid-line">
-                                <div class="grid-item-left" style="width: 20%;height:100%;">
-                                    <div style="margin-top: 15px">
-                                        <span>总经理<br/>审核意见</span>
-                                    </div>
-                                </div>
-                                <div class="grid-item-left"
-                                     style="column-span: 1; width: 80%; border-right: none; position: relative;">
-                                    <span style="position: absolute; left: 0; top: 0; padding: 2px;">【同意】</span>
+                                            <t t-set="line_h" t-value="30"/>
+                                            <t t-if="each_attach.type == each_attach_type">
+                                                <t t-set="attachment_exists" t-value="1"/>
+                                                <t t-set="name_len" t-value="len(each_attach_type.name)"/>
+                                                <t t-foreach="each_attach.attachment_id" t-as="each_attach_file">
+                                                    <t t-set="name_len" t-value="name_len + len(each_attach_file.name)"/>
+                                                </t>
+                                                <t t-set="line_h" t-value="(name_len + line_words - 1) // line_words * line_height"/>
+                                            </t>
+
+                                            <t t-if="each_attach.type == each_attach_type">
+                                                <div class="grid-line" style="width: 100%; display: flex; align-items: center;" t-attf-style="height: {{line_h}}px;">
+                                                    <div class="grid-item-left" style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
+                                                        <span>
+                                                            <t t-if="each_attach.nb_attachment != 0">
+                                                                <input type="checkbox" checked="1"/>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <input type="checkbox"/>
+                                                            </t>
+
+                                                            <t t-if="'发票' in each_attach_type.name">
+                                                                <span>发票　<t t-esc="each_attach.nb_attachment"/>　张</span>
+                                                            </t>
+                                                            <t t-else="">
+                                                                <span><t t-esc="each_attach_type.name"/></span>
+                                                            </t>
+                                                            <t t-if="each_attach.nb_attachment != 0">
+                                                                <t t-set="name_len" t-value="0"/>
+                                                                <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                    <t t-set="name_len" t-value="name_len + len(each_attachment_file.name)"/>
+                                                                </t>
+                                                                <t t-set="lines_h" t-value="(name_len + 46 - 1) // 46 * 20"/>
+                                                                <span t-attf-style="height: {{line_h}}px;">
+                                                                    <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                        <t t-esc="each_attachment_file.name"/>
+                                                                    </t>
+                                                                </span>
+                                                            </t>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </t>
+                                        <t t-if="attachment_exists == 0">
+                                            <div class="grid-line" style="width: 100%; display: flex; align-items: center;" t-attf-style="height: {{line_h}}px;">
+                                                <div class="grid-item-left" style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
+                                                    <input type="checkbox"/><t t-esc="each_attach_type.name"/>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </t>
+                                    <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
+                                        <t t-set="attachment_exists" t-value="0"/>
+                                        <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
+                                            <t t-if="each_attach_type == each_attach.type">
+                                                <t t-set="attachment_exists" t-value="1"/>
+                                            </t>
+                                        </t>
+                                        <t t-if="attachment_exists == 0">
+                                            <t t-set="name_len" t-value="len(each_attach.type.name)"/>
+                                            <t t-foreach="each_attach.attachment_id" t-as="each_attach_file">
+                                                <t t-set="name_len" t-value="name_len + len(each_attach_file.name)"/>
+                                            </t>
+                                            <t t-set="line_h" t-value="(name_len + line_words - 1) // line_words * line_height"/>
+                                            <div class="grid-line" style="width: 100%; display: flex; align-items: center;" t-attf-style="height: {{line_h}}px;">
+                                                <div class="grid-item-left" style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
+                                                    <span>
+                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                            <input type="checkbox" checked="1"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <input type="checkbox"/>
+                                                        </t>
+
+                                                        <t t-if="'发票' in each_attach.type.name">
+                                                            <span>发票　<t t-esc="each_attach.nb_attachment"/>　张</span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span><t t-esc="each_attach.type.name"/></span>
+                                                        </t>
+                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                            <t t-set="name_len" t-value="0"/>
+                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                <t t-set="name_len" t-value="name_len + len(each_attachment_file.name)"/>
+                                                            </t>
+                                                            <t t-set="line_h" t-value="(name_len + line_words - 1) // line_words * line_height"/>
+                                                            <span t-attf-style="height: {{line_h}}px;">
+                                                                <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                    <t t-esc="each_attachment_file.name"/>
+                                                                </t>
+                                                            </span>
+                                                        </t>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </t>
                                 </div>
                             </div>
                         </div>
@@ -914,7 +942,7 @@
                         </div>
 
 
-                        <div class="enter_exit_form_div" style="height: 3.67%;border-bottom: 1px solid black;">
+                        <div class="enter_exit_form_div" style="height: 3.67%;border-bottom: 2px solid black;">
                             <div class="grid-line">
                                 <div class="grid-item-left" style="width: 20%;height:100%;">
                                     <div style="margin-top: 8px">
@@ -978,7 +1006,7 @@
                                                     <t t-esc="detail.approval_comments or '　'"/>
                                                 </td>
                                                 <td style="border: 1px solid black; border-right: none; padding: 5px; text-align: center; vertical-align: middle;">
-                                                    <t t-esc="detail.approval_date_time or '　'"/>
+                                                    <t t-esc="context_timestamp(detail.approval_date_time).strftime('%Y-%m-%d %H:%M:%S') or '　'"/>
                                                 </td>
                                             </tr>
                                         </t>

@@ -269,6 +269,7 @@ class FundManagement(models.Model):
             line_words = 46
             one_line_h = 30
             div_h = 0
+            record.meeting_minutes_attach_div_right_h = one_line_h
             for meeting_minute_type in record.meeting_minute_types:
                 line_h = one_line_h
                 for attachments in record.meeting_minutes_attach_link:
