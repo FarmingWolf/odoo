@@ -383,8 +383,10 @@ class SmsAli(models.Model):
                                 'tgt_ids': [overdue.apply_no_suffix]
                             }
                         else:
-                            overdue_list[employee_partner_id]['overdue_cnt'] += 1
-                            overdue_list[employee_partner_id]['tgt_ids'].append(overdue.apply_no_suffix)
+                            # 排除重复的尾号
+                            if overdue.apply_no_suffix not in overdue_list[employee_partner_id]['tgt_ids']:
+                                overdue_list[employee_partner_id]['overdue_cnt'] += 1
+                                overdue_list[employee_partner_id]['tgt_ids'].append(overdue.apply_no_suffix)
                         overdue.sms_created = True
 
                     for overdue_rcd in overdue_list:

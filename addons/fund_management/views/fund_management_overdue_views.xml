@@ -7,8 +7,13 @@
         <field name="arch" type="xml">
             <search string="Fund Management Overdue">
                 <field string="Fund Management" name="name"
-                       filter_domain="['|', '|', ('employee_id', 'ilike', self), ('name', 'ilike', self), ('category_id', 'ilike', self)]"/>
+                       filter_domain="['|', '|', '|',
+                       ('employee_id', 'ilike', self),
+                       ('name', 'ilike', self),
+                       ('apply_no', 'ilike', self),
+                       ('category_id', 'ilike', self)]"/>
                 <field name="apply_date"/>
+                <field name="receive_employee_id"/>
                 <field name="employee_id"/>
                 <filter string="My Applications" name="my_fund_management"
                         domain="[('employee_id.user_id', '=', uid)]"/>
