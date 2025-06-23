@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-20 08:07+0000\n"
-"PO-Revision-Date: 2025-06-20 08:07+0000\n"
+"POT-Creation-Date: 2025-06-22 12:07+0000\n"
+"PO-Revision-Date: 2025-06-22 12:07+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -309,7 +309,7 @@ msgstr "科目类别"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_needaction
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_needaction
 msgid "Action Needed"
-msgstr "需要的动作"
+msgstr "需应对"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_category__active
@@ -330,7 +330,7 @@ msgstr "活动"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_exception_decoration
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__activity_exception_decoration
 msgid "Activity Exception Decoration"
-msgstr "活动异常"
+msgstr "异常活动标识"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_contract_expense__activity_state
@@ -395,21 +395,21 @@ msgstr "上传时发生错误"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__analytic_distribution
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__analytic_distribution
 msgid "Analytic Distribution"
-msgstr "分配分析"
+msgstr "分析分布"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_contract_expense__analytic_distribution_search
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__analytic_distribution_search
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__analytic_distribution_search
 msgid "Analytic Distribution Search"
-msgstr "分配分析检索"
+msgstr "分析分布查询"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_contract_expense__analytic_precision
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__analytic_precision
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__analytic_precision
 msgid "Analytic Precision"
-msgstr "分析精度"
+msgstr "分析决策"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__employee_id
@@ -616,7 +616,7 @@ msgstr "附件"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_attachment_count
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_attachment_count
 msgid "Attachment Count"
-msgstr "附件数量"
+msgstr "附件数"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
@@ -730,6 +730,11 @@ msgstr "合同金额"
 #: model:ir.model,name:fund_management.model_contract_expense
 msgid "Contract Expense"
 msgstr "支出类合同"
+
+#. module: fund_management
+#: model:ir.ui.menu,name:fund_management.menu_fund_management_contract_expense
+msgid "Contract Expense"
+msgstr "合同"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__contract_expense_id
@@ -973,14 +978,14 @@ msgstr "关注者"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_partner_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_partner_ids
 msgid "Followers (Partners)"
-msgstr "关注者（合作者）"
+msgstr "关注者（合作方）"
 
 #. module: fund_management
 #: model:ir.model.fields,help:fund_management.field_contract_expense__activity_type_icon
 #: model:ir.model.fields,help:fund_management.field_fund_management__activity_type_icon
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
-msgstr "小图标，例如：任务图标"
+msgstr "Font awesome 图标 如： fa-tasks"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_search
@@ -1266,14 +1271,14 @@ msgstr "图标"
 #: model:ir.model.fields,help:fund_management.field_fund_management__activity_exception_icon
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__activity_exception_icon
 msgid "Icon to indicate an exception activity."
-msgstr "异常活动的图标"
+msgstr "异常活动图标"
 
 #. module: fund_management
 #: model:ir.model.fields,help:fund_management.field_contract_expense__message_needaction
 #: model:ir.model.fields,help:fund_management.field_fund_management__message_needaction
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__message_needaction
 msgid "If checked, new messages require your attention."
-msgstr "新消息需要您的关注"
+msgstr "勾选，则新消息需要您的关注"
 
 #. module: fund_management
 #: model:ir.model.fields,help:fund_management.field_contract_expense__message_has_error
@@ -1283,7 +1288,7 @@ msgstr "新消息需要您的关注"
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__message_has_error
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
-msgstr "一些信息有分发错误"
+msgstr "勾选，则部分消息存在分发错误"
 
 #. module: fund_management
 #. odoo-python
@@ -1312,7 +1317,7 @@ msgstr "当前用户可编辑"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_is_follower
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_is_follower
 msgid "Is Follower"
-msgstr "关注者"
+msgstr "是否关注者"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__is_multiple_currency
@@ -1541,7 +1546,7 @@ msgstr "同一大类流程阶段序号不能重复"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_calendar_event_id
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__activity_calendar_event_id
 msgid "Next Activity Calendar Event"
-msgstr "下一活动日历"
+msgstr "下一活动日历事件"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_contract_expense__activity_date_deadline
@@ -1555,7 +1560,7 @@ msgstr "下一活动截止日"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__activity_summary
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__activity_summary
 msgid "Next Activity Summary"
-msgstr "下一活动概要"
+msgstr "下一活动简介"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_contract_expense__activity_type_id
@@ -1591,7 +1596,7 @@ msgstr "备注(申请资金事由等)"
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
 msgid "Notes..."
-msgstr "请输入申请资金事由等备注……"
+msgstr "申请资金事由等备注……"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_contract_expense__message_needaction_counter
@@ -1618,14 +1623,14 @@ msgstr "错误数量"
 #: model:ir.model.fields,help:fund_management.field_fund_management__message_needaction_counter
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr "需要应对的消息数量"
+msgstr "需关注的消息数"
 
 #. module: fund_management
 #: model:ir.model.fields,help:fund_management.field_contract_expense__message_has_error_counter
 #: model:ir.model.fields,help:fund_management.field_fund_management__message_has_error_counter
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__message_has_error_counter
 msgid "Number of messages with delivery error"
-msgstr "有分发错误的消息数量"
+msgstr "有分发错误的消息数"
 
 #. module: fund_management
 #. odoo-javascript
@@ -1844,7 +1849,7 @@ msgstr "限制该阶段只能该部室中具有审批权限的岗位或职位或
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__message_has_sms_error
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__message_has_sms_error
 msgid "SMS Delivery error"
-msgstr "短信发送错误"
+msgstr "SMS分发错误"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__sms_created
@@ -1947,9 +1952,9 @@ msgid ""
 "Planned: Future activities."
 msgstr ""
 "基于活动的状态\n"
-"逾期：已过截止日期\n"
-"今日：活动日期为今日\n"
-"计划：未来的活动\n"
+"超期: 已超过期限\n"
+"今日: 活动日是今日\n"
+"计划: 未来活动。"
 
 #. module: fund_management
 #: model_terms:ir.ui.view,arch_db:fund_management.fund_management_view_form
@@ -2122,7 +2127,7 @@ msgstr "类型名称不能重复"
 #: model:ir.model.fields,help:fund_management.field_fund_management__activity_exception_decoration
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__activity_exception_decoration
 msgid "Type of the exception activity on record."
-msgstr "记录中异常活动的类型。"
+msgstr "记录中的活动异常类型"
 
 #. module: fund_management
 #. odoo-javascript
@@ -2146,14 +2151,14 @@ msgstr "查看流程全部阶段"
 #: model:ir.model.fields,field_description:fund_management.field_fund_management__website_message_ids
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_contract__website_message_ids
 msgid "Website Messages"
-msgstr "本站在线消息"
+msgstr "在线消息"
 
 #. module: fund_management
 #: model:ir.model.fields,help:fund_management.field_contract_expense__website_message_ids
 #: model:ir.model.fields,help:fund_management.field_fund_management__website_message_ids
 #: model:ir.model.fields,help:fund_management.field_fund_management_contract__website_message_ids
 msgid "Website communication history"
-msgstr "本站在线沟通记录"
+msgstr "在线沟通历史"
 
 #. module: fund_management
 #: model:ir.model.fields,field_description:fund_management.field_fund_management_overdue__receive_mobile

@@ -15,22 +15,25 @@
                             </div>
                         </div>
 
-                        <div class="enter_exit_form_div"
+                        <div class="grid-line"
                              style="height: 3.67%;border-top: none;border-right: none; border-left: none;">
-                            <div class="grid-line">
+                            <div class="d-flex" style="width:35%;">
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 5%; padding-top: 5px; border-top: none;border-right: none; border-left: none;">
-                                    <span style="margin-top: 10px;">编号:
-                                        <t t-esc="doc.apply_no or '　'"/>
-                                    </span>
+                                     style="padding-top: 5px; border-top: none; border-right: none; border-left: none;;
+                                     text-align:left;width:23%">
+                                    <span style="margin-top: 10px;">编号:</span>
                                 </div>
-
-                                <div class="grid-item-right"
-                                     style="column-span: 1; width: 25%; padding-top: 5px; border-top: none;border-right: none;">
-                                    <span style="margin-top: 10px;">发起日期:
-                                        <t t-esc="doc.date or '　'"/>
-                                    </span>
+                                <div class="grid-item-left"
+                                     style="padding-top: 5px; border-top: none; border-right: none; border-left: none;;
+                                     text-align:left;width:77%">
+                                    <t t-esc="doc.apply_no or '　'"/>
                                 </div>
+                            </div>
+                            <div class="grid-item-right"
+                                 style="column-span: 1; padding-top: 5px; border-top: none;border-right: none; text-align:right;">
+                                <span style="margin-top: 10px">发起日期:
+                                    <t t-esc="doc.date or '　'"/>
+                                </span>
                             </div>
                         </div>
 
@@ -42,7 +45,7 @@
                                     </span>
                                 </div>
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 30%;padding-top: 5px;text-align: left; padding-left: 0;border-top: none;">
+                                     style="column-span: 1; width: 20%;padding-top: 5px;text-align: left; padding-left: 0;border-top: none;">
                                     <span>
                                         <t t-esc="doc.employee_id.name or '　'"/>
                                     </span>
@@ -55,7 +58,7 @@
                                     </span>
                                 </div>
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 30%;padding-top: 5px;text-align: left; padding-left: 0;border-top: none;border-right: none;">
+                                     style="column-span: 1; width: 40%;padding-top: 5px;text-align: left; padding-left: 0;border-top: none;border-right: none;">
                                     <span>
                                         <t t-esc="doc.employee_id.department_id.name or '　'"/>
                                     </span>
@@ -97,7 +100,7 @@
                                 </div>
                                 <div class="grid-item-left"
                                      style="column-span: 1; width: 80%;padding-top: 5px;text-align: left; padding-left: 0;border-right: none;">
-                                    <span><t t-esc="doc.fund_type.name or '　'"/>
+                                    <span><t t-esc="doc.contract_expense_fund_type.name or '　'"/>
                                     </span>
                                 </div>
                             </div>
@@ -112,7 +115,7 @@
                                 </div>
                                 <div class="grid-item-left"
                                      style="column-span: 1; width: 80%;text-align: left; padding-left: 0;border-right: none;">
-                                    <span><t t-esc="doc.procurement_method.name or '　'"/>
+                                    <span><t t-esc="doc.contract_expense_procurement_method.name or '　'"/>
                                     </span>
                                 </div>
                             </div>
@@ -132,26 +135,26 @@
                                     <div class="grid-line"
                                          style="column-span: 4; width: 100%; height: 16.66%; ">
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%; padding-top:15px;border-top: none;">
-                                            <span>合同名称
-                                            </span>
+                                             style="column-span: 1; width: 25%; padding-top:15px;border-top: none;">
+                                            <span>合同编号</span>
                                         </div>
-                                        <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%;vertical-align: middle;text-align: left; padding-left: 0;border-top: none;">
-                                            <span>
-                                                <t t-esc="doc.contract_name or '　'"/>
-                                            </span>
-                                        </div>
-
-                                        <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%; padding-top:15px;border-top: none;">
-                                            <span>合同号
-                                            </span>
-                                        </div>
-                                        <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%;padding-top: 5px;text-align: left; padding-left: 0;border-top: none;border-right: none;">
+                                        <div class="grid-item-right"
+                                             style="column-span: 1; width: 75%; padding-top:15px;text-align: left; padding-left: 0;border-top: none;">
                                             <span>
                                                 <t t-esc="doc.contract_no or '　'"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="grid-line"
+                                         style="column-span: 4; width: 100%; height: 16.66%; ">
+                                        <div class="grid-item-left"
+                                             style="column-span: 1; width: 25%; padding-top:15px;">
+                                            <span>合同名称</span>
+                                        </div>
+                                        <div class="grid-item-right"
+                                             style="column-span: 1; width: 75%; padding-top:15px;text-align: left; padding-left: 0;">
+                                            <span>
+                                                <t t-esc="doc.contract_name or '　'"/>
                                             </span>
                                         </div>
                                     </div>
@@ -159,24 +162,24 @@
                                     <!-- Contract Amount and Approval Date -->
                                     <div class="grid-line" style="column-span: 4; width: 100%; height: 16.66%;">
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%; padding-top:15px;">
+                                             style="column-span: 1; width: 25%; padding-top:15px;">
                                             <span>合同总金额
                                             </span>
                                         </div>
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%;padding-top: 15px;text-align: left; padding-left: 0;">
+                                             style="column-span: 1; width: 25%;padding-top: 15px;text-align: left; padding-left: 0;">
                                             <span>
-                                                <t t-esc="doc.contract_amount or '　'"/>
+                                                <t t-esc="doc.contract_amount or 0" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
                                             </span>
                                         </div>
 
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%; padding-top:2px;">
+                                             style="column-span: 1; width: 25%; padding-top:2px;">
                                             <span>资产会日期/<br/>党委会日期
                                             </span>
                                         </div>
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%;padding-top: 5px;text-align: left; padding-left: 0;border-right: none;">
+                                             style="column-span: 1; width: 25%;padding-top: 5px;text-align: left; padding-left: 0;border-right: none;">
                                             <span>
                                             </span>
                                         </div>
@@ -186,18 +189,18 @@
                                     <!-- Payment Amount and Ratio -->
                                     <div class="grid-line" style="column-span: 4; width: 100%; height: 16.66%;">
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width:20%; padding-top: 2px;">
+                                             style="column-span: 1; width:25%; padding-top: 2px;">
                                             <span>本次申请<br/>支付金额
                                             </span>
                                         </div>
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%;padding-top: 10px;text-align: left; padding-left: 0;">
+                                             style="column-span: 1; width: 25%;padding-top: 10px;text-align: left; padding-left: 0;">
                                             <span><t t-esc="doc.total_amount_currency or 0" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
                                             </span>
                                         </div>
 
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width:20%; padding-top: 5px;">
+                                             style="column-span: 1; width:25%; padding-top: 5px;">
                                             <div>
                                                 <span>付款比例</span>
                                             </div>
@@ -206,36 +209,32 @@
                                                 </span>
                                             </div>
                                         </div>
-                                        <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%;padding-top: 10px;text-align: left; padding-left: 0;border-right: none;">
+                                        <div class="grid-item-right"
+                                             style="column-span: 1; width: 25%;padding-top: 10px;text-align: left; padding-left: 0;">
                                             <span>
                                                 <t t-esc="round(doc.total_amount_currency_percent*100, 2) or '0'"/>%　
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div class="grid-line"
-                                         style="column-span: 4; width: 100%; height: 16.66%;border-right: none;">
+                                    <div class="grid-line" style="column-span: 4; width: 100%; height: 16.66%;">
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%; padding-top: 15px;">
+                                             style="column-span: 1; width: 25%; padding-top: 15px;">
                                             <span>付款方式
                                             </span>
                                         </div>
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 70%;padding-top: 15px;text-align: left; padding-left: 0;border-right: none;">
-                                            <span><t t-esc="doc.payment_method.name or '　'"/>
+                                             style="column-span: 1; width: 25%;padding-top: 15px;text-align: left; padding-left: 0;">
+                                            <span><t t-esc="doc.contract_expense_payment_method.name or '　'"/>
                                             </span>
                                         </div>
-                                    </div>
-
-                                    <div class="grid-line" style="column-span: 4; width: 100%; height: 16.66%;">
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%; padding-top: 15px;">
+                                             style="column-span: 1; width: 25%; padding-top: 15px;">
                                             <span>科目类别
                                             </span>
                                         </div>
-                                        <div class="grid-item-left"
-                                             style="column-span: 1; width: 70%;padding-top: 15px;text-align: left; padding-left: 0;border-right: none;">
+                                        <div class="grid-item-right"
+                                             style="column-span: 1; width: 25%; padding-top: 15px;text-align: left; padding-left: 0;">
                                             <span><t t-esc="doc.account_subject_category.code"/><t t-esc="doc.account_subject_category.name or '　'"/>
                                             </span>
                                         </div>
@@ -244,24 +243,24 @@
                                     <!-- Cumulative Payment Amount -->
                                     <div class="grid-line" style="column-span: 4; width: 100%;height: 18%;">
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%; padding-top: 5px;">
+                                             style="column-span: 1; width: 25%; padding-top: 5px;">
                                             <span>本次付款后<br/>累计已付金额
                                             </span>
                                         </div>
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%;padding-top: 15px;text-align: left; padding-left: 0;">
+                                             style="column-span: 1; width: 25%;padding-top: 15px;text-align: left; padding-left: 0;">
                                             <span>
                                                 <t t-esc="doc.total_hist_include_this or 0" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
                                             </span>
                                         </div>
 
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%; padding-top: 15px;">
+                                             style="column-span: 1; width: 25%; padding-top: 15px;">
                                             <span>剩余金额
                                             </span>
                                         </div>
                                         <div class="grid-item-left"
-                                             style="column-span: 1; width: 20%;padding-top: 15px;border-right: none;text-align: left; padding-left: 0;">
+                                             style="column-span: 1; width: 25%;padding-top: 15px;border-right: none;text-align: left; padding-left: 0;">
                                             <span>
                                                 <t t-esc="(doc.contract_amount - doc.total_hist_include_this) or 0" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
                                             </span>
@@ -274,7 +273,7 @@
                         <div class="enter_exit_form_div" style="height: 11.01%;">
                             <div class="grid-line">
                                 <div class="grid-item-left" style="column-span: 1; width: 20%; padding-top: 35px;">
-                                    <span>收款单位明细</span>
+                                    <span>收款单位详情</span>
                                 </div>
                                 <div class="grid-item-right" style="column-span: 4; width: 80%;">
                                     <div style="height: 34%; margin: 0; padding: 0;">
@@ -328,8 +327,7 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="enter_exit_form_div" t-attf-style="height: {{doc.meeting_minutes_attach_div_h}}%;">
+                        <div class="enter_exit_form_div" t-attf-style="height: {{doc.meeting_minutes_attach_div_h}}px;">
                             <div class="grid-line" style="border-bottom: 2px solid black;" >
                                 <div class="grid-item-left" style="width: 20%;height:100%;">
                                     <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
@@ -340,14 +338,27 @@
                                        </div>
                                     </t>
                                 </div>
-                                <div class="grid-item-right" style="column-span: 4; width: 80%;border-top: none;">
-
+                                <div class="grid-item-right" style="column-span: 4; width: 80%;border-top: none;border-bottom: none;">
+                                    <t t-set="line_words" t-value="46"/>
+                                    <t t-set="line_height" t-value="30"/>
                                     <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
-                                        <div class="grid-line" style="width: 100%; display: flex; align-items: center;" t-attf-style="height: {{doc.meeting_minutes_attach_div_right_h}}%;">
-                                            <div class="grid-item-left" style="width: 100%; border-right: none; text-align: left; padding-top: 5px;">
-                                                <span>
-                                                    <t t-foreach="doc.meeting_minutes_attach" t-as="each_attach">
-                                                        <t t-if="each_attach.type == each_attach_type">
+                                        <t t-set="attachment_exists" t-value="0"/>
+                                        <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
+
+                                            <t t-set="line_h" t-value="30"/>
+                                            <t t-if="each_attach.type == each_attach_type">
+                                                <t t-set="attachment_exists" t-value="1"/>
+                                                <t t-set="name_len" t-value="len(each_attach_type.name)"/>
+                                                <t t-foreach="each_attach.attachment_id" t-as="each_attach_file">
+                                                    <t t-set="name_len" t-value="name_len + len(each_attach_file.name)"/>
+                                                </t>
+                                                <t t-set="line_h" t-value="(name_len + line_words - 1) // line_words * line_height"/>
+                                            </t>
+
+                                            <t t-if="each_attach.type == each_attach_type">
+                                                <div class="grid-line" style="width: 100%; display: flex; align-items: center;" t-attf-style="height: {{line_h}}px;">
+                                                    <div class="grid-item-left" style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
+                                                        <span>
                                                             <t t-if="each_attach.nb_attachment != 0">
                                                                 <input type="checkbox" checked="1"/>
                                                             </t>
@@ -362,17 +373,76 @@
                                                                 <span><t t-esc="each_attach_type.name"/></span>
                                                             </t>
                                                             <t t-if="each_attach.nb_attachment != 0">
-                                                                <t t-foreach="each_attach.attachment_ids" t-as="each_attachment_file">
+                                                                <t t-set="name_len" t-value="0"/>
+                                                                <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                    <t t-set="name_len" t-value="name_len + len(each_attachment_file.name)"/>
+                                                                </t>
+                                                                <t t-set="lines_h" t-value="(name_len + 46 - 1) // 46 * 20"/>
+                                                                <span t-attf-style="height: {{line_h}}px;">
+                                                                    <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                        <t t-esc="each_attachment_file.name"/>
+                                                                    </t>
+                                                                </span>
+                                                            </t>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </t>
+                                        <t t-if="attachment_exists == 0">
+                                            <div class="grid-line" style="width: 100%; display: flex; align-items: center;" t-attf-style="height: {{line_h}}px;">
+                                                <div class="grid-item-left" style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
+                                                    <input type="checkbox"/><t t-esc="each_attach_type.name"/>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </t>
+                                    <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
+                                        <t t-set="attachment_exists" t-value="0"/>
+                                        <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
+                                            <t t-if="each_attach_type == each_attach.type">
+                                                <t t-set="attachment_exists" t-value="1"/>
+                                            </t>
+                                        </t>
+                                        <t t-if="attachment_exists == 0">
+                                            <t t-set="name_len" t-value="len(each_attach.type.name)"/>
+                                            <t t-foreach="each_attach.attachment_id" t-as="each_attach_file">
+                                                <t t-set="name_len" t-value="name_len + len(each_attach_file.name)"/>
+                                            </t>
+                                            <t t-set="line_h" t-value="(name_len + line_words - 1) // line_words * line_height"/>
+                                            <div class="grid-line" style="width: 100%; display: flex; align-items: center;" t-attf-style="height: {{line_h}}px;">
+                                                <div class="grid-item-left" style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
+                                                    <span>
+                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                            <input type="checkbox" checked="1"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <input type="checkbox"/>
+                                                        </t>
+
+                                                        <t t-if="'发票' in each_attach.type.name">
+                                                            <span>发票　<t t-esc="each_attach.nb_attachment"/>　张</span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span><t t-esc="each_attach.type.name"/></span>
+                                                        </t>
+                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                            <t t-set="name_len" t-value="0"/>
+                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                <t t-set="name_len" t-value="name_len + len(each_attachment_file.name)"/>
+                                                            </t>
+                                                            <t t-set="line_h" t-value="(name_len + line_words - 1) // line_words * line_height"/>
+                                                            <span t-attf-style="height: {{line_h}}px;">
+                                                                <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
                                                                     <t t-esc="each_attachment_file.name"/>
                                                                 </t>
-                                                            </t>
+                                                            </span>
                                                         </t>
-                                                    </t>
-                                                </span>
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </t>
                                     </t>
-
                                 </div>
                             </div>
                         </div>
@@ -457,25 +527,27 @@
                             </div>
                         </div>
 
-                        <div class="enter_exit_form_div"
+                        <div class="grid-line"
                              style="height: 3.67%;border-top: none;border-right: none; border-left: none;">
-                            <div class="grid-line">
+                            <div class="d-flex" style="width:35%;">
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 5%; padding-top: 5px; border-top: none;border-right: none; border-left: none;">
-                                    <span style="margin-top: 10px;">编号:
-                                        <t t-esc="doc.apply_no or '　'"/>
-                                    </span>
+                                     style="padding-top: 5px; border-top: none; border-right: none; border-left: none;;
+                                     text-align:left;width:23%">
+                                    <span style="margin-top: 10px;">编号:</span>
                                 </div>
-
-                                <div class="grid-item-right"
-                                     style="column-span: 1; width: 25%; padding-top: 5px; border-top: none;border-right: none;">
-                                    <span style="margin-top: 10px;">申请日期:
-                                        <t t-esc="doc.date or '　'"/>
-                                    </span>
+                                <div class="grid-item-left"
+                                     style="padding-top: 5px; border-top: none; border-right: none; border-left: none;;
+                                     text-align:left;width:77%">
+                                    <t t-esc="doc.apply_no or '　'"/>
                                 </div>
                             </div>
+                            <div class="grid-item-right"
+                                 style="column-span: 1; padding-top: 5px; border-top: none;border-right: none; text-align:right;">
+                                <span style="margin-top: 10px">发起日期:
+                                    <t t-esc="doc.date or '　'"/>
+                                </span>
+                            </div>
                         </div>
-
                         <div class="enter_exit_form_div" style="height: 3.67%; border-top: 1px solid black;">
                             <div class="grid-line">
                                 <div class="grid-item-left"
@@ -484,7 +556,7 @@
                                     </span>
                                 </div>
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 30%;padding-top: 5px;text-align: left; padding-left: 0;">
+                                     style="column-span: 1; width: 20%;padding-top: 5px;text-align: left; padding-left: 0;">
                                     <span><t t-esc="doc.employee_id.name or '　'"/>
                                     </span>
                                 </div>
@@ -495,7 +567,7 @@
                                     </span>
                                 </div>
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 30%;padding-top: 5px;border-right: none;text-align: left; padding-left: 0;">
+                                     style="column-span: 1; width: 40%;padding-top: 5px;border-right: none;text-align: left; padding-left: 0;">
                                     <span><t t-esc="doc.employee_id.department_id.name or '　'"/>
                                     </span>
                                 </div>
@@ -535,7 +607,7 @@
                                 </div>
                                 <div class="grid-item-left"
                                      style="column-span: 1; width: 80%;padding-top: 5px;text-align: left; padding-left: 0;border-right: none;">
-                                    <span><t t-esc="doc.fund_type.name or '　'"/>
+                                    <span><t t-esc="doc.contract_expense_fund_type.name or '　'"/>
                                     </span>
                                 </div>
                             </div>
@@ -587,7 +659,7 @@
                                         </div>
                                         <div class="grid-item-left"
                                              style="column-span: 1; width: 25%;padding-top: 15px;">
-                                            <span><t t-esc="doc.payment_method.name or '　'"/>
+                                            <span><t t-esc="doc.contract_expense_payment_method.name or '　'"/>
                                             </span>
                                         </div>
                                         <div class="grid-item-left"
@@ -692,7 +764,7 @@
                                         <div class="grid-item-left"
                                              style="width: 100%; padding-top: 10px;border-right: none; text-align: left;">
                                             <span>
-                                                <t t-foreach="doc.meeting_minutes_attach" t-as="each_attach">
+                                                <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
                                                     <t t-if="'发票' in each_attach.type.name">
                                                         <t t-if="each_attach.nb_attachment != 0">
                                                             <input type="checkbox" checked="1"/>
@@ -703,7 +775,7 @@
 
                                                         <span>发票　<t t-esc="each_attach.nb_attachment"/>　张</span>
                                                         <t t-if="each_attach.nb_attachment != 0">
-                                                            <t t-foreach="each_attach.attachment_ids" t-as="each_attachment_file">
+                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
                                                                 <t t-esc="each_attachment_file.name"/>
                                                             </t>
                                                         </t>
@@ -719,7 +791,7 @@
                                         <div class="grid-item-left"
                                              style="width: 100%; padding-top: 10px;border-right: none; text-align: left;">
                                             <span>
-                                                <t t-foreach="doc.meeting_minutes_attach" t-as="each_attach">
+                                                <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
                                                     <t t-if="'企业会议纪要' in each_attach.type.name">
                                                         <t t-if="each_attach.nb_attachment != 0">
                                                             <input type="checkbox" checked="1"/>
@@ -730,7 +802,7 @@
 
                                                         <span>企业会议纪要编号　</span>
                                                         <t t-if="each_attach.nb_attachment != 0">
-                                                            <t t-foreach="each_attach.attachment_ids" t-as="each_attachment_file">
+                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
                                                                 <t t-esc="each_attachment_file.name"/>
                                                             </t>
                                                         </t>
@@ -746,7 +818,7 @@
                                         <div class="grid-item-left"
                                              style="width: 100%; padding-top: 10px;border-right: none; text-align: left;">
                                             <span>
-                                                <t t-foreach="doc.meeting_minutes_attach" t-as="each_attach">
+                                                <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
                                                     <t t-if="'乡会议纪要' in each_attach.type.name">
                                                         <t t-if="each_attach.nb_attachment != 0">
                                                             <input type="checkbox" checked="1"/>
@@ -757,7 +829,7 @@
 
                                                         <span>乡会议纪要编号　</span>
                                                         <t t-if="each_attach.nb_attachment != 0">
-                                                            <t t-foreach="each_attach.attachment_ids" t-as="each_attachment_file">
+                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
                                                                 <t t-esc="each_attachment_file.name"/>
                                                             </t>
                                                         </t>

@@ -31,6 +31,7 @@ class FundManagement(models.Model):
         prefix_str = ["FM"]
 
         fund_type_first_letter = "ZJ"
+        _logger.info(f"self.contract_expense_fund_type:{self.contract_expense_fund_type}")
         if self.contract_expense_fund_type:
             fund_type_first_letter = Utils.get_first_letter(self.contract_expense_fund_type.name)
 
@@ -51,8 +52,7 @@ class FundManagement(models.Model):
         prefix_str.append(random_number)
 
         str_ret = '-'.join(prefix_str)
-        self.apply_no = str_ret
-
+        _logger.info(f"apply_no={str_ret}")
         return str_ret
 
     apply_no = fields.Char(string="Application NO.", default=_get_default_apply_no, required=True, store=True,
@@ -62,7 +62,8 @@ class FundManagement(models.Model):
     def _onchange_contract_expense_fund_type(self):
         _logger.info(f"self.contract_expense_fund_type={self.contract_expense_fund_type}")
         if not self.apply_no:
-            self._get_default_apply_no()
+            self.apply_no = self._get_default_apply_no()
+            _logger.info(f"apply_no={self.apply_no}")
         else:
             if self.contract_expense_fund_type:
                 this_fund_type = self.contract_expense_fund_type
@@ -74,13 +75,23 @@ class FundManagement(models.Model):
             _logger.info(f"this_fund_type={this_fund_type}")
             if this_fund_type:
                 tmp_lst = self.apply_no.split('-')
-                tmp_lst[1] = Utils.get_first_letter(this_fund_type.name)
-                self.apply_no = '-'.join(tmp_lst)
+                tmp_first_letter = Utils.get_first_letter(this_fund_type.name)
+                if tmp_lst[1] != tmp_first_letter:
+                    tmp_lst[1] = tmp_first_letter
+                    self.apply_no = '-'.join(tmp_lst)
+                _logger.info(f'self.apply_no={self.apply_no}')
 
+    @api.depends('contract_expense_fund_type')
     def _compute_apply_no(self):
         for record in self:
-            if not record.apply_no:
+            apply_no = record.apply_no
+            _logger.info(f'before compute record.apply_no={apply_no}')
+            if not apply_no:
                 record.apply_no = record._get_default_apply_no()
+                _logger.info(f'record.apply_no={record.apply_no}')
+            else:
+                record.apply_no = apply_no
+            _logger.info(f'after compute record.apply_no={record.apply_no}')
 
     name = fields.Char(
         string="Description",
@@ -249,12 +260,43 @@ class FundManagement(models.Model):
     @api.depends("meeting_minutes_attach_link")
     def _compute_meeting_minutes_attach_div_h(self):
         for record in self:
-            record.meeting_minutes_attach_div_h = len(record.meeting_minute_types) * 4.56
-
-            if record.meeting_minute_types:
-                record.meeting_minutes_attach_div_right_h = 1 / len(record.meeting_minute_types) * 100
-            else:
-                record.meeting_minutes_attach_div_right_h = 33.33
+            # record.meeting_minutes_attach_div_h = len(record.meeting_minute_types) * 4.56
+            #
+            # if record.meeting_minute_types:
+            #     record.meeting_minutes_attach_div_right_h = 1 / len(record.meeting_minute_types) * 100
+            # else:
+            #     record.meeting_minutes_attach_div_right_h = 33.33
+            line_words = 46
+            one_line_h = 30
+            div_h = 0
+            for meeting_minute_type in record.meeting_minute_types:
+                line_h = one_line_h
+                for attachments in record.meeting_minutes_attach_link:
+                    if meeting_minute_type == attachments.type:
+                        name_len = len(meeting_minute_type.name)
+                        for attachment in attachments.attachment_id:
+                            name_len += len(attachment.name)
+                        # 上取整
+                        line_h = (name_len + line_words - 1) // line_words * one_line_h
+                        break
+                div_h += line_h
+            _logger.info(f"规定内附件类型行高={div_h}")
+            # 上传的附件可能不在流程规定的附件种类里
+            for attachments in record.meeting_minutes_attach_link:
+                attachments_type_exists = False
+                for meeting_minute_type in record.meeting_minute_types:
+                    if attachments.type == meeting_minute_type:
+                        attachments_type_exists = True
+                        break
+                if not attachments_type_exists:
+                    name_len = len(attachments.type.name)
+                    for attachment in attachments.attachment_id:
+                        name_len += len(attachment.name)
+                    # 上取整
+                    line_h = (name_len + line_words - 1) // line_words * one_line_h
+                    div_h += line_h
+            _logger.info(f"全部附件类型行高={div_h}")
+            record.meeting_minutes_attach_div_h = div_h
 
     @api.model
     def _get_view(self, view_id=None, view_type='form', **options):
@@ -657,20 +699,6 @@ class FundManagement(models.Model):
                 default_stage = record._get_default_stage_id()
                 record.stage = default_stage
 
-            # 不再需要插入fund.management.meeting.minutes，二通过many2many字段引用独立的会议纪要模块
-            # # 根据category中的meeting_minutes_type生成meeting_minutes的预备list
-            # for meeting_minutes_type in record.meeting_minute_types:
-            #     type_exists = False
-            #     for meeting_minutes_created in record.meeting_minutes_attach_link:
-            #         if meeting_minutes_type == meeting_minutes_created.type:
-            #             type_exists = True
-            #             break
-            #     if not type_exists:
-            #         meeting_minutes = {
-            #             "fund_management_id": record.id,
-            #             "type": meeting_minutes_type.id,
-            #         }
-            #         self.env["fund.management.meeting.minutes"].create(meeting_minutes)
         return
 
     def action_submit_fund_management(self):
@@ -1459,6 +1487,8 @@ class FundManagement(models.Model):
         rcd = super().create(vals)
 
         rcd._record_check()
+        # 根据最新数据生成apply_no
+        rcd._onchange_contract_expense_fund_type()
 
         return rcd
 
@@ -1478,6 +1508,7 @@ class FundManagement(models.Model):
 
         for record in self:
             record._record_check()
+            record._onchange_contract_expense_fund_type()
 
         return res
 

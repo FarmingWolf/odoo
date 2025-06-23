@@ -33,6 +33,10 @@
               action="attachment_meeting_minutes.meeting_minutes_type_action"
               groups="attachment_meeting_minutes.group_meeting_minutes_manager"/>
 
+    <menuitem id="menu_fund_management_contract_expense" name="Contract Expense" sequence="30"
+              parent="menu_fund_management_root" action="contract_expense.action_contract_expense_actions_applications_all"
+              groups="contract_expense.group_contract_expense_apply"/>
+
     <menuitem id="menu_fund_management_configuration" name="Configuration" parent="menu_fund_management_root"
               groups="fund_management.group_fund_management_manager" sequence="100"/>
     <menuitem id="menu_fund_management_categories" name="Fun Management Categories"
