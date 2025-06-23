@@ -331,7 +331,7 @@
                             <div class="grid-line">
                                 <div class="grid-item-left" style="width: 20%;height:100%;">
                                     <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
-                                       <div t-attf-style="height: {{doc.meeting_minutes_attach_div_right_h}}%; padding-top: 5px;">
+                                       <div t-attf-style="height: {{doc.meeting_minutes_attach_div_right_h}}px; padding-top: 5px;">
                                            <t t-if="each_attach_type_index == ((len(doc.meeting_minute_types) + 1) // 2) - 1">
                                                <span>相关材料</span>
                                            </t>
@@ -390,7 +390,7 @@
                                             </t>
                                         </t>
                                         <t t-if="attachment_exists == 0">
-                                            <div class="grid-line" style="width: 100%; display: flex; align-items: center;" t-attf-style="height: {{line_h}}px;">
+                                            <div class="grid-line" style="width: 100%; display: flex; align-items: center;" t-attf-style="height: {{line_height}}px;">
                                                 <div class="grid-item-left" style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
                                                     <input type="checkbox"/><t t-esc="each_attach_type.name"/>
                                                 </div>
@@ -796,7 +796,7 @@
                             <div class="grid-line">
                                 <div class="grid-item-left" style="width: 20%;height:100%;">
                                     <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
-                                       <div t-attf-style="height: {{doc.meeting_minutes_attach_div_right_h}}%; padding-top: 5px;">
+                                       <div t-attf-style="height: {{doc.meeting_minutes_attach_div_right_h}}px; padding-top: 5px;">
                                            <t t-if="each_attach_type_index == ((len(doc.meeting_minute_types) + 1) // 2) - 1">
                                                <span>相关材料</span>
                                            </t>
@@ -855,7 +855,7 @@
                                             </t>
                                         </t>
                                         <t t-if="attachment_exists == 0">
-                                            <div class="grid-line" style="width: 100%; display: flex; align-items: center;" t-attf-style="height: {{line_h}}px;">
+                                            <div class="grid-line" style="width: 100%; display: flex; align-items: center;" t-attf-style="height: {{line_height}}px;">
                                                 <div class="grid-item-left" style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
                                                     <input type="checkbox"/><t t-esc="each_attach_type.name"/>
                                                 </div>
