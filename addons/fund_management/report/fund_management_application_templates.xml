@@ -845,8 +845,8 @@
                         <div class="enter_exit_form_div" style="height: 7.34%;">
                             <div class="grid-line">
                                 <div class="grid-item-left" style="width: 20%; height:100%;">
-                                    <div style="margin-top: 20px">
-                                        <span>企业财务审核意见</span>
+                                    <div style="margin-top: 15px">
+                                        <span>企业财务<br/>审核意见</span>
                                     </div>
                                 </div>
                                 <div class="grid-item-left"
@@ -859,8 +859,8 @@
                         <div class="enter_exit_form_div" style="height: 7.34%;">
                             <div class="grid-line">
                                 <div class="grid-item-left" style="width: 20%;height:100%;">
-                                    <div style="margin-top: 20px">
-                                        <span>主管副总经理审核意见</span>
+                                    <div style="margin-top: 15px">
+                                        <span>主管副总经理<br/>审核意见</span>
                                     </div>
                                 </div>
                                 <div class="grid-item-left"
@@ -873,8 +873,8 @@
                         <div class="enter_exit_form_div" style="height: 7.34%;">
                             <div class="grid-line">
                                 <div class="grid-item-left" style="width: 20%;height:100%;">
-                                    <div style="margin-top: 20px">
-                                        <span>总经理审核意见</span>
+                                    <div style="margin-top: 15px">
+                                        <span>总经理<br/>审核意见</span>
                                     </div>
                                 </div>
                                 <div class="grid-item-left"
