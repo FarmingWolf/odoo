@@ -49,7 +49,11 @@
                             <field name="contract_amount" readonly="not editable"/>
                             <field name="fund_type" readonly="not editable" options="{'no_open': True}"/>
                             <field name="procurement_method" readonly="not editable" options="{'no_open': True}"/>
-                            <field name="account_subject_category" readonly="not editable" options="{'no_open': True}"/>
+                            <label for="account_subject_category"/>
+                            <div class="d-flex">
+                                <field name="account_subject_category" readonly="not editable" options="{'no_open': True}"/>
+                                <field name="account_subject_category_code" readonly="1" nolabel="1"/>
+                            </div>
                             <field name="create_uid" readonly="1" options="{'no_open': True}"/>
                             <field name="create_date" readonly="1" widget="date"/>
                         </group>

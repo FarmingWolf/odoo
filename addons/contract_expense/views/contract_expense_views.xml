@@ -191,7 +191,11 @@
                                 </div>
                                 <field name="fund_type" readonly="not editable" options="{'no_create': True, 'no_open': True}"/>
                                 <field name="procurement_method" readonly="not editable" options="{'no_create': True, 'no_open': True}"/>
-                                <field name="account_subject" readonly="not editable" options="{'no_create': True, 'no_open': True}"/>
+                                <label for="account_subject"/>
+                                <div class="d-flex">
+                                    <field name="account_subject" readonly="not editable" options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="account_subject_code" readonly="1" nolabel="1"/>
+                                </div>
                                 <field name="receiving_unit" readonly="not editable" options="{'no_create': True, 'no_open': True}"/>
                                 <field name="receiving_bank" domain="[('partner_id', '=', receiving_unit)]"
                                        options="{'no_open': True, 'no_create': True}" readonly="(not receiving_unit) or (not editable)"/>

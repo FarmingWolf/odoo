@@ -283,7 +283,11 @@
                                 <field name="contract_amount" invisible="not contract_payment" widget='monetary' readonly="1"/>
                                 <field name="contract_expense_fund_type" readonly="(not is_editable) or contract_expense_id or contract_payment" options="{'no_create': True}"/>
                                 <field name="contract_expense_procurement_method" readonly="(not is_editable) or contract_expense_id or contract_payment" options="{'no_create': True, 'no_open': True}"/>
-                                <field name="account_subject_category" readonly="(not is_editable) or contract_expense_id or contract_payment" options="{'no_create': True, 'no_open': True}"/>
+                                <label for="account_subject_category"/>
+                                <div class="d-flex">
+                                    <field name="account_subject_category" readonly="(not is_editable) or contract_expense_id or contract_payment" options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="account_subject_category_code" readonly="1" nolabel="1"/>
+                                </div>
                                 <field name="receiving_unit" readonly="(not is_editable) or contract_expense_id or contract_payment" options="{'no_create': True, 'no_open': True}"/>
                                 <field name="receiving_bank" domain="[('partner_id', '=', receiving_unit)]"
                                        options="{'no_open': True, 'no_create': True}" readonly="(not receiving_unit) or ((not is_editable) or contract_expense_id or contract_payment)"/>

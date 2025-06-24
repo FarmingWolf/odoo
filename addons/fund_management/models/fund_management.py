@@ -507,6 +507,7 @@ class FundManagement(models.Model):
         string="Account Subject Category",
         store=True, required=True,
     )
+    account_subject_category_code = fields.Char(related="account_subject_category.code")
     receiving_unit = fields.Many2one(
         comodel_name='res.partner',
         string="Receiving Unit",
