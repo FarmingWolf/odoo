@@ -35,6 +35,7 @@
 
         'report/fund_management_application_reports.xml',
         'report/fund_management_application_templates.xml',
+        'report/fund_management_application_templates_linux.xml',
 
         'data/cron_daily_sms_ali_fund_management.xml',
     ],
