@@ -3,5 +3,6 @@
     <record id="group_accounting_subject_manager" model="res.groups">
         <field name="name">会计科目设置</field>
         <field name="category_id" ref="base.module_category_accounting_accounting"/>
+        <field name="implied_ids" eval="[(4, ref('account.group_account_manager'))]"/>
     </record>
 </odoo>

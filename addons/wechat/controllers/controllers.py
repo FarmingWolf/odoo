@@ -18,6 +18,7 @@ from . import receive
 from .deepseek_controllers import deepseek_chat
 from ...web.controllers.home import Home
 # from odoo.addons.web.controllers.home import Home
+from .api_middleware import validate_token
 
 _logger = logging.getLogger(__name__)
 
@@ -196,6 +197,9 @@ class WechatHandle(Home):
                         msg = "此时应有不同于业务处理和有效性验证的业务……暂时什么也不做，返回success"
                         _logger.info(msg)
                         return "success"
+
+                return "hello, welcome!!!"
+
             elif request.httprequest.method == 'POST':
                 signature = in_data.get('signature')
                 timestamp = in_data.get('timestamp')
@@ -449,3 +453,285 @@ class WechatHandle(Home):
                     })
 
         return response
+
+    # 添加小程序登录接口
+    @http.route('/wechat/miniprogram/login', type='json', auth='none', methods=['POST'], csrf=False)
+    def miniprogram_login(self, **kw):
+        """
+        小程序登录接口
+        参数:
+            code: 小程序登录code
+            app_id: 小程序appid (可选，如不提供则使用系统配置)
+            app_secret: 小程序secret (可选，如不提供则使用系统配置)
+        """
+        try:
+            _logger.info(f"小程序登录请求: {kw}")
+            code = kw.get('code')
+            if not code:
+                return {'success': False, 'message': '缺少code参数'}
+                
+            # 获取小程序配置
+            app_id = kw.get('app_id') or request.env['ir.config_parameter'].sudo().get_param('wechat_little_pgm_app_id')
+            app_secret = kw.get('app_secret') or request.env['ir.config_parameter'].sudo().get_param('wechat_little_pgm_app_secret')
+            
+            if not app_id or not app_secret:
+                return {'success': False, 'message': '未配置小程序参数'}
+                
+            # 请求微信接口获取openid和session_key
+            url = f"https://api.weixin.qq.com/sns/jscode2session?appid={app_id}&secret={app_secret}&js_code={code}&grant_type=authorization_code"
+            res = requests.get(url)
+            res_data = res.json()
+            
+            _logger.info(f"微信小程序登录返回: {res_data}")
+            
+            if 'openid' not in res_data:
+                return {'success': False, 'message': res_data.get('errmsg', '获取openid失败')}
+                
+            open_id = res_data['openid']
+            union_id = res_data.get('unionid', '')  # 如果用户有授权，可能会返回unionid
+            session_key = res_data.get('session_key', '')
+            
+            # 查找用户
+            wx_user = get_wx_user(open_id)
+            if not wx_user and union_id:
+                # 如果有unionid但没找到openid，尝试通过unionid查找
+                wx_user = get_wx_user_by_union_id(union_id)
+                
+            # 生成自定义登录态token
+            token = hashlib.md5((open_id + str(random.random())).encode('utf-8')).hexdigest()
+            
+            # 保存会话信息
+            env = request.env
+            session_data = {
+                'token': token,
+                'open_id': open_id,
+                'session_key': session_key,
+                'union_id': union_id,
+                'create_time': odoo.fields.Datetime.now(),
+                'expire_time': odoo.fields.Datetime.to_string(
+                    odoo.fields.Datetime.from_string(odoo.fields.Datetime.now()) + 
+                    odoo.fields.timedelta(days=7)  # 设置7天有效期
+                ),
+            }
+            
+            # 存储会话信息
+            env['wechat.miniprogram.session'].sudo().create(session_data)
+            
+            result = {
+                'success': True,
+                'token': token,
+                'is_registered': bool(wx_user),
+                'user_info': {}
+            }
+            
+            # 如果用户已注册，返回用户信息
+            if wx_user:
+                user = wx_user.res_user_id
+                result['user_info'] = {
+                    'id': user.id,
+                    'name': user.name,
+                    'login': user.login,
+                    'email': user.email,
+                }
+                
+            return result
+            
+        except Exception as e:
+            _logger.error(f"小程序登录异常: {str(e)}", exc_info=True)
+            return {'success': False, 'message': f'服务器错误: {str(e)}'}
+            
+    @http.route('/wechat/miniprogram/register', type='json', auth='none', methods=['POST'], csrf=False)
+    def miniprogram_register(self, **kw):
+        """
+        小程序用户注册/绑定接口
+        参数:
+            token: 登录接口返回的token
+            login: 用户名
+            password: 密码
+        """
+        try:
+            token = kw.get('token')
+            login = kw.get('login')
+            password = kw.get('password')
+            
+            if not all([token, login, password]):
+                return {'success': False, 'message': '参数不完整'}
+                
+            # 验证token有效性
+            env = request.env
+            session = env['wechat.miniprogram.session'].sudo().search([
+                ('token', '=', token),
+                ('expire_time', '>=', odoo.fields.Datetime.now())
+            ], limit=1)
+            
+            if not session:
+                return {'success': False, 'message': '无效的token或已过期'}
+                
+            open_id = session.open_id
+            union_id = session.union_id
+            
+            # 验证用户名密码
+            try:
+                uid = request.session.authenticate(request.db, login, password)
+                if not uid:
+                    return {'success': False, 'message': '用户名或密码错误'}
+            except Exception as e:
+                return {'success': False, 'message': f'登录验证失败: {str(e)}'}
+                
+            # 获取用户
+            user = env['res.users'].sudo().browse(uid)
+            
+            # 检查是否已绑定微信
+            wx_user = get_wx_user(open_id)
+            if not wx_user:
+                # 创建新的微信用户绑定
+                str_pwd = pwd_encoded(password)
+                env['wechat.users'].sudo().create({
+                    'name': user.name,
+                    'open_id': open_id,
+                    'union_id': union_id,
+                    'res_user_id': user.id,
+                    'password': str_pwd,
+                })
+                
+            return {
+                'success': True,
+                'message': '绑定成功',
+                'user_info': {
+                    'id': user.id,
+                    'name': user.name,
+                    'login': user.login,
+                    'email': user.email,
+                }
+            }
+            
+        except Exception as e:
+            _logger.error(f"小程序注册异常: {str(e)}", exc_info=True)
+            return {'success': False, 'message': f'服务器错误: {str(e)}'}
+            
+    @http.route('/wechat/miniprogram/check_token', type='json', auth='none', methods=['POST'], csrf=False)
+    def check_token(self, **kw):
+        """
+        验证token有效性
+        参数:
+            token: 登录接口返回的token
+        """
+        try:
+            token = kw.get('token')
+            if not token:
+                return {'success': False, 'message': '缺少token参数'}
+                
+            env = request.env
+            session = env['wechat.miniprogram.session'].sudo().search([
+                ('token', '=', token),
+                ('expire_time', '>=', odoo.fields.Datetime.now())
+            ], limit=1)
+            
+            if not session:
+                return {'success': False, 'message': '无效的token或已过期'}
+                
+            open_id = session.open_id
+            wx_user = get_wx_user(open_id)
+            
+            if not wx_user:
+                return {'success': True, 'is_registered': False}
+                
+            user = wx_user.res_user_id
+            return {
+                'success': True,
+                'is_registered': True,
+                'user_info': {
+                    'id': user.id,
+                    'name': user.name,
+                    'login': user.login,
+                    'email': user.email,
+                }
+            }
+            
+        except Exception as e:
+            _logger.error(f"验证token异常: {str(e)}", exc_info=True)
+            return {'success': False, 'message': f'服务器错误: {str(e)}'}
+
+    # 添加token验证中间件
+    def _validate_miniprogram_token(self, token):
+        """验证小程序token有效性"""
+        if not token:
+            return None
+            
+        env = request.env
+        session = env['wechat.miniprogram.session'].sudo().search([
+            ('token', '=', token),
+            ('expire_time', '>=', odoo.fields.Datetime.now())
+        ], limit=1)
+        
+        if not session:
+            return None
+            
+        open_id = session.open_id
+        wx_user = get_wx_user(open_id)
+        
+        if not wx_user:
+            return None
+            
+        return wx_user
+
+    @http.route('/wechat/miniprogram/api/user_info', type='json', auth='none', methods=['POST'], csrf=False)
+    @validate_token
+    def get_user_info(self, **kw):
+        """
+        获取用户信息接口（需要token验证）
+        """
+        try:
+            # 通过中间件验证，wx_user已经在kwargs中
+            wx_user = kw.get('wx_user')
+            user = wx_user.res_user_id
+            
+            return {
+                'success': True,
+                'user_info': {
+                    'id': user.id,
+                    'name': user.name,
+                    'login': user.login,
+                    'email': user.email,
+                }
+            }
+            
+        except Exception as e:
+            _logger.error(f"获取用户信息异常: {str(e)}", exc_info=True)
+            return {'success': False, 'message': f'服务器错误: {str(e)}'}
+            
+    @http.route('/wechat/miniprogram/api/update_profile', type='json', auth='none', methods=['POST'], csrf=False)
+    @validate_token
+    def update_profile(self, **kw):
+        """
+        更新用户信息接口（需要token验证）
+        """
+        try:
+            # 通过中间件验证，wx_user已经在kwargs中
+            wx_user = kw.get('wx_user')
+            user = wx_user.res_user_id
+            
+            # 获取要更新的字段
+            update_data = {}
+            if 'name' in kw:
+                update_data['name'] = kw.get('name')
+            if 'email' in kw:
+                update_data['email'] = kw.get('email')
+                
+            if update_data:
+                user.write(update_data)
+                
+            return {
+                'success': True,
+                'message': '更新成功',
+                'user_info': {
+                    'id': user.id,
+                    'name': user.name,
+                    'login': user.login,
+                    'email': user.email,
+                }
+            }
+            
+        except Exception as e:
+            _logger.error(f"更新用户信息异常: {str(e)}", exc_info=True)
+            return {'success': False, 'message': f'服务器错误: {str(e)}'}

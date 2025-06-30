@@ -3,11 +3,11 @@
     'name': "微信",
 
     'summary': """
-        对接微信
+        对接微信公众号和小程序
     """,
 
     'description': """
-        对接微信，握手校验
+        对接微信公众号和小程序，提供登录认证、用户管理等功能
     """,
 
     'author': "北京491科技",
@@ -21,6 +21,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/webclient_templates.xml',
+        'data/ir_cron_data.xml',
     ],
     'assets': {
         'web.assets_frontend': [

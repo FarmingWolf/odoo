@@ -16,3 +16,4 @@ from . import contract_expense_payment_method
 from . import contract_expense
 from . import fund_management_contract
 from . import fund_management
+from . import hr_job

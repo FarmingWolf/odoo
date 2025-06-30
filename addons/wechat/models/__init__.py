@@ -3,3 +3,4 @@
 
 from . import wechat_login
 from . import wechat_users
+from . import wechat_miniprogram_session

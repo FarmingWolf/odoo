@@ -2,6 +2,7 @@
 import logging
 import random
 import re
+import sys
 from datetime import datetime
 
 from ...contract_expense.models.contract_expense import words_to_del
@@ -224,7 +225,7 @@ class FundManagement(models.Model):
     def _onchange_stage(self):
 
         default_list = []
-        _logger.info(f"self.stage={self.stage};self.stage.meeting_minute_types={self.stage.meeting_minute_types}")
+        _logger.info(f"_onchange_stage self.stage={self.stage};self.stage.meeting_minute_types={self.stage.meeting_minute_types}")
         for default_type in self.stage.meeting_minute_types:
             default_list.append(default_type.name_show)
 
@@ -505,25 +506,25 @@ class FundManagement(models.Model):
     account_subject_category = fields.Many2one(
         comodel_name='accounting.subject.subject',
         string="Account Subject Category",
-        store=True, required=True,
+        store=True, required=True, compute="_compute_account_subject_category"
     )
     account_subject_category_code = fields.Char(related="account_subject_category.code")
     receiving_unit = fields.Many2one(
         comodel_name='res.partner',
         string="Receiving Unit",
-        store=True, required=True,
+        store=True, required=True, compute="_compute_receiving_unit",
         domain="[('company_id', '=', company_id)]"
     )
 
     receiving_bank = fields.Many2one(
         comodel_name="res.partner.bank",
         string="Receiving Bank",
-        store=True, required=True,
+        store=True, required=True, compute="_compute_receiving_bank",
     )
     bank_account = fields.Char(
         string="Bank Account Number",
         related="receiving_bank.acc_number",
-        store=True, required=True,
+        store=True, required=True, compute="_compute_bank_account",
     )
 
     is_multiple_currency = fields.Boolean(
@@ -545,6 +546,43 @@ class FundManagement(models.Model):
         string="Historically Accumulation In Percentage including this application",
         compute='_compute_total_amt_cur_hist_accu_per_include_this', readonly=True,
     )
+
+    @api.depends('contract_expense_id')
+    def _compute_account_subject_category(self):
+        _logger.info(f"_compute_account_subject_category in ")
+        for record in self:
+            _logger.info(f"record.contract_expense_id={record.contract_expense_id}")
+            if record.contract_expense_id:
+                _logger.info(f"contract_expense_id.account_subject={record.contract_expense_id.account_subject}")
+                if not record.account_subject_category:
+                    record.account_subject_category = record.contract_expense_id.account_subject
+
+    @api.depends('contract_expense_id')
+    def _compute_receiving_unit(self):
+        _logger.info(f"_compute_receiving_unit in ")
+        for record in self:
+            if record.contract_expense_id:
+                if not record.receiving_unit:
+                    record.receiving_unit = record.contract_expense_id.receiving_unit
+
+    @api.depends('contract_expense_id')
+    def _compute_receiving_bank(self):
+        _logger.info(f"_compute_receiving_bank in ")
+        for record in self:
+            if record.contract_expense_id:
+                if not record.receiving_bank:
+                    record.receiving_bank = record.contract_expense_id.receiving_bank
+
+    @api.depends('contract_expense_id', 'receiving_bank')
+    def _compute_bank_account(self):
+        _logger.info(f"_compute_bank_account in ")
+        for record in self:
+            if record.contract_expense_id:
+                if not record.bank_account:
+                    record.bank_account = record.contract_expense_id.bank_account
+            else:
+                if not record.bank_account:
+                    record.bank_account = record.receiving_bank.acc_number
 
     @api.depends('contract_expense_id', 'contract_no', 'total_amount_currency')
     def _compute_total_amt_cur_hist_accu_include_this(self):
@@ -1437,7 +1475,7 @@ class FundManagement(models.Model):
                     if (not rcd.contract_no) or (not rcd.contract_amount) or (not rcd.contract_name):
                         raise UserError(_("Please input Contract Info!"))
                 else:
-                    self._set_contract_fields(rcd.contract_expense_id)
+                    rcd._set_contract_fields(rcd.contract_expense_id)
 
                 if rcd.total_amount_currency + rcd.total_amt_cur_hist_accu > rcd.contract_amount:
                     raise UserError(_("The current application amount plus the cumulative historical "
@@ -1486,6 +1524,9 @@ class FundManagement(models.Model):
     # ----------------------------------------
     @api.model
     def create(self, vals):
+
+        vals = self.set_readonly_fields(vals)
+
         rcd = super().create(vals)
 
         rcd._record_check()
@@ -1506,6 +1547,8 @@ class FundManagement(models.Model):
             if any(not expense.is_editable for expense in self):
                 raise UserError(_("You are not authorized to edit this fund management application."))
 
+        vals = self.set_readonly_fields(vals)
+
         res = super().write(vals)
 
         for record in self:
@@ -1523,9 +1566,15 @@ class FundManagement(models.Model):
 
     def action_print_application(self):
         if self.contract_payment:
-            tgt_action = 'fund_management.action_print_contract_payment_application'
+            if sys.platform == "win32":
+                tgt_action = 'fund_management.action_print_contract_payment_application'
+            else:
+                tgt_action = 'fund_management.action_print_contract_payment_application_linux'
         else:
-            tgt_action = 'fund_management.action_print_no_contract_payment_application'
+            if sys.platform == "win32":
+                tgt_action = 'fund_management.action_print_no_contract_payment_application'
+            else:
+                tgt_action = 'fund_management.action_print_no_contract_payment_application_linux'
 
         return self.env.ref(tgt_action).report_action(self)
 
@@ -1554,6 +1603,7 @@ class FundManagement(models.Model):
 
     # 这是老方法，且未发现被使用，新方法迁移至contract.expense
     def _create_or_update_contract(self, rcd):
+        _logger.info(f"_create_or_update_contract in")
         if rcd.contract_id:
             contracts = self.env['fund.management.contract'].search([('id', '=', rcd.contract_id.id)])
             for contract in contracts:
@@ -1602,4 +1652,25 @@ class FundManagement(models.Model):
                 "fund_management_id": rcd.id,
             }
             rcd.contract_id = self.env['fund.management.contract'].create(contract_rcd)
+
+    def set_readonly_fields(self, vals):
+        if "contract_expense_id" in vals and vals["contract_expense_id"]:
+            contract = self.env["contract.expense"].browse(vals["contract_expense_id"])
+            vals["contract_expense_fund_type"] = contract.fund_type.id
+            vals["contract_expense_procurement_method"] = contract.procurement_method.id
+            vals["account_subject_category"] = contract.account_subject.id
+            vals["receiving_unit"] = contract.receiving_unit.id
+            vals["receiving_bank"] = contract.receiving_bank.id
+            vals["bank_account"] = contract.bank_account
+            vals["contract_expense_payment_method"] = contract.payment_method.id
+        else:
+            if "bank_account" not in vals or not vals["bank_account"]:
+                if "receiving_bank" in vals and vals["receiving_bank"]:
+                    bank = self.env["res.partner.bank"].browse(vals["receiving_bank"])
+                    vals["bank_account"] = bank.acc_number
+
+        return vals
+
+
+
 

@@ -7,3 +7,4 @@ from . import handle
 from . import menu_controller
 from . import qr_controllers
 from . import deepseek_controllers
+from . import api_middleware

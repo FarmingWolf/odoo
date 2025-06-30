@@ -63,7 +63,6 @@
         'views/estate_lease_contract_bank_account_views.xml',
         'views/estate_lease_contract_heat_fee_setting_views.xml',
         'views/estate_lease_contract_party_a_unit_views.xml',
-        'views/estate_lease_contract_party_b_res_partner_views.xml',
         'views/estate_lease_contract_incentives_views.xml',
         'views/estate_lease_contract_property_rental_detail_views.xml',
         'views/estate_lease_contract_property_rental_detail_sub_views.xml',
@@ -87,6 +86,7 @@
         'views/estate_lease_contract_rental_plan_rel_views.xml',
         'views/estate_lease_contract_registration_addr_rel_views.xml',
         'views/estate_lease_contract_views.xml',
+        'views/estate_lease_contract_party_b_res_partner_views.xml',
         'views/estate_lease_contract_property_daily_status_views.xml',
         'views/estate_lease_contract_menus.xml',
 

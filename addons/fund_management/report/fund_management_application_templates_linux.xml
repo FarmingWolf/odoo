@@ -1,0 +1,971 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="contract_payment_application_linux">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <title>合同付款申请单</title>
+                <style type="text/css">
+                    body {
+                      font-family: 'FZXiaoBiaoSong-B05S', '方正小标宋简体', 'SimHei', 'WenQuanYi Zen Hei', sans-serif;
+                    }
+                </style>
+            </head>
+            <body>
+                <t t-call="web.html_container">
+                    <t t-call="web.internal_layout">
+                        <div style="width: 610px; height: 1035px;">
+                            <t t-foreach="docs" t-as="doc">
+                                <table cellspacing="0" cellpadding="0"
+                                     style="height: 6%; border-top: none;border-right: none; border-left: none;">
+                                    <tbody style="column-span: all; margin-top: 10px;">
+                                        <tr>
+                                            <td colspan="2" style="text-align:center;">
+                                                <span style="font-family: 'FZXiaoBiaoSong-B05S', '方正小标宋简体', sans-serif; font-size: 30px; font-weight: bold;">
+                                                    <t t-esc="doc.employee_id.department_id.name"/>合同资金支付审批单
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr style="font-family: 'SimSun'; border-top: none;border-right: none; border-left: none;">
+                                            <td class="grid-item-lef" style="width:35%;padding-top: 5px; border-top: none; border-right: none; border-left: none;text-align:left;">
+                                                    <span style="margin-top: 10px;">编号:
+                                                    <t t-esc="doc.apply_no or '　'"/>
+                                                </span>
+
+                                            </td>
+                                            <td class="grid-item-right"
+                                                 style="column-span: 1; padding-top: 5px; border-top: none;border-right: none; text-align:right;">
+                                                <span style="margin-top: 10px">发起日期:
+                                                    <t t-esc="doc.date or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table cellspacing="0" cellpadding="0"
+                                       style="height: 4%; width:100%; font-family: 'SimSun'; border-left: 2px solid black; border-top: 2px solid black; border-right: 2px solid black;">
+                                    <tbody>
+                                        <tr style="vertical-align: middle; text-align: center">
+                                            <td style="width: 20%; padding-top:5px; border-top: none; border-right: 1px solid black; ">
+                                                <span>发起人
+                                                </span>
+                                            </td>
+                                            <td style="width: 20%;padding-top: 5px;text-align: left; padding-left: 0; border-top: none; border-right: 1px solid black;">
+                                                <span>
+                                                    <t t-esc="doc.employee_id.name or '　'"/>
+                                                </span>
+                                            </td>
+
+
+                                            <td style="width: 20%; padding-top:5px; border-top: none; border-right: 1px solid black;">
+                                                <span>发起部门
+                                                </span>
+                                            </td>
+                                            <td style="width: 40%;padding-top: 5px;text-align: left; padding-left: 0;  border-top: none; border-right: 1px solid black; border-right: none;">
+                                                <span>
+                                                    <t t-esc="doc.employee_id.department_id.name or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table cellspacing="0" cellpadding="0"
+                                       style="height: 17%; width:100%; font-family: 'SimSun';border-left: 2px solid black; border-top: 1px solid black; border-right: 2px solid black;">
+                                    <tbody>
+                                        <tr style="height: 50%;">
+                                            <td style="width: 20%;vertical-align:middle; border-right: 1px solid black; text-align:center">
+                                                <span>申请资金事由</span>
+                                            </td>
+                                            <td style="width: 80%; vertical-align:middle;">
+                                                <span><t t-esc="doc.name"/>　</span>
+                                                <span><t t-esc="doc.description or '　'"/></span>
+                                            </td>
+                                        </tr>
+
+                                        <tr style="height: 25%;">
+                                            <td style="vertical-align:middle; border-top: 1px solid black; border-right: 1px solid black; text-align:center">
+                                                <span>资金类型
+                                                </span>
+                                            </td>
+                                            <td style="vertical-align:middle; border-top: 1px solid black; width: 80%;text-align: left; padding-left: 0;border-right: none;">
+                                                <span><t t-esc="doc.contract_expense_fund_type.name or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr style="height: 25%;">
+                                            <td style="vertical-align:middle; border-top: 1px solid black; border-right: 1px solid black; width: 20%; text-align:center;">
+                                                <span>采购方式
+                                                </span>
+                                            </td>
+                                            <td style="vertical-align:middle; border-top: 1px solid black; width: 80%;text-align: left; padding-left: 0;border-right: none;">
+                                                <span><t t-esc="doc.contract_expense_procurement_method.name or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+                                <table cellspacing="0" cellpadding="0"
+                                       style="height: 32%; width:100%; font-family: 'SimSun';
+                                       border-left: 2px solid black; border-top: 1px solid black; border-right: 2px solid black;">
+                                    <tbody>
+                                        <tr>
+                                            <td  rowspan="7" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-right: 1px solid black; border-top: none;">
+                                                <span>资金构成</span>
+                                                <br/>
+                                                <span style="margin-left: 10px">及支付情况</span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                style="width: 20%; text-align: center; vertical-align: middle; border-top: none; border-right: 1px solid black;">
+
+                                            </td>
+                                        </tr>
+                                        <tr style="height: 16.66%;">
+                                            <!-- Contract Name and Number -->
+                                            <td rowspan="1" colspan="1"
+                                                style="width: 20%; text-align: center; vertical-align: middle; border-top: none; border-right: 1px solid black;">
+                                                <span>合同编号</span>
+                                            </td>
+                                            <td rowspan="1" colspan="3"
+                                                style="width: 60%;  vertical-align: middle; text-align: left; padding-left: 0;border-top: none;">
+                                                <span>
+                                                    <t t-esc="doc.contract_no or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr style="height: 16.67%">
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>合同名称</span>
+                                            </td>
+                                            <td rowspan="1" colspan="3"
+                                                style="width: 60%;  vertical-align: middle; text-align: left; padding-left: 0;border-top: 1px solid black;">
+                                                <span>
+                                                    <t t-esc="doc.contract_name or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr style="height: 16.67%">
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>合同总金额
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: left; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>
+                                                    <t t-esc="doc.contract_amount or 0" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
+                                                </span>
+                                            </td>
+
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>资产会日期/<br/>党委会日期
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: left; vertical-align: middle; border-top: 1px solid black; ">
+                                                <span>　</span>
+                                            </td>
+                                        </tr>
+                                        <tr style="height: 16.67%">
+                                            <!-- Payment Amount and Ratio -->
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>本次申请<br/>支付金额
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: left; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span><t t-esc="doc.total_amount_currency or 0" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
+                                                </span>
+                                            </td>
+
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <div>
+                                                    <span>付款比例</span>
+                                                </div>
+                                                <div style="margin-top: 2px">
+                                                    <span style="font-size: 12px">(第<t t-esc="doc.apply_times or '0'"/>次付款)
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: left; vertical-align: middle; border-top: 1px solid black; ">
+                                                <span>
+                                                    <t t-esc="round(doc.total_amount_currency_percent*100, 2) or '0'"/>%　
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr style="height: 16.66%">
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>付款方式
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: left; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span><t t-esc="doc.contract_expense_payment_method.name or '　'"/>
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>科目类别
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: left; vertical-align: middle; border-top: 1px solid black; ">
+                                                <span><t t-esc="doc.account_subject_category.code"/><t t-esc="doc.account_subject_category.name or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr style="height: 16.67%">
+                                            <!-- Cumulative Payment Amount -->
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>本次付款后<br/>累计已付金额
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: left; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>
+                                                    <t t-esc="doc.total_hist_include_this or 0" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
+                                                </span>
+                                            </td>
+
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>剩余金额
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: left; vertical-align: middle; border-top: 1px solid black; ">
+                                                <span>
+                                                    <t t-esc="(doc.contract_amount - doc.total_hist_include_this) or 0" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table cellspacing="0" cellpadding="0"
+                                       style="height: 10%; width:100%; font-family: 'SimSun';border-left: 2px solid black; border-top: 1px solid black; border-right: 2px solid black;">
+                                    <tbody>
+                                        <tr>
+                                            <td rowspan="4" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: none; border-right: 1px solid black;">
+                                                <span>收款单位详情</span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                style="width: 20%; text-align: center; vertical-align: middle; border-top: none; border-right: 1px solid black;">
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: none; border-right: 1px solid black;">
+                                                <span>收款单位名称
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="3"
+                                                style="width: 60%;  vertical-align: middle; text-align: left; padding-left: 0;border-top: none;">
+                                                <span><t t-esc="doc.receiving_unit.name or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>开户行
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="3"
+                                                style="width: 60%;  vertical-align: middle; text-align: left; padding-left: 0;border-top: 1px solid black;">
+                                                <span><t t-esc="doc.receiving_bank.bank_id.name or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>银行账号</span>
+                                            </td>
+                                            <td rowspan="1" colspan="3"
+                                                style="width: 60%;  vertical-align: middle; text-align: left; padding-left: 0;border-top: 1px solid black;">
+                                                <span>
+                                                    <t t-esc="doc.bank_account or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table cellspacing="0" cellpadding="0"
+                                       style="width: 100%; font-family: 'SimSun'; border-left: 2px solid black; border-top: 1px solid black; border-right: 2px solid black;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 20%;height:100%; border-right: 1px solid black; border-bottom: 1px solid black; vertical-align: middle; text-align: center">
+                                                <span>相关材料</span>
+                                            </td>
+                                            <td style="width: 80%;">
+                                                <t t-set="line_words" t-value="46"/>
+                                                <t t-set="line_height" t-value="30"/>
+                                                <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
+                                                    <t t-set="attachment_exists" t-value="0"/>
+                                                    <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
+
+                                                        <t t-set="line_h" t-value="30"/>
+                                                        <t t-if="each_attach.type == each_attach_type">
+                                                            <t t-set="attachment_exists" t-value="1"/>
+                                                            <t t-set="name_len" t-value="len(each_attach_type.name)"/>
+                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attach_file">
+                                                                <t t-set="name_len" t-value="name_len + len(each_attach_file.name)"/>
+                                                            </t>
+                                                            <t t-set="line_h" t-value="(name_len + line_words - 1) // line_words * line_height"/>
+                                                        </t>
+
+                                                        <t t-if="each_attach.type == each_attach_type">
+                                                            <div style="width: 100%; display: flex; align-items: center; border-bottom: 1px solid black;">
+                                                                <div style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
+                                                                    <span>
+                                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                                            <input type="checkbox" checked="1"/>
+                                                                        </t>
+                                                                        <t t-else="">
+                                                                            <input type="checkbox"/>
+                                                                        </t>
+
+                                                                        <t t-if="'发票' in each_attach_type.name">
+                                                                            <span>发票　<t t-esc="each_attach.nb_attachment"/>　张</span>
+                                                                        </t>
+                                                                        <t t-else="">
+                                                                            <span><t t-esc="each_attach_type.name"/></span>
+                                                                        </t>
+                                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                                            <t t-set="name_len" t-value="0"/>
+                                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                                <t t-set="name_len" t-value="name_len + len(each_attachment_file.name)"/>
+                                                                            </t>
+                                                                            <t t-set="lines_h" t-value="(name_len + 46 - 1) // 46 * 20"/>
+                                                                            <span t-attf-style="height: {{line_h}}px;">
+                                                                                <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                                    <t t-esc="each_attachment_file.name"/>
+                                                                                </t>
+                                                                            </span>
+                                                                        </t>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </t>
+                                                    </t>
+                                                    <t t-if="attachment_exists == 0">
+                                                        <div style="width: 100%; display: flex; align-items: center; border-bottom: 1px solid black;">
+                                                            <div style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
+                                                                <input type="checkbox"/><t t-esc="each_attach_type.name"/>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+                                                </t>
+                                                <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
+                                                    <t t-set="attachment_exists" t-value="0"/>
+                                                    <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
+                                                        <t t-if="each_attach_type == each_attach.type">
+                                                            <t t-set="attachment_exists" t-value="1"/>
+                                                        </t>
+                                                    </t>
+                                                    <t t-if="attachment_exists == 0">
+                                                        <t t-set="name_len" t-value="len(each_attach.type.name)"/>
+                                                        <t t-foreach="each_attach.attachment_id" t-as="each_attach_file">
+                                                            <t t-set="name_len" t-value="name_len + len(each_attach_file.name)"/>
+                                                        </t>
+                                                        <t t-set="line_h" t-value="(name_len + line_words - 1) // line_words * line_height"/>
+                                                        <div style="width: 100%; display: flex; align-items: center; border-bottom: 1px solid black;">
+                                                            <div style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
+                                                                <span>
+                                                                    <t t-if="each_attach.nb_attachment != 0">
+                                                                        <input type="checkbox" checked="1"/>
+                                                                    </t>
+                                                                    <t t-else="">
+                                                                        <input type="checkbox"/>
+                                                                    </t>
+
+                                                                    <t t-if="'发票' in each_attach.type.name">
+                                                                        <span>发票　<t t-esc="each_attach.nb_attachment"/>　张</span>
+                                                                    </t>
+                                                                    <t t-else="">
+                                                                        <span><t t-esc="each_attach.type.name"/></span>
+                                                                    </t>
+                                                                    <t t-if="each_attach.nb_attachment != 0">
+                                                                        <t t-set="name_len" t-value="0"/>
+                                                                        <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                            <t t-set="name_len" t-value="name_len + len(each_attachment_file.name)"/>
+                                                                        </t>
+                                                                        <t t-set="line_h" t-value="(name_len + line_words - 1) // line_words * line_height"/>
+                                                                        <span t-attf-style="height: {{line_h}}px;">
+                                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                                <t t-esc="each_attachment_file.name"/>
+                                                                            </t>
+                                                                        </span>
+                                                                    </t>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table cellspacing="0" cellpadding="0"
+                                       style="height: 4%; width:100%; font-family: 'SimSun';border-left: 2px solid black; border-right: 2px solid black;">
+                                    <tbody>
+                                        <tr>
+                                            <!-- 支付日期 -->
+                                            <td style="width: 20%;height:100%; vertical-align:middle; border-right: 1px solid black; text-align:center">
+                                                <span>支付日期</span>
+                                            </td>
+                                            <!-- 空白区域 -->
+                                            <td style="width: 20%;height:100%; vertical-align:middle; border-right: 1px solid black; text-align:center">
+                                                <span>　</span>
+                                            </td>
+
+                                            <!-- 上传银行回单 -->
+                                            <td style="width: 30%;height:100%; vertical-align:middle; border-right: 1px solid black; text-align:center">
+                                                <span>上传银行回单</span>
+                                            </td>
+                                            <!-- 空白区域 -->
+                                            <td style="width: 30%;height:100%; vertical-align:middle; text-align:center">
+                                                <span>　</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table cellspacing="0" cellpadding="0"
+                                       style="height: 4%; width:100%; font-family: 'SimSun';border-left: 2px solid black; border-top: 1px solid black; border-right: 2px solid black; border-bottom: 2px solid black;">
+                                    <tbody>
+                                        <tr class="grid-line" style="height: 60%;">
+                                            <td style="width: 20%;height:100%; vertical-align:middle; border-right: 1px solid black; text-align:center">
+                                                <span>备注</span>
+                                            </td>
+                                            <td class="grid-item-left" style="width: 80%;border-right: none; ">
+                                                <span>　</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div style="height: auto; position: relative; border-right: none; border-left: none;">
+                                    <div style="width: 100%;">
+                                        <table style="font-family: 'FZXiaoBiaoSong-B05S'; width: 100%; page-break-before:always; border-collapse: collapse; margin: 0 auto;
+                                        border-left: 2px solid black; border-top: 2px solid black; border-right: 2px solid black; ">
+                                            <tbody>
+                                                <tr style="width: 100%; border-right: none;">
+                                                    <td style="vertical-align: middle; text-align: center; width: 100%; ">
+                                                        <span><br/>审批流程</span>
+                                                        <span><br/>　</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table style="font-family: 'SimSun'; width: 100%; border-collapse: collapse; margin: 0 auto; page-break-inside: avoid; border-left: 2px solid black; border-right: 2px solid black; border-bottom: 2px solid black;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
+                                                        审批阶段
+                                                    </th>
+                                                    <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
+                                                        审批决定
+                                                    </th>
+                                                    <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
+                                                        审批人
+                                                    </th>
+                                                    <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
+                                                        审批备注
+                                                    </th>
+                                                    <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
+                                                        审批时间
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-set="approval_details"
+                                                   t-value="doc.approval_detail_ids.sorted(key=lambda r: r.id)"/>
+                                                <t t-foreach="approval_details" t-as="detail">
+                                                    <tr>
+                                                        <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
+                                                            <t t-esc="detail.approval_stage_nm or '　'"/>
+                                                        </td>
+                                                        <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
+                                                            <t t-esc="detail.approval_decision_txt or '　'"/>
+                                                        </td>
+                                                        <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
+                                                            <t t-esc="detail.approved_by_nm or '　'"/>
+                                                        </td>
+                                                        <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
+                                                            <t t-esc="detail.approval_comments or '　'"/>
+                                                        </td>
+                                                        <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
+                                                            <t t-esc="context_timestamp(detail.approval_date_time).strftime('%Y-%m-%d %H:%M:%S') or '　'"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </t>
+            </body>
+        </html>
+    </template>
+
+    <template id="no_contract_payment_application_linux">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <title>无合同付款申请单</title>
+                <style type="text/css">
+                    body {
+                      font-family: 'FZXiaoBiaoSong-B05S', '方正小标宋简体', 'SimHei', 'WenQuanYi Zen Hei', sans-serif;
+                    }
+                </style>
+            </head>
+            <body>
+                <t t-call="web.html_container">
+                    <t t-call="web.internal_layout">
+                        <div style="width: 610px; height: 1035px;">
+                            <t t-foreach="docs" t-as="doc">
+                                <table cellspacing="0" cellpadding="0"
+                                     style="height: 6%; border-top: none;border-right: none; border-left: none;">
+                                    <tbody style="column-span: all; margin-top: 10px;">
+                                        <tr>
+                                            <td colspan="2" style="text-align:center;">
+                                                <span style="font-family: 'FZXiaoBiaoSong-B05S', '方正小标宋简体', sans-serif; font-size: 30px; font-weight: bold;">
+                                                    <t t-esc="doc.employee_id.department_id.name"/>其他资金支付审批单
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr style="font-family: 'SimSun'; border-top: none;border-right: none; border-left: none;">
+                                            <td class="grid-item-lef" style="width:35%;padding-top: 5px; border-top: none; border-right: none; border-left: none;text-align:left;">
+                                                    <span style="margin-top: 10px;">编号:
+                                                    <t t-esc="doc.apply_no or '　'"/>
+                                                </span>
+
+                                            </td>
+                                            <td class="grid-item-right"
+                                                 style="column-span: 1; padding-top: 5px; border-top: none;border-right: none; text-align:right;">
+                                                <span style="margin-top: 10px">发起日期:
+                                                    <t t-esc="doc.date or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table cellspacing="0" cellpadding="0"
+                                       style="height: 4%; width:100%; font-family: 'SimSun'; border-left: 2px solid black; border-top: 2px solid black; border-right: 2px solid black;">
+                                    <tbody>
+                                        <tr style="vertical-align: middle; text-align: center">
+                                            <td style="width: 20%; padding-top:5px; border-top: none; border-right: 1px solid black; ">
+                                                <span>申请人
+                                                </span>
+                                            </td>
+                                            <td style="width: 20%;padding-top: 5px;text-align: left; padding-left: 0; border-top: none; border-right: 1px solid black;">
+                                                <span>
+                                                    <t t-esc="doc.employee_id.name or '　'"/>
+                                                </span>
+                                            </td>
+
+
+                                            <td style="width: 20%; padding-top:5px; border-top: none; border-right: 1px solid black;">
+                                                <span>申请部门
+                                                </span>
+                                            </td>
+                                            <td style="width: 40%;padding-top: 5px;text-align: left; padding-left: 0;  border-top: none; border-right: 1px solid black; border-right: none;">
+                                                <span>
+                                                    <t t-esc="doc.employee_id.department_id.name or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table cellspacing="0" cellpadding="0"
+                                       style="height: 13%; width:100%; font-family: 'SimSun';border-left: 2px solid black; border-top: 1px solid black; border-right: 2px solid black;">
+                                    <tbody>
+                                        <tr style="height: 70%;">
+                                            <td style="width: 20%;vertical-align:middle; border-right: 1px solid black; text-align:center">
+                                                <span>申请资金事由</span>
+                                            </td>
+                                            <td style="width: 80%; vertical-align:middle;">
+                                                <span><t t-esc="doc.name or '　'"/></span>
+                                                <span><t t-esc="doc.description or '　'"/></span>
+                                            </td>
+                                        </tr>
+
+                                        <tr style="height: 30%;">
+                                            <td style="vertical-align:middle; border-top: 1px solid black; border-right: 1px solid black; text-align:center">
+                                                <span>资金类型
+                                                </span>
+                                            </td>
+                                            <td style="vertical-align:middle; border-top: 1px solid black; width: 80%;text-align: left; padding-left: 0;border-right: none;">
+                                                <span><t t-esc="doc.contract_expense_fund_type.name or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table cellspacing="0" cellpadding="0"
+                                       style="height: 20%; width:100%; font-family: 'SimSun';
+                                       border-left: 2px solid black; border-top: 1px solid black; border-right: 2px solid black;">
+                                    <tbody>
+                                        <tr>
+                                            <td  rowspan="4" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-right: 1px solid black; border-top: none;">
+                                                <span>资金构成</span>
+                                                <br/>
+                                                <span style="margin-left: 10px">及支付情况</span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                style="width: 20%; text-align: center; vertical-align: middle; border-top: none; border-right: 1px solid black;">
+
+                                            </td>
+                                        </tr>
+                                        <!-- First Row: Matter Name and Payment Amount -->
+                                        <tr style="height: 33%;">
+                                            <td rowspan="1" colspan="1"
+                                                style="width: 20%; text-align: center; vertical-align: middle; border-top: none; border-right: 1px solid black;">
+                                                <span>事项名称</span>
+                                            </td>
+                                            <td rowspan="1" colspan="3"
+                                                style="width: 60%;  vertical-align: middle; text-align: left; padding-left: 0;border-top: none;">
+                                                <span>
+                                                    <t t-esc="doc.description or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <!-- Second Row: Payment Method -->
+                                        <tr style="height: 34%">
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>付款方式
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: left; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>
+                                                    <t t-esc="doc.contract_expense_payment_method.name or '　'"/>
+                                                </span>
+                                            </td>
+
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>本次申请<br/>支付金额
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: left; vertical-align: middle; border-top: 1px solid black; ">
+                                                <span><t t-esc="doc.total_amount_currency or 0" t-options='{"widget": "monetary", "display_currency": doc.company_currency_id}'/></span>
+                                            </td>
+                                        </tr>
+                                        <!-- Third Row: Subject Category -->
+                                        <tr style="height: 33%">
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>科目类别</span>
+                                            </td>
+                                            <td rowspan="1" colspan="3"
+                                                style="width: 60%;  vertical-align: middle; text-align: left; padding-left: 0;border-top: 1px solid black;">
+                                                <span>
+                                                    <t t-esc="doc.account_subject_category.code"/><t t-esc="doc.account_subject_category.name or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table cellspacing="0" cellpadding="0"
+                                       style="height: 15%; width:100%; font-family: 'SimSun';border-left: 2px solid black; border-top: 1px solid black; border-right: 2px solid black;">
+                                    <tbody>
+                                        <tr>
+                                            <td rowspan="4" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: none; border-right: 1px solid black;">
+                                                <span>收款单位详情</span>
+                                            </td>
+                                            <td rowspan="1" colspan="1"
+                                                style="width: 20%; text-align: center; vertical-align: middle; border-top: none; border-right: 1px solid black;">
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: none; border-right: 1px solid black;">
+                                                <span>收款单位名称
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="3"
+                                                style="width: 60%;  vertical-align: middle; text-align: left; padding-left: 0;border-top: none;">
+                                                <span><t t-esc="doc.receiving_unit.name or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>开户行
+                                                </span>
+                                            </td>
+                                            <td rowspan="1" colspan="3"
+                                                style="width: 60%;  vertical-align: middle; text-align: left; padding-left: 0;border-top: 1px solid black;">
+                                                <span><t t-esc="doc.receiving_bank.bank_id.name or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td rowspan="1" colspan="1"
+                                                 style="width: 20%; text-align: center; vertical-align: middle; border-top: 1px solid black; border-right: 1px solid black;">
+                                                <span>银行账号</span>
+                                            </td>
+                                            <td rowspan="1" colspan="3"
+                                                style="width: 60%;  vertical-align: middle; text-align: left; padding-left: 0;border-top: 1px solid black;">
+                                                <span>
+                                                    <t t-esc="doc.bank_account or '　'"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table cellspacing="0" cellpadding="0"
+                                       style="width: 100%; font-family: 'SimSun'; border-left: 2px solid black; border-top: 1px solid black; border-right: 2px solid black;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 20%;height:100%; border-right: 1px solid black; border-bottom: 1px solid black; vertical-align: middle; text-align: center">
+                                                <span>相关材料</span>
+                                            </td>
+                                            <td style="width: 80%;">
+                                                <t t-set="line_words" t-value="46"/>
+                                                <t t-set="line_height" t-value="30"/>
+                                                <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
+                                                    <t t-set="attachment_exists" t-value="0"/>
+                                                    <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
+
+                                                        <t t-set="line_h" t-value="30"/>
+                                                        <t t-if="each_attach.type == each_attach_type">
+                                                            <t t-set="attachment_exists" t-value="1"/>
+                                                            <t t-set="name_len" t-value="len(each_attach_type.name)"/>
+                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attach_file">
+                                                                <t t-set="name_len" t-value="name_len + len(each_attach_file.name)"/>
+                                                            </t>
+                                                            <t t-set="line_h" t-value="(name_len + line_words - 1) // line_words * line_height"/>
+                                                        </t>
+
+                                                        <t t-if="each_attach.type == each_attach_type">
+                                                            <div style="width: 100%; display: flex; align-items: center; border-bottom: 1px solid black;">
+                                                                <div style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
+                                                                    <span>
+                                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                                            <input type="checkbox" checked="1"/>
+                                                                        </t>
+                                                                        <t t-else="">
+                                                                            <input type="checkbox"/>
+                                                                        </t>
+
+                                                                        <t t-if="'发票' in each_attach_type.name">
+                                                                            <span>发票　<t t-esc="each_attach.nb_attachment"/>　张</span>
+                                                                        </t>
+                                                                        <t t-else="">
+                                                                            <span><t t-esc="each_attach_type.name"/></span>
+                                                                        </t>
+                                                                        <t t-if="each_attach.nb_attachment != 0">
+                                                                            <t t-set="name_len" t-value="0"/>
+                                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                                <t t-set="name_len" t-value="name_len + len(each_attachment_file.name)"/>
+                                                                            </t>
+                                                                            <t t-set="lines_h" t-value="(name_len + 46 - 1) // 46 * 20"/>
+                                                                            <span t-attf-style="height: {{line_h}}px;">
+                                                                                <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                                    <t t-esc="each_attachment_file.name"/>
+                                                                                </t>
+                                                                            </span>
+                                                                        </t>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </t>
+                                                    </t>
+                                                    <t t-if="attachment_exists == 0">
+                                                        <div style="width: 100%; display: flex; align-items: center; border-bottom: 1px solid black;">
+                                                            <div style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
+                                                                <input type="checkbox"/><t t-esc="each_attach_type.name"/>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+                                                </t>
+                                                <t t-foreach="doc.meeting_minutes_attach_link" t-as="each_attach">
+                                                    <t t-set="attachment_exists" t-value="0"/>
+                                                    <t t-foreach="doc.meeting_minute_types" t-as="each_attach_type">
+                                                        <t t-if="each_attach_type == each_attach.type">
+                                                            <t t-set="attachment_exists" t-value="1"/>
+                                                        </t>
+                                                    </t>
+                                                    <t t-if="attachment_exists == 0">
+                                                        <t t-set="name_len" t-value="len(each_attach.type.name)"/>
+                                                        <t t-foreach="each_attach.attachment_id" t-as="each_attach_file">
+                                                            <t t-set="name_len" t-value="name_len + len(each_attach_file.name)"/>
+                                                        </t>
+                                                        <t t-set="line_h" t-value="(name_len + line_words - 1) // line_words * line_height"/>
+                                                        <div style="width: 100%; display: flex; align-items: center; border-bottom: 1px solid black;">
+                                                            <div style="width: 100%; border-right: none; text-align: left; padding-top: 3px;">
+                                                                <span>
+                                                                    <t t-if="each_attach.nb_attachment != 0">
+                                                                        <input type="checkbox" checked="1"/>
+                                                                    </t>
+                                                                    <t t-else="">
+                                                                        <input type="checkbox"/>
+                                                                    </t>
+
+                                                                    <t t-if="'发票' in each_attach.type.name">
+                                                                        <span>发票　<t t-esc="each_attach.nb_attachment"/>　张</span>
+                                                                    </t>
+                                                                    <t t-else="">
+                                                                        <span><t t-esc="each_attach.type.name"/></span>
+                                                                    </t>
+                                                                    <t t-if="each_attach.nb_attachment != 0">
+                                                                        <t t-set="name_len" t-value="0"/>
+                                                                        <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                            <t t-set="name_len" t-value="name_len + len(each_attachment_file.name)"/>
+                                                                        </t>
+                                                                        <t t-set="line_h" t-value="(name_len + line_words - 1) // line_words * line_height"/>
+                                                                        <span t-attf-style="height: {{line_h}}px;">
+                                                                            <t t-foreach="each_attach.attachment_id" t-as="each_attachment_file">
+                                                                                <t t-esc="each_attachment_file.name"/>
+                                                                            </t>
+                                                                        </span>
+                                                                    </t>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table cellspacing="0" cellpadding="0"
+                                       style="height: 4%; width:100%; font-family: 'SimSun';border-left: 2px solid black; border-right: 2px solid black;">
+                                    <tbody>
+                                        <tr>
+                                            <!-- 支付日期 -->
+                                            <td style="width: 20%;height:100%; vertical-align:middle; border-right: 1px solid black; text-align:center">
+                                                <span>支付日期</span>
+                                            </td>
+                                            <!-- 空白区域 -->
+                                            <td style="width: 20%;height:100%; vertical-align:middle; border-right: 1px solid black; text-align:center">
+                                                <span>　</span>
+                                            </td>
+
+                                            <!-- 上传银行回单 -->
+                                            <td style="width: 30%;height:100%; vertical-align:middle; border-right: 1px solid black; text-align:center">
+                                                <span>上传银行回单</span>
+                                            </td>
+                                            <!-- 空白区域 -->
+                                            <td style="width: 30%;height:100%; vertical-align:middle; text-align:center">
+                                                <span>　</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <table cellspacing="0" cellpadding="0"
+                                       style="height: 4%; width:100%; font-family: 'SimSun';border-left: 2px solid black; border-top: 1px solid black; border-right: 2px solid black; border-bottom: 2px solid black;">
+                                    <tbody>
+                                        <tr class="grid-line" style="height: 60%;">
+                                            <td style="width: 20%;height:100%; vertical-align:middle; border-right: 1px solid black; text-align:center">
+                                                <span>备注</span>
+                                            </td>
+                                            <td class="grid-item-left" style="width: 80%;border-right: none; ">
+                                                <span>　</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div style="height: auto; position: relative; border-right: none; border-left: none;">
+                                    <div style="width: 100%;">
+                                        <table style="font-family: 'FZXiaoBiaoSong-B05S'; width: 100%; page-break-before:always; border-collapse: collapse; margin: 0 auto;
+                                        border-left: 2px solid black; border-top: 2px solid black; border-right: 2px solid black; ">
+                                            <tbody>
+                                                <tr style="width: 100%; border-right: none;">
+                                                    <td style="vertical-align: middle; text-align: center; width: 100%; ">
+                                                        <span><br/>审批流程</span>
+                                                        <span><br/>　</span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table style="font-family: 'SimSun'; width: 100%; border-collapse: collapse; margin: 0 auto; page-break-inside: avoid; border-left: 2px solid black; border-right: 2px solid black; border-bottom: 2px solid black;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
+                                                        审批阶段
+                                                    </th>
+                                                    <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
+                                                        审批决定
+                                                    </th>
+                                                    <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
+                                                        审批人
+                                                    </th>
+                                                    <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
+                                                        审批备注
+                                                    </th>
+                                                    <th style="border: 1px solid black; padding: 5px; text-align: center; font-weight: normal; vertical-align: middle;">
+                                                        审批时间
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-set="approval_details"
+                                                   t-value="doc.approval_detail_ids.sorted(key=lambda r: r.id)"/>
+                                                <t t-foreach="approval_details" t-as="detail">
+                                                    <tr>
+                                                        <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
+                                                            <t t-esc="detail.approval_stage_nm or '　'"/>
+                                                        </td>
+                                                        <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
+                                                            <t t-esc="detail.approval_decision_txt or '　'"/>
+                                                        </td>
+                                                        <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
+                                                            <t t-esc="detail.approved_by_nm or '　'"/>
+                                                        </td>
+                                                        <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
+                                                            <t t-esc="detail.approval_comments or '　'"/>
+                                                        </td>
+                                                        <td style="border: 1px solid black; padding: 5px; text-align: center; vertical-align: middle;">
+                                                            <t t-esc="context_timestamp(detail.approval_date_time).strftime('%Y-%m-%d %H:%M:%S') or '　'"/>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </t>
+            </body>
+        </html>
+    </template>
+</odoo>
+
+

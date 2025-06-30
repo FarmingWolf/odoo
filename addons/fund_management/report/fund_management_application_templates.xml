@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="contract_payment_application">
-        <style type="text/css">
-            @import '/addons/fund_management/static/src/scss/fund_management_report.scss';
-        </style>
         <t t-call="web.html_container">
             <t t-call="web.internal_layout">
                 <div class="fm_report">
@@ -556,9 +553,6 @@
     </template>
 
     <template id="no_contract_payment_application">
-        <style type="text/css">
-            @import '/addons/fund_management/static/src/scss/fund_management_report.scss';
-        </style>
         <t t-call="web.html_container">
             <t t-call="web.internal_layout">
                 <div class="fm_report">

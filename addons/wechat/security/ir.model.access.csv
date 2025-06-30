@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 "access_wechat_users","access.wechat.users","model_wechat_users","base.group_user",1,1,1,0
 "access_wechat_login","access.wechat.login","model_wechat_login","base.group_user",1,1,1,0
+"access_wechat_miniprogram_session","wechat.miniprogram.session","model_wechat_miniprogram_session","base.group_user",1,1,1,1
+"access_wechat_miniprogram_session_public","wechat.miniprogram.session.public","model_wechat_miniprogram_session",,0,0,0,0

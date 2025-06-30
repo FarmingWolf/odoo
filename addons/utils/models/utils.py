@@ -10,7 +10,6 @@ from typing import Union, List, Dict, Optional
 from attr.validators import instance_of
 from pypinyin import lazy_pinyin, Style, pinyin
 from pyzipper import AESZipFile, zipfile, WZ_AES
-from win32verstamp import null_byte
 
 _logger = logging.getLogger(__name__)
 

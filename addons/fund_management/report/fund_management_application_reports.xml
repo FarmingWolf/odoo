@@ -40,4 +40,29 @@
         <field name="paperformat_id" ref="paperformat_fund_management_application"/>
     </record>
 
+
+    <record id="action_print_contract_payment_application_linux" model="ir.actions.report">
+        <field name="name">合同资金支付申请单</field>
+        <field name="model">fund.management</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">fund_management.contract_payment_application_linux</field>
+        <field name="report_file">fund_management.contract_payment_application_linux</field>
+        <field name="binding_model_id" eval="False"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'合同资金支付申请单'</field>
+        <field name="paperformat_id" ref="paperformat_fund_management_application"/>
+    </record>
+
+    <record id="action_print_no_contract_payment_application_linux" model="ir.actions.report">
+        <field name="name">无合同资金支付申请单</field>
+        <field name="model">fund.management</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">fund_management.no_contract_payment_application_linux</field>
+        <field name="report_file">fund_management.no_contract_payment_application_linux</field>
+        <field name="binding_model_id" eval="False"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'无合同资金支付申请单'</field>
+        <field name="paperformat_id" ref="paperformat_fund_management_application"/>
+    </record>
+
 </odoo>
