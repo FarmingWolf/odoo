@@ -34,15 +34,15 @@
                             </div>
                         </div>
 
-                        <div class="enter_exit_form_div" style="height: 3.67%; border-top: 2px solid black;">
+                        <div class="enter_exit_form_div" style="height: 4.5%; border-top: 2px solid black;">
                             <div class="grid-line">
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 20%; padding-top:5px;border-top: none;">
+                                     style="column-span: 1; width: 20%; padding-top:1%;border-top: none;">
                                     <span>发起人
                                     </span>
                                 </div>
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 20%;padding-top: 5px;text-align: left; padding-left: 0;border-top: none;">
+                                     style="column-span: 1; width: 20%;padding-top: 1%;text-align: left; padding-left: 0;border-top: none;">
                                     <span>
                                         <t t-esc="doc.employee_id.name or '　'"/>
                                     </span>
@@ -50,12 +50,12 @@
 
 
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 20%; padding-top:5px;border-top: none;">
+                                     style="column-span: 1; width: 20%; padding-top:1%;border-top: none;">
                                     <span>发起部门
                                     </span>
                                 </div>
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 40%;padding-top: 5px;text-align: left; padding-left: 0;border-top: none;border-right: none;">
+                                     style="column-span: 1; width: 40%;padding-top: 1%;text-align: left; padding-left: 0;border-top: none;border-right: none;">
                                     <span>
                                         <t t-esc="doc.employee_id.department_id.name or '　'"/>
                                     </span>
@@ -585,26 +585,26 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="enter_exit_form_div" style="height: 3.67%; border-top: 1px solid black;">
+                        <div class="enter_exit_form_div" style="height: 4.5%; border-top: 1px solid black;">
                             <div class="grid-line">
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 20%; padding-top: 5px;">
+                                     style="column-span: 1; width: 20%; padding-top: 1%;">
                                     <span style="margin-top: 10px;">申请人
                                     </span>
                                 </div>
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 20%;padding-top: 5px;text-align: left; padding-left: 0;">
+                                     style="column-span: 1; width: 20%;padding-top: 1%;text-align: left; padding-left: 0;">
                                     <span><t t-esc="doc.employee_id.name or '　'"/>
                                     </span>
                                 </div>
 
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 20%; padding-top: 5px;">
+                                     style="column-span: 1; width: 20%; padding-top: 1%;">
                                     <span style="margin-top: 10px;">申请部门
                                     </span>
                                 </div>
                                 <div class="grid-item-left"
-                                     style="column-span: 1; width: 40%;padding-top: 5px;border-right: none;text-align: left; padding-left: 0;">
+                                     style="column-span: 1; width: 40%;padding-top: 1%;border-right: none;text-align: left; padding-left: 0;">
                                     <span><t t-esc="doc.employee_id.department_id.name or '　'"/>
                                     </span>
                                 </div>
